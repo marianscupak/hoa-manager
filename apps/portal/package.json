@@ -1,32 +1,38 @@
 {
-  "name": "portal",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite --clearScreen false",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "lint": "eslint \"src/**/*.ts\""
-  },
-  "dependencies": {
-    "@hoa-mngr/ui": "workspace:*",
-    "i18next": "25.8.13",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "react-i18next": "16.5.4",
-    "react-router": "7.13.1"
-  },
-  "devDependencies": {
-    "@hoa-mngr/eslint-config": "workspace:*",
-    "@hoa-mngr/typescript-config": "workspace:*",
-    "@tailwindcss/vite": "4.2.1",
-    "@types/react": "19.2.14",
-    "@types/react-dom": "19.2.3",
-    "@vitejs/plugin-react": "5.1.4",
-    "eslint": "^8.57.0",
-    "tailwindcss": "4.2.1",
-    "typescript": "5.5.4",
-    "vite": "^7.3.1"
-  }
+    "name": "@hoa-mngr/portal",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite --clearScreen false",
+        "build": "tsc && vite build",
+        "preview": "vite preview",
+        "lint": "eslint \"src/**/*.{ts,tsx}\"",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@hoa-mngr/ui": "workspace:*",
+        "i18next": "25.8.13",
+        "react": "19.2.4",
+        "react-dom": "19.2.4",
+        "react-i18next": "16.5.4",
+        "react-router": "7.13.1"
+    },
+    "devDependencies": {
+        "@eslint/js": "10.0.1",
+        "@hoa-mngr/eslint-config": "workspace:*",
+        "@hoa-mngr/typescript-config": "workspace:*",
+        "@tailwindcss/vite": "4.2.1",
+        "@types/react": "19.2.14",
+        "@types/react-dom": "19.2.3",
+        "@vitejs/plugin-react": "5.1.4",
+        "eslint": "^10.0.2",
+        "eslint-plugin-react": "7.37.5",
+        "eslint-plugin-react-hooks": "7.0.1",
+        "eslint-plugin-react-refresh": "0.5.2",
+        "tailwindcss": "4.2.1",
+        "typescript": "5.5.4",
+        "typescript-eslint": "8.56.1",
+        "vite": "^7.3.1"
+    }
 }

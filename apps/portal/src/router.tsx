@@ -1,4 +1,5 @@
 import { createBrowserRouter } from "react-router";
+
 import { HomePage } from "@/pages/home";
 import { NotFoundPage } from "@/pages/not-found";
 

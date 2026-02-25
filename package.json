@@ -1,17 +1,22 @@
 {
-  "private": true,
-  "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
-  },
-  "devDependencies": {
-    "@hoa-mngr/eslint-config": "workspace:*",
-    "eslint": "^8.57.0",
-    "prettier": "^3.2.5",
-    "turbo": "^2.8.10"
-  },
-  "packageManager": "pnpm@8.15.6",
-  "name": "with-vite"
+    "private": true,
+    "scripts": {
+        "build": "turbo run build",
+        "typecheck": "turbo run typecheck",
+        "dev": "turbo run dev",
+        "lint": "turbo run lint",
+        "format": "prettier --write \"**/*.{ts,tsx,md,json,css,html}\"",
+        "format:check": "prettier --check \"**/*.{ts,tsx,md,json,css,html}\""
+    },
+    "devDependencies": {
+        "@eslint/js": "10.0.1",
+        "@hoa-mngr/eslint-config": "workspace:*",
+        "eslint": "^10.0.2",
+        "prettier": "^3.2.5",
+        "prettier-plugin-tailwindcss": "0.7.2",
+        "turbo": "^2.8.10",
+        "typescript-eslint": "8.56.1"
+    },
+    "packageManager": "pnpm@8.15.6",
+    "name": "hoa-manager"
 }

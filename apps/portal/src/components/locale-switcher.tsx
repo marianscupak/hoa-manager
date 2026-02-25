@@ -9,7 +9,7 @@ export function LocaleSwitcher() {
         <select
             value={i18n.language}
             onChange={(e) => i18n.changeLanguage(e.target.value)}
-            className="rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
+            className="border-border bg-background text-foreground rounded-md border px-2 py-1 text-sm"
         >
             {locales.map((tag) => (
                 <option key={tag} value={tag}>

@@ -1,7 +1,34 @@
 {
-  "eslint.workingDirectories": [
-    {
-      "mode": "auto"
+    // Format on save with Prettier as the default formatter
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    // Auto-fix ESLint issues on save
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit"
+    },
+    // ESLint: pick up per-package configs automatically
+    "eslint.workingDirectories": [
+        {
+            "mode": "auto"
+        }
+    ],
+    // TypeScript: use the workspace version of TypeScript
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "typescript.enablePromptUseWorkspaceTsdk": true,
+    // Exclude heavy directories from file watcher & explorer
+    "files.watcherExclude": {
+        "**/node_modules/**": true,
+        "**/.turbo/**": true,
+        "**/dist/**": true
+    },
+    "files.exclude": {
+        "**/node_modules": true,
+        "**/.turbo": true
+    },
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/.turbo": true,
+        "**/dist": true,
+        "**/pnpm-lock.yaml": true
     }
-  ]
 }

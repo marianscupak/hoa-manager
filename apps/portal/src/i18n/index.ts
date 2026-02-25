@@ -9,8 +9,8 @@ import enNotFound from "./locales/en/not-found";
 
 i18n.use(initReactI18next).init({
     resources: {
-        en: { home: enHome, "not-found": enNotFound },
-        cs: { home: csHome, "not-found": csNotFound },
+        en: { "home": enHome, "not-found": enNotFound },
+        cs: { "home": csHome, "not-found": csNotFound },
     },
     lng: "en",
     fallbackLng: "en",

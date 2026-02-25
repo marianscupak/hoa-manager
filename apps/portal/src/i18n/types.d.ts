@@ -10,7 +10,7 @@ declare module "i18next" {
     interface CustomTypeOptions {
         defaultNS: "home";
         resources: {
-            home: typeof enHome;
+            "home": typeof enHome;
             "not-found": typeof enNotFound;
         };
     }

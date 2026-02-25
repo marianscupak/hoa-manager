@@ -7,7 +7,7 @@ export function HomePage() {
 
     return (
         <div className="relative flex min-h-screen flex-col items-center justify-center gap-4">
-            <div className="absolute right-4 top-4">
+            <div className="absolute top-4 right-4">
                 <LocaleSwitcher />
             </div>
             <h1 className="text-4xl font-bold">{t("title")}</h1>

@@ -10,9 +10,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "App"
-        ]
+        "tags": ["App"]
       }
     },
     "/api/identity/users": {
@@ -34,9 +32,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "Identity"
-        ]
+        "tags": ["Identity"]
       }
     },
     "/api/identity/users/{id}": {
@@ -57,9 +53,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "Identity"
-        ]
+        "tags": ["Identity"]
       }
     }
   },
@@ -82,9 +76,7 @@
             "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
           }
         },
-        "required": [
-          "email"
-        ]
+        "required": ["email"]
       }
     }
   }

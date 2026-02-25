@@ -11,10 +11,9 @@ import { GetUserByIdQuery } from '../queries/get-user-by-id.query';
 export type GetUserByIdResult = { id: string; email: string };
 
 @QueryHandler(GetUserByIdQuery)
-export class GetUserByIdHandler implements IQueryHandler<
-  GetUserByIdQuery,
-  GetUserByIdResult
-> {
+export class GetUserByIdHandler
+  implements IQueryHandler<GetUserByIdQuery, GetUserByIdResult>
+{
   constructor(
     @Inject(USER_REPOSITORY) private readonly users: UserRepository,
   ) {}

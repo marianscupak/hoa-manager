@@ -1,5 +1,5 @@
-import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router";
 
 export function NotFoundPage() {
     const { t } = useTranslation("not-found");

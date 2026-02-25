@@ -5,175 +5,272 @@
  * The HOA Manager API description
  * OpenAPI spec version: 1.0
  */
-import {
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
-  DataTag,
-  DefinedInitialDataOptions,
-  DefinedUseQueryResult,
-  MutationFunction,
-  QueryClient,
-  QueryFunction,
-  QueryKey,
-  UndefinedInitialDataOptions,
-  UseMutationOptions,
-  UseMutationResult,
-  UseQueryOptions,
-  UseQueryResult
-} from '@tanstack/react-query';
+    DataTag,
+    DefinedInitialDataOptions,
+    DefinedUseQueryResult,
+    MutationFunction,
+    QueryClient,
+    QueryFunction,
+    QueryKey,
+    UndefinedInitialDataOptions,
+    UseMutationOptions,
+    UseMutationResult,
+    UseQueryOptions,
+    UseQueryResult,
+} from "@tanstack/react-query";
 
-import type {
-  CreateUserDto
-} from '.././model';
+import type { CreateUserDto } from ".././model";
 
-import { customInstance } from '../../axios';
-import type { ErrorType , BodyType } from '../../axios';
-
+import { customInstance } from "../../axios";
+import type { ErrorType, BodyType } from "../../axios";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
-
-
 export const identityControllerRegisterUser = (
     createUserDto: BodyType<CreateUserDto>,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
 ) => {
-      
-      
-      return customInstance<void>(
-      {url: `/api/identity/users`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createUserDto, signal
-    },
-      options);
-    }
-  
+    return customInstance<void>(
+        {
+            url: `/api/identity/users`,
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            data: createUserDto,
+            signal,
+        },
+        options,
+    );
+};
 
-
-export const getIdentityControllerRegisterUserMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof identityControllerRegisterUser>>, TError,{data: BodyType<CreateUserDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof identityControllerRegisterUser>>, TError,{data: BodyType<CreateUserDto>}, TContext> => {
-
-const mutationKey = ['identityControllerRegisterUser'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof identityControllerRegisterUser>>, {data: BodyType<CreateUserDto>}> = (props) => {
-          const {data} = props ?? {};
-
-          return  identityControllerRegisterUser(data,requestOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type IdentityControllerRegisterUserMutationResult = NonNullable<Awaited<ReturnType<typeof identityControllerRegisterUser>>>
-    export type IdentityControllerRegisterUserMutationBody = BodyType<CreateUserDto>
-    export type IdentityControllerRegisterUserMutationError = ErrorType<unknown>
-
-    export const useIdentityControllerRegisterUser = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof identityControllerRegisterUser>>, TError,{data: BodyType<CreateUserDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
+export const getIdentityControllerRegisterUserMutationOptions = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
         Awaited<ReturnType<typeof identityControllerRegisterUser>>,
         TError,
-        {data: BodyType<CreateUserDto>},
+        { data: BodyType<CreateUserDto> },
         TContext
-      > => {
-      return useMutation(getIdentityControllerRegisterUserMutationOptions(options), queryClient);
-    }
-    export const identityControllerGetUser = (
-    id: string,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
-      
-      
-      return customInstance<void>(
-      {url: `/api/identity/users/${id}`, method: 'GET', signal
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof identityControllerRegisterUser>>,
+    TError,
+    { data: BodyType<CreateUserDto> },
+    TContext
+> => {
+    const mutationKey = ["identityControllerRegisterUser"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof identityControllerRegisterUser>>,
+        { data: BodyType<CreateUserDto> }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return identityControllerRegisterUser(data, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type IdentityControllerRegisterUserMutationResult = NonNullable<
+    Awaited<ReturnType<typeof identityControllerRegisterUser>>
+>;
+export type IdentityControllerRegisterUserMutationBody =
+    BodyType<CreateUserDto>;
+export type IdentityControllerRegisterUserMutationError = ErrorType<unknown>;
+
+export const useIdentityControllerRegisterUser = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof identityControllerRegisterUser>>,
+            TError,
+            { data: BodyType<CreateUserDto> },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
     },
-      options);
-    }
-  
-
-
-
-export const getIdentityControllerGetUserQueryKey = (id: string,) => {
-    return [
-    `/api/identity/users/${id}`
-    ] as const;
-    }
-
-    
-export const getIdentityControllerGetUserQueryOptions = <TData = Awaited<ReturnType<typeof identityControllerGetUser>>, TError = ErrorType<unknown>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof identityControllerGetUser>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof identityControllerRegisterUser>>,
+    TError,
+    { data: BodyType<CreateUserDto> },
+    TContext
+> => {
+    return useMutation(
+        getIdentityControllerRegisterUserMutationOptions(options),
+        queryClient,
+    );
+};
+export const identityControllerGetUser = (
+    id: string,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
 ) => {
+    return customInstance<void>(
+        { url: `/api/identity/users/${id}`, method: "GET", signal },
+        options,
+    );
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getIdentityControllerGetUserQueryKey = (id: string) => {
+    return [`/api/identity/users/${id}`] as const;
+};
 
-  const queryKey =  queryOptions?.queryKey ?? getIdentityControllerGetUserQueryKey(id);
+export const getIdentityControllerGetUserQueryOptions = <
+    TData = Awaited<ReturnType<typeof identityControllerGetUser>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof identityControllerGetUser>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  
+    const queryKey =
+        queryOptions?.queryKey ?? getIdentityControllerGetUserQueryKey(id);
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof identityControllerGetUser>>> = ({ signal }) => identityControllerGetUser(id, requestOptions, signal);
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof identityControllerGetUser>>
+    > = ({ signal }) => identityControllerGetUser(id, requestOptions, signal);
 
-      
+    return {
+        queryKey,
+        queryFn,
+        enabled: !!id,
+        ...queryOptions,
+    } as UseQueryOptions<
+        Awaited<ReturnType<typeof identityControllerGetUser>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-      
+export type IdentityControllerGetUserQueryResult = NonNullable<
+    Awaited<ReturnType<typeof identityControllerGetUser>>
+>;
+export type IdentityControllerGetUserQueryError = ErrorType<unknown>;
 
-   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof identityControllerGetUser>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useIdentityControllerGetUser<
+    TData = Awaited<ReturnType<typeof identityControllerGetUser>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof identityControllerGetUser>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof identityControllerGetUser>>,
+                    TError,
+                    Awaited<ReturnType<typeof identityControllerGetUser>>
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useIdentityControllerGetUser<
+    TData = Awaited<ReturnType<typeof identityControllerGetUser>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof identityControllerGetUser>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof identityControllerGetUser>>,
+                    TError,
+                    Awaited<ReturnType<typeof identityControllerGetUser>>
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useIdentityControllerGetUser<
+    TData = Awaited<ReturnType<typeof identityControllerGetUser>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof identityControllerGetUser>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useIdentityControllerGetUser<
+    TData = Awaited<ReturnType<typeof identityControllerGetUser>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof identityControllerGetUser>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
+    const queryOptions = getIdentityControllerGetUserQueryOptions(id, options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+        TData,
+        TError
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+    return { ...query, queryKey: queryOptions.queryKey };
 }
-
-export type IdentityControllerGetUserQueryResult = NonNullable<Awaited<ReturnType<typeof identityControllerGetUser>>>
-export type IdentityControllerGetUserQueryError = ErrorType<unknown>
-
-
-export function useIdentityControllerGetUser<TData = Awaited<ReturnType<typeof identityControllerGetUser>>, TError = ErrorType<unknown>>(
- id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof identityControllerGetUser>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof identityControllerGetUser>>,
-          TError,
-          Awaited<ReturnType<typeof identityControllerGetUser>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useIdentityControllerGetUser<TData = Awaited<ReturnType<typeof identityControllerGetUser>>, TError = ErrorType<unknown>>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof identityControllerGetUser>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof identityControllerGetUser>>,
-          TError,
-          Awaited<ReturnType<typeof identityControllerGetUser>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useIdentityControllerGetUser<TData = Awaited<ReturnType<typeof identityControllerGetUser>>, TError = ErrorType<unknown>>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof identityControllerGetUser>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
-export function useIdentityControllerGetUser<TData = Awaited<ReturnType<typeof identityControllerGetUser>>, TError = ErrorType<unknown>>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof identityControllerGetUser>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getIdentityControllerGetUserQueryOptions(id,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-
-
-

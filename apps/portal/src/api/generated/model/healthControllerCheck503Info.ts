@@ -9,7 +9,9 @@
 /**
  * @nullable
  */
-export type HealthControllerCheck503Info = {[key: string]: {
-  status: string;
-  [key: string]: unknown;
- }} | null;
+export type HealthControllerCheck503Info = {
+    [key: string]: {
+        status: string;
+        [key: string]: unknown;
+    };
+} | null;

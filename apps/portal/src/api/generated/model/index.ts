@@ -6,12 +6,12 @@
  * OpenAPI spec version: 1.0
  */
 
-export * from './createUserDto';
-export * from './healthControllerCheck200';
-export * from './healthControllerCheck200Details';
-export * from './healthControllerCheck200Error';
-export * from './healthControllerCheck200Info';
-export * from './healthControllerCheck503';
-export * from './healthControllerCheck503Details';
-export * from './healthControllerCheck503Error';
-export * from './healthControllerCheck503Info';
+export * from "./createUserDto";
+export * from "./healthControllerCheck200";
+export * from "./healthControllerCheck200Details";
+export * from "./healthControllerCheck200Error";
+export * from "./healthControllerCheck200Info";
+export * from "./healthControllerCheck503";
+export * from "./healthControllerCheck503Details";
+export * from "./healthControllerCheck503Error";
+export * from "./healthControllerCheck503Info";

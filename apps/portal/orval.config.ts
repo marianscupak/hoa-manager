@@ -4,6 +4,7 @@ export default defineConfig({
     api: {
         input: "../api/openapi-spec.json",
         output: {
+            clean: true,
             mode: "tags-split",
             target: "src/api/generated/endpoints.ts",
             schemas: "src/api/generated/model",
@@ -15,6 +16,9 @@ export default defineConfig({
                     name: "customInstance",
                 },
             },
+        },
+        hooks: {
+            afterAllFilesWrite: "prettier --write",
         },
     },
 });

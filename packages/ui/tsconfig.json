@@ -1,0 +1,13 @@
+{
+  "extends": "@hoa-mngr/typescript-config/base.json",
+  "include": [
+    "."
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+  "compilerOptions": {
+    "strictNullChecks": true,
+    "jsx": "react-jsx"
+  }
+}

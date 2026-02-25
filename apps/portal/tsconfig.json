@@ -1,0 +1,18 @@
+{
+  "extends": "@hoa-mngr/typescript-config/vite.json",
+  "include": [
+    "src"
+  ],
+  "compilerOptions": {
+    "strictNullChecks": true,
+    "jsx": "react-jsx",
+    "allowJs": true,
+    "checkJs": false,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
+  }
+}

@@ -1,0 +1,23 @@
+services:
+    postgres:
+        image: postgres:17-alpine
+        restart: unless-stopped
+        env_file:
+            - .env.docker
+        ports:
+            - "${POSTGRES_PORT:-5432}:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+            - ./docker/postgres/init:/docker-entrypoint-initdb.d
+        healthcheck:
+            test:
+                [
+                    "CMD-SHELL",
+                    "pg_isready -U ${POSTGRES_USER:-hoa_manager} -d ${POSTGRES_DB:-hoa_manager}",
+                ]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+volumes:
+    postgres_data:

@@ -11,6 +11,9 @@
         },
         "lint": {},
         "format:check": {},
+        "generate": {
+            "dependsOn": ["^generate"]
+        },
         "dev": {
             "cache": false,
             "persistent": true

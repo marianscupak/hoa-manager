@@ -5,13 +5,17 @@
     "type": "module",
     "scripts": {
         "dev": "vite --clearScreen false",
+        "generate": "orval",
         "build": "tsc && vite build",
         "preview": "vite preview",
         "lint": "eslint \"src/**/*.{ts,tsx}\"",
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
+        "@hoa-mngr/api": "workspace:*",
         "@hoa-mngr/ui": "workspace:*",
+        "@tanstack/react-query": "5.90.21",
+        "axios": "1.13.5",
         "i18next": "25.8.13",
         "react": "19.2.4",
         "react-dom": "19.2.4",
@@ -30,6 +34,7 @@
         "eslint-plugin-react": "7.37.5",
         "eslint-plugin-react-hooks": "7.0.1",
         "eslint-plugin-react-refresh": "0.5.2",
+        "orval": "8.4.2",
         "tailwindcss": "4.2.1",
         "typescript": "5.5.4",
         "typescript-eslint": "8.56.1",

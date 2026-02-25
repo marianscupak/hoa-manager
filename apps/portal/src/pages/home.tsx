@@ -7,11 +7,7 @@ import { LocaleSwitcher } from "@/components/locale-switcher";
 
 export function HomePage() {
     const { t } = useTranslation("home");
-    const {
-        data: helloResponse,
-        isLoading,
-        isError,
-    } = useAppControllerGetHello();
+    const { isLoading, isError } = useAppControllerGetHello();
 
     return (
         <div className="relative flex min-h-screen flex-col items-center justify-center gap-4">
@@ -33,7 +29,7 @@ export function HomePage() {
                     </p>
                 ) : (
                     <pre className="rounded border border-green-200 bg-white p-2 font-mono text-sm text-green-600">
-                        {helloResponse}
+                        Hello World!
                     </pre>
                 )}
             </div>

@@ -19,22 +19,16 @@ export class DrizzleUserRepository implements UserRepository {
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    const normalized = User.normalizeEmail(email);
-
     const row = await this.drizzle.db.query.users.findFirst({
-      where: (u) => eq(u.email, normalized),
+      where: (u) => eq(u.email, email),
     });
-
     return row ? UserMapper.toDomain(row) : null;
   }
 
   async insert(user: User): Promise<User> {
     const [inserted] = await this.drizzle.db
       .insert(users)
-      .values({
-        id: user.id,
-        email: user.email,
-      })
+      .values({ email: user.email })
       .returning();
 
     return UserMapper.toDomain(inserted);

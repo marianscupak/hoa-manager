@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import { CreateUserDto } from './dto/create-user.dto';
-import { RegisterUserCommand } from '../application/commands/create-user.command';
+import { CreateUserCommand } from '../application/commands/create-user.command';
 import type { GetUserByIdResult } from '../application/handlers/get-user-by-id.handler';
 import { GetUserByIdQuery } from '../application/queries/get-user-by-id.query';
 
@@ -15,7 +15,7 @@ export class IdentityController {
 
   @Post()
   async registerUser(@Body() dto: CreateUserDto): Promise<{ id: string }> {
-    return this.commandBus.execute(new RegisterUserCommand(dto.email));
+    return this.commandBus.execute(new CreateUserCommand(dto.email));
   }
 
   @Get(':id')

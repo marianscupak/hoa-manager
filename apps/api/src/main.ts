@@ -4,7 +4,7 @@ import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { ZodValidationPipe, cleanupOpenApiDoc } from 'nestjs-zod';
 
 import { AppModule } from './app.module';
-import { DomainExceptionFilter } from './shared/filters/domain-exception.filter';
+import { ConfigService } from './infrastructure/config/config.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -13,11 +13,15 @@ async function bootstrap() {
 
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
 
+  const configService = app.get(ConfigService);
+
   app.setGlobalPrefix('api');
-  app.enableCors();
+  app.enableCors({
+    origin: configService.get('CORS_ORIGINS'),
+    credentials: true,
+  });
 
   app.useGlobalPipes(new ZodValidationPipe());
-  app.useGlobalFilters(new DomainExceptionFilter());
 
   const config = new DocumentBuilder()
     .setTitle('HOA Manager API')

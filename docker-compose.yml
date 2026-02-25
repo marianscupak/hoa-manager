@@ -19,5 +19,55 @@ services:
             timeout: 5s
             retries: 5
 
+    prometheus:
+        image: prom/prometheus:v3.3.0
+        restart: unless-stopped
+        ports:
+            - "${PROMETHEUS_PORT:-9090}:9090"
+        volumes:
+            - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+            - prometheus_data:/prometheus
+        command:
+            - "--config.file=/etc/prometheus/prometheus.yml"
+            - "--storage.tsdb.retention.time=7d"
+
+    loki:
+        image: grafana/loki:3.5.0
+        restart: unless-stopped
+        ports:
+            - "3200:3100"
+        volumes:
+            - ./docker/loki/loki.yml:/etc/loki/local-config.yaml:ro
+            - loki_data:/loki
+        command: -config.file=/etc/loki/local-config.yaml
+
+    promtail:
+        image: grafana/promtail:3.5.0
+        restart: unless-stopped
+        volumes:
+            - ./docker/promtail/promtail.yml:/etc/promtail/config.yml:ro
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+        command: -config.file=/etc/promtail/config.yml
+        depends_on:
+            - loki
+
+    grafana:
+        image: grafana/grafana:12.0.0
+        restart: unless-stopped
+        ports:
+            - "${GRAFANA_PORT:-3100}:3000"
+        volumes:
+            - grafana_data:/var/lib/grafana
+            - ./docker/grafana/provisioning:/etc/grafana/provisioning:ro
+        environment:
+            - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+            - GF_USERS_ALLOW_SIGN_UP=false
+        depends_on:
+            - prometheus
+            - loki
+
 volumes:
     postgres_data:
+    prometheus_data:
+    loki_data:
+    grafana_data:

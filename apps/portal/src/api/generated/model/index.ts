@@ -6,3 +6,4 @@
  * OpenAPI spec version: 1.0
  */
 
+export * from './createUserDto';

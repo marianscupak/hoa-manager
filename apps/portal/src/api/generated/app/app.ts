@@ -34,7 +34,7 @@ export const appControllerGetHello = (
 ) => {
       
       
-      return customInstance<string>(
+      return customInstance<void>(
       {url: `/api`, method: 'GET', signal
     },
       options);

@@ -2,11 +2,12 @@ import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 
+import * as schema from './schema';
 import { ConfigService } from '../config/config.service';
 
 @Injectable()
 export class DrizzleService implements OnModuleInit, OnModuleDestroy {
-  public db!: NodePgDatabase;
+  public db!: NodePgDatabase<typeof schema>;
   private pool!: Pool;
 
   constructor(private readonly configService: ConfigService) {}
@@ -16,10 +17,10 @@ export class DrizzleService implements OnModuleInit, OnModuleDestroy {
       connectionString: this.configService.get('DATABASE_URL'),
     });
 
-    this.db = drizzle(this.pool);
+    this.db = drizzle(this.pool, { schema });
   }
 
   async onModuleDestroy() {
-    await this.pool.end();
+    await this.pool?.end();
   }
 }

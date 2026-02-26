@@ -1,45 +1,45 @@
 import { randomBytes, createHash } from 'crypto';
 
-import { Injectable, Inject } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { addDays } from 'date-fns';
 
 import {
   UnauthorizedException,
   InvalidCredentialsException,
 } from '../../../../shared/application/exceptions/auth.exceptions';
-import { CLOCK } from '../../../../shared/application/ports/clock.port';
-import type { Clock } from '../../../../shared/application/ports/clock.port';
-import { UNIT_OF_WORK } from '../../../../shared/application/ports/unit-of-work.port';
-import type { UnitOfWork } from '../../../../shared/application/ports/unit-of-work.port';
-import { USER_REPOSITORY } from '../../../identity/application/ports/user.repository.port';
-import type { UserRepository } from '../../../identity/application/ports/user.repository.port';
-import { MEMBERSHIP_REPOSITORY } from '../../../tenancy/application/ports/tenant.repository.port';
-import type { MembershipRepository } from '../../../tenancy/application/ports/tenant.repository.port';
+import {
+  CLOCK,
+  type Clock,
+} from '../../../../shared/application/ports/clock.port';
+import {
+  UNIT_OF_WORK,
+  type UnitOfWork,
+} from '../../../../shared/application/ports/unit-of-work.port';
+import {
+  USER_REPOSITORY,
+  type UserRepository,
+} from '../../../identity/application/ports/user.repository.port';
+import {
+  MEMBERSHIP_REPOSITORY,
+  type MembershipRepository,
+} from '../../../tenancy/application/ports/tenant.repository.port';
+import { LoginCommand, type LoginResult } from '../commands/login.command';
 import {
   AUTH_IDENTITY_REPOSITORY,
   AUTH_SESSION_REPOSITORY,
+  type AuthIdentityRepository,
+  type AuthSessionRepository,
 } from '../ports/auth.repository.port';
-import type {
-  AuthIdentityRepository,
-  AuthSessionRepository,
-} from '../ports/auth.repository.port';
-import { PASSWORD_HASHER, TOKEN_SIGNER } from '../ports/auth.utils.port';
-import type { PasswordHasher, TokenSigner } from '../ports/auth.utils.port';
+import {
+  PASSWORD_HASHER,
+  TOKEN_SIGNER,
+  type PasswordHasher,
+  type TokenSigner,
+} from '../ports/auth.utils.port';
 
-export interface LoginCommand {
-  email: string;
-  password?: string;
-  provider: 'LOCAL' | 'OIDC_GOOGLE';
-  providerSubject?: string;
-}
-
-export interface LoginResult {
-  accessToken: string;
-  refreshToken: string;
-}
-
-@Injectable()
-export class LoginUseCase {
+@CommandHandler(LoginCommand)
+export class LoginHandler implements ICommandHandler<LoginCommand> {
   constructor(
     @Inject(UNIT_OF_WORK) private readonly uow: UnitOfWork,
     @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,

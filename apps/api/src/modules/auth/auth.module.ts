@@ -1,10 +1,15 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { CqrsModule } from '@nestjs/cqrs';
 import { JwtModule } from '@nestjs/jwt';
 
 import { IdentityModule } from '../identity/identity.module';
 import { TenancyModule } from '../tenancy/tenancy.module';
 import { AuthController } from './api/auth.controller';
+import { LoginHandler } from './application/handlers/login.handler';
+import { LogoutHandler } from './application/handlers/logout.handler';
+import { RefreshTokenHandler } from './application/handlers/refresh-token.handler';
+import { SwitchTenantHandler } from './application/handlers/switch-tenant.handler';
 import {
   AUTH_IDENTITY_REPOSITORY,
   AUTH_SESSION_REPOSITORY,
@@ -14,10 +19,6 @@ import {
   TOKEN_SIGNER,
   TOKEN_VERIFIER,
 } from './application/ports/auth.utils.port';
-import { LoginUseCase } from './application/use-cases/login.use-case';
-import { LogoutUseCase } from './application/use-cases/logout.use-case';
-import { RefreshTokenUseCase } from './application/use-cases/refresh-token.use-case';
-import { SwitchTenantUseCase } from './application/use-cases/switch-tenant.use-case';
 import { BcryptPasswordHasher } from './infrastructure/bcrypt-password-hasher';
 import { JwtTokenService } from './infrastructure/jwt-token.service';
 import {
@@ -27,6 +28,7 @@ import {
 
 @Module({
   imports: [
+    CqrsModule,
     TenancyModule,
     IdentityModule,
     JwtModule.registerAsync({
@@ -53,10 +55,10 @@ import {
     { provide: PASSWORD_HASHER, useClass: BcryptPasswordHasher },
     { provide: TOKEN_SIGNER, useClass: JwtTokenService },
     { provide: TOKEN_VERIFIER, useClass: JwtTokenService },
-    LoginUseCase,
-    LogoutUseCase,
-    RefreshTokenUseCase,
-    SwitchTenantUseCase,
+    LoginHandler,
+    LogoutHandler,
+    RefreshTokenHandler,
+    SwitchTenantHandler,
   ],
   exports: [TOKEN_VERIFIER],
 })

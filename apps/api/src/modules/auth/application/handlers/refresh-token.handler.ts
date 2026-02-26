@@ -1,6 +1,7 @@
 import { randomBytes, createHash } from 'crypto';
 
-import { Injectable, Inject } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { addDays, differenceInMilliseconds } from 'date-fns';
 
 import {
@@ -8,31 +9,39 @@ import {
   ReplayAttackException,
   UnauthorizedException,
 } from '../../../../shared/application/exceptions/auth.exceptions';
-import { CLOCK } from '../../../../shared/application/ports/clock.port';
-import type { Clock } from '../../../../shared/application/ports/clock.port';
-import { UNIT_OF_WORK } from '../../../../shared/application/ports/unit-of-work.port';
-import type { UnitOfWork } from '../../../../shared/application/ports/unit-of-work.port';
+import {
+  CLOCK,
+  type Clock,
+} from '../../../../shared/application/ports/clock.port';
+import {
+  UNIT_OF_WORK,
+  type UnitOfWork,
+} from '../../../../shared/application/ports/unit-of-work.port';
 import { AuthClaims } from '../../../../shared/domain/auth-claims';
-import { MEMBERSHIP_REPOSITORY } from '../../../tenancy/application/ports/tenant.repository.port';
-import type { MembershipRepository } from '../../../tenancy/application/ports/tenant.repository.port';
+import {
+  MEMBERSHIP_REPOSITORY,
+  type MembershipRepository,
+} from '../../../tenancy/application/ports/tenant.repository.port';
 import { AuthSession } from '../../domain/auth-identity.entity';
-import { AUTH_SESSION_REPOSITORY } from '../ports/auth.repository.port';
-import type { AuthSessionRepository } from '../ports/auth.repository.port';
-import { TOKEN_SIGNER, TOKEN_VERIFIER } from '../ports/auth.utils.port';
-import type { TokenSigner, TokenVerifier } from '../ports/auth.utils.port';
+import {
+  RefreshTokenCommand,
+  type RefreshTokenResult,
+} from '../commands/refresh-token.command';
+import {
+  AUTH_SESSION_REPOSITORY,
+  type AuthSessionRepository,
+} from '../ports/auth.repository.port';
+import {
+  TOKEN_SIGNER,
+  TOKEN_VERIFIER,
+  type TokenSigner,
+  type TokenVerifier,
+} from '../ports/auth.utils.port';
 
-export interface RefreshTokenCommand {
-  refreshToken: string;
-  oldAccessToken: string;
-}
-
-export interface RefreshTokenResult {
-  accessToken: string;
-  refreshToken: string;
-}
-
-@Injectable()
-export class RefreshTokenUseCase {
+@CommandHandler(RefreshTokenCommand)
+export class RefreshTokenHandler
+  implements ICommandHandler<RefreshTokenCommand>
+{
   private readonly REUSE_GRACE_PERIOD_MS = 30 * 1000;
 
   constructor(

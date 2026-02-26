@@ -5,27 +5,33 @@ import importX from "eslint-plugin-import-x";
 export const baseConfig = tseslint.config({
     files: ["**/*.{ts,tsx}"],
     extends: [
-        js.configs.recommended, 
+        js.configs.recommended,
         ...tseslint.configs.recommended,
         importX.flatConfigs.recommended,
-        importX.flatConfigs.typescript
+        importX.flatConfigs.typescript,
     ],
     languageOptions: {
         ecmaVersion: 2020,
         sourceType: "module",
+    },
+    settings: {
+        "import-x/resolver": {
+            typescript: true,
+            node: true,
+        },
     },
     rules: {
         "@typescript-eslint/no-non-null-assertion": "off",
         "import-x/order": [
             "warn",
             {
-                groups: [
+                "groups": [
                     "builtin",
                     "external",
                     "internal",
                     ["parent", "sibling", "index"],
                 ],
-                pathGroups: [
+                "pathGroups": [
                     {
                         pattern: "@hoa-mngr/**",
                         group: "internal",
@@ -37,9 +43,9 @@ export const baseConfig = tseslint.config({
                         position: "after",
                     },
                 ],
-                pathGroupsExcludedImportTypes: ["builtin"],
+                "pathGroupsExcludedImportTypes": ["builtin"],
                 "newlines-between": "always",
-                alphabetize: {
+                "alphabetize": {
                     order: "asc",
                     caseInsensitive: true,
                 },

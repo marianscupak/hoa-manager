@@ -7,7 +7,6 @@ import { AuthProvider } from "@/providers/auth-provider";
 import { router } from "@/router";
 import "@/i18n";
 import "./index.css";
-
 import "@/api/axios";
 
 const queryClient = new QueryClient();

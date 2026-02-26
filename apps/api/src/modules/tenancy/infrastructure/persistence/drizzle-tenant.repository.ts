@@ -10,6 +10,7 @@ import {
 import {
   TenantRepository,
   MembershipRepository,
+  type TenantWithMembership,
 } from '../../application/ports/tenant.repository.port';
 import { Tenant, TenantMembership } from '../../domain/tenant.entity';
 
@@ -62,6 +63,23 @@ export class DrizzleMembershipRepository implements MembershipRepository {
       ),
     });
     return row ?? null;
+  }
+
+  async findTenantsWithMembership(
+    userId: string,
+  ): Promise<TenantWithMembership[]> {
+    const rows = await this.db
+      .select({
+        tenantId: tenants.id,
+        tenantName: tenants.name,
+        role: tenantMemberships.role,
+        status: tenantMemberships.status,
+      })
+      .from(tenantMemberships)
+      .innerJoin(tenants, eq(tenants.id, tenantMemberships.tenantId))
+      .where(eq(tenantMemberships.userId, userId));
+
+    return rows;
   }
 
   async create(

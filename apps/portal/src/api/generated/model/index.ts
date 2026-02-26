@@ -20,4 +20,7 @@ export * from "./healthControllerCheck503Info";
 export * from "./loginDto";
 export * from "./successResponseDto";
 export * from "./switchTenantDto";
+export * from "./tenantResponseDto";
+export * from "./tenantResponseDtoRole";
+export * from "./tenantResponseDtoStatus";
 export * from "./userResponseDto";

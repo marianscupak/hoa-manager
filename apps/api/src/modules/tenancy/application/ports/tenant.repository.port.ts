@@ -7,12 +7,20 @@ export interface TenantRepository {
 
 export const TENANT_REPOSITORY = Symbol('TENANT_REPOSITORY');
 
+export interface TenantWithMembership {
+  tenantId: string;
+  tenantName: string;
+  role: TenantMembership['role'];
+  status: TenantMembership['status'];
+}
+
 export interface MembershipRepository {
   findByUserId(userId: string): Promise<TenantMembership[]>;
   findByTenantAndUser(
     tenantId: string,
     userId: string,
   ): Promise<TenantMembership | null>;
+  findTenantsWithMembership(userId: string): Promise<TenantWithMembership[]>;
   create(
     membership: Omit<
       TenantMembership,

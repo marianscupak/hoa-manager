@@ -23,9 +23,3 @@ export interface TokenVerifier {
 }
 
 export const TOKEN_VERIFIER = Symbol('TOKEN_VERIFIER');
-
-export interface Clock {
-  now(): Date;
-}
-
-export const CLOCK = Symbol('CLOCK');

@@ -10,7 +10,6 @@ import {
   AUTH_SESSION_REPOSITORY,
 } from './application/ports/auth.repository.port';
 import {
-  CLOCK,
   PASSWORD_HASHER,
   TOKEN_SIGNER,
   TOKEN_VERIFIER,
@@ -25,7 +24,6 @@ import {
   DrizzleAuthIdentityRepository,
   DrizzleAuthSessionRepository,
 } from './infrastructure/persistence/drizzle-auth.repository';
-import { SystemClock } from './infrastructure/system-clock';
 
 @Module({
   imports: [
@@ -55,7 +53,6 @@ import { SystemClock } from './infrastructure/system-clock';
     { provide: PASSWORD_HASHER, useClass: BcryptPasswordHasher },
     { provide: TOKEN_SIGNER, useClass: JwtTokenService },
     { provide: TOKEN_VERIFIER, useClass: JwtTokenService },
-    { provide: CLOCK, useClass: SystemClock },
     LoginUseCase,
     LogoutUseCase,
     RefreshTokenUseCase,

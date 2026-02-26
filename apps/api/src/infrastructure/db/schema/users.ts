@@ -6,8 +6,10 @@ export const users = pgTable('users', {
   fullName: text('full_name').notNull(),
   isEmailVerified: boolean('is_email_verified').default(false).notNull(),
   isActive: boolean('is_active').default(true).notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at')
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'date' })
     .defaultNow()
     .notNull()
     .$onUpdate(() => new Date()),

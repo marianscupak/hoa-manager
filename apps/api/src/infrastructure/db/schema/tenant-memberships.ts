@@ -23,12 +23,14 @@ export const tenantMemberships = pgTable(
       .references(() => users.id, { onDelete: 'cascade' }),
     role: roleEnum('role').notNull(),
     status: statusEnum('status').notNull().default('ACTIVE'),
-    createdAt: timestamp('created_at').defaultNow().notNull(),
-    updatedAt: timestamp('updated_at')
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'date' })
       .defaultNow()
       .notNull()
       .$onUpdate(() => new Date()),
-    lastSeenAt: timestamp('last_seen_at'),
+    lastSeenAt: timestamp('last_seen_at', { withTimezone: true, mode: 'date' }),
   },
   (table) => ({
     unqTenantUser: unique('unq_tenant_user').on(table.tenantId, table.userId),

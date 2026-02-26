@@ -12,10 +12,12 @@
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
+        "@date-fns/tz": "1.4.1",
         "@hoa-mngr/api": "workspace:*",
         "@hoa-mngr/ui": "workspace:*",
         "@tanstack/react-query": "5.90.21",
         "axios": "1.13.5",
+        "date-fns": "4.1.0",
         "i18next": "25.8.13",
         "react": "19.2.4",
         "react-dom": "19.2.4",

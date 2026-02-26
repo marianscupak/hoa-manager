@@ -1,12 +1,15 @@
 import { randomBytes, createHash } from 'crypto';
 
 import { Injectable, Inject } from '@nestjs/common';
+import { addDays, differenceInMilliseconds } from 'date-fns';
 
 import {
   InvalidTokenException,
   ReplayAttackException,
   UnauthorizedException,
 } from '../../../../shared/application/exceptions/auth.exceptions';
+import { CLOCK } from '../../../../shared/application/ports/clock.port';
+import type { Clock } from '../../../../shared/application/ports/clock.port';
 import { UNIT_OF_WORK } from '../../../../shared/application/ports/unit-of-work.port';
 import type { UnitOfWork } from '../../../../shared/application/ports/unit-of-work.port';
 import { AuthClaims } from '../../../../shared/domain/auth-claims';
@@ -15,12 +18,8 @@ import type { MembershipRepository } from '../../../tenancy/application/ports/te
 import { AuthSession } from '../../domain/auth-identity.entity';
 import { AUTH_SESSION_REPOSITORY } from '../ports/auth.repository.port';
 import type { AuthSessionRepository } from '../ports/auth.repository.port';
-import { TOKEN_SIGNER, TOKEN_VERIFIER, CLOCK } from '../ports/auth.utils.port';
-import type {
-  TokenSigner,
-  TokenVerifier,
-  Clock,
-} from '../ports/auth.utils.port';
+import { TOKEN_SIGNER, TOKEN_VERIFIER } from '../ports/auth.utils.port';
+import type { TokenSigner, TokenVerifier } from '../ports/auth.utils.port';
 
 export interface RefreshTokenCommand {
   refreshToken: string;
@@ -118,8 +117,10 @@ export class RefreshTokenUseCase {
     }
 
     if (session.revokedAt) {
-      const timeSinceRevoked =
-        this.clock.now().getTime() - session.revokedAt.getTime();
+      const timeSinceRevoked = differenceInMilliseconds(
+        this.clock.now(),
+        session.revokedAt,
+      );
 
       if (timeSinceRevoked > this.REUSE_GRACE_PERIOD_MS) {
         await this.authSessionRepository.revokeAllForUser(userId);
@@ -153,9 +154,7 @@ export class RefreshTokenUseCase {
   private generateNewRefreshToken() {
     const rawToken = randomBytes(32).toString('hex');
     const hash = createHash('sha256').update(rawToken).digest('hex');
-    const expiresAt = new Date(
-      this.clock.now().getTime() + 30 * 24 * 60 * 60 * 1000,
-    );
+    const expiresAt = addDays(this.clock.now(), 30);
     return { rawToken, hash, expiresAt };
   }
 }

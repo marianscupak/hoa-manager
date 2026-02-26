@@ -1,11 +1,14 @@
 import { randomBytes, createHash } from 'crypto';
 
 import { Injectable, Inject } from '@nestjs/common';
+import { addDays } from 'date-fns';
 
 import {
   UnauthorizedException,
   InvalidCredentialsException,
 } from '../../../../shared/application/exceptions/auth.exceptions';
+import { CLOCK } from '../../../../shared/application/ports/clock.port';
+import type { Clock } from '../../../../shared/application/ports/clock.port';
 import { UNIT_OF_WORK } from '../../../../shared/application/ports/unit-of-work.port';
 import type { UnitOfWork } from '../../../../shared/application/ports/unit-of-work.port';
 import { USER_REPOSITORY } from '../../../identity/application/ports/user.repository.port';
@@ -20,12 +23,8 @@ import type {
   AuthIdentityRepository,
   AuthSessionRepository,
 } from '../ports/auth.repository.port';
-import { PASSWORD_HASHER, TOKEN_SIGNER, CLOCK } from '../ports/auth.utils.port';
-import type {
-  PasswordHasher,
-  TokenSigner,
-  Clock,
-} from '../ports/auth.utils.port';
+import { PASSWORD_HASHER, TOKEN_SIGNER } from '../ports/auth.utils.port';
+import type { PasswordHasher, TokenSigner } from '../ports/auth.utils.port';
 
 export interface LoginCommand {
   email: string;
@@ -123,9 +122,7 @@ export class LoginUseCase {
         .update(rawRefreshToken)
         .digest('hex');
 
-      const expiresAt = new Date(
-        this.clock.now().getTime() + 30 * 24 * 60 * 60 * 1000,
-      ); // 30 days
+      const expiresAt = addDays(this.clock.now(), 30);
 
       await this.authSessionRepository.create({
         userId: user.id,

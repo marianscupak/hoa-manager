@@ -21,8 +21,10 @@ export const authIdentities = pgTable(
     provider: providerEnum('provider').notNull(),
     providerSubject: text('provider_subject').notNull(),
     passwordHash: text('password_hash'),
-    createdAt: timestamp('created_at').defaultNow().notNull(),
-    lastUsedAt: timestamp('last_used_at'),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' })
+      .defaultNow()
+      .notNull(),
+    lastUsedAt: timestamp('last_used_at', { withTimezone: true, mode: 'date' }),
   },
   (table) => ({
     unqProviderSubject: unique('unq_provider_subject').on(

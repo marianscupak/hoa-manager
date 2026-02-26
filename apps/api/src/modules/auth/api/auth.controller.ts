@@ -14,7 +14,7 @@ import type { Response, Request } from 'express';
 import { AuthResponseDto, SuccessResponseDto } from './dto/auth-response.dto';
 import { LoginDto } from './dto/login.dto';
 import { SwitchTenantDto } from './dto/switch-tenant.dto';
-import { AccessTokenAuthGuard } from '../../../shared/presentation/guards/access-token-auth.guard';
+import { AccessTokenAuthGuard } from '../../../shared/api/guards/access-token-auth.guard';
 import { LoginUseCase } from '../application/use-cases/login.use-case';
 import { LogoutUseCase } from '../application/use-cases/logout.use-case';
 import { RefreshTokenUseCase } from '../application/use-cases/refresh-token.use-case';

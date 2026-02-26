@@ -1,0 +1,28 @@
+import { Tenant, TenantMembership } from '../../domain/tenant.entity';
+
+export interface TenantRepository {
+  findById(id: string): Promise<Tenant | null>;
+  create(name: string): Promise<Tenant>;
+}
+
+export const TENANT_REPOSITORY = Symbol('TENANT_REPOSITORY');
+
+export interface MembershipRepository {
+  findByUserId(userId: string): Promise<TenantMembership[]>;
+  findByTenantAndUser(
+    tenantId: string,
+    userId: string,
+  ): Promise<TenantMembership | null>;
+  create(
+    membership: Omit<
+      TenantMembership,
+      'id' | 'createdAt' | 'updatedAt' | 'lastSeenAt'
+    >,
+  ): Promise<TenantMembership>;
+  updateStatus(
+    id: string,
+    status: 'ACTIVE' | 'SUSPENDED' | 'INVITED',
+  ): Promise<void>;
+}
+
+export const MEMBERSHIP_REPOSITORY = Symbol('MEMBERSHIP_REPOSITORY');

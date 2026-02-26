@@ -1,0 +1,55 @@
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  Inject,
+} from '@nestjs/common';
+import type { Request } from 'express';
+
+import { TOKEN_VERIFIER } from '../../../modules/auth/application/ports/auth.utils.port';
+import type { TokenVerifier } from '../../../modules/auth/application/ports/auth.utils.port';
+import { InvalidTokenException } from '../../application/exceptions/auth.exceptions';
+import { AuthClaims } from '../../domain/auth-claims';
+import { AuthPrincipal } from '../../domain/auth-principal';
+
+@Injectable()
+export class AccessTokenAuthGuard implements CanActivate {
+  constructor(
+    @Inject(TOKEN_VERIFIER) private readonly tokenVerifier: TokenVerifier,
+  ) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context
+      .switchToHttp()
+      .getRequest<
+        Request & { user?: AuthPrincipal; authClaims?: AuthClaims }
+      >();
+    const token = this.extractTokenFromHeader(request);
+
+    if (!token) {
+      throw new InvalidTokenException();
+    }
+
+    try {
+      const payload = await this.tokenVerifier.verifyToken<AuthClaims>(token);
+
+      const principal: AuthPrincipal = {
+        userId: payload.sub,
+        subject: payload.sub,
+        authMethod: 'JWT',
+      };
+
+      request['user'] = principal;
+      request['authClaims'] = payload;
+    } catch {
+      throw new InvalidTokenException();
+    }
+
+    return true;
+  }
+
+  private extractTokenFromHeader(request: Request): string | undefined {
+    const [type, token] = request.headers.authorization?.split(' ') ?? [];
+    return type === 'Bearer' ? token : undefined;
+  }
+}

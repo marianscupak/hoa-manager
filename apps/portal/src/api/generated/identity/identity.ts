@@ -21,7 +21,11 @@ import type {
     UseQueryResult,
 } from "@tanstack/react-query";
 
-import type { CreateUserDto } from ".././model";
+import type {
+    CreateUserDto,
+    CreateUserResponseDto,
+    UserResponseDto,
+} from ".././model";
 
 import { customInstance } from "../../axios";
 import type { ErrorType, BodyType } from "../../axios";
@@ -33,7 +37,7 @@ export const identityControllerRegisterUser = (
     options?: SecondParameter<typeof customInstance>,
     signal?: AbortSignal,
 ) => {
-    return customInstance<void>(
+    return customInstance<CreateUserResponseDto>(
         {
             url: `/api/identity/users`,
             method: "POST",
@@ -120,7 +124,7 @@ export const identityControllerGetUser = (
     options?: SecondParameter<typeof customInstance>,
     signal?: AbortSignal,
 ) => {
-    return customInstance<void>(
+    return customInstance<UserResponseDto>(
         { url: `/api/identity/users/${id}`, method: "GET", signal },
         options,
     );

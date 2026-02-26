@@ -7,7 +7,7 @@ import { CreateUserCommand } from '../commands/create-user.command';
 import {
   USER_REPOSITORY,
   type UserRepository,
-} from '../ports/user-repository.port';
+} from '../ports/user.repository.port';
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
@@ -22,8 +22,8 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
       throw new UserAlreadyExistsError();
     }
 
-    const inserted = await this.users.insert(
-      User.createNew({ email: cmd.email }),
+    const inserted = await this.users.create(
+      User.createNew({ email: cmd.email, fullName: cmd.fullName }),
     );
 
     return { id: inserted.id };

@@ -5,7 +5,7 @@ import { UserNotFoundError } from '../../domain/errors/user-not-found.error';
 import {
   USER_REPOSITORY,
   type UserRepository,
-} from '../ports/user-repository.port';
+} from '../ports/user.repository.port';
 import { GetUserByIdQuery } from '../queries/get-user-by-id.query';
 
 export type GetUserByIdResult = { id: string; email: string };

@@ -6,7 +6,11 @@ export const UserMapper = {
     return User.rehydrate({
       id: row.id,
       email: row.email,
+      fullName: row.fullName,
+      isEmailVerified: row.isEmailVerified,
+      isActive: row.isActive,
       createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
     });
   },
 };

@@ -1,7 +1,7 @@
 export class RefreshTokenCommand {
   constructor(
     public readonly refreshToken: string,
-    public readonly oldAccessToken: string,
+    public readonly oldAccessToken?: string,
   ) {}
 }
 

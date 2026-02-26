@@ -4,19 +4,19 @@ import { Navigate, Outlet } from "react-router";
 import { authStatusAtom } from "@/auth/atoms";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 
-export function PublicLayout() {
+export function SelectTenantLayout() {
     const authStatus = useAtomValue(authStatusAtom);
 
     if (authStatus === "initializing") {
         return null;
     }
 
-    if (authStatus === "authenticated") {
-        return <Navigate to="/" replace />;
+    if (authStatus === "anonymous") {
+        return <Navigate to="/login" replace />;
     }
 
-    if (authStatus === "select-tenant") {
-        return <Navigate to="/select-tenant" replace />;
+    if (authStatus === "authenticated") {
+        return <Navigate to="/" replace />;
     }
 
     return (

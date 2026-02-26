@@ -7,6 +7,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { ApiOkResponse } from '@nestjs/swagger';
@@ -65,8 +66,8 @@ export class AuthController {
     const refreshToken = req.cookies?.refresh_token;
     const oldAccessToken = this.extractTokenFromHeader(req);
 
-    if (!refreshToken || !oldAccessToken) {
-      throw new Error('Missing tokens');
+    if (!refreshToken) {
+      throw new UnauthorizedException('Missing refresh token');
     }
 
     const result = await this.commandBus.execute<

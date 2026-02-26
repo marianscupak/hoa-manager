@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { ZodValidationPipe, cleanupOpenApiDoc } from 'nestjs-zod';
 
@@ -21,6 +22,7 @@ async function bootstrap() {
     credentials: true,
   });
 
+  app.use(cookieParser());
   app.useGlobalPipes(new ZodValidationPipe());
 
   const config = new DocumentBuilder()

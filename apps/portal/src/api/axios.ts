@@ -1,13 +1,28 @@
-import Axios, { AxiosError, AxiosRequestConfig } from "axios";
+import Axios, {
+    AxiosError,
+    AxiosRequestConfig,
+    InternalAxiosRequestConfig,
+} from "axios";
+import { getDefaultStore } from "jotai";
 
+import {
+    accessTokenAtom,
+    authStatusAtom,
+    tenantContextAtom,
+    userAtom,
+} from "@/auth/atoms";
+import { refreshAccessToken } from "@/auth/refresh";
 import { env } from "@/config/env";
+import { StorageService } from "@/storage/storage";
 
 export const AXIOS_INSTANCE = Axios.create({
     baseURL: env.VITE_API_URL,
+    withCredentials: true,
 });
 
 AXIOS_INSTANCE.interceptors.request.use((config) => {
-    const token = localStorage.getItem("auth_token");
+    const store = getDefaultStore();
+    const token = store.get(accessTokenAtom);
     if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
     }
@@ -16,15 +31,42 @@ AXIOS_INSTANCE.interceptors.request.use((config) => {
 
 AXIOS_INSTANCE.interceptors.response.use(
     (response) => response,
-    (error) => {
-        if (error.response?.status === 401) {
-            // Auto logout if 401 Unauthorized returned from API
-            localStorage.removeItem("auth_token");
-            localStorage.removeItem("auth_user");
+    async (error) => {
+        const originalRequest = error.config as InternalAxiosRequestConfig & {
+            _retry?: boolean;
+        };
 
-            // Only redirect if we aren't already on the login page
-            if (window.location.pathname !== "/login") {
-                window.location.href = "/login";
+        if (error.response?.status === 401) {
+            // Prevent infinite refresh loops if the refresh itself fails
+            if (originalRequest.url?.includes("/api/auth/refresh")) {
+                const store = getDefaultStore();
+                store.set(accessTokenAtom, null);
+                store.set(authStatusAtom, "anonymous");
+                store.set(tenantContextAtom, null);
+                store.set(userAtom, null);
+                StorageService.clearAuthHints();
+
+                return Promise.reject(error);
+            }
+
+            if (!originalRequest._retry) {
+                originalRequest._retry = true;
+                try {
+                    const newToken = await refreshAccessToken();
+                    if (originalRequest.headers) {
+                        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+                    }
+                    return AXIOS_INSTANCE(originalRequest);
+                } catch (refreshError) {
+                    const store = getDefaultStore();
+                    store.set(accessTokenAtom, null);
+                    store.set(authStatusAtom, "anonymous");
+                    store.set(tenantContextAtom, null);
+                    store.set(userAtom, null);
+                    StorageService.clearAuthHints();
+
+                    return Promise.reject(refreshError);
+                }
             }
         }
         return Promise.reject(error);

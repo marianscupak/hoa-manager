@@ -3,20 +3,20 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router";
 
-import { AuthProvider } from "@/providers/auth-provider";
-import { router } from "@/router";
-import "@/i18n";
-import "./index.css";
 import "@/api/axios";
+import "@/i18n";
+import { AppBootLoader } from "@/providers/app-boot-loader";
+import { router } from "@/router";
+import "./index.css";
 
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById("app")!).render(
     <StrictMode>
-        <AuthProvider>
-            <QueryClientProvider client={queryClient}>
+        <QueryClientProvider client={queryClient}>
+            <AppBootLoader>
                 <RouterProvider router={router} />
-            </QueryClientProvider>
-        </AuthProvider>
+            </AppBootLoader>
+        </QueryClientProvider>
     </StrictMode>,
 );

@@ -22,6 +22,7 @@ import {
   MEMBERSHIP_REPOSITORY,
   type MembershipRepository,
 } from '../../../tenancy/application/ports/tenant.repository.port';
+import { TenantMembership } from '../../../tenancy/domain/tenant.entity';
 import { AuthSession } from '../../domain/auth-identity.entity';
 import {
   RefreshTokenCommand,
@@ -58,16 +59,20 @@ export class RefreshTokenHandler
   async execute(command: RefreshTokenCommand): Promise<RefreshTokenResult> {
     return this.uow.execute(async () => {
       const oldClaims = await this.verifyOldToken(command.oldAccessToken);
-      const userId = oldClaims.sub;
 
       const session = await this.findAndValidateSession(
         command.refreshToken,
-        userId,
+        oldClaims?.sub,
       );
+
+      const userId = session.userId;
 
       await this.validateSessionStatus(session, userId);
 
-      const scopedClaims = await this.resolveTenantScope(oldClaims, userId);
+      const scopedClaims = await this.resolveTenantScope(
+        oldClaims ?? { sub: userId },
+        userId,
+      );
 
       await this.authSessionRepository.markRevoked(session.id);
       const { rawToken, hash, expiresAt } = this.generateNewRefreshToken();
@@ -91,7 +96,10 @@ export class RefreshTokenHandler
     });
   }
 
-  private async verifyOldToken(oldAccessToken: string): Promise<AuthClaims> {
+  private async verifyOldToken(
+    oldAccessToken?: string,
+  ): Promise<AuthClaims | null> {
+    if (!oldAccessToken) return null;
     try {
       return await this.tokenVerifier.verifyToken<AuthClaims>(oldAccessToken, {
         ignoreExpiration: true,
@@ -103,14 +111,14 @@ export class RefreshTokenHandler
 
   private async findAndValidateSession(
     refreshToken: string,
-    expectedUserId: string,
+    expectedUserId?: string,
   ) {
     const providedHash = createHash('sha256')
       .update(refreshToken)
       .digest('hex');
     const session = await this.authSessionRepository.findByHash(providedHash);
 
-    if (!session || session.userId !== expectedUserId) {
+    if (!session || (expectedUserId && session.userId !== expectedUserId)) {
       throw new InvalidTokenException();
     }
 
@@ -146,6 +154,15 @@ export class RefreshTokenHandler
   ): Promise<AuthClaims> {
     const claims: AuthClaims = { ...oldClaims, sub: userId };
 
+    const makeClaimsFromMemberShip = (
+      membership: TenantMembership,
+    ): AuthClaims => ({
+      ...claims,
+      tid: membership.tenantId,
+      mid: membership.id,
+      roles: [membership.role],
+    });
+
     if (claims.tid) {
       const membership = await this.membershipRepository.findByTenantAndUser(
         claims.tid,
@@ -154,10 +171,19 @@ export class RefreshTokenHandler
       if (!membership || membership.status !== 'ACTIVE') {
         throw new UnauthorizedException();
       }
-      claims.roles = [membership.role];
+      return makeClaimsFromMemberShip(membership);
+    } else {
+      const memberships = await this.membershipRepository.findByUserId(userId);
+      if (memberships.length === 1) {
+        const membership = memberships[0];
+        if (membership.status !== 'ACTIVE') {
+          throw new UnauthorizedException();
+        }
+        return makeClaimsFromMemberShip(membership);
+      } else {
+        return claims;
+      }
     }
-
-    return claims;
   }
 
   private generateNewRefreshToken() {

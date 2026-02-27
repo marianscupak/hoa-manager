@@ -1,6 +1,9 @@
 import { useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router";
+
+import { toast } from "@hoa-mngr/ui";
 
 import { useAuthControllerExchangeGoogleCode } from "@/api/generated/auth/auth";
 import {
@@ -14,6 +17,7 @@ import { STORAGE_KEYS } from "@/storage/keys";
 import { StorageService } from "@/storage/storage";
 
 export function GoogleCallbackPage() {
+    const { t } = useTranslation("auth");
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -27,9 +31,7 @@ export function GoogleCallbackPage() {
 
     const params = new URLSearchParams(location.search);
     const code = params.get("code");
-    const error = !code
-        ? "Authentication code is missing from the callback."
-        : mutationError;
+    const error = !code ? t("googleCallback.error") : mutationError;
 
     useEffect(() => {
         if (!code) {
@@ -43,7 +45,8 @@ export function GoogleCallbackPage() {
                     const token = data.accessToken;
                     const payload = parseJwt(token);
                     if (!payload) {
-                        setMutationError("Received invalid access token.");
+                        toast.error(t("googleCallback.error"));
+                        setMutationError(t("googleCallback.error"));
                         return;
                     }
 
@@ -68,7 +71,8 @@ export function GoogleCallbackPage() {
                     }
                 },
                 onError: () => {
-                    setMutationError("Failed to exchange authentication code.");
+                    toast.error(t("googleCallback.error"));
+                    setMutationError(t("googleCallback.error"));
                 },
             },
         );

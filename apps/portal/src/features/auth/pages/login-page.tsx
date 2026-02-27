@@ -1,6 +1,9 @@
 import { useSetAtom } from "jotai";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router";
+
+import { toast } from "@hoa-mngr/ui";
 
 import { useAuthControllerLogin } from "@/api/generated/auth/auth";
 import {
@@ -16,6 +19,7 @@ import { StorageService } from "@/storage/storage";
 import { GoogleLoginButton } from "../components/google-login-button";
 
 export function LoginPage() {
+    const { t } = useTranslation("auth");
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -60,6 +64,9 @@ export function LoginPage() {
                         setAuthStatus("select-tenant");
                         navigate("/select-tenant", { replace: true });
                     }
+                },
+                onError: () => {
+                    toast.error(t("login.error"));
                 },
             },
         );

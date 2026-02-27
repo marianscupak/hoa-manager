@@ -1,3 +1,4 @@
+import type enAuth from "./locales/en/auth";
 import type enHome from "./locales/en/home";
 import type enNotFound from "./locales/en/not-found";
 
@@ -12,6 +13,7 @@ declare module "i18next" {
         resources: {
             "home": typeof enHome;
             "not-found": typeof enNotFound;
+            "auth": typeof enAuth;
         };
     }
 }

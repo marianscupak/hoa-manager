@@ -16,7 +16,9 @@ export const baseConfig = tseslint.config({
     },
     settings: {
         "import-x/resolver": {
-            typescript: true,
+            typescript: {
+                alwaysTryTypes: true,
+            },
             node: true,
         },
     },

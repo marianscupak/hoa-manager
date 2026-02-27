@@ -3,6 +3,8 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router";
 
+import { Toaster } from "@hoa-mngr/ui";
+
 import "@/api/axios";
 import "@/i18n";
 import { AppBootLoader } from "@/providers/app-boot-loader";
@@ -16,6 +18,7 @@ createRoot(document.getElementById("app")!).render(
         <QueryClientProvider client={queryClient}>
             <AppBootLoader>
                 <RouterProvider router={router} />
+                <Toaster />
             </AppBootLoader>
         </QueryClientProvider>
     </StrictMode>,

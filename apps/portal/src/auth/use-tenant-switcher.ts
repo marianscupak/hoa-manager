@@ -1,6 +1,9 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
+
+import { toast } from "@hoa-mngr/ui";
 
 import { useAuthControllerSwitchTenant } from "@/api/generated/auth/auth";
 import {
@@ -14,6 +17,7 @@ import { STORAGE_KEYS } from "@/storage/keys";
 import { StorageService } from "@/storage/storage";
 
 export function useTenantSwitcher() {
+    const { t } = useTranslation("auth");
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
@@ -54,7 +58,12 @@ export function useTenantSwitcher() {
                         if (options?.redirectUrl) {
                             navigate(options.redirectUrl, { replace: true });
                         }
+
+                        toast.success(t("tenantSwitcher.success"));
                     }
+                },
+                onError: () => {
+                    toast.error(t("tenantSwitcher.error"));
                 },
             },
         );

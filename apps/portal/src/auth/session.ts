@@ -5,20 +5,14 @@ import { authControllerSwitchTenant } from "@/api/generated/auth/auth";
 import { STORAGE_KEYS } from "@/storage/keys";
 import { StorageService } from "@/storage/storage";
 
-import {
-    accessTokenAtom,
-    authStatusAtom,
-    tenantContextAtom,
-    userAtom,
-} from "./atoms";
+import { authStatusAtom } from "./atoms";
 import { parseJwt } from "./jwt";
 import { refreshAccessToken } from "./refresh";
+import { useSessionManager } from "./use-session-manager";
 
 export function useAuthBoot() {
     const setAuthStatus = useSetAtom(authStatusAtom);
-    const setAccessToken = useSetAtom(accessTokenAtom);
-    const setTenantContext = useSetAtom(tenantContextAtom);
-    const setUser = useSetAtom(userAtom);
+    const { setSession } = useSessionManager();
 
     const hasBooted = useRef(false);
 
@@ -62,24 +56,12 @@ export function useAuthBoot() {
 
                 if (!payload) throw new Error("Invalid payload state");
 
-                setAccessToken(token);
-                setUser({ userId: payload.sub, email: payload.email });
-
-                if (payload.tid && payload.mid) {
-                    setTenantContext({
-                        tenantId: payload.tid,
-                        membershipId: payload.mid,
-                        roles: payload.roles || [],
-                    });
-                    setAuthStatus("authenticated");
-                } else {
-                    setAuthStatus("select-tenant");
-                }
+                setSession(token, false);
             } catch {
                 setAuthStatus("anonymous");
             }
         };
 
         boot();
-    }, [setAuthStatus, setAccessToken, setTenantContext, setUser]);
+    }, [setAuthStatus, setSession]);
 }

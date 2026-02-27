@@ -1,30 +1,18 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useSetAtom } from "jotai";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
 import { toast } from "@hoa-mngr/ui";
 
 import { useAuthControllerSwitchTenant } from "@/api/generated/auth/auth";
-import {
-    accessTokenAtom,
-    authStatusAtom,
-    tenantContextAtom,
-    userAtom,
-} from "@/auth/atoms";
-import { parseJwt } from "@/auth/jwt";
-import { STORAGE_KEYS } from "@/storage/keys";
-import { StorageService } from "@/storage/storage";
+import { useSessionManager } from "@/auth/use-session-manager";
 
 export function useTenantSwitcher() {
     const { t } = useTranslation("auth");
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    const setAccessToken = useSetAtom(accessTokenAtom);
-    const setAuthStatus = useSetAtom(authStatusAtom);
-    const setTenantContext = useSetAtom(tenantContextAtom);
-    const setUser = useSetAtom(userAtom);
+    const { setSession } = useSessionManager();
 
     const switchTenantMutation = useAuthControllerSwitchTenant();
 
@@ -36,23 +24,9 @@ export function useTenantSwitcher() {
             { data: { tenantId } },
             {
                 onSuccess: (res) => {
-                    const token = res.accessToken;
-                    const payload = parseJwt(token);
+                    const { success, hasTenant } = setSession(res.accessToken);
 
-                    if (payload && payload.tid && payload.mid) {
-                        setAccessToken(token);
-                        setUser({ userId: payload.sub, email: payload.email });
-                        setTenantContext({
-                            tenantId: payload.tid,
-                            membershipId: payload.mid,
-                            roles: payload.roles || [],
-                        });
-                        setAuthStatus("authenticated");
-                        StorageService.setString(
-                            STORAGE_KEYS.LAST_TENANT_ID,
-                            payload.tid,
-                        );
-
+                    if (success && hasTenant) {
                         queryClient.clear();
 
                         if (options?.redirectUrl) {

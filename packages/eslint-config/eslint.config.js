@@ -21,6 +21,13 @@ export const baseConfig = tseslint.config({
         },
     },
     rules: {
+        "@typescript-eslint/no-unused-vars": [
+            "error",
+            {
+                argsIgnorePattern: "^_",
+                varsIgnorePattern: "^_",
+            },
+        ],
         "@typescript-eslint/no-non-null-assertion": "off",
         "import-x/order": [
             "warn",

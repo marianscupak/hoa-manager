@@ -1,0 +1,1 @@
+ALTER TABLE "oidc_login_attempts" RENAME COLUMN "nonce_hash" TO "nonce";

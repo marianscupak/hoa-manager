@@ -1,7 +1,9 @@
 import {
   Controller,
   Post,
+  Get,
   Body,
+  Query,
   Res,
   Req,
   UseGuards,
@@ -14,9 +16,12 @@ import { ApiOkResponse } from '@nestjs/swagger';
 import type { Response, Request } from 'express';
 
 import { AuthResponseDto, SuccessResponseDto } from './dto/auth-response.dto';
+import { ExchangeCodeDto } from './dto/exchange-code.dto';
 import { LoginDto } from './dto/login.dto';
 import { SwitchTenantDto } from './dto/switch-tenant.dto';
 import { AccessTokenAuthGuard } from '../../../shared/api/guards/access-token-auth.guard';
+import { ExchangeGoogleCodeCommand } from '../application/commands/exchange-google-code.command';
+import { HandleGoogleCallbackCommand } from '../application/commands/handle-google-callback.command';
 import {
   LoginCommand,
   type LoginResult,
@@ -26,10 +31,14 @@ import {
   RefreshTokenCommand,
   type RefreshTokenResult,
 } from '../application/commands/refresh-token.command';
+import { StartGoogleLoginCommand } from '../application/commands/start-google-login.command';
 import {
   SwitchTenantCommand,
   type SwitchTenantResult,
 } from '../application/commands/switch-tenant.command';
+import { type ExchangeGoogleCodeResult } from '../application/handlers/exchange-google-code.handler';
+import { type HandleGoogleCallbackResult } from '../application/handlers/handle-google-callback.handler';
+import { type StartGoogleLoginResult } from '../application/handlers/start-google-login.handler';
 
 @Controller('auth')
 export class AuthController {
@@ -56,6 +65,54 @@ export class AuthController {
     return { accessToken: result.accessToken };
   }
 
+  @Get('google/start')
+  async startGoogleLogin(@Res() res: Response) {
+    const result = await this.commandBus.execute<
+      StartGoogleLoginCommand,
+      StartGoogleLoginResult
+    >(new StartGoogleLoginCommand());
+    return res.redirect(result.redirectUrl);
+  }
+
+  @Get('google/callback')
+  async handleGoogleCallback(
+    @Query('code') code: string,
+    @Query('state') state: string,
+    @Res() res: Response,
+  ) {
+    if (!code || !state) {
+      throw new UnauthorizedException();
+    }
+
+    const result = await this.commandBus.execute<
+      HandleGoogleCallbackCommand,
+      HandleGoogleCallbackResult
+    >(new HandleGoogleCallbackCommand(code, state));
+
+    res.cookie('refresh_token', result.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.redirect(result.redirectUrl);
+  }
+
+  @Post('google/exchange')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: AuthResponseDto })
+  async exchangeGoogleCode(
+    @Body() body: ExchangeCodeDto,
+  ): Promise<AuthResponseDto> {
+    const result = await this.commandBus.execute<
+      ExchangeGoogleCodeCommand,
+      ExchangeGoogleCodeResult
+    >(new ExchangeGoogleCodeCommand(body.code));
+
+    return { accessToken: result.accessToken };
+  }
+
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: AuthResponseDto })
@@ -67,7 +124,7 @@ export class AuthController {
     const oldAccessToken = this.extractTokenFromHeader(req);
 
     if (!refreshToken) {
-      throw new UnauthorizedException('Missing refresh token');
+      throw new UnauthorizedException();
     }
 
     const result = await this.commandBus.execute<

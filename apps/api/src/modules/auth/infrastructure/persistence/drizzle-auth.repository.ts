@@ -6,10 +6,16 @@ import { DRIZZLE_TX_STORAGE } from '../../../../infrastructure/db/drizzle.unit-o
 import {
   authIdentities,
   authSessions,
+  oidcLoginAttempts,
+  authExchangeCodes,
 } from '../../../../infrastructure/db/schema';
 import {
   AuthIdentityRepository,
   AuthSessionRepository,
+  OidcLoginAttemptRepository,
+  AuthExchangeCodeRepository,
+  OidcLoginAttempt,
+  AuthExchangeCode,
 } from '../../application/ports/auth.repository.port';
 import { AuthIdentity, AuthSession } from '../../domain/auth-identity.entity';
 
@@ -101,5 +107,72 @@ export class DrizzleAuthSessionRepository implements AuthSessionRepository {
       .where(
         and(eq(authSessions.userId, userId), isNull(authSessions.revokedAt)),
       );
+  }
+}
+
+@Injectable()
+export class DrizzleOidcLoginAttemptRepository
+  implements OidcLoginAttemptRepository
+{
+  constructor(private readonly drizzle: DrizzleService) {}
+
+  private get db() {
+    return DRIZZLE_TX_STORAGE.getStore() ?? this.drizzle.db;
+  }
+
+  async create(
+    attempt: Omit<OidcLoginAttempt, 'id' | 'createdAt'>,
+  ): Promise<OidcLoginAttempt> {
+    const [inserted] = await this.db
+      .insert(oidcLoginAttempts)
+      .values(attempt)
+      .returning();
+    return inserted;
+  }
+
+  async findByStateHash(stateHash: string): Promise<OidcLoginAttempt | null> {
+    const row = await this.db.query.oidcLoginAttempts.findFirst({
+      where: eq(oidcLoginAttempts.stateHash, stateHash),
+    });
+    return row ?? null;
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.db.delete(oidcLoginAttempts).where(eq(oidcLoginAttempts.id, id));
+  }
+}
+
+@Injectable()
+export class DrizzleAuthExchangeCodeRepository
+  implements AuthExchangeCodeRepository
+{
+  constructor(private readonly drizzle: DrizzleService) {}
+
+  private get db() {
+    return DRIZZLE_TX_STORAGE.getStore() ?? this.drizzle.db;
+  }
+
+  async create(
+    code: Omit<AuthExchangeCode, 'id' | 'createdAt' | 'usedAt'>,
+  ): Promise<AuthExchangeCode> {
+    const [inserted] = await this.db
+      .insert(authExchangeCodes)
+      .values(code)
+      .returning();
+    return inserted as AuthExchangeCode;
+  }
+
+  async findByCodeHash(codeHash: string): Promise<AuthExchangeCode | null> {
+    const row = await this.db.query.authExchangeCodes.findFirst({
+      where: eq(authExchangeCodes.codeHash, codeHash),
+    });
+    return (row as AuthExchangeCode) ?? null;
+  }
+
+  async markUsed(id: string): Promise<void> {
+    await this.db
+      .update(authExchangeCodes)
+      .set({ usedAt: new Date() })
+      .where(eq(authExchangeCodes.id, id));
   }
 }

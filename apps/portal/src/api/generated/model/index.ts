@@ -6,9 +6,11 @@
  * OpenAPI spec version: 1.0
  */
 
+export * from "./authControllerHandleGoogleCallbackParams";
 export * from "./authResponseDto";
 export * from "./createUserDto";
 export * from "./createUserResponseDto";
+export * from "./exchangeCodeDto";
 export * from "./healthControllerCheck200";
 export * from "./healthControllerCheck200Details";
 export * from "./healthControllerCheck200Error";

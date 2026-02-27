@@ -5,16 +5,26 @@
  * The HOA Manager API description
  * OpenAPI spec version: 1.0
  */
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
+    DataTag,
+    DefinedInitialDataOptions,
+    DefinedUseQueryResult,
     MutationFunction,
     QueryClient,
+    QueryFunction,
+    QueryKey,
+    UndefinedInitialDataOptions,
     UseMutationOptions,
     UseMutationResult,
+    UseQueryOptions,
+    UseQueryResult,
 } from "@tanstack/react-query";
 
 import type {
+    AuthControllerHandleGoogleCallbackParams,
     AuthResponseDto,
+    ExchangeCodeDto,
     LoginDto,
     SuccessResponseDto,
     SwitchTenantDto,
@@ -108,6 +118,410 @@ export const useAuthControllerLogin = <
 > => {
     return useMutation(
         getAuthControllerLoginMutationOptions(options),
+        queryClient,
+    );
+};
+export const authControllerStartGoogleLogin = (
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<void>(
+        { url: `/api/auth/google/start`, method: "GET", signal },
+        options,
+    );
+};
+
+export const getAuthControllerStartGoogleLoginQueryKey = () => {
+    return [`/api/auth/google/start`] as const;
+};
+
+export const getAuthControllerStartGoogleLoginQueryOptions = <
+    TData = Awaited<ReturnType<typeof authControllerStartGoogleLogin>>,
+    TError = ErrorType<unknown>,
+>(options?: {
+    query?: Partial<
+        UseQueryOptions<
+            Awaited<ReturnType<typeof authControllerStartGoogleLogin>>,
+            TError,
+            TData
+        >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ?? getAuthControllerStartGoogleLoginQueryKey();
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof authControllerStartGoogleLogin>>
+    > = ({ signal }) => authControllerStartGoogleLogin(requestOptions, signal);
+
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof authControllerStartGoogleLogin>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type AuthControllerStartGoogleLoginQueryResult = NonNullable<
+    Awaited<ReturnType<typeof authControllerStartGoogleLogin>>
+>;
+export type AuthControllerStartGoogleLoginQueryError = ErrorType<unknown>;
+
+export function useAuthControllerStartGoogleLogin<
+    TData = Awaited<ReturnType<typeof authControllerStartGoogleLogin>>,
+    TError = ErrorType<unknown>,
+>(
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof authControllerStartGoogleLogin>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof authControllerStartGoogleLogin>>,
+                    TError,
+                    Awaited<ReturnType<typeof authControllerStartGoogleLogin>>
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useAuthControllerStartGoogleLogin<
+    TData = Awaited<ReturnType<typeof authControllerStartGoogleLogin>>,
+    TError = ErrorType<unknown>,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof authControllerStartGoogleLogin>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof authControllerStartGoogleLogin>>,
+                    TError,
+                    Awaited<ReturnType<typeof authControllerStartGoogleLogin>>
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useAuthControllerStartGoogleLogin<
+    TData = Awaited<ReturnType<typeof authControllerStartGoogleLogin>>,
+    TError = ErrorType<unknown>,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof authControllerStartGoogleLogin>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useAuthControllerStartGoogleLogin<
+    TData = Awaited<ReturnType<typeof authControllerStartGoogleLogin>>,
+    TError = ErrorType<unknown>,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof authControllerStartGoogleLogin>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
+    const queryOptions = getAuthControllerStartGoogleLoginQueryOptions(options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+        TData,
+        TError
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+    return { ...query, queryKey: queryOptions.queryKey };
+}
+
+export const authControllerHandleGoogleCallback = (
+    params: AuthControllerHandleGoogleCallbackParams,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<void>(
+        { url: `/api/auth/google/callback`, method: "GET", params, signal },
+        options,
+    );
+};
+
+export const getAuthControllerHandleGoogleCallbackQueryKey = (
+    params?: AuthControllerHandleGoogleCallbackParams,
+) => {
+    return [`/api/auth/google/callback`, ...(params ? [params] : [])] as const;
+};
+
+export const getAuthControllerHandleGoogleCallbackQueryOptions = <
+    TData = Awaited<ReturnType<typeof authControllerHandleGoogleCallback>>,
+    TError = ErrorType<unknown>,
+>(
+    params: AuthControllerHandleGoogleCallbackParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof authControllerHandleGoogleCallback>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getAuthControllerHandleGoogleCallbackQueryKey(params);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof authControllerHandleGoogleCallback>>
+    > = ({ signal }) =>
+        authControllerHandleGoogleCallback(params, requestOptions, signal);
+
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof authControllerHandleGoogleCallback>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type AuthControllerHandleGoogleCallbackQueryResult = NonNullable<
+    Awaited<ReturnType<typeof authControllerHandleGoogleCallback>>
+>;
+export type AuthControllerHandleGoogleCallbackQueryError = ErrorType<unknown>;
+
+export function useAuthControllerHandleGoogleCallback<
+    TData = Awaited<ReturnType<typeof authControllerHandleGoogleCallback>>,
+    TError = ErrorType<unknown>,
+>(
+    params: AuthControllerHandleGoogleCallbackParams,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof authControllerHandleGoogleCallback>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof authControllerHandleGoogleCallback>
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<typeof authControllerHandleGoogleCallback>
+                    >
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useAuthControllerHandleGoogleCallback<
+    TData = Awaited<ReturnType<typeof authControllerHandleGoogleCallback>>,
+    TError = ErrorType<unknown>,
+>(
+    params: AuthControllerHandleGoogleCallbackParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof authControllerHandleGoogleCallback>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof authControllerHandleGoogleCallback>
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<typeof authControllerHandleGoogleCallback>
+                    >
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useAuthControllerHandleGoogleCallback<
+    TData = Awaited<ReturnType<typeof authControllerHandleGoogleCallback>>,
+    TError = ErrorType<unknown>,
+>(
+    params: AuthControllerHandleGoogleCallbackParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof authControllerHandleGoogleCallback>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useAuthControllerHandleGoogleCallback<
+    TData = Awaited<ReturnType<typeof authControllerHandleGoogleCallback>>,
+    TError = ErrorType<unknown>,
+>(
+    params: AuthControllerHandleGoogleCallbackParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof authControllerHandleGoogleCallback>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
+    const queryOptions = getAuthControllerHandleGoogleCallbackQueryOptions(
+        params,
+        options,
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+        TData,
+        TError
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+    return { ...query, queryKey: queryOptions.queryKey };
+}
+
+export const authControllerExchangeGoogleCode = (
+    exchangeCodeDto: BodyType<ExchangeCodeDto>,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<AuthResponseDto>(
+        {
+            url: `/api/auth/google/exchange`,
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            data: exchangeCodeDto,
+            signal,
+        },
+        options,
+    );
+};
+
+export const getAuthControllerExchangeGoogleCodeMutationOptions = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof authControllerExchangeGoogleCode>>,
+        TError,
+        { data: BodyType<ExchangeCodeDto> },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof authControllerExchangeGoogleCode>>,
+    TError,
+    { data: BodyType<ExchangeCodeDto> },
+    TContext
+> => {
+    const mutationKey = ["authControllerExchangeGoogleCode"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof authControllerExchangeGoogleCode>>,
+        { data: BodyType<ExchangeCodeDto> }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return authControllerExchangeGoogleCode(data, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type AuthControllerExchangeGoogleCodeMutationResult = NonNullable<
+    Awaited<ReturnType<typeof authControllerExchangeGoogleCode>>
+>;
+export type AuthControllerExchangeGoogleCodeMutationBody =
+    BodyType<ExchangeCodeDto>;
+export type AuthControllerExchangeGoogleCodeMutationError = ErrorType<unknown>;
+
+export const useAuthControllerExchangeGoogleCode = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof authControllerExchangeGoogleCode>>,
+            TError,
+            { data: BodyType<ExchangeCodeDto> },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof authControllerExchangeGoogleCode>>,
+    TError,
+    { data: BodyType<ExchangeCodeDto> },
+    TContext
+> => {
+    return useMutation(
+        getAuthControllerExchangeGoogleCodeMutationOptions(options),
         queryClient,
     );
 };

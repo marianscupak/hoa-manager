@@ -13,6 +13,8 @@ import { parseJwt } from "@/auth/jwt";
 import { STORAGE_KEYS } from "@/storage/keys";
 import { StorageService } from "@/storage/storage";
 
+import { GoogleLoginButton } from "../components/google-login-button";
+
 export function LoginPage() {
     const navigate = useNavigate();
     const location = useLocation();
@@ -119,6 +121,16 @@ export function LoginPage() {
                     )}
                 </div>
             </form>
+
+            <div className="mt-6 flex items-center justify-center">
+                <span className="bg-white px-2 text-sm text-slate-500">
+                    Or continue with
+                </span>
+            </div>
+
+            <div className="mt-6">
+                <GoogleLoginButton disabled={loginMutation.isPending} />
+            </div>
         </div>
     );
 }

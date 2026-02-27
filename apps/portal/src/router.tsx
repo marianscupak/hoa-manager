@@ -4,6 +4,7 @@ import { ErrorBoundary } from "@/components/error/error-boundary";
 import { AuthLayout } from "@/components/layouts/auth-layout";
 import { PublicLayout } from "@/components/layouts/public-layout";
 import { SelectTenantLayout } from "@/components/layouts/select-tenant-layout";
+import { GoogleCallbackPage } from "@/features/auth/pages/google-callback-page";
 import { LoginPage } from "@/features/auth/pages/login-page";
 import { SelectTenantPage } from "@/features/auth/pages/select-tenant-page";
 import { DashboardPage } from "@/features/dashboard/pages/dashboard-page";
@@ -49,6 +50,10 @@ export const router = createBrowserRouter([
             {
                 path: "login",
                 element: <LoginPage />,
+            },
+            {
+                path: "auth/google/callback",
+                element: <GoogleCallbackPage />,
             },
         ],
     },

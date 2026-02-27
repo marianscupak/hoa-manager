@@ -121,7 +121,9 @@ export class DrizzleAuthSessionRepository implements AuthSessionRepository {
 }
 
 @Injectable()
-export class DrizzleOidcLoginAttemptRepository implements OidcLoginAttemptRepository {
+export class DrizzleOidcLoginAttemptRepository
+  implements OidcLoginAttemptRepository
+{
   constructor(private readonly drizzle: DrizzleService) {}
 
   private get db() {
@@ -151,7 +153,9 @@ export class DrizzleOidcLoginAttemptRepository implements OidcLoginAttemptReposi
 }
 
 @Injectable()
-export class DrizzleAuthExchangeCodeRepository implements AuthExchangeCodeRepository {
+export class DrizzleAuthExchangeCodeRepository
+  implements AuthExchangeCodeRepository
+{
   constructor(
     private readonly drizzle: DrizzleService,
     @Inject(CLOCK)

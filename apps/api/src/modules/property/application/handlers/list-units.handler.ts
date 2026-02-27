@@ -15,10 +15,9 @@ export interface UnitWithStatus extends Unit {
 }
 
 @QueryHandler(ListUnitsQuery)
-export class ListUnitsHandler implements IQueryHandler<
-  ListUnitsQuery,
-  UnitWithStatus[]
-> {
+export class ListUnitsHandler
+  implements IQueryHandler<ListUnitsQuery, UnitWithStatus[]>
+{
   constructor(
     @Inject(UNIT_REPOSITORY)
     private readonly unitRepo: UnitRepository,

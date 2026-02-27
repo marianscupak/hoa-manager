@@ -1,6 +1,7 @@
-import { PlusIcon } from "lucide-react";
+import { PencilIcon, PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 
 import { Button, ColumnDef, DataTable } from "@hoa-mngr/ui";
 
@@ -10,10 +11,13 @@ import { useUnitControllerGetUnits } from "@/api/generated/property-units/proper
 import { CreateUnitDialog } from "../components/create-unit-dialog";
 
 export function UnitsPage() {
-    const { t } = useTranslation(["admin"]);
+    const { t } = useTranslation("admin");
+    const { t: tCommon } = useTranslation("common");
     const [isCreateOpen, setIsCreateOpen] = useState(false);
 
     const { data: units, isLoading, refetch } = useUnitControllerGetUnits();
+
+    const navigate = useNavigate();
 
     const columns: ColumnDef<UnitResponseDto>[] = [
         {
@@ -24,6 +28,24 @@ export function UnitsPage() {
         {
             header: t("units.table.buildingShare"),
             accessorKey: "buildingShare",
+        },
+        {
+            header: tCommon("actions"),
+            cell: ({ row }) => {
+                return (
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => {
+                                navigate(`/admin/units/${row.id}`);
+                            }}
+                        >
+                            <PencilIcon className="h-4 w-4" />
+                        </Button>
+                    </div>
+                );
+            },
         },
     ];
 

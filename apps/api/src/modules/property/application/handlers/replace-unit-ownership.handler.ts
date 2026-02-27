@@ -15,10 +15,9 @@ import {
 } from '../ports/property.repository.port';
 
 @CommandHandler(ReplaceUnitOwnershipCommand)
-export class ReplaceUnitOwnershipHandler implements ICommandHandler<
-  ReplaceUnitOwnershipCommand,
-  void
-> {
+export class ReplaceUnitOwnershipHandler
+  implements ICommandHandler<ReplaceUnitOwnershipCommand, void>
+{
   constructor(
     @Inject(UNIT_REPOSITORY)
     private readonly unitRepo: UnitRepository,

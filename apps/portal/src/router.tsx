@@ -14,6 +14,8 @@ import { DashboardPage } from "@/features/dashboard/pages/dashboard-page";
 import { CreateTenantPage } from "@/features/tenants/pages/create-tenant-page";
 import { NotFoundPage } from "@/pages/not-found";
 
+import { UnitDetailPage } from "./features/admin/pages/unit-detail-page";
+
 export const router = createBrowserRouter([
     {
         path: "/",
@@ -42,6 +44,10 @@ export const router = createBrowserRouter([
                     {
                         path: "owners",
                         element: <OwnersPage />,
+                    },
+                    {
+                        path: "units/:id",
+                        element: <UnitDetailPage />,
                     },
                 ],
             },

@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0
  */
 import type { UnitOwnershipResponseDto } from "./unitOwnershipResponseDto";
-import type { UnitResponseDto } from "./unitResponseDto";
 
 export interface UnitDetailResponseDto {
-    unit: UnitResponseDto;
-    activeOwnerships: UnitOwnershipResponseDto[];
+    id: string;
+    tenantId: string;
+    unitNo: string;
+    buildingShare: string;
+    createdAt: string;
+    updatedAt: string;
+    ownerships: UnitOwnershipResponseDto[];
 }

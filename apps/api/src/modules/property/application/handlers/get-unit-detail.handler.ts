@@ -15,10 +15,9 @@ export interface UnitDetail extends Unit {
 }
 
 @QueryHandler(GetUnitDetailQuery)
-export class GetUnitDetailHandler implements IQueryHandler<
-  GetUnitDetailQuery,
-  UnitDetail
-> {
+export class GetUnitDetailHandler
+  implements IQueryHandler<GetUnitDetailQuery, UnitDetail>
+{
   constructor(
     @Inject(UNIT_REPOSITORY)
     private readonly unitRepo: UnitRepository,

@@ -1,0 +1,152 @@
+import { ArrowLeftIcon, PencilIcon } from "lucide-react";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Link, useParams } from "react-router";
+
+import { Button, DataTable, ColumnDef } from "@hoa-mngr/ui";
+
+import type { UnitOwnershipResponseDto } from "@/api/generated/model";
+import { useOwnerControllerGetOwners } from "@/api/generated/property-owners/property-owners";
+import { useUnitControllerGetUnitDetail } from "@/api/generated/property-units/property-units";
+
+import { ReplaceOwnershipDialog } from "../components/replace-ownership-dialog";
+
+export function UnitDetailPage() {
+    const { id } = useParams();
+    const { t } = useTranslation(["admin", "common"]);
+    const [isEditOpen, setIsEditOpen] = useState(false);
+
+    if (!id) {
+        throw new Error("No unit id provided");
+    }
+
+    const {
+        data: unit,
+        isLoading,
+        refetch,
+    } = useUnitControllerGetUnitDetail(id);
+    const { data: owners } = useOwnerControllerGetOwners();
+
+    console.log(unit);
+
+    const getOwnerName = (ownerId: string) => {
+        return owners?.find((o) => o.id === ownerId)?.displayName ?? ownerId;
+    };
+
+    const columns: ColumnDef<UnitOwnershipResponseDto>[] = [
+        {
+            header: t("admin:units.details.ownership.owner"),
+            cell: ({ row }) => (
+                <span className="font-medium text-slate-900">
+                    {getOwnerName(row.ownerId)}
+                </span>
+            ),
+        },
+        {
+            header: t("admin:units.details.ownership.share"),
+            accessorKey: "share",
+            cell: ({ row }) => (
+                <span className="text-slate-600">
+                    {(parseFloat(row.share) * 100).toFixed(2)}%
+                </span>
+            ),
+        },
+        {
+            header: t("admin:units.details.ownership.since"),
+            accessorKey: "validFrom",
+            cell: ({ row }) => (
+                <span className="text-slate-500">
+                    {new Date(row.validFrom).toLocaleDateString()}
+                </span>
+            ),
+        },
+        {
+            header: t("admin:units.details.ownership.active"),
+            cell: () => (
+                <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-green-600/20 ring-inset">
+                    {t("admin:units.details.ownership.active")}
+                </span>
+            ),
+        },
+    ];
+
+    if (isLoading) {
+        return <div className="p-8 text-center">{t("common:loading")}</div>;
+    }
+
+    return (
+        <div className="space-y-8">
+            <div className="flex items-center gap-4">
+                <Button variant="ghost" size="icon" asChild>
+                    <Link to="/admin/units">
+                        <ArrowLeftIcon className="h-4 w-4" />
+                    </Link>
+                </Button>
+                <div>
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+                        {t("admin:units.details.title")}
+                    </h1>
+                    <p className="text-sm text-slate-500">
+                        {t("admin:units.details.info")}
+                    </p>
+                </div>
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-2">
+                <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <h2 className="mb-4 text-sm font-semibold tracking-wider text-slate-500 uppercase">
+                        {t("admin:units.details.info")}
+                    </h2>
+                    <dl className="grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <dt className="text-sm text-slate-500">
+                                {t("admin:units.details.unitNo")}
+                            </dt>
+                            <dd className="text-lg font-medium text-slate-900">
+                                {unit?.unitNo}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt className="text-sm text-slate-500">
+                                {t("admin:units.details.buildingShare")}
+                            </dt>
+                            <dd className="text-lg font-medium text-slate-900">
+                                {(
+                                    parseFloat(unit?.buildingShare ?? "0") * 100
+                                ).toFixed(2)}
+                                %
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+
+            <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                    <h2 className="text-lg font-semibold text-slate-900">
+                        {t("admin:units.details.ownership.title")}
+                    </h2>
+                    <Button onClick={() => setIsEditOpen(true)} size="sm">
+                        <PencilIcon className="mr-2 h-4 w-4" />
+                        {t("admin:units.details.ownership.edit")}
+                    </Button>
+                </div>
+
+                <DataTable
+                    columns={columns}
+                    data={unit?.ownerships ?? []}
+                    isLoading={isLoading}
+                    emptyMessage={t("admin:units.details.ownership.empty")}
+                />
+            </div>
+
+            <ReplaceOwnershipDialog
+                unitId={id}
+                open={isEditOpen}
+                onOpenChange={setIsEditOpen}
+                currentOwnerships={unit?.ownerships}
+                onSuccess={() => refetch()}
+            />
+        </div>
+    );
+}

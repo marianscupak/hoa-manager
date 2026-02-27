@@ -46,9 +46,6 @@ export class UnitController {
   async getUnits(
     @Tenant() tenantCtx: TenantContext,
   ): Promise<UnitResponseDto[]> {
-    if (!tenantCtx.tenantId) {
-      throw new Error('Tenant context required');
-    }
     return this.queryBus.execute(new ListUnitsQuery(tenantCtx.tenantId));
   }
 
@@ -62,9 +59,6 @@ export class UnitController {
     @Tenant() tenantCtx: TenantContext,
     @Body() dto: CreateUnitDto,
   ): Promise<CreateUnitResponseDto> {
-    if (!tenantCtx.tenantId) {
-      throw new Error('Tenant context required');
-    }
     return this.commandBus.execute<CreateUnitCommand, { unitId: string }>(
       new CreateUnitCommand(tenantCtx.tenantId, dto.unitNo, dto.buildingShare),
     );
@@ -80,9 +74,6 @@ export class UnitController {
     @Tenant() tenantCtx: TenantContext,
     @Param('id') unitId: string,
   ): Promise<UnitDetailResponseDto> {
-    if (!tenantCtx.tenantId) {
-      throw new Error('Tenant context required');
-    }
     return this.queryBus.execute(
       new GetUnitDetailQuery(tenantCtx.tenantId, unitId),
     );
@@ -98,9 +89,6 @@ export class UnitController {
     @Param('id') unitId: string,
     @Body() dto: ReplaceOwnershipsDto,
   ): Promise<void> {
-    if (!tenantCtx.tenantId) {
-      throw new Error('Tenant context required');
-    }
     await this.commandBus.execute(
       new ReplaceUnitOwnershipCommand(
         tenantCtx.tenantId,

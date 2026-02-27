@@ -9,10 +9,9 @@ import {
 import { ListOwnersQuery } from '../queries/list-owners.query';
 
 @QueryHandler(ListOwnersQuery)
-export class ListOwnersHandler implements IQueryHandler<
-  ListOwnersQuery,
-  Owner[]
-> {
+export class ListOwnersHandler
+  implements IQueryHandler<ListOwnersQuery, Owner[]>
+{
   constructor(
     @Inject(OWNER_REPOSITORY)
     private readonly ownerRepo: OwnerRepository,

@@ -79,10 +79,7 @@ export class UnitOwnershipResponseDto {
   validTo!: Date | null;
 }
 
-export class UnitDetailResponseDto {
-  @ApiProperty()
-  unit!: UnitResponseDto;
-
+export class UnitDetailResponseDto extends UnitResponseDto {
   @ApiProperty({ type: [UnitOwnershipResponseDto] })
-  activeOwnerships!: UnitOwnershipResponseDto[];
+  ownerships!: UnitOwnershipResponseDto[];
 }

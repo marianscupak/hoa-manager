@@ -26,9 +26,7 @@
                       },
                       "additionalProperties": {
                         "type": "object",
-                        "required": [
-                          "status"
-                        ],
+                        "required": ["status"],
                         "properties": {
                           "status": {
                             "type": "string"
@@ -43,9 +41,7 @@
                       "example": {},
                       "additionalProperties": {
                         "type": "object",
-                        "required": [
-                          "status"
-                        ],
+                        "required": ["status"],
                         "properties": {
                           "status": {
                             "type": "string"
@@ -64,9 +60,7 @@
                       },
                       "additionalProperties": {
                         "type": "object",
-                        "required": [
-                          "status"
-                        ],
+                        "required": ["status"],
                         "properties": {
                           "status": {
                             "type": "string"
@@ -100,9 +94,7 @@
                       },
                       "additionalProperties": {
                         "type": "object",
-                        "required": [
-                          "status"
-                        ],
+                        "required": ["status"],
                         "properties": {
                           "status": {
                             "type": "string"
@@ -122,9 +114,7 @@
                       },
                       "additionalProperties": {
                         "type": "object",
-                        "required": [
-                          "status"
-                        ],
+                        "required": ["status"],
                         "properties": {
                           "status": {
                             "type": "string"
@@ -147,9 +137,7 @@
                       },
                       "additionalProperties": {
                         "type": "object",
-                        "required": [
-                          "status"
-                        ],
+                        "required": ["status"],
                         "properties": {
                           "status": {
                             "type": "string"
@@ -164,9 +152,7 @@
             }
           }
         },
-        "tags": [
-          "Health"
-        ]
+        "tags": ["Health"]
       }
     },
     "/api/metrics": {
@@ -178,9 +164,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "Prometheus"
-        ]
+        "tags": ["Prometheus"]
       }
     },
     "/api/tenants": {
@@ -202,9 +186,7 @@
             }
           }
         },
-        "tags": [
-          "Tenancy"
-        ]
+        "tags": ["Tenancy"]
       },
       "post": {
         "operationId": "TenancyController_createTenant",
@@ -231,9 +213,7 @@
             }
           }
         },
-        "tags": [
-          "Tenancy"
-        ]
+        "tags": ["Tenancy"]
       }
     },
     "/api/auth/login": {
@@ -262,9 +242,7 @@
             }
           }
         },
-        "tags": [
-          "Auth"
-        ]
+        "tags": ["Auth"]
       }
     },
     "/api/auth/google/start": {
@@ -276,9 +254,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "Auth"
-        ]
+        "tags": ["Auth"]
       }
     },
     "/api/auth/google/callback": {
@@ -307,9 +283,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "Auth"
-        ]
+        "tags": ["Auth"]
       }
     },
     "/api/auth/google/exchange": {
@@ -338,9 +312,7 @@
             }
           }
         },
-        "tags": [
-          "Auth"
-        ]
+        "tags": ["Auth"]
       }
     },
     "/api/auth/refresh": {
@@ -359,9 +331,7 @@
             }
           }
         },
-        "tags": [
-          "Auth"
-        ]
+        "tags": ["Auth"]
       }
     },
     "/api/auth/switch-tenant": {
@@ -390,9 +360,7 @@
             }
           }
         },
-        "tags": [
-          "Auth"
-        ]
+        "tags": ["Auth"]
       }
     },
     "/api/auth/logout": {
@@ -411,9 +379,7 @@
             }
           }
         },
-        "tags": [
-          "Auth"
-        ]
+        "tags": ["Auth"]
       }
     },
     "/api/identity/users": {
@@ -442,9 +408,7 @@
             }
           }
         },
-        "tags": [
-          "Identity"
-        ]
+        "tags": ["Identity"]
       }
     },
     "/api/identity/users/{id}": {
@@ -472,9 +436,7 @@
             }
           }
         },
-        "tags": [
-          "Identity"
-        ]
+        "tags": ["Identity"]
       }
     },
     "/api/owners": {
@@ -496,9 +458,7 @@
             }
           }
         },
-        "tags": [
-          "Property Owners"
-        ]
+        "tags": ["Property Owners"]
       },
       "post": {
         "operationId": "OwnerController_createOwner",
@@ -525,9 +485,7 @@
             }
           }
         },
-        "tags": [
-          "Property Owners"
-        ]
+        "tags": ["Property Owners"]
       }
     },
     "/api/units": {
@@ -549,9 +507,7 @@
             }
           }
         },
-        "tags": [
-          "Property Units"
-        ]
+        "tags": ["Property Units"]
       },
       "post": {
         "operationId": "UnitController_createUnit",
@@ -578,9 +534,7 @@
             }
           }
         },
-        "tags": [
-          "Property Units"
-        ]
+        "tags": ["Property Units"]
       }
     },
     "/api/units/{id}": {
@@ -608,9 +562,7 @@
             }
           }
         },
-        "tags": [
-          "Property Units"
-        ]
+        "tags": ["Property Units"]
       }
     },
     "/api/units/{id}/ownership": {
@@ -641,9 +593,7 @@
             "description": "Ownership for the unit replaced successfully"
           }
         },
-        "tags": [
-          "Property Units"
-        ]
+        "tags": ["Property Units"]
       }
     }
   },
@@ -670,28 +620,14 @@
           },
           "role": {
             "type": "string",
-            "enum": [
-              "ADMIN",
-              "BOARD_MEMBER",
-              "AUDITOR",
-              "UNIT_OWNER"
-            ]
+            "enum": ["ADMIN", "BOARD_MEMBER", "AUDITOR", "UNIT_OWNER"]
           },
           "status": {
             "type": "string",
-            "enum": [
-              "ACTIVE",
-              "SUSPENDED",
-              "INVITED"
-            ]
+            "enum": ["ACTIVE", "SUSPENDED", "INVITED"]
           }
         },
-        "required": [
-          "id",
-          "name",
-          "role",
-          "status"
-        ]
+        "required": ["id", "name", "role", "status"]
       },
       "CreateTenantDto": {
         "type": "object",
@@ -702,9 +638,7 @@
             "maxLength": 255
           }
         },
-        "required": [
-          "name"
-        ]
+        "required": ["name"]
       },
       "CreateTenantResponseDto": {
         "type": "object",
@@ -715,9 +649,7 @@
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
           }
         },
-        "required": [
-          "tenantId"
-        ]
+        "required": ["tenantId"]
       },
       "LoginDto": {
         "type": "object",
@@ -732,10 +664,7 @@
             "minLength": 1
           }
         },
-        "required": [
-          "email",
-          "password"
-        ]
+        "required": ["email", "password"]
       },
       "AuthResponseDto": {
         "type": "object",
@@ -744,9 +673,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "accessToken"
-        ]
+        "required": ["accessToken"]
       },
       "ExchangeCodeDto": {
         "type": "object",
@@ -756,9 +683,7 @@
             "minLength": 1
           }
         },
-        "required": [
-          "code"
-        ]
+        "required": ["code"]
       },
       "SwitchTenantDto": {
         "type": "object",
@@ -769,9 +694,7 @@
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
           }
         },
-        "required": [
-          "tenantId"
-        ]
+        "required": ["tenantId"]
       },
       "SuccessResponseDto": {
         "type": "object",
@@ -780,9 +703,7 @@
             "type": "boolean"
           }
         },
-        "required": [
-          "success"
-        ]
+        "required": ["success"]
       },
       "CreateUserDto": {
         "type": "object",
@@ -797,10 +718,7 @@
             "minLength": 1
           }
         },
-        "required": [
-          "email",
-          "fullName"
-        ]
+        "required": ["email", "fullName"]
       },
       "CreateUserResponseDto": {
         "type": "object",
@@ -811,9 +729,7 @@
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "UserResponseDto": {
         "type": "object",
@@ -829,10 +745,7 @@
             "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
           }
         },
-        "required": [
-          "id",
-          "email"
-        ]
+        "required": ["id", "email"]
       },
       "OwnerResponseDto": {
         "type": "object",
@@ -884,9 +797,7 @@
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
           }
         },
-        "required": [
-          "displayName"
-        ]
+        "required": ["displayName"]
       },
       "CreateOwnerResponseDto": {
         "type": "object",
@@ -897,9 +808,7 @@
             "example": "123e4567-e89b-12d3-a456-426614174000"
           }
         },
-        "required": [
-          "ownerId"
-        ]
+        "required": ["ownerId"]
       },
       "UnitResponseDto": {
         "type": "object",
@@ -949,10 +858,7 @@
             "description": "The building share as a decimal string"
           }
         },
-        "required": [
-          "unitNo",
-          "buildingShare"
-        ]
+        "required": ["unitNo", "buildingShare"]
       },
       "CreateUnitResponseDto": {
         "type": "object",
@@ -963,9 +869,7 @@
             "example": "123e4567-e89b-12d3-a456-426614174000"
           }
         },
-        "required": [
-          "unitId"
-        ]
+        "required": ["unitId"]
       },
       "UnitOwnershipResponseDto": {
         "type": "object",
@@ -1008,10 +912,27 @@
       "UnitDetailResponseDto": {
         "type": "object",
         "properties": {
-          "unit": {
-            "$ref": "#/components/schemas/UnitResponseDto"
+          "id": {
+            "type": "string"
           },
-          "activeOwnerships": {
+          "tenantId": {
+            "type": "string"
+          },
+          "unitNo": {
+            "type": "string"
+          },
+          "buildingShare": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "ownerships": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/UnitOwnershipResponseDto"
@@ -1019,8 +940,13 @@
           }
         },
         "required": [
-          "unit",
-          "activeOwnerships"
+          "id",
+          "tenantId",
+          "unitNo",
+          "buildingShare",
+          "createdAt",
+          "updatedAt",
+          "ownerships"
         ]
       },
       "ReplaceOwnershipsDto": {
@@ -1042,17 +968,12 @@
                   "pattern": "^\\d+(\\.\\d+)?$"
                 }
               },
-              "required": [
-                "ownerId",
-                "share"
-              ]
+              "required": ["ownerId", "share"]
             },
             "description": "List of ownerships to replace the current active ones"
           }
         },
-        "required": [
-          "ownerships"
-        ]
+        "required": ["ownerships"]
       }
     }
   }

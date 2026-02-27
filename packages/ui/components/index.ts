@@ -7,4 +7,5 @@ export * from "./sonner";
 export * from "./table";
 export * from "./dialog";
 export * from "./form-controls";
+export * from "./select";
 export * from "./data-table";

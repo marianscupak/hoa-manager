@@ -3,7 +3,10 @@ import { Link, Navigate, Outlet, useLocation } from "react-router";
 
 import { tenantContextAtom } from "@/auth/atoms";
 
-const navigation = [{ name: "Units & Owners", href: "/admin/units" }];
+const navigation = [
+    { name: "Units", href: "/admin/units" },
+    { name: "Owners", href: "/admin/owners" },
+];
 
 export function AdminLayout() {
     const location = useLocation();

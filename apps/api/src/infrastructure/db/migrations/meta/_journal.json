@@ -43,6 +43,13 @@
       "when": 1772193794954,
       "tag": "0005_clear_mastermind",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1772214103682,
+      "tag": "0006_massive_earthquake",
+      "breakpoints": true
     }
   ]
 }

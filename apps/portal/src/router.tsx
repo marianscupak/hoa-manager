@@ -5,6 +5,7 @@ import { AuthLayout } from "@/components/layouts/auth-layout";
 import { PublicLayout } from "@/components/layouts/public-layout";
 import { SelectTenantLayout } from "@/components/layouts/select-tenant-layout";
 import { AdminLayout } from "@/features/admin/components/admin-layout";
+import { OwnersPage } from "@/features/admin/pages/owners-page";
 import { UnitsPage } from "@/features/admin/pages/units-page";
 import { GoogleCallbackPage } from "@/features/auth/pages/google-callback-page";
 import { LoginPage } from "@/features/auth/pages/login-page";
@@ -37,6 +38,10 @@ export const router = createBrowserRouter([
                     {
                         path: "units",
                         element: <UnitsPage />,
+                    },
+                    {
+                        path: "owners",
+                        element: <OwnersPage />,
                     },
                 ],
             },

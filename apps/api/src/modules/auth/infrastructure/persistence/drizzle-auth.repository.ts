@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { eq, and, isNull } from 'drizzle-orm';
 
+import { SystemClock } from '../../../../infrastructure/clock/system-clock';
 import { DrizzleService } from '../../../../infrastructure/db/drizzle.service';
 import { DRIZZLE_TX_STORAGE } from '../../../../infrastructure/db/drizzle.unit-of-work';
 import {
@@ -9,6 +10,7 @@ import {
   oidcLoginAttempts,
   authExchangeCodes,
 } from '../../../../infrastructure/db/schema';
+import { CLOCK } from '../../../../shared/application/ports/clock.port';
 import {
   AuthIdentityRepository,
   AuthSessionRepository,
@@ -21,7 +23,11 @@ import { AuthIdentity, AuthSession } from '../../domain/auth-identity.entity';
 
 @Injectable()
 export class DrizzleAuthIdentityRepository implements AuthIdentityRepository {
-  constructor(private readonly drizzle: DrizzleService) {}
+  constructor(
+    private readonly drizzle: DrizzleService,
+    @Inject(CLOCK)
+    private readonly clock: SystemClock,
+  ) {}
 
   private get db() {
     return DRIZZLE_TX_STORAGE.getStore() ?? this.drizzle.db;
@@ -58,14 +64,18 @@ export class DrizzleAuthIdentityRepository implements AuthIdentityRepository {
   async updateLastUsed(id: string): Promise<void> {
     await this.db
       .update(authIdentities)
-      .set({ lastUsedAt: new Date() })
+      .set({ lastUsedAt: this.clock.now() })
       .where(eq(authIdentities.id, id));
   }
 }
 
 @Injectable()
 export class DrizzleAuthSessionRepository implements AuthSessionRepository {
-  constructor(private readonly drizzle: DrizzleService) {}
+  constructor(
+    private readonly drizzle: DrizzleService,
+    @Inject(CLOCK)
+    private readonly clock: SystemClock,
+  ) {}
 
   private get db() {
     return DRIZZLE_TX_STORAGE.getStore() ?? this.drizzle.db;
@@ -96,14 +106,14 @@ export class DrizzleAuthSessionRepository implements AuthSessionRepository {
   async markRevoked(id: string): Promise<void> {
     await this.db
       .update(authSessions)
-      .set({ revokedAt: new Date() })
+      .set({ revokedAt: this.clock.now() })
       .where(eq(authSessions.id, id));
   }
 
   async revokeAllForUser(userId: string): Promise<void> {
     await this.db
       .update(authSessions)
-      .set({ revokedAt: new Date() })
+      .set({ revokedAt: this.clock.now() })
       .where(
         and(eq(authSessions.userId, userId), isNull(authSessions.revokedAt)),
       );
@@ -111,9 +121,7 @@ export class DrizzleAuthSessionRepository implements AuthSessionRepository {
 }
 
 @Injectable()
-export class DrizzleOidcLoginAttemptRepository
-  implements OidcLoginAttemptRepository
-{
+export class DrizzleOidcLoginAttemptRepository implements OidcLoginAttemptRepository {
   constructor(private readonly drizzle: DrizzleService) {}
 
   private get db() {
@@ -143,10 +151,12 @@ export class DrizzleOidcLoginAttemptRepository
 }
 
 @Injectable()
-export class DrizzleAuthExchangeCodeRepository
-  implements AuthExchangeCodeRepository
-{
-  constructor(private readonly drizzle: DrizzleService) {}
+export class DrizzleAuthExchangeCodeRepository implements AuthExchangeCodeRepository {
+  constructor(
+    private readonly drizzle: DrizzleService,
+    @Inject(CLOCK)
+    private readonly clock: SystemClock,
+  ) {}
 
   private get db() {
     return DRIZZLE_TX_STORAGE.getStore() ?? this.drizzle.db;
@@ -172,7 +182,7 @@ export class DrizzleAuthExchangeCodeRepository
   async markUsed(id: string): Promise<void> {
     await this.db
       .update(authExchangeCodes)
-      .set({ usedAt: new Date() })
+      .set({ usedAt: this.clock.now() })
       .where(eq(authExchangeCodes.id, id));
   }
 }

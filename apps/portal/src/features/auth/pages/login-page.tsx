@@ -1,9 +1,11 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useSetAtom } from "jotai";
-import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router";
+import { z } from "zod";
 
-import { toast } from "@hoa-mngr/ui";
+import { Form, FormInput, toast } from "@hoa-mngr/ui";
 
 import { useAuthControllerLogin } from "@/api/generated/auth/auth";
 import {
@@ -18,6 +20,11 @@ import { StorageService } from "@/storage/storage";
 
 import { GoogleLoginButton } from "../components/google-login-button";
 
+const formSchema = z.object({
+    email: z.email("auth:login.invalidEmail"),
+    password: z.string().min(1, "auth:login.invalidPassword"),
+});
+
 export function LoginPage() {
     const { t } = useTranslation("auth");
     const navigate = useNavigate();
@@ -28,17 +35,21 @@ export function LoginPage() {
     const setTenantContext = useSetAtom(tenantContextAtom);
     const setUser = useSetAtom(userAtom);
 
-    // The intended destination from AuthLayout, or fallback to home
     const from = location.state?.from?.pathname || "/";
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+
+    const form = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            email: "",
+            password: "",
+        },
+    });
 
     const loginMutation = useAuthControllerLogin();
 
-    const handleLogin = (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleLogin = (values: z.infer<typeof formSchema>) => {
         loginMutation.mutate(
-            { data: { email, password } },
+            { data: { email: values.email, password: values.password } },
             {
                 onSuccess: (data) => {
                     const token = data.accessToken;
@@ -83,51 +94,44 @@ export function LoginPage() {
                 </p>
             </div>
 
-            <form onSubmit={handleLogin} className="space-y-4">
-                <div>
-                    <label className="mb-2 block text-sm font-medium text-slate-900">
-                        Email Address
-                    </label>
-                    <input
+            <Form {...form}>
+                <form
+                    onSubmit={form.handleSubmit(handleLogin)}
+                    className="space-y-4"
+                >
+                    <FormInput
+                        name="email"
+                        label="Email Address"
                         type="email"
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="focus:ring-primary block w-full rounded-md border-0 py-1.5 text-slate-900 ring-1 ring-slate-300 ring-inset placeholder:text-slate-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
                         placeholder="admin@hoa.local"
                         disabled={loginMutation.isPending}
                     />
-                </div>
-                <div>
-                    <label className="mb-2 block text-sm font-medium text-slate-900">
-                        Password
-                    </label>
-                    <input
+                    <FormInput
+                        name="password"
+                        label="Password"
                         type="password"
-                        required
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="focus:ring-primary block w-full rounded-md border-0 py-1.5 text-slate-900 ring-1 ring-slate-300 ring-inset placeholder:text-slate-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
                         placeholder="••••••••"
                         disabled={loginMutation.isPending}
                     />
-                </div>
 
-                <div className="pt-2">
-                    <button
-                        type="submit"
-                        disabled={loginMutation.isPending}
-                        className="flex w-full justify-center rounded-md bg-slate-900 px-3 py-1.5 text-sm leading-6 font-semibold text-white shadow-sm hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:opacity-50"
-                    >
-                        {loginMutation.isPending ? "Signing in..." : "Sign in"}
-                    </button>
-                    {loginMutation.isError && (
-                        <p className="mt-2 text-center text-sm text-red-500">
-                            Login failed. Please check your credentials.
-                        </p>
-                    )}
-                </div>
-            </form>
+                    <div className="pt-2">
+                        <button
+                            type="submit"
+                            disabled={loginMutation.isPending}
+                            className="flex w-full justify-center rounded-md bg-slate-900 px-3 py-1.5 text-sm leading-6 font-semibold text-white shadow-sm hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:opacity-50"
+                        >
+                            {loginMutation.isPending
+                                ? "Signing in..."
+                                : "Sign in"}
+                        </button>
+                        {loginMutation.isError && (
+                            <p className="mt-2 text-center text-sm text-red-500">
+                                Login failed. Please check your credentials.
+                            </p>
+                        )}
+                    </div>
+                </form>
+            </Form>
 
             <div className="mt-6 flex items-center justify-center">
                 <span className="bg-white px-2 text-sm text-slate-500">

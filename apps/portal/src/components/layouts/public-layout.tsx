@@ -7,10 +7,6 @@ import { LocaleSwitcher } from "@/components/locale-switcher";
 export function PublicLayout() {
     const authStatus = useAtomValue(authStatusAtom);
 
-    if (authStatus === "initializing") {
-        return null;
-    }
-
     if (authStatus === "authenticated") {
         return <Navigate to="/" replace />;
     }

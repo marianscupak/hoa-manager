@@ -56,7 +56,7 @@ export function useAuthBoot() {
 
                 if (!payload) throw new Error("Invalid payload state");
 
-                setSession(token, false);
+                setSession(token);
             } catch {
                 setAuthStatus("anonymous");
             }

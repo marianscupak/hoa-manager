@@ -12,14 +12,6 @@ export function AuthLayout() {
     const location = useLocation();
     const { data: tenants } = useTenancyControllerGetUserTenants();
 
-    if (authStatus === "initializing") {
-        return (
-            <div className="flex min-h-screen items-center justify-center">
-                <p className="animate-pulse text-slate-500">Loading...</p>
-            </div>
-        );
-    }
-
     if (authStatus === "anonymous") {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }

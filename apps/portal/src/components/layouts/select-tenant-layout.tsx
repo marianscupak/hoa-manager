@@ -8,10 +8,6 @@ import { LogoutButton } from "@/components/logout-button";
 export function SelectTenantLayout() {
     const authStatus = useAtomValue(authStatusAtom);
 
-    if (authStatus === "initializing") {
-        return null;
-    }
-
     if (authStatus === "anonymous") {
         return <Navigate to="/login" replace />;
     }

@@ -11,7 +11,15 @@ import { AppBootLoader } from "@/providers/app-boot-loader";
 import { router } from "@/router";
 import "./index.css";
 
-const queryClient = new QueryClient();
+const FIVE_MINUTES = 1000 * 60 * 5;
+
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            staleTime: FIVE_MINUTES,
+        },
+    },
+});
 
 createRoot(document.getElementById("app")!).render(
     <StrictMode>

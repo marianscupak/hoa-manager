@@ -8,8 +8,6 @@ import {
     userAtom,
 } from "@/auth/atoms";
 import { parseJwt } from "@/auth/jwt";
-import { STORAGE_KEYS } from "@/storage/keys";
-import { StorageService } from "@/storage/storage";
 
 export function useSessionManager() {
     const setAccessToken = useSetAtom(accessTokenAtom);
@@ -18,7 +16,7 @@ export function useSessionManager() {
     const setUser = useSetAtom(userAtom);
 
     const setSession = useCallback(
-        (token: string, persistTenantId: boolean = true) => {
+        (token: string) => {
             const payload = parseJwt(token);
             if (!payload) return { success: false, hasTenant: false };
 
@@ -32,12 +30,6 @@ export function useSessionManager() {
                     roles: payload.roles || [],
                 });
                 setAuthStatus("authenticated");
-                if (persistTenantId) {
-                    StorageService.setString(
-                        STORAGE_KEYS.LAST_TENANT_ID,
-                        payload.tid,
-                    );
-                }
                 return { success: true, hasTenant: true };
             } else {
                 setAuthStatus("select-tenant");

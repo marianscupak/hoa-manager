@@ -6,6 +6,7 @@ import { authStatusAtom } from "@/auth/atoms";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { LogoutButton } from "@/components/logout-button";
 import { TenantSwitcher } from "@/components/tenant-switcher";
+import { TopNav } from "@/components/top-nav";
 
 export function AuthLayout() {
     const authStatus = useAtomValue(authStatusAtom);
@@ -30,6 +31,7 @@ export function AuthLayout() {
                     <span className="hidden text-lg font-bold text-slate-900 sm:inline-block">
                         HOA Manager
                     </span>
+                    <TopNav />
                 </div>
                 <div className="flex items-center gap-3">
                     {(tenants?.length ?? 0) > 1 && <TenantSwitcher />}

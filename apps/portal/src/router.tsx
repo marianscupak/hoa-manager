@@ -1,9 +1,11 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter, Navigate } from "react-router";
 
 import { ErrorBoundary } from "@/components/error/error-boundary";
 import { AuthLayout } from "@/components/layouts/auth-layout";
 import { PublicLayout } from "@/components/layouts/public-layout";
 import { SelectTenantLayout } from "@/components/layouts/select-tenant-layout";
+import { AdminLayout } from "@/features/admin/components/admin-layout";
+import { UnitsPage } from "@/features/admin/pages/units-page";
 import { GoogleCallbackPage } from "@/features/auth/pages/google-callback-page";
 import { LoginPage } from "@/features/auth/pages/login-page";
 import { SelectTenantPage } from "@/features/auth/pages/select-tenant-page";
@@ -23,6 +25,20 @@ export const router = createBrowserRouter([
             {
                 index: true,
                 element: <DashboardPage />,
+            },
+            {
+                path: "admin",
+                element: <AdminLayout />,
+                children: [
+                    {
+                        index: true,
+                        element: <Navigate to="units" replace />,
+                    },
+                    {
+                        path: "units",
+                        element: <UnitsPage />,
+                    },
+                ],
             },
         ],
     },

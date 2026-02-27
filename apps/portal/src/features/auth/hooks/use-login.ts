@@ -46,7 +46,7 @@ export function useLogin() {
                     if (hasTenant) {
                         navigate(from, { replace: true });
                     } else {
-                        navigate("/select-tenant", { replace: true });
+                        navigate("/tenant", { replace: true });
                     }
                 },
                 onError: () => {

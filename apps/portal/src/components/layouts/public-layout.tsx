@@ -12,7 +12,7 @@ export function PublicLayout() {
     }
 
     if (authStatus === "select-tenant") {
-        return <Navigate to="/select-tenant" replace />;
+        return <Navigate to="/tenant" replace />;
     }
 
     return (

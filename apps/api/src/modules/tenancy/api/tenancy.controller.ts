@@ -1,23 +1,33 @@
 import {
   Controller,
   Get,
+  Post,
+  Body,
   UseGuards,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { QueryBus } from '@nestjs/cqrs';
-import { ApiOkResponse } from '@nestjs/swagger';
+import { QueryBus, CommandBus } from '@nestjs/cqrs';
+import { ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
 
+import {
+  CreateTenantDto,
+  CreateTenantResponseDto,
+} from './dto/create-tenant.dto';
 import { TenantResponseDto } from './dto/tenant-response.dto';
 import { CurrentAuthUser } from '../../../shared/api/decorators/auth.decorators';
 import { AccessTokenAuthGuard } from '../../../shared/api/guards/access-token-auth.guard';
 import type { AuthPrincipal } from '../../../shared/domain/auth-principal';
+import { CreateTenantCommand } from '../application/commands/create-tenant.command';
 import { GetUserTenantsQuery } from '../application/queries/get-user-tenants.query';
 
 @Controller('tenants')
 @UseGuards(AccessTokenAuthGuard)
 export class TenancyController {
-  constructor(private readonly queryBus: QueryBus) {}
+  constructor(
+    private readonly queryBus: QueryBus,
+    private readonly commandBus: CommandBus,
+  ) {}
 
   @Get()
   @HttpCode(HttpStatus.OK)
@@ -27,6 +37,21 @@ export class TenancyController {
   ): Promise<TenantResponseDto[]> {
     return this.queryBus.execute<GetUserTenantsQuery, TenantResponseDto[]>(
       new GetUserTenantsQuery(user.userId),
+    );
+  }
+
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  @ApiCreatedResponse({
+    description: 'Tenant created successfully',
+    type: CreateTenantResponseDto,
+  })
+  async createTenant(
+    @CurrentAuthUser() user: AuthPrincipal,
+    @Body() dto: CreateTenantDto,
+  ): Promise<CreateTenantResponseDto> {
+    return this.commandBus.execute<CreateTenantCommand, { tenantId: string }>(
+      new CreateTenantCommand(dto.name, user.userId),
     );
   }
 }

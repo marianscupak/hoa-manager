@@ -5,23 +5,30 @@
  * The HOA Manager API description
  * OpenAPI spec version: 1.0
  */
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
     DataTag,
     DefinedInitialDataOptions,
     DefinedUseQueryResult,
+    MutationFunction,
     QueryClient,
     QueryFunction,
     QueryKey,
     UndefinedInitialDataOptions,
+    UseMutationOptions,
+    UseMutationResult,
     UseQueryOptions,
     UseQueryResult,
 } from "@tanstack/react-query";
 
-import type { TenantResponseDto } from ".././model";
+import type {
+    CreateTenantDto,
+    CreateTenantResponseDto,
+    TenantResponseDto,
+} from ".././model";
 
 import { customInstance } from "../../axios";
-import type { ErrorType } from "../../axios";
+import type { ErrorType, BodyType } from "../../axios";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
@@ -172,3 +179,91 @@ export function useTenancyControllerGetUserTenants<
 
     return { ...query, queryKey: queryOptions.queryKey };
 }
+
+export const tenancyControllerCreateTenant = (
+    createTenantDto: BodyType<CreateTenantDto>,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<CreateTenantResponseDto>(
+        {
+            url: `/api/tenants`,
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            data: createTenantDto,
+            signal,
+        },
+        options,
+    );
+};
+
+export const getTenancyControllerCreateTenantMutationOptions = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof tenancyControllerCreateTenant>>,
+        TError,
+        { data: BodyType<CreateTenantDto> },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof tenancyControllerCreateTenant>>,
+    TError,
+    { data: BodyType<CreateTenantDto> },
+    TContext
+> => {
+    const mutationKey = ["tenancyControllerCreateTenant"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof tenancyControllerCreateTenant>>,
+        { data: BodyType<CreateTenantDto> }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return tenancyControllerCreateTenant(data, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type TenancyControllerCreateTenantMutationResult = NonNullable<
+    Awaited<ReturnType<typeof tenancyControllerCreateTenant>>
+>;
+export type TenancyControllerCreateTenantMutationBody =
+    BodyType<CreateTenantDto>;
+export type TenancyControllerCreateTenantMutationError = ErrorType<unknown>;
+
+export const useTenancyControllerCreateTenant = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof tenancyControllerCreateTenant>>,
+            TError,
+            { data: BodyType<CreateTenantDto> },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof tenancyControllerCreateTenant>>,
+    TError,
+    { data: BodyType<CreateTenantDto> },
+    TContext
+> => {
+    return useMutation(
+        getTenancyControllerCreateTenantMutationOptions(options),
+        queryClient,
+    );
+};

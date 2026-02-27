@@ -67,7 +67,7 @@ export function GoogleCallbackPage() {
                         navigate("/", { replace: true });
                     } else {
                         setAuthStatus("select-tenant");
-                        navigate("/select-tenant", { replace: true });
+                        navigate("/tenant", { replace: true });
                     }
                 },
                 onError: () => {

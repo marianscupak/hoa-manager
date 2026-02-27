@@ -8,6 +8,7 @@ import { GoogleCallbackPage } from "@/features/auth/pages/google-callback-page";
 import { LoginPage } from "@/features/auth/pages/login-page";
 import { SelectTenantPage } from "@/features/auth/pages/select-tenant-page";
 import { DashboardPage } from "@/features/dashboard/pages/dashboard-page";
+import { CreateTenantPage } from "@/features/tenants/pages/create-tenant-page";
 import { NotFoundPage } from "@/pages/not-found";
 
 export const router = createBrowserRouter([
@@ -26,7 +27,7 @@ export const router = createBrowserRouter([
         ],
     },
     {
-        path: "/select-tenant",
+        path: "/tenant",
         element: (
             <ErrorBoundary>
                 <SelectTenantLayout />
@@ -36,6 +37,10 @@ export const router = createBrowserRouter([
             {
                 index: true,
                 element: <SelectTenantPage />,
+            },
+            {
+                path: "new",
+                element: <CreateTenantPage />,
             },
         ],
     },

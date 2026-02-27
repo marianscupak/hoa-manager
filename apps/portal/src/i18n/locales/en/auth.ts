@@ -11,4 +11,12 @@ export default {
     googleCallback: {
         error: "Failed to authenticate with Google.",
     },
+    selectTenant: {
+        title: "Select a Community",
+        loading: "Loading your communities...",
+        noCommunities: "No communities found.",
+        joining: "Joining...",
+        notFound: "Don't see your community?",
+        createNew: "Create a new community",
+    },
 } as const;

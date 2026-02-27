@@ -8,6 +8,8 @@
 
 export * from "./authControllerHandleGoogleCallbackParams";
 export * from "./authResponseDto";
+export * from "./createTenantDto";
+export * from "./createTenantResponseDto";
 export * from "./createUserDto";
 export * from "./createUserResponseDto";
 export * from "./exchangeCodeDto";

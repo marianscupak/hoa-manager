@@ -3,6 +3,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 
 import { TenancyController } from './api/tenancy.controller';
 import { AuthModule } from '../auth/auth.module';
+import { CreateTenantHandler } from './application/handlers/create-tenant.handler';
 import { GetUserTenantsHandler } from './application/handlers/get-user-tenants.handler';
 import {
   MEMBERSHIP_REPOSITORY,
@@ -20,6 +21,7 @@ import {
     { provide: TENANT_REPOSITORY, useClass: DrizzleTenantRepository },
     { provide: MEMBERSHIP_REPOSITORY, useClass: DrizzleMembershipRepository },
     GetUserTenantsHandler,
+    CreateTenantHandler,
   ],
   exports: [TENANT_REPOSITORY, MEMBERSHIP_REPOSITORY],
 })

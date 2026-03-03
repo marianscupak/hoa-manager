@@ -6,6 +6,7 @@ import {
   UNIT_OF_WORK,
   type UnitOfWork,
 } from '../../../../shared/application/ports/unit-of-work.port';
+import { TenantMembershipRole } from '../../domain/tenant.entity';
 import { CreateTenantCommand } from '../commands/create-tenant.command';
 import {
   MEMBERSHIP_REPOSITORY,
@@ -15,9 +16,10 @@ import {
 } from '../ports/tenant.repository.port';
 
 @CommandHandler(CreateTenantCommand)
-export class CreateTenantHandler
-  implements ICommandHandler<CreateTenantCommand, { tenantId: string }>
-{
+export class CreateTenantHandler implements ICommandHandler<
+  CreateTenantCommand,
+  { tenantId: string }
+> {
   constructor(
     @Inject(TENANT_REPOSITORY)
     private readonly tenantRepository: TenantRepository,
@@ -35,7 +37,7 @@ export class CreateTenantHandler
       await this.membershipRepository.create({
         tenantId: tenant.id,
         userId: command.createdByUserId,
-        role: 'ADMIN',
+        role: TenantMembershipRole.ADMIN,
         status: 'ACTIVE',
       });
 

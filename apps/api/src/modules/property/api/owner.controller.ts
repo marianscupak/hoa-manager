@@ -15,17 +15,19 @@ import {
   CreateOwnerResponseDto,
   OwnerResponseDto,
 } from './dto/owner.dto';
-import { Tenant } from '../../../shared/api/decorators/auth.decorators';
+import { Roles, Tenant } from '../../../shared/api/decorators/auth.decorators';
 import { AccessTokenAuthGuard } from '../../../shared/api/guards/access-token-auth.guard';
+import { RolesGuard } from '../../../shared/api/guards/roles.guard';
 import { TenantContextGuard } from '../../../shared/api/guards/tenant-context.guard';
 import type { TenantContext } from '../../../shared/domain/tenant-context';
+import { TenantMembershipRole } from '../../tenancy/domain/tenant.entity';
 import { CreateOwnerCommand } from '../application/commands/create-owner.command';
 import { ListOwnersQuery } from '../application/queries/list-owners.query';
 import { Owner } from '../domain/property.entity';
 
 @ApiTags('Property Owners')
 @Controller('owners')
-@UseGuards(AccessTokenAuthGuard, TenantContextGuard)
+@UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
 export class OwnerController {
   constructor(
     private readonly queryBus: QueryBus,
@@ -33,6 +35,7 @@ export class OwnerController {
   ) {}
 
   @Get()
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
     description: 'List of all owners within the current tenant',
@@ -47,6 +50,7 @@ export class OwnerController {
   }
 
   @Post()
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
   @HttpCode(HttpStatus.CREATED)
   @ApiCreatedResponse({
     description: 'Owner created successfully',

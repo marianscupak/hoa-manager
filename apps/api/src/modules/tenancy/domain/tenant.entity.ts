@@ -5,11 +5,12 @@ export interface Tenant {
   updatedAt: Date;
 }
 
-export type TenantMembershipRole =
-  | 'ADMIN'
-  | 'BOARD_MEMBER'
-  | 'AUDITOR'
-  | 'UNIT_OWNER';
+export enum TenantMembershipRole {
+  ADMIN = 'ADMIN',
+  BOARD_MEMBER = 'BOARD_MEMBER',
+  AUDITOR = 'AUDITOR',
+  UNIT_OWNER = 'UNIT_OWNER',
+}
 
 export type TenantMembershipStatus = 'ACTIVE' | 'SUSPENDED' | 'INVITED';
 

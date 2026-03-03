@@ -19,10 +19,12 @@ import {
   UnitResponseDto,
   UnitDetailResponseDto,
 } from './dto/unit.dto';
-import { Tenant } from '../../../shared/api/decorators/auth.decorators';
+import { Roles, Tenant } from '../../../shared/api/decorators/auth.decorators';
 import { AccessTokenAuthGuard } from '../../../shared/api/guards/access-token-auth.guard';
+import { RolesGuard } from '../../../shared/api/guards/roles.guard';
 import { TenantContextGuard } from '../../../shared/api/guards/tenant-context.guard';
 import type { TenantContext } from '../../../shared/domain/tenant-context';
+import { TenantMembershipRole } from '../../tenancy/domain/tenant.entity';
 import { CreateUnitCommand } from '../application/commands/create-unit.command';
 import { ReplaceUnitOwnershipCommand } from '../application/commands/replace-unit-ownership.command';
 import { GetUnitDetailQuery } from '../application/queries/get-unit-detail.query';
@@ -30,7 +32,7 @@ import { ListUnitsQuery } from '../application/queries/list-units.query';
 
 @ApiTags('Property Units')
 @Controller('units')
-@UseGuards(AccessTokenAuthGuard, TenantContextGuard)
+@UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
 export class UnitController {
   constructor(
     private readonly queryBus: QueryBus,
@@ -38,6 +40,7 @@ export class UnitController {
   ) {}
 
   @Get()
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
     description: 'List of all units within the current tenant',
@@ -50,6 +53,7 @@ export class UnitController {
   }
 
   @Post()
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
   @HttpCode(HttpStatus.CREATED)
   @ApiCreatedResponse({
     description: 'Unit created successfully',
@@ -65,6 +69,7 @@ export class UnitController {
   }
 
   @Get(':id')
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
     description: 'Details of a specific unit including active ownerships',
@@ -80,6 +85,7 @@ export class UnitController {
   }
 
   @Put(':id/ownership')
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOkResponse({
     description: 'Ownership for the unit replaced successfully',

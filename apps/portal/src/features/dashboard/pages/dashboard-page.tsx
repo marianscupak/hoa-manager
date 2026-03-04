@@ -1,26 +1,67 @@
 import { useAtomValue } from "jotai";
+import { Info } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Button } from "@hoa-mngr/ui";
+import { Card, CardContent } from "@hoa-mngr/ui";
 
 import { useTenancyControllerGetUserTenants } from "@/api/generated/tenancy/tenancy";
 import { tenantContextAtom } from "@/auth/atoms";
+import { DashboardHeader } from "@/features/dashboard/components/dashboard-header";
+import { MembershipCard } from "@/features/dashboard/components/membership-card";
+import { QuickLinks } from "@/features/dashboard/components/quick-links";
+import { QuickStats } from "@/features/dashboard/components/quick-stats";
 
-export function DashboardPage() {
+const ADMIN_ROLES = ["ADMIN", "BOARD_MEMBER"];
+
+function OwnerPlaceholder() {
     const { t } = useTranslation("home");
-    const tenantContext = useAtomValue(tenantContextAtom);
-
-    const { data: tenants } = useTenancyControllerGetUserTenants();
-
-    const activeTenant = tenants?.find((t) => t.id === tenantContext?.tenantId);
-    const tenantName = activeTenant?.name || "Loading community...";
 
     return (
-        <div className="flex flex-col items-center justify-center gap-4 py-12">
-            <h1 className="text-foreground text-4xl font-bold">{tenantName}</h1>
-            <p className="text-muted-foreground">{t("subtitle")}</p>
+        <Card>
+            <CardContent className="flex items-start gap-4 p-6">
+                <div className="bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
+                    <Info className="text-primary h-5 w-5" />
+                </div>
+                <div className="flex flex-col gap-1">
+                    <span className="text-sm font-medium">
+                        {t("ownerPlaceholder.title")}
+                    </span>
+                    <span className="text-muted-foreground text-sm">
+                        {t("ownerPlaceholder.description")}
+                    </span>
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
 
-            <Button className="mt-8">{t("cta")}</Button>
+export function DashboardPage() {
+    const tenantCtx = useAtomValue(tenantContextAtom);
+    const { data: tenants } = useTenancyControllerGetUserTenants();
+
+    const activeTenant = tenants?.find((t) => t.id === tenantCtx?.tenantId);
+    const communityName = activeTenant?.name ?? "...";
+
+    const isAdmin = tenantCtx?.roles.some((r) => ADMIN_ROLES.includes(r));
+
+    return (
+        <div className="flex flex-col gap-6">
+            <DashboardHeader communityName={communityName} />
+
+            {isAdmin ? (
+                <>
+                    <QuickStats />
+                    <div className="grid gap-6 lg:grid-cols-2">
+                        <MembershipCard communityName={communityName} />
+                        <QuickLinks />
+                    </div>
+                </>
+            ) : (
+                <div className="grid gap-6 lg:grid-cols-2">
+                    <MembershipCard communityName={communityName} />
+                    <OwnerPlaceholder />
+                </div>
+            )}
         </div>
     );
 }

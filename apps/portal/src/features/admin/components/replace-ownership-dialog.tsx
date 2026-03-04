@@ -170,7 +170,7 @@ export function ReplaceOwnershipDialog({
                             {fields.map((field, index) => (
                                 <div
                                     key={field.id}
-                                    className="border-border bg-muted/60 flex items-start gap-4 rounded-xl border p-4 transition-colors hover:border-slate-300"
+                                    className="border-border bg-muted/60 hover:border-primary/30 flex items-start gap-4 rounded-xl border p-4 transition-colors"
                                 >
                                     <div className="flex-1">
                                         <FormSelect
@@ -199,7 +199,7 @@ export function ReplaceOwnershipDialog({
                                         type="button"
                                         variant="ghost"
                                         size="icon"
-                                        className="mt-5 text-slate-500 hover:text-red-500"
+                                        className="text-muted-foreground hover:text-destructive mt-5"
                                         onClick={() => remove(index)}
                                         disabled={fields.length <= 1}
                                     >
@@ -210,12 +210,12 @@ export function ReplaceOwnershipDialog({
                         </div>
 
                         {form.formState.errors.ownerships?.root && (
-                            <p className="text-sm font-medium text-red-500">
+                            <p className="text-destructive text-sm font-medium">
                                 {form.formState.errors.ownerships.root.message}
                             </p>
                         )}
 
-                        <div className="flex items-center justify-between border-t border-slate-100 pt-4 dark:border-slate-800">
+                        <div className="flex items-center justify-between border-t pt-4">
                             <Button
                                 type="button"
                                 variant="outline"
@@ -229,14 +229,14 @@ export function ReplaceOwnershipDialog({
                             </Button>
 
                             <div className="text-sm font-medium">
-                                <span className="text-slate-500">
+                                <span className="text-muted-foreground">
                                     {t("units.ownershipEditor.totalShare")}:{" "}
                                 </span>
                                 <span
                                     className={
                                         Math.abs(totalShare - 1.0) < 0.0001
-                                            ? "text-green-600"
-                                            : "text-red-600"
+                                            ? "text-success"
+                                            : "text-destructive"
                                     }
                                 >
                                     {totalShare.toFixed(4)}

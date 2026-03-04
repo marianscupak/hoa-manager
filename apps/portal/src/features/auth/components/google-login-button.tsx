@@ -8,11 +8,12 @@ export function GoogleLoginButton(
     };
 
     return (
+        // TODO: Replace with Button component
         <button
             {...props}
             type="button"
             onClick={handleGoogleLogin}
-            className={`flex w-full items-center justify-center gap-3 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:opacity-50 ${props.className || ""}`}
+            className={`bg-card text-foreground hover:bg-accent focus-visible:outline-primary flex w-full items-center justify-center gap-3 rounded-md border px-3 py-1.5 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50 ${props.className || ""}`}
         >
             <svg className="h-5 w-5" viewBox="0 0 24 24">
                 <path

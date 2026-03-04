@@ -36,10 +36,10 @@ export function InviteRegisterSection({
     return (
         <div className="space-y-4">
             <div className="text-center">
-                <h2 className="text-lg font-semibold text-slate-900">
+                <h2 className="text-foreground text-lg font-semibold">
                     {t("register.title")}
                 </h2>
-                <p className="mt-1 text-sm text-slate-500">
+                <p className="text-muted-foreground mt-1 text-sm">
                     {t("register.description")}
                 </p>
             </div>
@@ -72,7 +72,7 @@ export function InviteRegisterSection({
                 <button
                     type="button"
                     onClick={onCancel}
-                    className="text-sm text-slate-500 underline"
+                    className="text-muted-foreground text-sm underline"
                 >
                     {t("actions.signInDescription")}
                 </button>

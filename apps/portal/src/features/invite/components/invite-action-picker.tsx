@@ -20,11 +20,11 @@ export function InviteActionPicker({
 
     return (
         <div className="space-y-3">
-            <div className="rounded-lg border border-slate-200 p-4">
-                <h3 className="font-medium text-slate-900">
+            <div className="rounded-lg border p-4">
+                <h3 className="text-foreground font-medium">
                     {t("actions.createAccount")}
                 </h3>
-                <p className="mt-1 text-sm text-slate-500">
+                <p className="text-muted-foreground mt-1 text-sm">
                     {t("actions.createAccountDescription")}
                 </p>
                 <Button onClick={onCreateAccount} className="mt-3 w-full">
@@ -32,11 +32,11 @@ export function InviteActionPicker({
                 </Button>
             </div>
 
-            <div className="rounded-lg border border-slate-200 p-4">
-                <h3 className="font-medium text-slate-900">
+            <div className="rounded-lg border p-4">
+                <h3 className="text-foreground font-medium">
                     {t("actions.signIn")}
                 </h3>
-                <p className="mt-1 text-sm text-slate-500">
+                <p className="text-muted-foreground mt-1 text-sm">
                     {t("actions.signInDescription")}
                 </p>
                 <Button

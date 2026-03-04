@@ -33,7 +33,7 @@ export function TenantSwitcher() {
 
     if (isLoading || !tenants || tenants.length === 0) {
         return (
-            <div className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-500 opacity-50 shadow-sm">
+            <div className="bg-card text-muted-foreground flex items-center gap-2 rounded-md border px-3 py-2 text-sm opacity-50 shadow-sm">
                 <Building className="h-4 w-4" />
                 <span>Loading tenants...</span>
             </div>
@@ -42,17 +42,17 @@ export function TenantSwitcher() {
 
     return (
         <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center justify-between gap-4 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-900 shadow-sm transition-colors outline-none hover:bg-slate-50 focus:ring-2 focus:ring-slate-400">
+            <DropdownMenuTrigger className="bg-card text-foreground hover:bg-accent focus:ring-ring flex items-center justify-between gap-4 rounded-md border px-3 py-2 text-sm font-medium shadow-sm transition-colors outline-none focus:ring-2">
                 <div className="flex items-center gap-2">
-                    <Building className="h-4 w-4 text-slate-500" />
+                    <Building className="text-muted-foreground h-4 w-4" />
                     <span className="max-w-[200px] truncate">
                         {activeTenant?.name || "Select Tenant"}
                     </span>
                 </div>
-                <ChevronsUpDown className="h-4 w-4 text-slate-500" />
+                <ChevronsUpDown className="text-muted-foreground h-4 w-4" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[280px]">
-                <DropdownMenuLabel className="text-xs font-normal text-slate-500">
+                <DropdownMenuLabel className="text-muted-foreground text-xs font-normal">
                     Switch Community
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
@@ -67,7 +67,7 @@ export function TenantSwitcher() {
                     >
                         <span className="truncate pr-4">{tenant.name}</span>
                         {tenant.id === tenantContext?.tenantId && (
-                            <Check className="h-4 w-4 shrink-0 text-slate-900" />
+                            <Check className="text-foreground h-4 w-4 shrink-0" />
                         )}
                     </DropdownMenuItem>
                 ))}

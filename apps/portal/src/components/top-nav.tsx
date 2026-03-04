@@ -33,8 +33,8 @@ export function TopNav() {
                     to={link.path}
                     className={`inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium transition-colors ${
                         link.active
-                            ? "border-slate-900 text-slate-900"
-                            : "border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700"
+                            ? "border-primary text-foreground"
+                            : "text-muted-foreground hover:border-border hover:text-foreground border-transparent"
                     }`}
                 >
                     {link.name}

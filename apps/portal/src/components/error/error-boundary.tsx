@@ -37,14 +37,14 @@ function ErrorFallback({ error }: { error?: Error }) {
 
     return (
         <div className="flex min-h-screen flex-col items-center justify-center p-4 text-center">
-            <h1 className="mb-4 text-3xl font-bold text-red-600">
+            <h1 className="text-destructive mb-4 text-3xl font-bold">
                 {t("error.title", "Something went wrong")}
             </h1>
-            <p className="mb-8 text-slate-600">
+            <p className="text-muted-foreground mb-8">
                 {t("error.description", "An unexpected error occurred.")}
             </p>
             {error && (
-                <pre className="mt-4 max-w-2xl overflow-auto rounded bg-slate-100 p-4 text-left text-sm text-red-800">
+                <pre className="bg-muted text-destructive mt-4 max-w-2xl overflow-auto rounded p-4 text-left text-sm">
                     {error.message}
                 </pre>
             )}

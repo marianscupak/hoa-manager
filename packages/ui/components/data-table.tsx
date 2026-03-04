@@ -30,7 +30,7 @@ export function DataTable<TData>({
     emptyMessage = "No results.",
 }: DataTableProps<TData>) {
     return (
-        <div className="rounded-md border border-slate-200 bg-white">
+        <div className="bg-card rounded-md border">
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -55,7 +55,7 @@ export function DataTable<TData>({
                         <TableRow>
                             <TableCell
                                 colSpan={columns.length}
-                                className="h-24 text-center text-slate-500"
+                                className="text-muted-foreground h-24 text-center"
                             >
                                 {emptyMessage}
                             </TableCell>

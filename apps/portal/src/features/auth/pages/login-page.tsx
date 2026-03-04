@@ -7,12 +7,12 @@ export function LoginPage() {
     const { form, handleLogin, isPending, isError } = useLogin();
 
     return (
-        <div className="w-full rounded-xl border border-slate-200 bg-white p-8 px-6 shadow-sm sm:px-10">
+        <div className="bg-card w-full rounded-xl border p-8 px-6 shadow-sm sm:px-10">
             <div className="mb-6 text-center">
-                <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+                <h1 className="text-foreground text-2xl font-bold tracking-tight">
                     Sign in
                 </h1>
-                <p className="mt-2 text-sm text-slate-500">
+                <p className="text-muted-foreground mt-2 text-sm">
                     Welcome to the HOA Manager portal.
                 </p>
             </div>
@@ -41,12 +41,12 @@ export function LoginPage() {
                         <button
                             type="submit"
                             disabled={isPending}
-                            className="flex w-full justify-center rounded-md bg-slate-900 px-3 py-1.5 text-sm leading-6 font-semibold text-white shadow-sm hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:opacity-50"
+                            className="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:outline-primary flex w-full justify-center rounded-md px-3 py-1.5 text-sm leading-6 font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50"
                         >
                             {isPending ? "Signing in..." : "Sign in"}
                         </button>
                         {isError && (
-                            <p className="mt-2 text-center text-sm text-red-500">
+                            <p className="text-destructive mt-2 text-center text-sm">
                                 Login failed. Please check your credentials.
                             </p>
                         )}
@@ -55,7 +55,7 @@ export function LoginPage() {
             </Form>
 
             <div className="mt-6 flex items-center justify-center">
-                <span className="bg-white px-2 text-sm text-slate-500">
+                <span className="bg-card text-muted-foreground px-2 text-sm">
                     Or continue with
                 </span>
             </div>

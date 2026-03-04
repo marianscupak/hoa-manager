@@ -37,7 +37,7 @@ export function UnitDetailPage() {
         {
             header: t("admin:units.details.ownership.owner"),
             cell: ({ row }) => (
-                <span className="font-medium text-slate-900">
+                <span className="text-foreground font-medium">
                     {getOwnerName(row.ownerId)}
                 </span>
             ),
@@ -46,7 +46,7 @@ export function UnitDetailPage() {
             header: t("admin:units.details.ownership.share"),
             accessorKey: "share",
             cell: ({ row }) => (
-                <span className="text-slate-600">
+                <span className="text-muted-foreground">
                     {(parseFloat(row.share) * 100).toFixed(2)}%
                 </span>
             ),
@@ -55,7 +55,7 @@ export function UnitDetailPage() {
             header: t("admin:units.details.ownership.since"),
             accessorKey: "validFrom",
             cell: ({ row }) => (
-                <span className="text-slate-500">
+                <span className="text-muted-foreground">
                     {new Date(row.validFrom).toLocaleDateString()}
                 </span>
             ),
@@ -63,7 +63,7 @@ export function UnitDetailPage() {
         {
             header: t("admin:units.details.ownership.active"),
             cell: () => (
-                <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-green-600/20 ring-inset">
+                <span className="bg-success-muted text-success ring-success/20 inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset">
                     {t("admin:units.details.ownership.active")}
                 </span>
             ),
@@ -83,34 +83,34 @@ export function UnitDetailPage() {
                     </Link>
                 </Button>
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+                    <h1 className="text-foreground text-2xl font-bold tracking-tight">
                         {t("admin:units.details.title")}
                     </h1>
-                    <p className="text-sm text-slate-500">
+                    <p className="text-muted-foreground text-sm">
                         {t("admin:units.details.info")}
                     </p>
                 </div>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
-                <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-                    <h2 className="mb-4 text-sm font-semibold tracking-wider text-slate-500 uppercase">
+                <div className="bg-card rounded-xl border p-6 shadow-sm">
+                    <h2 className="text-muted-foreground mb-4 text-sm font-semibold tracking-wider uppercase">
                         {t("admin:units.details.info")}
                     </h2>
                     <dl className="grid gap-4 sm:grid-cols-2">
                         <div>
-                            <dt className="text-sm text-slate-500">
+                            <dt className="text-muted-foreground text-sm">
                                 {t("admin:units.details.unitNo")}
                             </dt>
-                            <dd className="text-lg font-medium text-slate-900">
+                            <dd className="text-foreground text-lg font-medium">
                                 {unit?.unitNo}
                             </dd>
                         </div>
                         <div>
-                            <dt className="text-sm text-slate-500">
+                            <dt className="text-muted-foreground text-sm">
                                 {t("admin:units.details.buildingShare")}
                             </dt>
-                            <dd className="text-lg font-medium text-slate-900">
+                            <dd className="text-foreground text-lg font-medium">
                                 {(
                                     parseFloat(unit?.buildingShare ?? "0") * 100
                                 ).toFixed(2)}
@@ -123,7 +123,7 @@ export function UnitDetailPage() {
 
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-semibold text-slate-900">
+                    <h2 className="text-foreground text-lg font-semibold">
                         {t("admin:units.details.ownership.title")}
                     </h2>
                     <Button onClick={() => setIsEditOpen(true)} size="sm">

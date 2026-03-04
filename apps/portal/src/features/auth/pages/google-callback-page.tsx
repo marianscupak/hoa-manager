@@ -89,25 +89,25 @@ export function GoogleCallbackPage() {
 
     return (
         <div className="flex w-full items-center justify-center p-8">
-            <div className="w-full max-w-sm rounded-xl border border-slate-200 bg-white p-8 px-6 text-center shadow-sm sm:px-10">
-                <h1 className="mb-4 text-2xl font-bold tracking-tight text-slate-900">
+            <div className="bg-card w-full max-w-sm rounded-xl border p-8 px-6 text-center shadow-sm sm:px-10">
+                <h1 className="text-foreground mb-4 text-2xl font-bold tracking-tight">
                     Signing you in...
                 </h1>
 
                 {error ? (
-                    <div className="text-red-500">
+                    <div className="text-destructive">
                         <p className="mb-4">{error}</p>
                         <button
                             onClick={() => navigate("/login")}
-                            className="rounded-md bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-200"
+                            className="bg-muted text-foreground hover:bg-accent rounded-md px-4 py-2 text-sm font-semibold"
                         >
                             Return to login
                         </button>
                     </div>
                 ) : (
                     <div className="flex animate-pulse flex-col items-center">
-                        <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-900" />
-                        <p className="mt-4 text-sm text-slate-500">
+                        <div className="border-muted border-t-primary h-8 w-8 animate-spin rounded-full border-4" />
+                        <p className="text-muted-foreground mt-4 text-sm">
                             Please wait while we complete the Google
                             authentication...
                         </p>

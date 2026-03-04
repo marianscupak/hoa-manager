@@ -9,3 +9,7 @@ export * from "./dialog";
 export * from "./form-controls";
 export * from "./select";
 export * from "./data-table";
+export * from "./card";
+export * from "./badge";
+export * from "./avatar";
+export * from "./skeleton";

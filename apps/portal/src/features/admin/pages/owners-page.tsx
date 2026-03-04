@@ -50,23 +50,23 @@ export function OwnersPage() {
             header: t("owners.table.email"),
             cell: ({ row }) =>
                 row.email ? (
-                    <span className="flex items-center gap-1.5 text-sm text-slate-600">
+                    <span className="text-muted-foreground flex items-center gap-1.5 text-sm">
                         <MailIcon className="h-3.5 w-3.5" />
                         {row.email}
                     </span>
                 ) : (
-                    <span className="text-sm text-slate-400">—</span>
+                    <span className="text-muted-foreground/50 text-sm">—</span>
                 ),
         },
         {
             header: t("owners.table.userAccount"),
             cell: ({ row }) =>
                 row.userId ? (
-                    <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-green-600/20 ring-inset">
+                    <span className="bg-success-muted text-success ring-success/20 inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset">
                         {t("owners.table.linked")}
                     </span>
                 ) : (
-                    <span className="inline-flex items-center rounded-md bg-slate-50 px-2 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-500/10 ring-inset">
+                    <span className="bg-muted text-muted-foreground ring-border inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset">
                         {t("owners.table.unlinked")}
                     </span>
                 ),
@@ -110,7 +110,7 @@ export function OwnersPage() {
                                     revokeInvite.mutate({ ownerId: row.id })
                                 }
                                 disabled={isRevoking}
-                                className="text-red-600 hover:text-red-700"
+                                className="text-destructive hover:text-destructive/80"
                             >
                                 <XIcon className="mr-1.5 h-3.5 w-3.5" />
                                 {t("owners.invite.revoke")}
@@ -122,7 +122,7 @@ export function OwnersPage() {
                 if (row.inviteStatus === "expired") {
                     return (
                         <div className="flex items-center gap-2">
-                            <span className="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-red-600/20 ring-inset">
+                            <span className="bg-destructive-muted text-destructive ring-destructive/20 inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset">
                                 {t("owners.invite.statusExpired")}
                             </span>
                             <Button
@@ -163,10 +163,10 @@ export function OwnersPage() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+                    <h1 className="text-foreground text-2xl font-bold tracking-tight">
                         {t("owners.title")}
                     </h1>
-                    <p className="mt-2 text-sm text-slate-500">
+                    <p className="text-muted-foreground mt-2 text-sm">
                         {t("owners.description")}
                     </p>
                 </div>

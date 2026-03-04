@@ -88,19 +88,19 @@ export function OwnerInvitePage() {
 
     return (
         <div className="flex min-h-[60vh] items-center justify-center">
-            <div className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
+            <div className="bg-card w-full max-w-md rounded-xl border p-8 shadow-sm">
                 <div className="mb-6 text-center">
                     <div className="mb-4 text-4xl">📨</div>
-                    <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+                    <h1 className="text-foreground text-2xl font-bold tracking-tight">
                         {t("status.valid")}
                     </h1>
                     {emailMasked && (
-                        <p className="mt-2 text-sm text-slate-500">
+                        <p className="text-muted-foreground mt-2 text-sm">
                             {t("status.emailHint", { email: emailMasked })}
                         </p>
                     )}
                     {expiresAt && (
-                        <p className="mt-1 text-xs text-slate-400">
+                        <p className="text-muted-foreground/70 mt-1 text-xs">
                             {t("status.expiresAt", {
                                 date: new Date(expiresAt).toLocaleString(),
                             })}

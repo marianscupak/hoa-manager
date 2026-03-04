@@ -17,7 +17,7 @@ export function DashboardPage() {
 
     return (
         <div className="flex flex-col items-center justify-center gap-4 py-12">
-            <h1 className="text-4xl font-bold text-slate-900">{tenantName}</h1>
+            <h1 className="text-foreground text-4xl font-bold">{tenantName}</h1>
             <p className="text-muted-foreground">{t("subtitle")}</p>
 
             <Button className="mt-8">{t("cta")}</Button>

@@ -17,7 +17,7 @@ export function SelectTenantLayout() {
     }
 
     return (
-        <div className="relative flex min-h-screen flex-col items-center justify-center bg-slate-50">
+        <div className="bg-muted relative flex min-h-screen flex-col items-center justify-center">
             <div className="absolute top-4 right-4 flex items-center gap-2">
                 <LocaleSwitcher />
                 <LogoutButton />

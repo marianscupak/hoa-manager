@@ -15,15 +15,15 @@ export function SelectTenantPage() {
 
     if (isLoading) {
         return (
-            <div className="p-8 text-center text-slate-500">
+            <div className="text-muted-foreground p-8 text-center">
                 {t("selectTenant.loading")}
             </div>
         );
     }
 
     return (
-        <div className="w-full rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
-            <h1 className="mb-6 text-center text-2xl font-bold tracking-tight text-slate-900">
+        <div className="bg-card w-full rounded-xl border p-8 shadow-sm">
+            <h1 className="text-foreground mb-6 text-center text-2xl font-bold tracking-tight">
                 {t("selectTenant.title")}
             </h1>
             <div className="flex flex-col space-y-3">
@@ -32,32 +32,32 @@ export function SelectTenantPage() {
                         key={tenant.id}
                         onClick={() => handleSwitch(tenant.id)}
                         disabled={isSwitching}
-                        className="rounded-md border border-slate-300 p-4 text-left hover:border-slate-400 hover:bg-slate-50 focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 focus:outline-none disabled:opacity-50"
+                        className="hover:border-primary hover:bg-accent focus:ring-ring rounded-md border p-4 text-left focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:opacity-50"
                     >
-                        <span className="block font-medium text-slate-900">
+                        <span className="text-foreground block font-medium">
                             {tenant.name || tenant.id}
                         </span>
                     </button>
                 ))}
                 {(!tenants || tenants.length === 0) && (
-                    <p className="text-center text-sm text-slate-500">
+                    <p className="text-muted-foreground text-center text-sm">
                         {t("selectTenant.noCommunities")}
                     </p>
                 )}
             </div>
             {isSwitching && (
-                <p className="mt-4 text-center text-sm text-slate-500">
+                <p className="text-muted-foreground mt-4 text-center text-sm">
                     {t("selectTenant.joining")}
                 </p>
             )}
 
-            <div className="mt-8 border-t border-slate-100 pt-6 text-center">
-                <p className="text-sm text-slate-500">
+            <div className="mt-8 border-t pt-6 text-center">
+                <p className="text-muted-foreground text-sm">
                     {t("selectTenant.notFound")}
                 </p>
                 <Link
                     to="/tenant/new"
-                    className="mt-2 inline-block text-sm font-medium text-slate-900 hover:underline"
+                    className="text-foreground mt-2 inline-block text-sm font-medium hover:underline"
                 >
                     {t("selectTenant.createNew")}
                 </Link>

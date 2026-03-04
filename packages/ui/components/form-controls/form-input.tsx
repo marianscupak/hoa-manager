@@ -31,7 +31,7 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
                             <Input {...field} {...props} ref={ref} />
                         </FormControl>
                         {description && (
-                            <p className="text-[0.8rem] text-slate-500">
+                            <p className="text-muted-foreground text-[0.8rem]">
                                 {description}
                             </p>
                         )}

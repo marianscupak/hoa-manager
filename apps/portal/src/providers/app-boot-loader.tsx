@@ -10,8 +10,8 @@ export function AppBootLoader({ children }: { children: ReactNode }) {
 
     if (authStatus === "initializing") {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-slate-50">
-                <p className="animate-pulse text-slate-500">
+            <div className="bg-muted flex min-h-screen items-center justify-center">
+                <p className="text-muted-foreground animate-pulse">
                     Loading application...
                 </p>
             </div>

@@ -20,7 +20,7 @@ export function InviteAcceptSection({
             <Button onClick={onAccept} disabled={isPending} className="w-full">
                 {isPending ? t("accept.loading") : t("accept.submit")}
             </Button>
-            <div className="flex items-center justify-center gap-2 text-sm text-slate-500">
+            <div className="text-muted-foreground flex items-center justify-center gap-2 text-sm">
                 <span>{t("accept.wrongAccount")}</span>
                 <LogoutButton />
             </div>

@@ -43,7 +43,7 @@ export function LogoutButton() {
             onClick={handleLogout}
             disabled={logoutMutation.isPending}
             title="Logout"
-            className="text-slate-500 hover:text-slate-900"
+            className="text-muted-foreground hover:text-foreground"
         >
             <LogOut className="h-5 w-5" />
         </Button>

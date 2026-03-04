@@ -22,13 +22,13 @@ export function AuthLayout() {
     }
 
     return (
-        <div className="flex min-h-screen flex-col bg-slate-50">
-            <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200 bg-white px-4 shadow-sm sm:px-6 lg:px-8">
+        <div className="bg-muted flex min-h-screen flex-col">
+            <header className="bg-card sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b px-4 shadow-sm sm:px-6 lg:px-8">
                 <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 font-bold text-white">
+                    <div className="bg-primary text-primary-foreground flex h-8 w-8 items-center justify-center rounded-lg font-bold">
                         H
                     </div>
-                    <span className="hidden text-lg font-bold text-slate-900 sm:inline-block">
+                    <span className="text-foreground hidden text-lg font-bold sm:inline-block">
                         HOA Manager
                     </span>
                     <TopNav />

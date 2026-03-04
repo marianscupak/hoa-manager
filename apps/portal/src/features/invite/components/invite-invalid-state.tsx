@@ -25,20 +25,20 @@ export function InviteInvalidState({
     const { t } = useTranslation(["invite"]);
 
     return (
-        <div className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+        <div className="bg-card w-full max-w-md rounded-xl border p-8 text-center shadow-sm">
             <div className="mb-4 text-4xl">{STATUS_EMOJI[status]}</div>
-            <h1 className="text-xl font-bold text-slate-900">
+            <h1 className="text-foreground text-xl font-bold">
                 {t(STATUS_I18N_KEY[status]!)}
             </h1>
             {emailMasked && (
-                <p className="mt-2 text-sm text-slate-500">
+                <p className="text-muted-foreground mt-2 text-sm">
                     {t("status.emailHint", { email: emailMasked })}
                 </p>
             )}
             <div className="mt-6">
                 <Link
                     to="/"
-                    className="text-sm font-medium text-slate-900 underline"
+                    className="text-foreground text-sm font-medium underline"
                 >
                     {t("actions.goToDashboard")}
                 </Link>

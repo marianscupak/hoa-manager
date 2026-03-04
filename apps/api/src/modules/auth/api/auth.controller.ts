@@ -15,31 +15,34 @@ import { CommandBus } from '@nestjs/cqrs';
 import { ApiOkResponse } from '@nestjs/swagger';
 import type { Response, Request } from 'express';
 
-import { AuthResponseDto, SuccessResponseDto } from './dto/auth-response.dto';
-import { ExchangeCodeDto } from './dto/exchange-code.dto';
-import { LoginDto } from './dto/login.dto';
-import { SwitchTenantDto } from './dto/switch-tenant.dto';
-import { AccessTokenAuthGuard } from '../../../shared/api/guards/access-token-auth.guard';
-import { setRefreshTokenCookie } from '../../../shared/api/utils/refresh-cookie';
-import { ExchangeGoogleCodeCommand } from '../application/commands/exchange-google-code.command';
-import { HandleGoogleCallbackCommand } from '../application/commands/handle-google-callback.command';
+import {
+  AuthResponseDto,
+  SuccessResponseDto,
+} from '@/modules/auth/api/dto/auth-response.dto';
+import { ExchangeCodeDto } from '@/modules/auth/api/dto/exchange-code.dto';
+import { LoginDto } from '@/modules/auth/api/dto/login.dto';
+import { SwitchTenantDto } from '@/modules/auth/api/dto/switch-tenant.dto';
+import { ExchangeGoogleCodeCommand } from '@/modules/auth/application/commands/exchange-google-code.command';
+import { HandleGoogleCallbackCommand } from '@/modules/auth/application/commands/handle-google-callback.command';
 import {
   LoginCommand,
   type LoginResult,
-} from '../application/commands/login.command';
-import { LogoutCommand } from '../application/commands/logout.command';
+} from '@/modules/auth/application/commands/login.command';
+import { LogoutCommand } from '@/modules/auth/application/commands/logout.command';
 import {
   RefreshTokenCommand,
   type RefreshTokenResult,
-} from '../application/commands/refresh-token.command';
-import { StartGoogleLoginCommand } from '../application/commands/start-google-login.command';
+} from '@/modules/auth/application/commands/refresh-token.command';
+import { StartGoogleLoginCommand } from '@/modules/auth/application/commands/start-google-login.command';
 import {
   SwitchTenantCommand,
   type SwitchTenantResult,
-} from '../application/commands/switch-tenant.command';
-import { type ExchangeGoogleCodeResult } from '../application/handlers/exchange-google-code.handler';
-import { type HandleGoogleCallbackResult } from '../application/handlers/handle-google-callback.handler';
-import { type StartGoogleLoginResult } from '../application/handlers/start-google-login.handler';
+} from '@/modules/auth/application/commands/switch-tenant.command';
+import { type ExchangeGoogleCodeResult } from '@/modules/auth/application/handlers/exchange-google-code.handler';
+import { type HandleGoogleCallbackResult } from '@/modules/auth/application/handlers/handle-google-callback.handler';
+import { type StartGoogleLoginResult } from '@/modules/auth/application/handlers/start-google-login.handler';
+import { AccessTokenAuthGuard } from '@/shared/api/guards/access-token-auth.guard';
+import { setRefreshTokenCookie } from '@/shared/api/utils/refresh-cookie';
 
 @Controller('auth')
 export class AuthController {
@@ -56,12 +59,7 @@ export class AuthController {
       new LoginCommand(body.email, 'LOCAL', body.password),
     );
 
-    res.cookie('refresh_token', result.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-    });
+    setRefreshTokenCookie(res, result.refreshToken);
 
     return { accessToken: result.accessToken };
   }

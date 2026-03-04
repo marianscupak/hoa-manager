@@ -4,19 +4,16 @@ import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { addMinutes } from 'date-fns';
 
-import {
-  CLOCK,
-  type Clock,
-} from '../../../../shared/application/ports/clock.port';
-import { StartGoogleLoginCommand } from '../commands/start-google-login.command';
+import { StartGoogleLoginCommand } from '@/modules/auth/application/commands/start-google-login.command';
 import {
   OIDC_LOGIN_ATTEMPT_REPOSITORY,
   type OidcLoginAttemptRepository,
-} from '../ports/auth.repository.port';
+} from '@/modules/auth/application/ports/auth.repository.port';
 import {
   GOOGLE_OIDC_SERVICE,
   type GoogleOidcService,
-} from '../ports/google-oidc.service.port';
+} from '@/modules/auth/application/ports/google-oidc.service.port';
+import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 
 export interface StartGoogleLoginResult {
   redirectUrl: string;

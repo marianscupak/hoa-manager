@@ -5,24 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { addDays, addMinutes } from 'date-fns';
 
-import { UnauthorizedException } from '../../../../shared/application/exceptions/auth.exceptions';
-import {
-  CLOCK,
-  type Clock,
-} from '../../../../shared/application/ports/clock.port';
-import {
-  UNIT_OF_WORK,
-  type UnitOfWork,
-} from '../../../../shared/application/ports/unit-of-work.port';
-import {
-  USER_REPOSITORY,
-  type UserRepository,
-} from '../../../identity/application/ports/user.repository.port';
-import {
-  MEMBERSHIP_REPOSITORY,
-  type MembershipRepository,
-} from '../../../tenancy/application/ports/tenant.repository.port';
-import { HandleGoogleCallbackCommand } from '../commands/handle-google-callback.command';
+import { HandleGoogleCallbackCommand } from '@/modules/auth/application/commands/handle-google-callback.command';
 import {
   AUTH_IDENTITY_REPOSITORY,
   AUTH_SESSION_REPOSITORY,
@@ -32,11 +15,25 @@ import {
   type AuthSessionRepository,
   type OidcLoginAttemptRepository,
   type AuthExchangeCodeRepository,
-} from '../ports/auth.repository.port';
+} from '@/modules/auth/application/ports/auth.repository.port';
 import {
   GOOGLE_OIDC_SERVICE,
   type GoogleOidcService,
-} from '../ports/google-oidc.service.port';
+} from '@/modules/auth/application/ports/google-oidc.service.port';
+import {
+  USER_REPOSITORY,
+  type UserRepository,
+} from '@/modules/identity/application/ports/user.repository.port';
+import {
+  MEMBERSHIP_REPOSITORY,
+  type MembershipRepository,
+} from '@/modules/tenancy/application/ports/tenant.repository.port';
+import { UnauthorizedException } from '@/shared/application/exceptions/auth.exceptions';
+import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
+import {
+  UNIT_OF_WORK,
+  type UnitOfWork,
+} from '@/shared/application/ports/unit-of-work.port';
 
 export interface HandleGoogleCallbackResult {
   refreshToken: string;

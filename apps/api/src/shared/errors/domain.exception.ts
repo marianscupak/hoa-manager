@@ -1,4 +1,4 @@
-import { type ErrorCode } from './error-codes';
+import { type ErrorCode } from '@/shared/errors/error-codes';
 
 /**
  * Base class for all domain exceptions.

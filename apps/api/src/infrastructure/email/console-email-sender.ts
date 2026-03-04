@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import type { Logger as WinstonLogger } from 'winston';
 
-import { EmailSender } from './email-sender.port';
+import { EmailSender } from '@/infrastructure/email/email-sender.port';
 
 @Injectable()
 export class ConsoleEmailSender implements EmailSender {

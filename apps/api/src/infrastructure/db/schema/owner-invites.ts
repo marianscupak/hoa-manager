@@ -1,8 +1,8 @@
 import { pgTable, text, timestamp, uuid, unique } from 'drizzle-orm/pg-core';
 
-import { owners } from './owners';
-import { tenants } from './tenants';
-import { users } from './users';
+import { owners } from '@/infrastructure/db/schema/owners';
+import { tenants } from '@/infrastructure/db/schema/tenants';
+import { users } from '@/infrastructure/db/schema/users';
 
 export const ownerInvites = pgTable(
   'owner_invites',

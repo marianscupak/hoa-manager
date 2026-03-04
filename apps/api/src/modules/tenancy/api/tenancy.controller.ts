@@ -13,13 +13,13 @@ import { ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
 import {
   CreateTenantDto,
   CreateTenantResponseDto,
-} from './dto/create-tenant.dto';
-import { TenantResponseDto } from './dto/tenant-response.dto';
-import { CurrentAuthUser } from '../../../shared/api/decorators/auth.decorators';
-import { AccessTokenAuthGuard } from '../../../shared/api/guards/access-token-auth.guard';
-import type { AuthPrincipal } from '../../../shared/domain/auth-principal';
-import { CreateTenantCommand } from '../application/commands/create-tenant.command';
-import { GetUserTenantsQuery } from '../application/queries/get-user-tenants.query';
+} from '@/modules/tenancy/api/dto/create-tenant.dto';
+import { TenantResponseDto } from '@/modules/tenancy/api/dto/tenant-response.dto';
+import { CreateTenantCommand } from '@/modules/tenancy/application/commands/create-tenant.command';
+import { GetUserTenantsQuery } from '@/modules/tenancy/application/queries/get-user-tenants.query';
+import { CurrentAuthUser } from '@/shared/api/decorators/auth.decorators';
+import { AccessTokenAuthGuard } from '@/shared/api/guards/access-token-auth.guard';
+import type { AuthPrincipal } from '@/shared/domain/auth-principal';
 
 @Controller('tenants')
 @UseGuards(AccessTokenAuthGuard)

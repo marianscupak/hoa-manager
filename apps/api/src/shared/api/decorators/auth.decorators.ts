@@ -4,9 +4,9 @@ import {
   ExecutionContext,
 } from '@nestjs/common';
 
-import { AuthPrincipal } from '../../domain/auth-principal';
-import { TenantContext } from '../../domain/tenant-context';
-import { ROLES_KEY } from '../guards/roles.guard';
+import { ROLES_KEY } from '@/shared/api/guards/roles.guard';
+import { AuthPrincipal } from '@/shared/domain/auth-principal';
+import { TenantContext } from '@/shared/domain/tenant-context';
 
 export const Roles = (...roles: string[]) => SetMetadata(ROLES_KEY, roles);
 

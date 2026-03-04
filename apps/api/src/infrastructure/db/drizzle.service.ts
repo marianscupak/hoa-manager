@@ -2,8 +2,8 @@ import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 
-import * as schema from './schema';
-import { ConfigService } from '../config/config.service';
+import { ConfigService } from '@/infrastructure/config/config.service';
+import * as schema from '@/infrastructure/db/schema';
 
 @Injectable()
 export class DrizzleService implements OnModuleInit, OnModuleDestroy {

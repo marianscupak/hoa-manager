@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { eq, and, isNull } from 'drizzle-orm';
 
-import { DrizzleService } from '../../../../infrastructure/db/drizzle.service';
-import { DRIZZLE_TX_STORAGE } from '../../../../infrastructure/db/drizzle.unit-of-work';
-import { ownerInvites } from '../../../../infrastructure/db/schema';
-import { OwnerInviteRepository } from '../../application/ports/owner-invite.repository.port';
-import { OwnerInvite } from '../../domain/owner-invite.entity';
+import { DrizzleService } from '@/infrastructure/db/drizzle.service';
+import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
+import { ownerInvites } from '@/infrastructure/db/schema';
+import { OwnerInviteRepository } from '@/modules/invitation/application/ports/owner-invite.repository.port';
+import { OwnerInvite } from '@/modules/invitation/domain/owner-invite.entity';
 
 @Injectable()
 export class DrizzleOwnerInviteRepository implements OwnerInviteRepository {

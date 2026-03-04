@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 
-import { UserMapper } from './user.mapper';
-import { DrizzleService } from '../../../../infrastructure/db/drizzle.service';
-import { DRIZZLE_TX_STORAGE } from '../../../../infrastructure/db/drizzle.unit-of-work';
-import { users } from '../../../../infrastructure/db/schema/users';
-import { UserRepository } from '../../application/ports/user.repository.port';
-import { User } from '../../domain/user.entity';
+import { DrizzleService } from '@/infrastructure/db/drizzle.service';
+import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
+import { users } from '@/infrastructure/db/schema/users';
+import { UserRepository } from '@/modules/identity/application/ports/user.repository.port';
+import { User } from '@/modules/identity/domain/user.entity';
+import { UserMapper } from '@/modules/identity/infrastructure/persistence/user.mapper';
 
 @Injectable()
 export class DrizzleUserRepository implements UserRepository {

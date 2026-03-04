@@ -1,25 +1,24 @@
 import { Inject } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { UnitNotFoundException } from '../../../../shared/application/exceptions/property.exceptions';
-import { Unit, UnitOwnership } from '../../domain/property.entity';
 import {
   UNIT_OWNERSHIP_REPOSITORY,
   UNIT_REPOSITORY,
   type UnitOwnershipRepository,
   type UnitRepository,
-} from '../ports/property.repository.port';
-import { GetUnitDetailQuery } from '../queries/get-unit-detail.query';
+} from '@/modules/property/application/ports/property.repository.port';
+import { GetUnitDetailQuery } from '@/modules/property/application/queries/get-unit-detail.query';
+import { Unit, UnitOwnership } from '@/modules/property/domain/property.entity';
+import { UnitNotFoundException } from '@/shared/application/exceptions/property.exceptions';
 
 export interface UnitDetail extends Unit {
   ownerships: UnitOwnership[];
 }
 
 @QueryHandler(GetUnitDetailQuery)
-export class GetUnitDetailHandler implements IQueryHandler<
-  GetUnitDetailQuery,
-  UnitDetail
-> {
+export class GetUnitDetailHandler
+  implements IQueryHandler<GetUnitDetailQuery, UnitDetail>
+{
   constructor(
     @Inject(UNIT_REPOSITORY)
     private readonly unitRepo: UnitRepository,

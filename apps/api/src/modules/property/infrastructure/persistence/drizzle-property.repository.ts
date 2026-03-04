@@ -1,19 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { and, eq, isNull } from 'drizzle-orm';
 
-import { DrizzleService } from '../../../../infrastructure/db/drizzle.service';
-import { DRIZZLE_TX_STORAGE } from '../../../../infrastructure/db/drizzle.unit-of-work';
-import {
-  owners,
-  unitOwnerships,
-  units,
-} from '../../../../infrastructure/db/schema';
+import { DrizzleService } from '@/infrastructure/db/drizzle.service';
+import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
+import { owners, unitOwnerships, units } from '@/infrastructure/db/schema';
 import {
   OwnerRepository,
   UnitOwnershipRepository,
   UnitRepository,
-} from '../../application/ports/property.repository.port';
-import { Owner, Unit, UnitOwnership } from '../../domain/property.entity';
+} from '@/modules/property/application/ports/property.repository.port';
+import {
+  Owner,
+  Unit,
+  UnitOwnership,
+} from '@/modules/property/domain/property.entity';
 
 @Injectable()
 export class DrizzleUnitRepository implements UnitRepository {

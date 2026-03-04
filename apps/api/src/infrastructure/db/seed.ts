@@ -3,7 +3,7 @@ import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 
-import * as schema from './schema';
+import * as schema from '@/infrastructure/db/schema';
 
 async function seed() {
   const connectionString = process.env.DATABASE_URL;

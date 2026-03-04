@@ -1,29 +1,29 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
-import { OwnerController } from './api/owner.controller';
-import { UnitController } from './api/unit.controller';
-import { AuthModule } from '../auth/auth.module';
-import { IdentityModule } from '../identity/identity.module';
-import { InvitationModule } from '../invitation/invitation.module';
-import { TenancyModule } from '../tenancy/tenancy.module';
-import { CreateOwnerHandler } from './application/handlers/create-owner.handler';
-import { CreateUnitHandler } from './application/handlers/create-unit.handler';
-import { GetUnitDetailHandler } from './application/handlers/get-unit-detail.handler';
-import { ListOwnersHandler } from './application/handlers/list-owners.handler';
-import { ListUnitsHandler } from './application/handlers/list-units.handler';
-import { ReplaceUnitOwnershipHandler } from './application/handlers/replace-unit-ownership.handler';
+import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
+import { AuthModule } from '@/modules/auth/auth.module';
+import { IdentityModule } from '@/modules/identity/identity.module';
+import { InvitationModule } from '@/modules/invitation/invitation.module';
+import { OwnerController } from '@/modules/property/api/owner.controller';
+import { UnitController } from '@/modules/property/api/unit.controller';
+import { CreateOwnerHandler } from '@/modules/property/application/handlers/create-owner.handler';
+import { CreateUnitHandler } from '@/modules/property/application/handlers/create-unit.handler';
+import { GetUnitDetailHandler } from '@/modules/property/application/handlers/get-unit-detail.handler';
+import { ListOwnersHandler } from '@/modules/property/application/handlers/list-owners.handler';
+import { ListUnitsHandler } from '@/modules/property/application/handlers/list-units.handler';
+import { ReplaceUnitOwnershipHandler } from '@/modules/property/application/handlers/replace-unit-ownership.handler';
 import {
   OWNER_REPOSITORY,
   UNIT_OWNERSHIP_REPOSITORY,
   UNIT_REPOSITORY,
-} from './application/ports/property.repository.port';
+} from '@/modules/property/application/ports/property.repository.port';
 import {
   DrizzleOwnerRepository,
   DrizzleUnitOwnershipRepository,
   DrizzleUnitRepository,
-} from './infrastructure/persistence/drizzle-property.repository';
-import { DrizzleUnitOfWork } from '../../infrastructure/db/drizzle.unit-of-work';
+} from '@/modules/property/infrastructure/persistence/drizzle-property.repository';
+import { TenancyModule } from '@/modules/tenancy/tenancy.module';
 
 const CommandHandlers = [
   CreateOwnerHandler,

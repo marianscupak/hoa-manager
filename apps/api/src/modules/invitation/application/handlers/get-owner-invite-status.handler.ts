@@ -2,15 +2,12 @@ import { Inject } from '@nestjs/common';
 import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
 
 import {
-  CLOCK,
-  type Clock,
-} from '../../../../shared/application/ports/clock.port';
-import { hashToken } from '../../../../shared/application/utils/token.utils';
-import {
   OWNER_INVITE_REPOSITORY,
   type OwnerInviteRepository,
-} from '../ports/owner-invite.repository.port';
-import { GetOwnerInviteStatusQuery } from '../queries/get-owner-invite-status.query';
+} from '@/modules/invitation/application/ports/owner-invite.repository.port';
+import { GetOwnerInviteStatusQuery } from '@/modules/invitation/application/queries/get-owner-invite-status.query';
+import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
+import { hashToken } from '@/shared/application/utils/token.utils';
 
 export interface InviteStatusResult {
   status: 'valid' | 'expired' | 'accepted' | 'not_found';

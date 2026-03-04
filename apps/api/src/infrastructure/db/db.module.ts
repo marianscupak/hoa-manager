@@ -1,9 +1,9 @@
 import { Global, Module } from '@nestjs/common';
 
-import { DrizzleService } from './drizzle.service';
-import { DrizzleUnitOfWork } from './drizzle.unit-of-work';
-import { UNIT_OF_WORK } from '../../shared/application/ports/unit-of-work.port';
-import { ConfigModule } from '../config/config.module';
+import { ConfigModule } from '@/infrastructure/config/config.module';
+import { DrizzleService } from '@/infrastructure/db/drizzle.service';
+import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
+import { UNIT_OF_WORK } from '@/shared/application/ports/unit-of-work.port';
 
 @Global()
 @Module({

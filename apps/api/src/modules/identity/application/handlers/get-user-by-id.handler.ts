@@ -1,12 +1,12 @@
 import { Inject } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { UserNotFoundError } from '../../domain/errors/user-not-found.error';
 import {
   USER_REPOSITORY,
   type UserRepository,
-} from '../ports/user.repository.port';
-import { GetUserByIdQuery } from '../queries/get-user-by-id.query';
+} from '@/modules/identity/application/ports/user.repository.port';
+import { GetUserByIdQuery } from '@/modules/identity/application/queries/get-user-by-id.query';
+import { UserNotFoundError } from '@/modules/identity/domain/errors/user-not-found.error';
 
 export type GetUserByIdResult = { id: string; email: string };
 

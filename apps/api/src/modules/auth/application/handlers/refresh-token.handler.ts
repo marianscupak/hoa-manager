@@ -5,47 +5,46 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { addDays, differenceInMilliseconds } from 'date-fns';
 
 import {
-  InvalidTokenException,
-  ReplayAttackException,
-  UnauthorizedException,
-} from '../../../../shared/application/exceptions/auth.exceptions';
-import { UserInactiveException } from '../../../../shared/application/exceptions/user.exceptions';
-import {
-  CLOCK,
-  type Clock,
-} from '../../../../shared/application/ports/clock.port';
-import {
-  UNIT_OF_WORK,
-  type UnitOfWork,
-} from '../../../../shared/application/ports/unit-of-work.port';
-import { AuthClaims } from '../../../../shared/domain/auth-claims';
-import {
-  USER_REPOSITORY,
-  type UserRepository,
-} from '../../../identity/application/ports/user.repository.port';
-import {
-  MEMBERSHIP_REPOSITORY,
-  type MembershipRepository,
-} from '../../../tenancy/application/ports/tenant.repository.port';
-import { TenantMembership } from '../../../tenancy/domain/tenant.entity';
-import { AuthSession } from '../../domain/auth-identity.entity';
-import {
   RefreshTokenCommand,
   type RefreshTokenResult,
-} from '../commands/refresh-token.command';
+} from '@/modules/auth/application/commands/refresh-token.command';
 import {
   AUTH_SESSION_REPOSITORY,
   type AuthSessionRepository,
-} from '../ports/auth.repository.port';
+} from '@/modules/auth/application/ports/auth.repository.port';
 import {
   TOKEN_SIGNER,
   TOKEN_VERIFIER,
   type TokenSigner,
   type TokenVerifier,
-} from '../ports/auth.utils.port';
+} from '@/modules/auth/application/ports/auth.utils.port';
+import { AuthSession } from '@/modules/auth/domain/auth-identity.entity';
+import {
+  USER_REPOSITORY,
+  type UserRepository,
+} from '@/modules/identity/application/ports/user.repository.port';
+import {
+  MEMBERSHIP_REPOSITORY,
+  type MembershipRepository,
+} from '@/modules/tenancy/application/ports/tenant.repository.port';
+import { TenantMembership } from '@/modules/tenancy/domain/tenant.entity';
+import {
+  InvalidTokenException,
+  ReplayAttackException,
+  UnauthorizedException,
+} from '@/shared/application/exceptions/auth.exceptions';
+import { UserInactiveException } from '@/shared/application/exceptions/user.exceptions';
+import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
+import {
+  UNIT_OF_WORK,
+  type UnitOfWork,
+} from '@/shared/application/ports/unit-of-work.port';
+import { AuthClaims } from '@/shared/domain/auth-claims';
 
 @CommandHandler(RefreshTokenCommand)
-export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand> {
+export class RefreshTokenHandler
+  implements ICommandHandler<RefreshTokenCommand>
+{
   private readonly REUSE_GRACE_PERIOD_MS = 30 * 1000;
 
   constructor(

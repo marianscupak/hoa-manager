@@ -6,39 +6,38 @@ import { addHours } from 'date-fns';
 import {
   EMAIL_SENDER,
   type EmailSender,
-} from '../../../../infrastructure/email/email-sender.port';
-import {
-  OwnerAlreadyClaimedException,
-  OwnerEmailRequiredException,
-} from '../../../../shared/application/exceptions/invite.exceptions';
-import { OwnerNotFoundException } from '../../../../shared/application/exceptions/property.exceptions';
-import {
-  CLOCK,
-  type Clock,
-} from '../../../../shared/application/ports/clock.port';
-import { normalizeEmail } from '../../../../shared/application/utils/normalize-email';
-import {
-  generateToken,
-  hashToken,
-} from '../../../../shared/application/utils/token.utils';
-import {
-  OWNER_REPOSITORY,
-  type OwnerRepository,
-} from '../../../property/application/ports/property.repository.port';
-import {
-  TENANT_REPOSITORY,
-  type TenantRepository,
-} from '../../../tenancy/application/ports/tenant.repository.port';
-import { SendOwnerInviteCommand } from '../commands/send-owner-invite.command';
+} from '@/infrastructure/email/email-sender.port';
+import { SendOwnerInviteCommand } from '@/modules/invitation/application/commands/send-owner-invite.command';
 import {
   OWNER_INVITE_REPOSITORY,
   type OwnerInviteRepository,
-} from '../ports/owner-invite.repository.port';
+} from '@/modules/invitation/application/ports/owner-invite.repository.port';
+import {
+  OWNER_REPOSITORY,
+  type OwnerRepository,
+} from '@/modules/property/application/ports/property.repository.port';
+import {
+  TENANT_REPOSITORY,
+  type TenantRepository,
+} from '@/modules/tenancy/application/ports/tenant.repository.port';
+import {
+  OwnerAlreadyClaimedException,
+  OwnerEmailRequiredException,
+} from '@/shared/application/exceptions/invite.exceptions';
+import { OwnerNotFoundException } from '@/shared/application/exceptions/property.exceptions';
+import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
+import { normalizeEmail } from '@/shared/application/utils/normalize-email';
+import {
+  generateToken,
+  hashToken,
+} from '@/shared/application/utils/token.utils';
 
 const INVITE_TTL_HOURS = 72;
 
 @CommandHandler(SendOwnerInviteCommand)
-export class SendOwnerInviteHandler implements ICommandHandler<SendOwnerInviteCommand> {
+export class SendOwnerInviteHandler
+  implements ICommandHandler<SendOwnerInviteCommand>
+{
   constructor(
     @Inject(OWNER_REPOSITORY)
     private readonly ownerRepo: OwnerRepository,

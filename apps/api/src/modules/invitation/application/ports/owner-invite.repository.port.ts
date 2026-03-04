@@ -1,4 +1,4 @@
-import { OwnerInvite } from '../../domain/owner-invite.entity';
+import { OwnerInvite } from '@/modules/invitation/domain/owner-invite.entity';
 
 export interface OwnerInviteRepository {
   findByTokenHash(tokenHash: string): Promise<OwnerInvite | null>;

@@ -1,8 +1,8 @@
 import { pgTable, text, timestamp, uuid, jsonb } from 'drizzle-orm/pg-core';
 
-import { tenantMemberships } from './tenant-memberships';
-import { tenants } from './tenants';
-import { users } from './users';
+import { tenantMemberships } from '@/infrastructure/db/schema/tenant-memberships';
+import { tenants } from '@/infrastructure/db/schema/tenants';
+import { users } from '@/infrastructure/db/schema/users';
 
 export const authExchangeCodes = pgTable('auth_exchange_codes', {
   id: uuid('id').primaryKey().defaultRandom(),

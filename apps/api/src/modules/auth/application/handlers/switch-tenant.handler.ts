@@ -2,32 +2,34 @@ import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import {
-  InvalidTokenException,
-  UnauthorizedException,
-} from '../../../../shared/application/exceptions/auth.exceptions';
-import { UserInactiveException } from '../../../../shared/application/exceptions/user.exceptions';
-import { AuthClaims } from '../../../../shared/domain/auth-claims';
-import {
-  USER_REPOSITORY,
-  type UserRepository,
-} from '../../../identity/application/ports/user.repository.port';
-import {
-  MEMBERSHIP_REPOSITORY,
-  type MembershipRepository,
-} from '../../../tenancy/application/ports/tenant.repository.port';
-import {
   SwitchTenantCommand,
   type SwitchTenantResult,
-} from '../commands/switch-tenant.command';
+} from '@/modules/auth/application/commands/switch-tenant.command';
 import {
   TOKEN_SIGNER,
   TOKEN_VERIFIER,
   type TokenSigner,
   type TokenVerifier,
-} from '../ports/auth.utils.port';
+} from '@/modules/auth/application/ports/auth.utils.port';
+import {
+  USER_REPOSITORY,
+  type UserRepository,
+} from '@/modules/identity/application/ports/user.repository.port';
+import {
+  MEMBERSHIP_REPOSITORY,
+  type MembershipRepository,
+} from '@/modules/tenancy/application/ports/tenant.repository.port';
+import {
+  InvalidTokenException,
+  UnauthorizedException,
+} from '@/shared/application/exceptions/auth.exceptions';
+import { UserInactiveException } from '@/shared/application/exceptions/user.exceptions';
+import { AuthClaims } from '@/shared/domain/auth-claims';
 
 @CommandHandler(SwitchTenantCommand)
-export class SwitchTenantHandler implements ICommandHandler<SwitchTenantCommand> {
+export class SwitchTenantHandler
+  implements ICommandHandler<SwitchTenantCommand>
+{
   constructor(
     @Inject(TOKEN_VERIFIER) private readonly tokenVerifier: TokenVerifier,
     @Inject(TOKEN_SIGNER) private readonly tokenSigner: TokenSigner,

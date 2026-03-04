@@ -1,16 +1,13 @@
 import { Inject } from '@nestjs/common';
 import { IQueryHandler, QueryHandler, QueryBus } from '@nestjs/cqrs';
 
-import {
-  CLOCK,
-  type Clock,
-} from '../../../../shared/application/ports/clock.port';
-import { GetPendingInviteByOwnerIdQuery } from '../../../invitation/application/queries/get-pending-invite-by-owner-id.query';
+import { GetPendingInviteByOwnerIdQuery } from '@/modules/invitation/application/queries/get-pending-invite-by-owner-id.query';
 import {
   OWNER_REPOSITORY,
   type OwnerRepository,
-} from '../ports/property.repository.port';
-import { ListOwnersQuery } from '../queries/list-owners.query';
+} from '@/modules/property/application/ports/property.repository.port';
+import { ListOwnersQuery } from '@/modules/property/application/queries/list-owners.query';
+import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 
 export interface OwnerWithInviteStatus {
   id: string;
@@ -24,10 +21,9 @@ export interface OwnerWithInviteStatus {
 }
 
 @QueryHandler(ListOwnersQuery)
-export class ListOwnersHandler implements IQueryHandler<
-  ListOwnersQuery,
-  OwnerWithInviteStatus[]
-> {
+export class ListOwnersHandler
+  implements IQueryHandler<ListOwnersQuery, OwnerWithInviteStatus[]>
+{
   constructor(
     @Inject(OWNER_REPOSITORY)
     private readonly ownerRepo: OwnerRepository,

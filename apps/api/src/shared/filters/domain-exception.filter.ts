@@ -10,10 +10,10 @@ import type { Request, Response } from 'express';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import type { Logger as WinstonLogger } from 'winston';
 
-import { AuthClaims } from '../domain/auth-claims';
-import { TenantContext } from '../domain/tenant-context';
-import { DomainException } from '../errors/domain.exception';
-import { ERROR_HTTP_STATUS } from '../errors/error-codes';
+import { AuthClaims } from '@/shared/domain/auth-claims';
+import { TenantContext } from '@/shared/domain/tenant-context';
+import { DomainException } from '@/shared/errors/domain.exception';
+import { ERROR_HTTP_STATUS } from '@/shared/errors/error-codes';
 
 @Catch()
 export class DomainExceptionFilter implements ExceptionFilter {

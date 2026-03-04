@@ -2,21 +2,18 @@ import { Inject, Injectable } from '@nestjs/common';
 import { addDays } from 'date-fns';
 
 import {
-  CLOCK,
-  type Clock,
-} from '../../../shared/application/ports/clock.port';
-import {
-  generateToken,
-  hashToken,
-} from '../../../shared/application/utils/token.utils';
-import {
   AUTH_SESSION_REPOSITORY,
   type AuthSessionRepository,
-} from '../application/ports/auth.repository.port';
+} from '@/modules/auth/application/ports/auth.repository.port';
 import {
   TOKEN_SIGNER,
   type TokenSigner,
-} from '../application/ports/auth.utils.port';
+} from '@/modules/auth/application/ports/auth.utils.port';
+import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
+import {
+  generateToken,
+  hashToken,
+} from '@/shared/application/utils/token.utils';
 
 export interface CreateSessionResult {
   accessToken: string;

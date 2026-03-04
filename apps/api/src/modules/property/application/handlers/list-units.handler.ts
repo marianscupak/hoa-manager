@@ -1,14 +1,14 @@
 import { Inject } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { Unit } from '../../domain/property.entity';
 import {
   UNIT_OWNERSHIP_REPOSITORY,
   UNIT_REPOSITORY,
   type UnitOwnershipRepository,
   type UnitRepository,
-} from '../ports/property.repository.port';
-import { ListUnitsQuery } from '../queries/list-units.query';
+} from '@/modules/property/application/ports/property.repository.port';
+import { ListUnitsQuery } from '@/modules/property/application/queries/list-units.query';
+import { Unit } from '@/modules/property/domain/property.entity';
 
 export interface UnitWithStatus extends Unit {
   isOwnershipComplete: boolean;

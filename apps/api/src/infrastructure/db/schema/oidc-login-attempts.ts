@@ -1,6 +1,6 @@
 import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
-import { providerEnum } from './auth-identities';
+import { providerEnum } from '@/infrastructure/db/schema/auth-identities';
 
 export const oidcLoginAttempts = pgTable('oidc_login_attempts', {
   id: uuid('id').primaryKey().defaultRandom(),

@@ -1,21 +1,20 @@
 import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import {
-  DuplicateUnitNumberException,
-  InvalidOwnershipShareException,
-} from '../../../../shared/application/exceptions/property.exceptions';
-import { CreateUnitCommand } from '../commands/create-unit.command';
+import { CreateUnitCommand } from '@/modules/property/application/commands/create-unit.command';
 import {
   UNIT_REPOSITORY,
   type UnitRepository,
-} from '../ports/property.repository.port';
+} from '@/modules/property/application/ports/property.repository.port';
+import {
+  DuplicateUnitNumberException,
+  InvalidOwnershipShareException,
+} from '@/shared/application/exceptions/property.exceptions';
 
 @CommandHandler(CreateUnitCommand)
-export class CreateUnitHandler implements ICommandHandler<
-  CreateUnitCommand,
-  { unitId: string }
-> {
+export class CreateUnitHandler
+  implements ICommandHandler<CreateUnitCommand, { unitId: string }>
+{
   constructor(
     @Inject(UNIT_REPOSITORY)
     private readonly unitRepo: UnitRepository,

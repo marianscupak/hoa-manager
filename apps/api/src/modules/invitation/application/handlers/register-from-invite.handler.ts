@@ -2,51 +2,48 @@ import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import {
+  AUTH_IDENTITY_REPOSITORY,
+  type AuthIdentityRepository,
+} from '@/modules/auth/application/ports/auth.repository.port';
+import {
+  PASSWORD_HASHER,
+  type PasswordHasher,
+} from '@/modules/auth/application/ports/auth.utils.port';
+import {
+  AUTH_SESSION_SERVICE,
+  type AuthSessionService,
+} from '@/modules/auth/infrastructure/auth-session.service';
+import {
+  USER_REPOSITORY,
+  type UserRepository,
+} from '@/modules/identity/application/ports/user.repository.port';
+import { RegisterFromInviteCommand } from '@/modules/invitation/application/commands/register-from-invite.command';
+import {
+  OWNER_INVITE_REPOSITORY,
+  type OwnerInviteRepository,
+} from '@/modules/invitation/application/ports/owner-invite.repository.port';
+import {
+  OWNER_REPOSITORY,
+  type OwnerRepository,
+} from '@/modules/property/application/ports/property.repository.port';
+import {
+  MEMBERSHIP_REPOSITORY,
+  type MembershipRepository,
+} from '@/modules/tenancy/application/ports/tenant.repository.port';
+import { TenantMembershipRole } from '@/modules/tenancy/domain/tenant.entity';
+import {
   InviteNotFoundException,
   InviteExpiredException,
   InviteAlreadyAcceptedException,
   OwnerAlreadyClaimedException,
   AccountExistsException,
-} from '../../../../shared/application/exceptions/invite.exceptions';
-import {
-  CLOCK,
-  type Clock,
-} from '../../../../shared/application/ports/clock.port';
+} from '@/shared/application/exceptions/invite.exceptions';
+import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 import {
   UNIT_OF_WORK,
   type UnitOfWork,
-} from '../../../../shared/application/ports/unit-of-work.port';
-import { hashToken } from '../../../../shared/application/utils/token.utils';
-import {
-  AUTH_IDENTITY_REPOSITORY,
-  type AuthIdentityRepository,
-} from '../../../auth/application/ports/auth.repository.port';
-import {
-  PASSWORD_HASHER,
-  type PasswordHasher,
-} from '../../../auth/application/ports/auth.utils.port';
-import {
-  AUTH_SESSION_SERVICE,
-  type AuthSessionService,
-} from '../../../auth/infrastructure/auth-session.service';
-import {
-  USER_REPOSITORY,
-  type UserRepository,
-} from '../../../identity/application/ports/user.repository.port';
-import {
-  OWNER_REPOSITORY,
-  type OwnerRepository,
-} from '../../../property/application/ports/property.repository.port';
-import {
-  MEMBERSHIP_REPOSITORY,
-  type MembershipRepository,
-} from '../../../tenancy/application/ports/tenant.repository.port';
-import { TenantMembershipRole } from '../../../tenancy/domain/tenant.entity';
-import { RegisterFromInviteCommand } from '../commands/register-from-invite.command';
-import {
-  OWNER_INVITE_REPOSITORY,
-  type OwnerInviteRepository,
-} from '../ports/owner-invite.repository.port';
+} from '@/shared/application/ports/unit-of-work.port';
+import { hashToken } from '@/shared/application/utils/token.utils';
 
 export interface RegisterFromInviteResult {
   accessToken: string;

@@ -1,19 +1,18 @@
 import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { DuplicateOwnerEmailException } from '../../../../shared/application/exceptions/property.exceptions';
-import { normalizeEmail } from '../../../../shared/application/utils/normalize-email';
-import { CreateOwnerCommand } from '../commands/create-owner.command';
+import { CreateOwnerCommand } from '@/modules/property/application/commands/create-owner.command';
 import {
   OWNER_REPOSITORY,
   type OwnerRepository,
-} from '../ports/property.repository.port';
+} from '@/modules/property/application/ports/property.repository.port';
+import { DuplicateOwnerEmailException } from '@/shared/application/exceptions/property.exceptions';
+import { normalizeEmail } from '@/shared/application/utils/normalize-email';
 
 @CommandHandler(CreateOwnerCommand)
-export class CreateOwnerHandler implements ICommandHandler<
-  CreateOwnerCommand,
-  { ownerId: string }
-> {
+export class CreateOwnerHandler
+  implements ICommandHandler<CreateOwnerCommand, { ownerId: string }>
+{
   constructor(
     @Inject(OWNER_REPOSITORY)
     private readonly ownerRepo: OwnerRepository,

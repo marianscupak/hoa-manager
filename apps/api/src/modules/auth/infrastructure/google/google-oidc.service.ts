@@ -5,7 +5,7 @@ import { Issuer, BaseClient } from 'openid-client';
 import {
   GoogleOidcService,
   CodeExchangeResult,
-} from '../../application/ports/google-oidc.service.port';
+} from '@/modules/auth/application/ports/google-oidc.service.port';
 
 @Injectable()
 export class GoogleOidcServiceImpl implements GoogleOidcService, OnModuleInit {

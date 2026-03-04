@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService as NestConfigService } from '@nestjs/config';
 
-import { Config } from './config.schema';
+import { Config } from '@/infrastructure/config/config.schema';
 
 @Injectable()
 export class ConfigService {

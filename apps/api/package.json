@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
-    "generate": "dotenv -e .env.local ts-node -r tsconfig-paths/register src/generate-openapi.ts",
+    "generate": "dotenv -e .env.local -- ts-node -r tsconfig-paths/register src/generate-openapi.ts",
     "db:generate": "dotenv -e .env.local -- drizzle-kit generate --config=src/infrastructure/db/drizzle.config.ts",
     "db:migrate": "dotenv -e .env.local -- drizzle-kit migrate --config=src/infrastructure/db/drizzle.config.ts",
     "db:seed": "dotenv -e .env.local -- ts-node -r tsconfig-paths/register src/infrastructure/db/seed.ts",
@@ -92,6 +92,9 @@
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/$1"
     },
     "collectCoverageFrom": [
       "**/*.(t|j)s"

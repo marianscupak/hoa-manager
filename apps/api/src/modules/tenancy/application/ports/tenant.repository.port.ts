@@ -1,4 +1,7 @@
-import { Tenant, TenantMembership } from '../../domain/tenant.entity';
+import {
+  Tenant,
+  TenantMembership,
+} from '@/modules/tenancy/domain/tenant.entity';
 
 export interface TenantRepository {
   findById(id: string): Promise<Tenant | null>;

@@ -216,6 +216,63 @@
         "tags": ["Tenancy"]
       }
     },
+    "/api/identity/users": {
+      "post": {
+        "operationId": "IdentityController_registerUser",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateUserResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Identity"]
+      }
+    },
+    "/api/identity/users/{id}": {
+      "get": {
+        "operationId": "IdentityController_getUser",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Identity"]
+      }
+    },
     "/api/auth/login": {
       "post": {
         "operationId": "AuthController_login",
@@ -380,63 +437,6 @@
           }
         },
         "tags": ["Auth"]
-      }
-    },
-    "/api/identity/users": {
-      "post": {
-        "operationId": "IdentityController_registerUser",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateUserDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CreateUserResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": ["Identity"]
-      }
-    },
-    "/api/identity/users/{id}": {
-      "get": {
-        "operationId": "IdentityController_getUser",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": ["Identity"]
       }
     },
     "/api/owners": {
@@ -777,6 +777,48 @@
         },
         "required": ["tenantId"]
       },
+      "CreateUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+          },
+          "fullName": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": ["email", "fullName"]
+      },
+      "CreateUserResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          }
+        },
+        "required": ["id"]
+      },
+      "UserResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+          }
+        },
+        "required": ["id", "email"]
+      },
       "LoginDto": {
         "type": "object",
         "properties": {
@@ -830,48 +872,6 @@
           }
         },
         "required": ["success"]
-      },
-      "CreateUserDto": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string",
-            "format": "email",
-            "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
-          },
-          "fullName": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "required": ["email", "fullName"]
-      },
-      "CreateUserResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-          }
-        },
-        "required": ["id"]
-      },
-      "UserResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-          },
-          "email": {
-            "type": "string",
-            "format": "email",
-            "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
-          }
-        },
-        "required": ["id", "email"]
       },
       "OwnerResponseDto": {
         "type": "object",

@@ -1,16 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { eq, and, isNull } from 'drizzle-orm';
 
-import { SystemClock } from '../../../../infrastructure/clock/system-clock';
-import { DrizzleService } from '../../../../infrastructure/db/drizzle.service';
-import { DRIZZLE_TX_STORAGE } from '../../../../infrastructure/db/drizzle.unit-of-work';
+import { SystemClock } from '@/infrastructure/clock/system-clock';
+import { DrizzleService } from '@/infrastructure/db/drizzle.service';
+import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
 import {
   authIdentities,
   authSessions,
   oidcLoginAttempts,
   authExchangeCodes,
-} from '../../../../infrastructure/db/schema';
-import { CLOCK } from '../../../../shared/application/ports/clock.port';
+} from '@/infrastructure/db/schema';
 import {
   AuthIdentityRepository,
   AuthSessionRepository,
@@ -18,8 +17,12 @@ import {
   AuthExchangeCodeRepository,
   OidcLoginAttempt,
   AuthExchangeCode,
-} from '../../application/ports/auth.repository.port';
-import { AuthIdentity, AuthSession } from '../../domain/auth-identity.entity';
+} from '@/modules/auth/application/ports/auth.repository.port';
+import {
+  AuthIdentity,
+  AuthSession,
+} from '@/modules/auth/domain/auth-identity.entity';
+import { CLOCK } from '@/shared/application/ports/clock.port';
 
 @Injectable()
 export class DrizzleAuthIdentityRepository implements AuthIdentityRepository {

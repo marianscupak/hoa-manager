@@ -6,16 +6,16 @@ import {
 } from '@nestjs/common';
 import type { Request } from 'express';
 
-import { TOKEN_VERIFIER } from '../../../modules/auth/application/ports/auth.utils.port';
-import type { TokenVerifier } from '../../../modules/auth/application/ports/auth.utils.port';
+import { TOKEN_VERIFIER } from '@/modules/auth/application/ports/auth.utils.port';
+import type { TokenVerifier } from '@/modules/auth/application/ports/auth.utils.port';
 import {
   USER_REPOSITORY,
   type UserRepository,
-} from '../../../modules/identity/application/ports/user.repository.port';
-import { InvalidTokenException } from '../../application/exceptions/auth.exceptions';
-import { UserInactiveException } from '../../application/exceptions/user.exceptions';
-import { AuthClaims } from '../../domain/auth-claims';
-import { AuthPrincipal } from '../../domain/auth-principal';
+} from '@/modules/identity/application/ports/user.repository.port';
+import { InvalidTokenException } from '@/shared/application/exceptions/auth.exceptions';
+import { UserInactiveException } from '@/shared/application/exceptions/user.exceptions';
+import { AuthClaims } from '@/shared/domain/auth-claims';
+import { AuthPrincipal } from '@/shared/domain/auth-principal';
 
 @Injectable()
 export class AccessTokenAuthGuard implements CanActivate {

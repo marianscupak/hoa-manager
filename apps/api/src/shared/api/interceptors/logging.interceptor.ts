@@ -10,8 +10,8 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Observable, tap } from 'rxjs';
 import type { Logger as WinstonLogger } from 'winston';
 
-import { AuthClaims } from '../../domain/auth-claims';
-import { TenantContext } from '../../domain/tenant-context';
+import { AuthClaims } from '@/shared/domain/auth-claims';
+import { TenantContext } from '@/shared/domain/tenant-context';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {

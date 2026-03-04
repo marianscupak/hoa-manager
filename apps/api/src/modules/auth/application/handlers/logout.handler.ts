@@ -3,15 +3,15 @@ import { createHash } from 'crypto';
 import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import {
-  UNIT_OF_WORK,
-  type UnitOfWork,
-} from '../../../../shared/application/ports/unit-of-work.port';
-import { LogoutCommand } from '../commands/logout.command';
+import { LogoutCommand } from '@/modules/auth/application/commands/logout.command';
 import {
   AUTH_SESSION_REPOSITORY,
   type AuthSessionRepository,
-} from '../ports/auth.repository.port';
+} from '@/modules/auth/application/ports/auth.repository.port';
+import {
+  UNIT_OF_WORK,
+  type UnitOfWork,
+} from '@/shared/application/ports/unit-of-work.port';
 
 @CommandHandler(LogoutCommand)
 export class LogoutHandler implements ICommandHandler<LogoutCommand> {

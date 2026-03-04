@@ -2,13 +2,13 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
 
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from '@/modules/identity/api/dto/create-user.dto';
 import {
   CreateUserResponseDto,
   UserResponseDto,
-} from './dto/user-response.dto';
-import { CreateUserCommand } from '../application/commands/create-user.command';
-import { GetUserByIdQuery } from '../application/queries/get-user-by-id.query';
+} from '@/modules/identity/api/dto/user-response.dto';
+import { CreateUserCommand } from '@/modules/identity/application/commands/create-user.command';
+import { GetUserByIdQuery } from '@/modules/identity/application/queries/get-user-by-id.query';
 
 @Controller('identity/users')
 export class IdentityController {

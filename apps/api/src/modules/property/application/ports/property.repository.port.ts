@@ -1,4 +1,8 @@
-import { Owner, Unit, UnitOwnership } from '../../domain/property.entity';
+import {
+  Owner,
+  Unit,
+  UnitOwnership,
+} from '@/modules/property/domain/property.entity';
 
 export interface UnitRepository {
   create(

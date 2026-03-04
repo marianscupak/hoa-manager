@@ -18,17 +18,17 @@ import {
   ReplaceOwnershipsDto,
   UnitResponseDto,
   UnitDetailResponseDto,
-} from './dto/unit.dto';
-import { Roles, Tenant } from '../../../shared/api/decorators/auth.decorators';
-import { AccessTokenAuthGuard } from '../../../shared/api/guards/access-token-auth.guard';
-import { RolesGuard } from '../../../shared/api/guards/roles.guard';
-import { TenantContextGuard } from '../../../shared/api/guards/tenant-context.guard';
-import type { TenantContext } from '../../../shared/domain/tenant-context';
-import { TenantMembershipRole } from '../../tenancy/domain/tenant.entity';
-import { CreateUnitCommand } from '../application/commands/create-unit.command';
-import { ReplaceUnitOwnershipCommand } from '../application/commands/replace-unit-ownership.command';
-import { GetUnitDetailQuery } from '../application/queries/get-unit-detail.query';
-import { ListUnitsQuery } from '../application/queries/list-units.query';
+} from '@/modules/property/api/dto/unit.dto';
+import { CreateUnitCommand } from '@/modules/property/application/commands/create-unit.command';
+import { ReplaceUnitOwnershipCommand } from '@/modules/property/application/commands/replace-unit-ownership.command';
+import { GetUnitDetailQuery } from '@/modules/property/application/queries/get-unit-detail.query';
+import { ListUnitsQuery } from '@/modules/property/application/queries/list-units.query';
+import { TenantMembershipRole } from '@/modules/tenancy/domain/tenant.entity';
+import { Roles, Tenant } from '@/shared/api/decorators/auth.decorators';
+import { AccessTokenAuthGuard } from '@/shared/api/guards/access-token-auth.guard';
+import { RolesGuard } from '@/shared/api/guards/roles.guard';
+import { TenantContextGuard } from '@/shared/api/guards/tenant-context.guard';
+import type { TenantContext } from '@/shared/domain/tenant-context';
 
 @ApiTags('Property Units')
 @Controller('units')

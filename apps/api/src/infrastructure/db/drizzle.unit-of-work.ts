@@ -2,8 +2,8 @@ import { AsyncLocalStorage } from 'async_hooks';
 
 import { Injectable } from '@nestjs/common';
 
-import { DrizzleService } from './drizzle.service';
-import { UnitOfWork } from '../../shared/application/ports/unit-of-work.port';
+import { DrizzleService } from '@/infrastructure/db/drizzle.service';
+import { UnitOfWork } from '@/shared/application/ports/unit-of-work.port';
 
 export const DRIZZLE_TX_STORAGE = new AsyncLocalStorage<any>();
 

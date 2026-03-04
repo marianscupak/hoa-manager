@@ -1,16 +1,9 @@
 import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { SystemClock } from '../../../../infrastructure/clock/system-clock';
-import { DrizzleUnitOfWork } from '../../../../infrastructure/db/drizzle.unit-of-work';
-import {
-  InvalidOwnershipShareException,
-  InvalidOwnershipSumException,
-  OwnerNotFoundException,
-  UnitNotFoundException,
-} from '../../../../shared/application/exceptions/property.exceptions';
-import { CLOCK } from '../../../../shared/application/ports/clock.port';
-import { ReplaceUnitOwnershipCommand } from '../commands/replace-unit-ownership.command';
+import { SystemClock } from '@/infrastructure/clock/system-clock';
+import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
+import { ReplaceUnitOwnershipCommand } from '@/modules/property/application/commands/replace-unit-ownership.command';
 import {
   OWNER_REPOSITORY,
   UNIT_OWNERSHIP_REPOSITORY,
@@ -18,13 +11,19 @@ import {
   type OwnerRepository,
   type UnitOwnershipRepository,
   type UnitRepository,
-} from '../ports/property.repository.port';
+} from '@/modules/property/application/ports/property.repository.port';
+import {
+  InvalidOwnershipShareException,
+  InvalidOwnershipSumException,
+  OwnerNotFoundException,
+  UnitNotFoundException,
+} from '@/shared/application/exceptions/property.exceptions';
+import { CLOCK } from '@/shared/application/ports/clock.port';
 
 @CommandHandler(ReplaceUnitOwnershipCommand)
-export class ReplaceUnitOwnershipHandler implements ICommandHandler<
-  ReplaceUnitOwnershipCommand,
-  void
-> {
+export class ReplaceUnitOwnershipHandler
+  implements ICommandHandler<ReplaceUnitOwnershipCommand, void>
+{
   constructor(
     @Inject(UNIT_REPOSITORY)
     private readonly unitRepo: UnitRepository,

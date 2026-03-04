@@ -3,41 +3,41 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { JwtModule } from '@nestjs/jwt';
 
-import { IdentityModule } from '../identity/identity.module';
-import { TenancyModule } from '../tenancy/tenancy.module';
-import { AuthController } from './api/auth.controller';
-import { ExchangeGoogleCodeHandler } from './application/handlers/exchange-google-code.handler';
-import { HandleGoogleCallbackHandler } from './application/handlers/handle-google-callback.handler';
-import { LoginHandler } from './application/handlers/login.handler';
-import { LogoutHandler } from './application/handlers/logout.handler';
-import { RefreshTokenHandler } from './application/handlers/refresh-token.handler';
-import { StartGoogleLoginHandler } from './application/handlers/start-google-login.handler';
-import { SwitchTenantHandler } from './application/handlers/switch-tenant.handler';
+import { AuthController } from '@/modules/auth/api/auth.controller';
+import { ExchangeGoogleCodeHandler } from '@/modules/auth/application/handlers/exchange-google-code.handler';
+import { HandleGoogleCallbackHandler } from '@/modules/auth/application/handlers/handle-google-callback.handler';
+import { LoginHandler } from '@/modules/auth/application/handlers/login.handler';
+import { LogoutHandler } from '@/modules/auth/application/handlers/logout.handler';
+import { RefreshTokenHandler } from '@/modules/auth/application/handlers/refresh-token.handler';
+import { StartGoogleLoginHandler } from '@/modules/auth/application/handlers/start-google-login.handler';
+import { SwitchTenantHandler } from '@/modules/auth/application/handlers/switch-tenant.handler';
 import {
   AUTH_IDENTITY_REPOSITORY,
   AUTH_SESSION_REPOSITORY,
   OIDC_LOGIN_ATTEMPT_REPOSITORY,
   AUTH_EXCHANGE_CODE_REPOSITORY,
-} from './application/ports/auth.repository.port';
+} from '@/modules/auth/application/ports/auth.repository.port';
 import {
   PASSWORD_HASHER,
   TOKEN_SIGNER,
   TOKEN_VERIFIER,
-} from './application/ports/auth.utils.port';
-import { GOOGLE_OIDC_SERVICE } from './application/ports/google-oidc.service.port';
+} from '@/modules/auth/application/ports/auth.utils.port';
+import { GOOGLE_OIDC_SERVICE } from '@/modules/auth/application/ports/google-oidc.service.port';
 import {
   AUTH_SESSION_SERVICE,
   AuthSessionServiceImpl,
-} from './infrastructure/auth-session.service';
-import { BcryptPasswordHasher } from './infrastructure/bcrypt-password-hasher';
-import { GoogleOidcServiceImpl } from './infrastructure/google/google-oidc.service';
-import { JwtTokenService } from './infrastructure/jwt-token.service';
+} from '@/modules/auth/infrastructure/auth-session.service';
+import { BcryptPasswordHasher } from '@/modules/auth/infrastructure/bcrypt-password-hasher';
+import { GoogleOidcServiceImpl } from '@/modules/auth/infrastructure/google/google-oidc.service';
+import { JwtTokenService } from '@/modules/auth/infrastructure/jwt-token.service';
 import {
   DrizzleAuthIdentityRepository,
   DrizzleAuthSessionRepository,
   DrizzleOidcLoginAttemptRepository,
   DrizzleAuthExchangeCodeRepository,
-} from './infrastructure/persistence/drizzle-auth.repository';
+} from '@/modules/auth/infrastructure/persistence/drizzle-auth.repository';
+import { IdentityModule } from '@/modules/identity/identity.module';
+import { TenancyModule } from '@/modules/tenancy/tenancy.module';
 
 @Module({
   imports: [

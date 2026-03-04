@@ -5,38 +5,38 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { addDays } from 'date-fns';
 
 import {
-  UnauthorizedException,
-  InvalidCredentialsException,
-} from '../../../../shared/application/exceptions/auth.exceptions';
-import {
-  CLOCK,
-  type Clock,
-} from '../../../../shared/application/ports/clock.port';
-import {
-  UNIT_OF_WORK,
-  type UnitOfWork,
-} from '../../../../shared/application/ports/unit-of-work.port';
-import {
-  USER_REPOSITORY,
-  type UserRepository,
-} from '../../../identity/application/ports/user.repository.port';
-import {
-  MEMBERSHIP_REPOSITORY,
-  type MembershipRepository,
-} from '../../../tenancy/application/ports/tenant.repository.port';
-import { LoginCommand, type LoginResult } from '../commands/login.command';
+  LoginCommand,
+  type LoginResult,
+} from '@/modules/auth/application/commands/login.command';
 import {
   AUTH_IDENTITY_REPOSITORY,
   AUTH_SESSION_REPOSITORY,
   type AuthIdentityRepository,
   type AuthSessionRepository,
-} from '../ports/auth.repository.port';
+} from '@/modules/auth/application/ports/auth.repository.port';
 import {
   PASSWORD_HASHER,
   TOKEN_SIGNER,
   type PasswordHasher,
   type TokenSigner,
-} from '../ports/auth.utils.port';
+} from '@/modules/auth/application/ports/auth.utils.port';
+import {
+  USER_REPOSITORY,
+  type UserRepository,
+} from '@/modules/identity/application/ports/user.repository.port';
+import {
+  MEMBERSHIP_REPOSITORY,
+  type MembershipRepository,
+} from '@/modules/tenancy/application/ports/tenant.repository.port';
+import {
+  UnauthorizedException,
+  InvalidCredentialsException,
+} from '@/shared/application/exceptions/auth.exceptions';
+import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
+import {
+  UNIT_OF_WORK,
+  type UnitOfWork,
+} from '@/shared/application/ports/unit-of-work.port';
 
 @CommandHandler(LoginCommand)
 export class LoginHandler implements ICommandHandler<LoginCommand> {

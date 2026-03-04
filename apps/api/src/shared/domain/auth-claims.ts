@@ -1,4 +1,4 @@
-import { TenantMembershipRole } from '../../modules/tenancy/domain/tenant.entity';
+import { TenantMembershipRole } from '@/modules/tenancy/domain/tenant.entity';
 
 export interface AuthClaims {
   sub: string;

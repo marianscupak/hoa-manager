@@ -7,7 +7,7 @@ import {
   unique,
 } from 'drizzle-orm/pg-core';
 
-import { tenants } from './tenants';
+import { tenants } from '@/infrastructure/db/schema/tenants';
 
 export const units = pgTable(
   'units',

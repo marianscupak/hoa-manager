@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { HealthCheck, HealthCheckService } from '@nestjs/terminus';
 
-import { DrizzleHealthIndicator } from './drizzle.health-indicator';
+import { DrizzleHealthIndicator } from '@/infrastructure/health/drizzle.health-indicator';
 
 @Controller('health')
 export class HealthController {

@@ -2,23 +2,23 @@ import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
 
-import { DrizzleUnitOfWork } from '../../infrastructure/db/drizzle.unit-of-work';
-import { ConsoleEmailSender } from '../../infrastructure/email/console-email-sender';
-import { EMAIL_SENDER } from '../../infrastructure/email/email-sender.port';
-import { UNIT_OF_WORK } from '../../shared/application/ports/unit-of-work.port';
-import { AuthModule } from '../auth/auth.module';
-import { IdentityModule } from '../identity/identity.module';
-import { PropertyModule } from '../property/property.module';
-import { TenancyModule } from '../tenancy/tenancy.module';
-import { InviteController } from './api/invite.controller';
-import { AcceptOwnerInviteHandler } from './application/handlers/accept-owner-invite.handler';
-import { GetOwnerInviteStatusHandler } from './application/handlers/get-owner-invite-status.handler';
-import { GetPendingInviteByOwnerIdHandler } from './application/handlers/get-pending-invite-by-owner-id.handler';
-import { RegisterFromInviteHandler } from './application/handlers/register-from-invite.handler';
-import { RevokeOwnerInviteHandler } from './application/handlers/revoke-owner-invite.handler';
-import { SendOwnerInviteHandler } from './application/handlers/send-owner-invite.handler';
-import { OWNER_INVITE_REPOSITORY } from './application/ports/owner-invite.repository.port';
-import { DrizzleOwnerInviteRepository } from './infrastructure/persistence/drizzle-owner-invite.repository';
+import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
+import { ConsoleEmailSender } from '@/infrastructure/email/console-email-sender';
+import { EMAIL_SENDER } from '@/infrastructure/email/email-sender.port';
+import { AuthModule } from '@/modules/auth/auth.module';
+import { IdentityModule } from '@/modules/identity/identity.module';
+import { InviteController } from '@/modules/invitation/api/invite.controller';
+import { AcceptOwnerInviteHandler } from '@/modules/invitation/application/handlers/accept-owner-invite.handler';
+import { GetOwnerInviteStatusHandler } from '@/modules/invitation/application/handlers/get-owner-invite-status.handler';
+import { GetPendingInviteByOwnerIdHandler } from '@/modules/invitation/application/handlers/get-pending-invite-by-owner-id.handler';
+import { RegisterFromInviteHandler } from '@/modules/invitation/application/handlers/register-from-invite.handler';
+import { RevokeOwnerInviteHandler } from '@/modules/invitation/application/handlers/revoke-owner-invite.handler';
+import { SendOwnerInviteHandler } from '@/modules/invitation/application/handlers/send-owner-invite.handler';
+import { OWNER_INVITE_REPOSITORY } from '@/modules/invitation/application/ports/owner-invite.repository.port';
+import { DrizzleOwnerInviteRepository } from '@/modules/invitation/infrastructure/persistence/drizzle-owner-invite.repository';
+import { PropertyModule } from '@/modules/property/property.module';
+import { TenancyModule } from '@/modules/tenancy/tenancy.module';
+import { UNIT_OF_WORK } from '@/shared/application/ports/unit-of-work.port';
 
 const CommandHandlers = [
   SendOwnerInviteHandler,

@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { eq, and } from 'drizzle-orm';
 
-import { DrizzleService } from '../../../../infrastructure/db/drizzle.service';
-import { DRIZZLE_TX_STORAGE } from '../../../../infrastructure/db/drizzle.unit-of-work';
-import {
-  tenants,
-  tenantMemberships,
-} from '../../../../infrastructure/db/schema';
+import { DrizzleService } from '@/infrastructure/db/drizzle.service';
+import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
+import { tenants, tenantMemberships } from '@/infrastructure/db/schema';
 import {
   TenantRepository,
   MembershipRepository,
   type TenantWithMembership,
-} from '../../application/ports/tenant.repository.port';
-import { Tenant, TenantMembership } from '../../domain/tenant.entity';
+} from '@/modules/tenancy/application/ports/tenant.repository.port';
+import {
+  Tenant,
+  TenantMembership,
+} from '@/modules/tenancy/domain/tenant.entity';
 
 @Injectable()
 export class DrizzleTenantRepository implements TenantRepository {

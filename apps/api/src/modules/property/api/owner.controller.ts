@@ -12,26 +12,26 @@ import {
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
 import { ApiOkResponse, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 
+import { RevokeOwnerInviteCommand } from '@/modules/invitation/application/commands/revoke-owner-invite.command';
+import { SendOwnerInviteCommand } from '@/modules/invitation/application/commands/send-owner-invite.command';
 import {
   CreateOwnerDto,
   CreateOwnerResponseDto,
   OwnerResponseDto,
-} from './dto/owner.dto';
+} from '@/modules/property/api/dto/owner.dto';
+import { CreateOwnerCommand } from '@/modules/property/application/commands/create-owner.command';
+import { ListOwnersQuery } from '@/modules/property/application/queries/list-owners.query';
+import { TenantMembershipRole } from '@/modules/tenancy/domain/tenant.entity';
 import {
   Roles,
   Tenant,
   CurrentAuthUser,
-} from '../../../shared/api/decorators/auth.decorators';
-import { AccessTokenAuthGuard } from '../../../shared/api/guards/access-token-auth.guard';
-import { RolesGuard } from '../../../shared/api/guards/roles.guard';
-import { TenantContextGuard } from '../../../shared/api/guards/tenant-context.guard';
-import type { AuthPrincipal } from '../../../shared/domain/auth-principal';
-import type { TenantContext } from '../../../shared/domain/tenant-context';
-import { RevokeOwnerInviteCommand } from '../../invitation/application/commands/revoke-owner-invite.command';
-import { SendOwnerInviteCommand } from '../../invitation/application/commands/send-owner-invite.command';
-import { TenantMembershipRole } from '../../tenancy/domain/tenant.entity';
-import { CreateOwnerCommand } from '../application/commands/create-owner.command';
-import { ListOwnersQuery } from '../application/queries/list-owners.query';
+} from '@/shared/api/decorators/auth.decorators';
+import { AccessTokenAuthGuard } from '@/shared/api/guards/access-token-auth.guard';
+import { RolesGuard } from '@/shared/api/guards/roles.guard';
+import { TenantContextGuard } from '@/shared/api/guards/tenant-context.guard';
+import type { AuthPrincipal } from '@/shared/domain/auth-principal';
+import type { TenantContext } from '@/shared/domain/tenant-context';
 
 @ApiTags('Property Owners')
 @Controller('owners')

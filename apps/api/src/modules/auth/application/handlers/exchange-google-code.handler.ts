@@ -3,21 +3,21 @@ import { createHash } from 'crypto';
 import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { UnauthorizedException } from '../../../../shared/application/exceptions/auth.exceptions';
-import {
-  CLOCK,
-  type Clock,
-} from '../../../../shared/application/ports/clock.port';
-import {
-  UNIT_OF_WORK,
-  type UnitOfWork,
-} from '../../../../shared/application/ports/unit-of-work.port';
-import { ExchangeGoogleCodeCommand } from '../commands/exchange-google-code.command';
+import { ExchangeGoogleCodeCommand } from '@/modules/auth/application/commands/exchange-google-code.command';
 import {
   AUTH_EXCHANGE_CODE_REPOSITORY,
   type AuthExchangeCodeRepository,
-} from '../ports/auth.repository.port';
-import { TOKEN_SIGNER, type TokenSigner } from '../ports/auth.utils.port';
+} from '@/modules/auth/application/ports/auth.repository.port';
+import {
+  TOKEN_SIGNER,
+  type TokenSigner,
+} from '@/modules/auth/application/ports/auth.utils.port';
+import { UnauthorizedException } from '@/shared/application/exceptions/auth.exceptions';
+import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
+import {
+  UNIT_OF_WORK,
+  type UnitOfWork,
+} from '@/shared/application/ports/unit-of-work.port';
 
 export interface ExchangeGoogleCodeResult {
   accessToken: string;

@@ -1,13 +1,13 @@
 import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { UserAlreadyExistsError } from '../../domain/errors/user-already-exists.error';
-import { User } from '../../domain/user.entity';
-import { CreateUserCommand } from '../commands/create-user.command';
+import { CreateUserCommand } from '@/modules/identity/application/commands/create-user.command';
 import {
   USER_REPOSITORY,
   type UserRepository,
-} from '../ports/user.repository.port';
+} from '@/modules/identity/application/ports/user.repository.port';
+import { UserAlreadyExistsError } from '@/modules/identity/domain/errors/user-already-exists.error';
+import { User } from '@/modules/identity/domain/user.entity';
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {

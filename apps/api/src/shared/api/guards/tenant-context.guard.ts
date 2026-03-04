@@ -6,11 +6,11 @@ import {
 } from '@nestjs/common';
 import type { Request } from 'express';
 
-import { MEMBERSHIP_REPOSITORY } from '../../../modules/tenancy/application/ports/tenant.repository.port';
-import type { MembershipRepository } from '../../../modules/tenancy/application/ports/tenant.repository.port';
-import { UnauthorizedException } from '../../application/exceptions/auth.exceptions';
-import { AuthClaims } from '../../domain/auth-claims';
-import { TenantContext } from '../../domain/tenant-context';
+import { MEMBERSHIP_REPOSITORY } from '@/modules/tenancy/application/ports/tenant.repository.port';
+import type { MembershipRepository } from '@/modules/tenancy/application/ports/tenant.repository.port';
+import { UnauthorizedException } from '@/shared/application/exceptions/auth.exceptions';
+import { AuthClaims } from '@/shared/domain/auth-claims';
+import { TenantContext } from '@/shared/domain/tenant-context';
 
 @Injectable()
 export class TenantContextGuard implements CanActivate {

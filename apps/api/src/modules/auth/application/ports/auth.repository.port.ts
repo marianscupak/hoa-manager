@@ -1,4 +1,7 @@
-import { AuthIdentity, AuthSession } from '../../domain/auth-identity.entity';
+import {
+  AuthIdentity,
+  AuthSession,
+} from '@/modules/auth/domain/auth-identity.entity';
 
 export interface AuthIdentityRepository {
   findByProvider(

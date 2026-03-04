@@ -4,7 +4,7 @@ import { z } from 'zod';
 import {
   roleEnum,
   statusEnum,
-} from '../../../../infrastructure/db/schema/tenant-memberships';
+} from '@/infrastructure/db/schema/tenant-memberships';
 
 export const TenantResponseSchema = z.object({
   id: z.uuid(),

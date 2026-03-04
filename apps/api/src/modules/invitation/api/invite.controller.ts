@@ -19,17 +19,17 @@ import {
   InviteStatusResponseDto,
   RegisterFromInviteDto,
   RegisterFromInviteResponseDto,
-} from './dto/invite.dto';
-import { CurrentAuthUser } from '../../../shared/api/decorators/auth.decorators';
-import { AccessTokenAuthGuard } from '../../../shared/api/guards/access-token-auth.guard';
-import { setRefreshTokenCookie } from '../../../shared/api/utils/refresh-cookie';
-import type { AuthPrincipal } from '../../../shared/domain/auth-principal';
-import { AcceptOwnerInviteCommand } from '../application/commands/accept-owner-invite.command';
-import { RegisterFromInviteCommand } from '../application/commands/register-from-invite.command';
-import { type AcceptOwnerInviteResult } from '../application/handlers/accept-owner-invite.handler';
-import { type InviteStatusResult } from '../application/handlers/get-owner-invite-status.handler';
-import { type RegisterFromInviteResult } from '../application/handlers/register-from-invite.handler';
-import { GetOwnerInviteStatusQuery } from '../application/queries/get-owner-invite-status.query';
+} from '@/modules/invitation/api/dto/invite.dto';
+import { AcceptOwnerInviteCommand } from '@/modules/invitation/application/commands/accept-owner-invite.command';
+import { RegisterFromInviteCommand } from '@/modules/invitation/application/commands/register-from-invite.command';
+import { type AcceptOwnerInviteResult } from '@/modules/invitation/application/handlers/accept-owner-invite.handler';
+import { type InviteStatusResult } from '@/modules/invitation/application/handlers/get-owner-invite-status.handler';
+import { type RegisterFromInviteResult } from '@/modules/invitation/application/handlers/register-from-invite.handler';
+import { GetOwnerInviteStatusQuery } from '@/modules/invitation/application/queries/get-owner-invite-status.query';
+import { CurrentAuthUser } from '@/shared/api/decorators/auth.decorators';
+import { AccessTokenAuthGuard } from '@/shared/api/guards/access-token-auth.guard';
+import { setRefreshTokenCookie } from '@/shared/api/utils/refresh-cookie';
+import type { AuthPrincipal } from '@/shared/domain/auth-principal';
 
 @ApiTags('Owner Invitations')
 @Controller()

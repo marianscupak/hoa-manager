@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
-import { IdentityController } from './api/identity.controller';
-import { CreateUserHandler } from './application/handlers/create-user.handler';
-import { GetUserByIdHandler } from './application/handlers/get-user-by-id.handler';
-import { USER_REPOSITORY } from './application/ports/user.repository.port';
-import { DrizzleUserRepository } from './infrastructure/persistence/drizzle-user.repository';
+import { IdentityController } from '@/modules/identity/api/identity.controller';
+import { CreateUserHandler } from '@/modules/identity/application/handlers/create-user.handler';
+import { GetUserByIdHandler } from '@/modules/identity/application/handlers/get-user-by-id.handler';
+import { USER_REPOSITORY } from '@/modules/identity/application/ports/user.repository.port';
+import { DrizzleUserRepository } from '@/modules/identity/infrastructure/persistence/drizzle-user.repository';
 
 const CommandHandlers = [CreateUserHandler];
 const QueryHandlers = [GetUserByIdHandler];

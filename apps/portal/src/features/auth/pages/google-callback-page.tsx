@@ -1,5 +1,5 @@
 import { useSetAtom } from "jotai";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router";
 
@@ -27,55 +27,64 @@ export function GoogleCallbackPage() {
     const setUser = useSetAtom(userAtom);
 
     const [mutationError, setMutationError] = useState<string | null>(null);
-    const exchangeMutation = useAuthControllerExchangeGoogleCode();
+    const exchangeMutation = useAuthControllerExchangeGoogleCode({
+        mutation: {
+            onSuccess: (data) => {
+                const token = data.accessToken;
+                const payload = parseJwt(token);
+                if (!payload) {
+                    toast.error(t("googleCallback.error"));
+                    setMutationError(t("googleCallback.error"));
+                    return;
+                }
+
+                setAccessToken(token);
+                setUser({ userId: payload.sub, email: payload.email });
+
+                const redirectUrl = StorageService.getString(
+                    STORAGE_KEYS.POST_LOGIN_REDIRECT,
+                );
+                StorageService.remove(STORAGE_KEYS.POST_LOGIN_REDIRECT);
+
+                if (payload.tid && payload.mid) {
+                    setTenantContext({
+                        tenantId: payload.tid,
+                        membershipId: payload.mid,
+                        roles: payload.roles || [],
+                    });
+                    setAuthStatus("authenticated");
+                    StorageService.setString(
+                        STORAGE_KEYS.LAST_TENANT_ID,
+                        payload.tid,
+                    );
+                    navigate(redirectUrl ?? "/", { replace: true });
+                } else {
+                    setAuthStatus("select-tenant");
+                    navigate(redirectUrl ?? "/tenant", { replace: true });
+                }
+            },
+            onError: () => {
+                toast.error(t("googleCallback.error"));
+                setMutationError(t("googleCallback.error"));
+            },
+        },
+    });
 
     const params = new URLSearchParams(location.search);
     const code = params.get("code");
     const error = !code ? t("googleCallback.error") : mutationError;
 
+    console.log("Here");
+
+    const hasFetched = useRef(false);
+
     useEffect(() => {
-        if (!code) {
+        if (!code || hasFetched.current) {
             return;
         }
+        hasFetched.current = true;
 
-        exchangeMutation.mutate(
-            { data: { code } },
-            {
-                onSuccess: (data) => {
-                    const token = data.accessToken;
-                    const payload = parseJwt(token);
-                    if (!payload) {
-                        toast.error(t("googleCallback.error"));
-                        setMutationError(t("googleCallback.error"));
-                        return;
-                    }
-
-                    setAccessToken(token);
-                    setUser({ userId: payload.sub, email: payload.email });
-
-                    if (payload.tid && payload.mid) {
-                        setTenantContext({
-                            tenantId: payload.tid,
-                            membershipId: payload.mid,
-                            roles: payload.roles || [],
-                        });
-                        setAuthStatus("authenticated");
-                        StorageService.setString(
-                            STORAGE_KEYS.LAST_TENANT_ID,
-                            payload.tid,
-                        );
-                        navigate("/", { replace: true });
-                    } else {
-                        setAuthStatus("select-tenant");
-                        navigate("/tenant", { replace: true });
-                    }
-                },
-                onError: () => {
-                    toast.error(t("googleCallback.error"));
-                    setMutationError(t("googleCallback.error"));
-                },
-            },
-        );
+        exchangeMutation.mutate({ data: { code } });
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (

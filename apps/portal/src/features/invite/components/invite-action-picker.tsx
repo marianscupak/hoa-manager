@@ -1,7 +1,10 @@
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { useNavigate } from "react-router";
 
 import { Button } from "@hoa-mngr/ui";
+
+import { STORAGE_KEYS } from "@/storage/keys";
+import { StorageService } from "@/storage/storage";
 
 interface InviteActionPickerProps {
     token: string;
@@ -13,6 +16,7 @@ export function InviteActionPicker({
     onCreateAccount,
 }: InviteActionPickerProps) {
     const { t } = useTranslation(["invite"]);
+    const navigate = useNavigate();
 
     return (
         <div className="space-y-3">
@@ -35,18 +39,19 @@ export function InviteActionPicker({
                 <p className="mt-1 text-sm text-slate-500">
                     {t("actions.signInDescription")}
                 </p>
-                <Link
-                    to="/login"
-                    state={{
-                        from: {
-                            pathname: `/invites/owner?token=${token}`,
-                        },
+                <Button
+                    variant="outline"
+                    className="mt-3 w-full"
+                    onClick={() => {
+                        StorageService.setString(
+                            STORAGE_KEYS.POST_LOGIN_REDIRECT,
+                            `/invites/owner?token=${token}`,
+                        );
+                        navigate("/login");
                     }}
                 >
-                    <Button variant="outline" className="mt-3 w-full">
-                        {t("actions.signIn")}
-                    </Button>
-                </Link>
+                    {t("actions.signIn")}
+                </Button>
             </div>
         </div>
     );

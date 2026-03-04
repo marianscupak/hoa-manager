@@ -69,4 +69,15 @@ export class DrizzleOwnerInviteRepository implements OwnerInviteRepository {
       .set({ acceptedAt: now })
       .where(eq(ownerInvites.id, id));
   }
+
+  async deleteByOwnerId(tenantId: string, ownerId: string): Promise<void> {
+    await this.db
+      .delete(ownerInvites)
+      .where(
+        and(
+          eq(ownerInvites.tenantId, tenantId),
+          eq(ownerInvites.ownerId, ownerId),
+        ),
+      );
+  }
 }

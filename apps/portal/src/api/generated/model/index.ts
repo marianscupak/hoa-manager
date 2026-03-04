@@ -32,6 +32,7 @@ export * from "./inviteStatusResponseDto";
 export * from "./inviteStatusResponseDtoStatus";
 export * from "./loginDto";
 export * from "./ownerResponseDto";
+export * from "./ownerResponseDtoInviteStatus";
 export * from "./registerFromInviteDto";
 export * from "./registerFromInviteResponseDto";
 export * from "./replaceOwnershipsDto";

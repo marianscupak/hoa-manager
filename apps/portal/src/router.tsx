@@ -85,11 +85,15 @@ export const router = createBrowserRouter([
                 path: "login",
                 element: <LoginPage />,
             },
-            {
-                path: "auth/google/callback",
-                element: <GoogleCallbackPage />,
-            },
         ],
+    },
+    {
+        path: "/auth/google/callback",
+        element: (
+            <ErrorBoundary>
+                <GoogleCallbackPage />
+            </ErrorBoundary>
+        ),
     },
     {
         path: "/invites",

@@ -1,12 +1,11 @@
 import { AxiosError } from "axios";
-import { getDefaultStore } from "jotai";
+import { useAtomValue } from "jotai";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams, useNavigate } from "react-router";
 
 import { toast } from "@hoa-mngr/ui";
 
-import { authControllerSwitchTenant } from "@/api/generated/auth/auth";
 import {
     useInviteControllerAcceptInvite,
     useInviteControllerGetInviteStatus,
@@ -37,9 +36,8 @@ export function OwnerInvitePage() {
 
     const [showRegisterForm, setShowRegisterForm] = useState(false);
 
-    const store = getDefaultStore();
-    const currentToken = store.get(accessTokenAtom);
-    const isAuthenticated = !!currentToken;
+    const currentAccessToken = useAtomValue(accessTokenAtom);
+    const isAuthenticated = !!currentAccessToken;
 
     const { data: statusData, isLoading } = useInviteControllerGetInviteStatus(
         { token },
@@ -50,19 +48,13 @@ export function OwnerInvitePage() {
     const emailMasked = statusData?.emailMasked ?? "";
     const expiresAt = statusData?.expiresAt;
 
+    const { switchTenant } = useTenantSwitcher();
+
     const acceptMutation = useInviteControllerAcceptInvite({
         mutation: {
-            onSuccess: async (data) => {
+            onSuccess: (data) => {
                 toast.success(t("accept.success"));
-                try {
-                    const switchRes = await authControllerSwitchTenant({
-                        tenantId: data.tenantId,
-                    });
-                    store.set(accessTokenAtom, switchRes.accessToken);
-                    navigate("/");
-                } catch {
-                    navigate("/");
-                }
+                switchTenant(data.tenantId, { redirectUrl: "/" });
             },
             onError: (err) => {
                 const code = getErrorCode(err);
@@ -78,14 +70,14 @@ export function OwnerInvitePage() {
     });
 
     const { setSession } = useSessionManager();
-    const { switchTenant } = useTenantSwitcher();
 
     const registerMutation = useInviteControllerRegisterFromInvite({
         mutation: {
             onSuccess: async (data) => {
                 const { success } = setSession(data.accessToken);
                 if (!success) return;
-                switchTenant(data.tenantId, { redirectUrl: "/" });
+                toast.success(t("register.success"));
+                navigate("/");
             },
             onError: (err) => {
                 const code = getErrorCode(err);

@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Delete,
   Body,
   Param,
   UseGuards,
@@ -26,11 +27,11 @@ import { RolesGuard } from '../../../shared/api/guards/roles.guard';
 import { TenantContextGuard } from '../../../shared/api/guards/tenant-context.guard';
 import type { AuthPrincipal } from '../../../shared/domain/auth-principal';
 import type { TenantContext } from '../../../shared/domain/tenant-context';
+import { RevokeOwnerInviteCommand } from '../../invitation/application/commands/revoke-owner-invite.command';
 import { SendOwnerInviteCommand } from '../../invitation/application/commands/send-owner-invite.command';
 import { TenantMembershipRole } from '../../tenancy/domain/tenant.entity';
 import { CreateOwnerCommand } from '../application/commands/create-owner.command';
 import { ListOwnersQuery } from '../application/queries/list-owners.query';
-import { Owner } from '../domain/property.entity';
 
 @ApiTags('Property Owners')
 @Controller('owners')
@@ -51,7 +52,7 @@ export class OwnerController {
   async getOwners(
     @Tenant() tenantCtx: TenantContext,
   ): Promise<OwnerResponseDto[]> {
-    return this.queryBus.execute<ListOwnersQuery, Owner[]>(
+    return this.queryBus.execute<ListOwnersQuery, OwnerResponseDto[]>(
       new ListOwnersQuery(tenantCtx.tenantId),
     );
   }
@@ -92,5 +93,20 @@ export class OwnerController {
       SendOwnerInviteCommand,
       { success: boolean }
     >(new SendOwnerInviteCommand(tenantCtx.tenantId, ownerId, user.userId));
+  }
+
+  @Delete(':ownerId/invite')
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Revoke a pending invitation for the owner',
+  })
+  async revokeInvite(
+    @Tenant() tenantCtx: TenantContext,
+    @Param('ownerId') ownerId: string,
+  ): Promise<void> {
+    return this.commandBus.execute<RevokeOwnerInviteCommand, void>(
+      new RevokeOwnerInviteCommand(tenantCtx.tenantId, ownerId),
+    );
   }
 }

@@ -5,6 +5,7 @@
  * The HOA Manager API description
  * OpenAPI spec version: 1.0
  */
+import type { OwnerResponseDtoInviteStatus } from "./ownerResponseDtoInviteStatus";
 
 export interface OwnerResponseDto {
     id: string;
@@ -14,6 +15,11 @@ export interface OwnerResponseDto {
     email: string | null;
     /** @nullable */
     userId: string | null;
+    /**
+     * Status of the invite for this owner, null if no pending invite
+     * @nullable
+     */
+    inviteStatus: OwnerResponseDtoInviteStatus;
     createdAt: string;
     updatedAt: string;
 }

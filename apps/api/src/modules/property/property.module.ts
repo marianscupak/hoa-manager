@@ -1,10 +1,11 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
 import { OwnerController } from './api/owner.controller';
 import { UnitController } from './api/unit.controller';
 import { AuthModule } from '../auth/auth.module';
 import { IdentityModule } from '../identity/identity.module';
+import { InvitationModule } from '../invitation/invitation.module';
 import { TenancyModule } from '../tenancy/tenancy.module';
 import { CreateOwnerHandler } from './application/handlers/create-owner.handler';
 import { CreateUnitHandler } from './application/handlers/create-unit.handler';
@@ -47,7 +48,13 @@ const Repositories = [
 ];
 
 @Module({
-  imports: [CqrsModule, IdentityModule, TenancyModule, AuthModule],
+  imports: [
+    CqrsModule,
+    IdentityModule,
+    TenancyModule,
+    AuthModule,
+    forwardRef(() => InvitationModule),
+  ],
   controllers: [OwnerController, UnitController],
   providers: [...CommandHandlers, ...QueryHandlers, ...Repositories],
   exports: [OWNER_REPOSITORY],

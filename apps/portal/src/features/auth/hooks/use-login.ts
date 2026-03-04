@@ -1,13 +1,15 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { useLocation, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { z } from "zod";
 
 import { toast } from "@hoa-mngr/ui";
 
 import { useAuthControllerLogin } from "@/api/generated/auth/auth";
 import { useSessionManager } from "@/auth/use-session-manager";
+import { STORAGE_KEYS } from "@/storage/keys";
+import { StorageService } from "@/storage/storage";
 
 const formSchema = z.object({
     email: z.email("auth:login.invalidEmail"),
@@ -19,11 +21,8 @@ export type LoginFormValues = z.infer<typeof formSchema>;
 export function useLogin() {
     const { t } = useTranslation("auth");
     const navigate = useNavigate();
-    const location = useLocation();
 
     const { setSession } = useSessionManager();
-
-    const from = location.state?.from?.pathname || "/";
 
     const form = useForm<LoginFormValues>({
         resolver: zodResolver(formSchema),
@@ -43,10 +42,17 @@ export function useLogin() {
                     const { success, hasTenant } = setSession(data.accessToken);
                     if (!success) return;
 
-                    if (from.startsWith("/invites") || hasTenant) {
-                        navigate(from, { replace: true });
-                    } else {
-                        navigate("/tenant", { replace: true });
+                    const storedRedirect = StorageService.getString(
+                        STORAGE_KEYS.POST_LOGIN_REDIRECT,
+                    );
+
+                    // if there is a stored redirect, leave the redirect up to the public layout
+                    if (!storedRedirect) {
+                        if (hasTenant) {
+                            navigate("/", { replace: true });
+                        } else {
+                            navigate("/tenant", { replace: true });
+                        }
                     }
                 },
                 onError: () => {

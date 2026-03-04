@@ -9,10 +9,9 @@ import {
 } from '../ports/property.repository.port';
 
 @CommandHandler(CreateOwnerCommand)
-export class CreateOwnerHandler implements ICommandHandler<
-  CreateOwnerCommand,
-  { ownerId: string }
-> {
+export class CreateOwnerHandler
+  implements ICommandHandler<CreateOwnerCommand, { ownerId: string }>
+{
   constructor(
     @Inject(OWNER_REPOSITORY)
     private readonly ownerRepo: OwnerRepository,

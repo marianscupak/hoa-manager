@@ -138,7 +138,7 @@ export class RegisterFromInviteHandler
       await this.ownerRepo.setUserId(invite.tenantId, invite.ownerId, user.id);
 
       // Create membership
-      await this.membershipRepo.create({
+      const membership = await this.membershipRepo.create({
         tenantId: invite.tenantId,
         userId: user.id,
         role: TenantMembershipRole.UNIT_OWNER,
@@ -148,9 +148,12 @@ export class RegisterFromInviteHandler
       // Mark invite accepted
       await this.inviteRepo.markAccepted(invite.id, now);
 
-      // Create auth session via shared service
+      // Create auth session with tenant-scoped token
       const session = await this.authSessionService.createSession(user.id, {
         sub: user.id,
+        tid: invite.tenantId,
+        mid: membership.id,
+        roles: [TenantMembershipRole.UNIT_OWNER],
       });
 
       return {

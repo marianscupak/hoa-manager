@@ -10,6 +10,7 @@ export interface OwnerInviteRepository {
     invite: Omit<OwnerInvite, 'id' | 'createdAt' | 'acceptedAt'>,
   ): Promise<OwnerInvite>;
   markAccepted(id: string, now: Date): Promise<void>;
+  deleteByOwnerId(tenantId: string, ownerId: string): Promise<void>;
 }
 
 export const OWNER_INVITE_REPOSITORY = Symbol('OWNER_INVITE_REPOSITORY');

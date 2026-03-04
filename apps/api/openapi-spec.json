@@ -507,6 +507,25 @@
           }
         },
         "tags": ["Property Owners"]
+      },
+      "delete": {
+        "operationId": "OwnerController_revokeInvite",
+        "parameters": [
+          {
+            "name": "ownerId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Revoke a pending invitation for the owner"
+          }
+        },
+        "tags": ["Property Owners"]
       }
     },
     "/api/units": {
@@ -874,6 +893,12 @@
             "type": "string",
             "nullable": true
           },
+          "inviteStatus": {
+            "type": "string",
+            "nullable": true,
+            "enum": ["pending", "expired"],
+            "description": "Status of the invite for this owner, null if no pending invite"
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string"
@@ -889,6 +914,7 @@
           "displayName",
           "email",
           "userId",
+          "inviteStatus",
           "createdAt",
           "updatedAt"
         ]

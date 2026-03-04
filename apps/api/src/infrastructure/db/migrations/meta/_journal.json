@@ -50,6 +50,20 @@
       "when": 1772214103682,
       "tag": "0006_massive_earthquake",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1772581047805,
+      "tag": "0007_mysterious_psynapse",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1772588145172,
+      "tag": "0008_third_enchantress",
+      "breakpoints": true
     }
   ]
 }

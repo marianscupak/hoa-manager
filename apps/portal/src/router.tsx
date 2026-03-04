@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from "react-router";
 
 import { ErrorBoundary } from "@/components/error/error-boundary";
 import { AuthLayout } from "@/components/layouts/auth-layout";
+import { InviteLayout } from "@/components/layouts/invite-layout";
 import { PublicLayout } from "@/components/layouts/public-layout";
 import { SelectTenantLayout } from "@/components/layouts/select-tenant-layout";
 import { AdminLayout } from "@/features/admin/components/admin-layout";
@@ -11,6 +12,7 @@ import { GoogleCallbackPage } from "@/features/auth/pages/google-callback-page";
 import { LoginPage } from "@/features/auth/pages/login-page";
 import { SelectTenantPage } from "@/features/auth/pages/select-tenant-page";
 import { DashboardPage } from "@/features/dashboard/pages/dashboard-page";
+import { OwnerInvitePage } from "@/features/invite/pages/owner-invite-page";
 import { CreateTenantPage } from "@/features/tenants/pages/create-tenant-page";
 import { NotFoundPage } from "@/pages/not-found";
 
@@ -86,6 +88,20 @@ export const router = createBrowserRouter([
             {
                 path: "auth/google/callback",
                 element: <GoogleCallbackPage />,
+            },
+        ],
+    },
+    {
+        path: "/invites",
+        element: (
+            <ErrorBoundary>
+                <InviteLayout />
+            </ErrorBoundary>
+        ),
+        children: [
+            {
+                path: "owner",
+                element: <OwnerInvitePage />,
             },
         ],
     },

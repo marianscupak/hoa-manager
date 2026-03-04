@@ -8,6 +8,7 @@ export const createOwnerSchema = z.object({
     .min(1, 'Display name is required')
     .max(255)
     .describe('Display name of the owner'),
+  email: z.email().optional().describe('Optional email address for the owner'),
   userId: z
     .uuid()
     .optional()
@@ -33,6 +34,9 @@ export class OwnerResponseDto {
 
   @ApiProperty()
   displayName!: string;
+
+  @ApiProperty({ nullable: true, type: String })
+  email!: string | null;
 
   @ApiProperty({ nullable: true, type: String })
   userId!: string | null;

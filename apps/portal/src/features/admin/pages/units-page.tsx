@@ -28,6 +28,8 @@ export function UnitsPage() {
         {
             header: t("units.table.buildingShare"),
             accessorKey: "buildingShare",
+            cell: ({ row }) =>
+                `${Number.parseFloat(row.buildingShare) * 100} %`,
         },
         {
             header: tCommon("actions"),

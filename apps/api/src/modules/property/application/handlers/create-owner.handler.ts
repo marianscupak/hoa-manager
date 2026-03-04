@@ -1,10 +1,7 @@
-import { Inject, NotFoundException } from '@nestjs/common';
+import { ConflictException, Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import {
-  USER_REPOSITORY,
-  type UserRepository,
-} from '../../../identity/application/ports/user.repository.port';
+import { normalizeEmail } from '../../../../shared/application/utils/normalize-email';
 import { CreateOwnerCommand } from '../commands/create-owner.command';
 import {
   OWNER_REPOSITORY,
@@ -12,30 +9,35 @@ import {
 } from '../ports/property.repository.port';
 
 @CommandHandler(CreateOwnerCommand)
-export class CreateOwnerHandler
-  implements ICommandHandler<CreateOwnerCommand, { ownerId: string }>
-{
+export class CreateOwnerHandler implements ICommandHandler<
+  CreateOwnerCommand,
+  { ownerId: string }
+> {
   constructor(
     @Inject(OWNER_REPOSITORY)
     private readonly ownerRepo: OwnerRepository,
-    @Inject(USER_REPOSITORY)
-    private readonly userRepo: UserRepository,
   ) {}
 
   async execute(command: CreateOwnerCommand): Promise<{ ownerId: string }> {
-    if (command.userId) {
-      const user = await this.userRepo.findById(command.userId);
-      if (!user) {
-        throw new NotFoundException(`User with id ${command.userId} not found`);
-      }
+    const email = command.email ? normalizeEmail(command.email) : null;
 
-      // TODO: move to uow, connect user to owner
+    if (email) {
+      const existing = await this.ownerRepo.findByEmail(
+        command.tenantId,
+        email,
+      );
+      if (existing) {
+        throw new ConflictException(
+          'An owner with this email already exists in this community.',
+        );
+      }
     }
 
     const newOwner = await this.ownerRepo.create(
       command.tenantId,
       command.displayName,
       command.userId,
+      email,
     );
 
     return { ownerId: newOwner.id };

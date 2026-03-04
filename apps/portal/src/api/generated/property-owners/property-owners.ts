@@ -265,3 +265,83 @@ export const useOwnerControllerCreateOwner = <
         queryClient,
     );
 };
+export const ownerControllerSendInvite = (
+    ownerId: string,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<void>(
+        { url: `/api/owners/${ownerId}/invite`, method: "POST", signal },
+        options,
+    );
+};
+
+export const getOwnerControllerSendInviteMutationOptions = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof ownerControllerSendInvite>>,
+        TError,
+        { ownerId: string },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof ownerControllerSendInvite>>,
+    TError,
+    { ownerId: string },
+    TContext
+> => {
+    const mutationKey = ["ownerControllerSendInvite"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof ownerControllerSendInvite>>,
+        { ownerId: string }
+    > = (props) => {
+        const { ownerId } = props ?? {};
+
+        return ownerControllerSendInvite(ownerId, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type OwnerControllerSendInviteMutationResult = NonNullable<
+    Awaited<ReturnType<typeof ownerControllerSendInvite>>
+>;
+
+export type OwnerControllerSendInviteMutationError = ErrorType<unknown>;
+
+export const useOwnerControllerSendInvite = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof ownerControllerSendInvite>>,
+            TError,
+            { ownerId: string },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof ownerControllerSendInvite>>,
+    TError,
+    { ownerId: string },
+    TContext
+> => {
+    return useMutation(
+        getOwnerControllerSendInviteMutationOptions(options),
+        queryClient,
+    );
+};

@@ -6,6 +6,7 @@ export default {
         empty: "Nenalezeni žádní vlastníci.",
         table: {
             displayName: "Zobrazované jméno",
+            email: "E-mail",
             userAccount: "Uživatelský účet",
             linked: "Propojeno",
             unlinked: "Nepropojeno",
@@ -21,6 +22,15 @@ export default {
             success: "Vlastník byl úspěšně vytvořen",
             error: "Nepodařilo se vytvořit vlastníka",
             required: "Zobrazované jméno je povinné",
+            emailLabel: "E-mailová adresa",
+            emailPlaceholder: "Např. jan@priklad.cz",
+        },
+        invite: {
+            send: "Odeslat pozvánku",
+            sending: "Odesílání...",
+            success: "Pozvánka byla úspěšně odeslána",
+            error: "Nepodařilo se odeslat pozvánku",
+            noEmail: "Bez e-mailové adresy",
         },
     },
     units: {

@@ -66,6 +66,7 @@ export class DrizzleOwnerRepository implements OwnerRepository {
     tenantId: string,
     displayName: string,
     userId: string | null,
+    email: string | null,
   ): Promise<Owner> {
     const [inserted] = await this.db
       .insert(owners)
@@ -73,9 +74,24 @@ export class DrizzleOwnerRepository implements OwnerRepository {
         tenantId,
         displayName,
         userId,
+        email,
       })
       .returning();
     return inserted;
+  }
+
+  async findById(tenantId: string, ownerId: string): Promise<Owner | null> {
+    const row = await this.db.query.owners.findFirst({
+      where: and(eq(owners.tenantId, tenantId), eq(owners.id, ownerId)),
+    });
+    return row ?? null;
+  }
+
+  async findByEmail(tenantId: string, email: string): Promise<Owner | null> {
+    const row = await this.db.query.owners.findFirst({
+      where: and(eq(owners.tenantId, tenantId), eq(owners.email, email)),
+    });
+    return row ?? null;
   }
 
   async existsById(tenantId: string, ownerId: string): Promise<boolean> {
@@ -93,6 +109,17 @@ export class DrizzleOwnerRepository implements OwnerRepository {
         asc(t.displayName),
       ],
     });
+  }
+
+  async setUserId(
+    tenantId: string,
+    ownerId: string,
+    userId: string,
+  ): Promise<void> {
+    await this.db
+      .update(owners)
+      .set({ userId })
+      .where(and(eq(owners.tenantId, tenantId), eq(owners.id, ownerId)));
   }
 }
 

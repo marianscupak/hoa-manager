@@ -6,11 +6,13 @@ import csAdmin from "./locales/cs/admin";
 import csAuth from "./locales/cs/auth";
 import csCommon from "./locales/cs/common";
 import csHome from "./locales/cs/home";
+import csInvite from "./locales/cs/invite";
 import csNotFound from "./locales/cs/not-found";
 import enAdmin from "./locales/en/admin";
 import enAuth from "./locales/en/auth";
 import enCommon from "./locales/en/common";
 import enHome from "./locales/en/home";
+import enInvite from "./locales/en/invite";
 import enNotFound from "./locales/en/not-found";
 
 declare module "i18next" {
@@ -22,6 +24,7 @@ declare module "i18next" {
             "common": typeof enCommon;
             "auth": typeof enAuth;
             "admin": typeof enAdmin;
+            "invite": typeof enInvite;
         };
     }
 }
@@ -34,6 +37,7 @@ i18n.use(initReactI18next).init({
             "common": enCommon,
             "auth": enAuth,
             "admin": enAdmin,
+            "invite": enInvite,
         },
         cs: {
             "home": csHome,
@@ -41,6 +45,7 @@ i18n.use(initReactI18next).init({
             "common": csCommon,
             "auth": csAuth,
             "admin": csAdmin,
+            "invite": csInvite,
         },
     },
     lng: "en",

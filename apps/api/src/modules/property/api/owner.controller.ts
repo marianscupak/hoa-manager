@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Body,
+  Param,
   UseGuards,
   HttpCode,
   HttpStatus,
@@ -15,11 +16,17 @@ import {
   CreateOwnerResponseDto,
   OwnerResponseDto,
 } from './dto/owner.dto';
-import { Roles, Tenant } from '../../../shared/api/decorators/auth.decorators';
+import {
+  Roles,
+  Tenant,
+  CurrentAuthUser,
+} from '../../../shared/api/decorators/auth.decorators';
 import { AccessTokenAuthGuard } from '../../../shared/api/guards/access-token-auth.guard';
 import { RolesGuard } from '../../../shared/api/guards/roles.guard';
 import { TenantContextGuard } from '../../../shared/api/guards/tenant-context.guard';
+import type { AuthPrincipal } from '../../../shared/domain/auth-principal';
 import type { TenantContext } from '../../../shared/domain/tenant-context';
+import { SendOwnerInviteCommand } from '../../invitation/application/commands/send-owner-invite.command';
 import { TenantMembershipRole } from '../../tenancy/domain/tenant.entity';
 import { CreateOwnerCommand } from '../application/commands/create-owner.command';
 import { ListOwnersQuery } from '../application/queries/list-owners.query';
@@ -65,7 +72,25 @@ export class OwnerController {
         tenantCtx.tenantId,
         dto.displayName,
         dto.userId ?? null,
+        dto.email ?? null,
       ),
     );
+  }
+
+  @Post(':ownerId/invite')
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Send an invitation email to the owner',
+  })
+  async sendInvite(
+    @Tenant() tenantCtx: TenantContext,
+    @CurrentAuthUser() user: AuthPrincipal,
+    @Param('ownerId') ownerId: string,
+  ): Promise<{ success: boolean }> {
+    return this.commandBus.execute<
+      SendOwnerInviteCommand,
+      { success: boolean }
+    >(new SendOwnerInviteCommand(tenantCtx.tenantId, ownerId, user.userId));
   }
 }

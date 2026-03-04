@@ -11,6 +11,8 @@ export interface OwnerResponseDto {
     tenantId: string;
     displayName: string;
     /** @nullable */
+    email: string | null;
+    /** @nullable */
     userId: string | null;
     createdAt: string;
     updatedAt: string;

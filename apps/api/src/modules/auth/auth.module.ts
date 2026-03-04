@@ -25,6 +25,10 @@ import {
   TOKEN_VERIFIER,
 } from './application/ports/auth.utils.port';
 import { GOOGLE_OIDC_SERVICE } from './application/ports/google-oidc.service.port';
+import {
+  AUTH_SESSION_SERVICE,
+  AuthSessionServiceImpl,
+} from './infrastructure/auth-session.service';
 import { BcryptPasswordHasher } from './infrastructure/bcrypt-password-hasher';
 import { GoogleOidcServiceImpl } from './infrastructure/google/google-oidc.service';
 import { JwtTokenService } from './infrastructure/jwt-token.service';
@@ -74,6 +78,7 @@ import {
     { provide: TOKEN_SIGNER, useClass: JwtTokenService },
     { provide: TOKEN_VERIFIER, useClass: JwtTokenService },
     { provide: GOOGLE_OIDC_SERVICE, useClass: GoogleOidcServiceImpl },
+    { provide: AUTH_SESSION_SERVICE, useClass: AuthSessionServiceImpl },
     LoginHandler,
     LogoutHandler,
     RefreshTokenHandler,
@@ -82,6 +87,13 @@ import {
     HandleGoogleCallbackHandler,
     ExchangeGoogleCodeHandler,
   ],
-  exports: [TOKEN_VERIFIER],
+  exports: [
+    TOKEN_VERIFIER,
+    TOKEN_SIGNER,
+    PASSWORD_HASHER,
+    AUTH_IDENTITY_REPOSITORY,
+    AUTH_SESSION_REPOSITORY,
+    AUTH_SESSION_SERVICE,
+  ],
 })
 export class AuthModule {}

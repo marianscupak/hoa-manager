@@ -50,5 +50,6 @@ const Repositories = [
   imports: [CqrsModule, IdentityModule, TenancyModule, AuthModule],
   controllers: [OwnerController, UnitController],
   providers: [...CommandHandlers, ...QueryHandlers, ...Repositories],
+  exports: [OWNER_REPOSITORY],
 })
 export class PropertyModule {}

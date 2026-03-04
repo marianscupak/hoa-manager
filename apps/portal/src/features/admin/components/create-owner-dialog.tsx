@@ -12,12 +12,7 @@ import {
     DialogHeader,
     DialogTitle,
     Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-    Input,
+    FormInput,
     toast,
 } from "@hoa-mngr/ui";
 
@@ -25,6 +20,7 @@ import { useOwnerControllerCreateOwner } from "@/api/generated/property-owners/p
 
 const ownerSchema = z.object({
     displayName: z.string().min(1, "admin:owners.create.required"),
+    email: z.email().or(z.literal("")).optional(),
 });
 
 type CreateOwnerValues = z.infer<typeof ownerSchema>;
@@ -60,11 +56,17 @@ export function CreateOwnerDialog({
         resolver: zodResolver(ownerSchema),
         defaultValues: {
             displayName: "",
+            email: "",
         },
     });
 
     const onSubmit = (values: CreateOwnerValues) => {
-        createOwner.mutate({ data: values });
+        createOwner.mutate({
+            data: {
+                displayName: values.displayName,
+                ...(values.email ? { email: values.email } : {}),
+            },
+        });
     };
 
     return (
@@ -82,25 +84,18 @@ export function CreateOwnerDialog({
                         onSubmit={form.handleSubmit(onSubmit)}
                         className="space-y-4"
                     >
-                        <FormField
-                            control={form.control}
+                        <FormInput
                             name="displayName"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>
-                                        {t("owners.create.displayNameLabel")}
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            placeholder={t(
-                                                "owners.create.displayNamePlaceholder",
-                                            )}
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
+                            label={t("owners.create.displayNameLabel")}
+                            placeholder={t(
+                                "owners.create.displayNamePlaceholder",
                             )}
+                        />
+                        <FormInput
+                            name="email"
+                            label={t("owners.create.emailLabel")}
+                            type="email"
+                            placeholder={t("owners.create.emailPlaceholder")}
                         />
                         <DialogFooter>
                             <Button

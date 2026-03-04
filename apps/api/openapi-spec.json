@@ -488,6 +488,27 @@
         "tags": ["Property Owners"]
       }
     },
+    "/api/owners/{ownerId}/invite": {
+      "post": {
+        "operationId": "OwnerController_sendInvite",
+        "parameters": [
+          {
+            "name": "ownerId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Send an invitation email to the owner"
+          }
+        },
+        "tags": ["Property Owners"]
+      }
+    },
     "/api/units": {
       "get": {
         "operationId": "UnitController_getUnits",
@@ -594,6 +615,92 @@
           }
         },
         "tags": ["Property Units"]
+      }
+    },
+    "/api/invites/owner/status": {
+      "get": {
+        "operationId": "InviteController_getInviteStatus",
+        "parameters": [
+          {
+            "name": "token",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns the current status of an owner invitation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InviteStatusResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Owner Invitations"]
+      }
+    },
+    "/api/invites/owner/accept": {
+      "post": {
+        "operationId": "InviteController_acceptInvite",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptInviteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Accept an owner invitation as an authenticated user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptInviteResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Owner Invitations"]
+      }
+    },
+    "/api/auth/register-from-invite": {
+      "post": {
+        "operationId": "InviteController_registerFromInvite",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterFromInviteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Register a new account from an owner invitation and claim the owner record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterFromInviteResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Owner Invitations"]
       }
     }
   },
@@ -759,6 +866,10 @@
           "displayName": {
             "type": "string"
           },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
           "userId": {
             "type": "string",
             "nullable": true
@@ -776,6 +887,7 @@
           "id",
           "tenantId",
           "displayName",
+          "email",
           "userId",
           "createdAt",
           "updatedAt"
@@ -789,6 +901,12 @@
             "minLength": 1,
             "maxLength": 255,
             "description": "Display name of the owner"
+          },
+          "email": {
+            "description": "Optional email address for the owner",
+            "type": "string",
+            "format": "email",
+            "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
           },
           "userId": {
             "description": "Optional user ID if linking to an existing user account",
@@ -974,6 +1092,70 @@
           }
         },
         "required": ["ownerships"]
+      },
+      "InviteStatusResponseDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["valid", "expired", "accepted", "not_found"]
+          },
+          "emailMasked": {
+            "type": "string",
+            "nullable": true
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": ["status"]
+      },
+      "AcceptInviteDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": ["token"]
+      },
+      "AcceptInviteResponseDto": {
+        "type": "object",
+        "properties": {
+          "tenantId": {
+            "type": "string"
+          }
+        },
+        "required": ["tenantId"]
+      },
+      "RegisterFromInviteDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8
+          }
+        },
+        "required": ["token", "password"]
+      },
+      "RegisterFromInviteResponseDto": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "tenantId": {
+            "type": "string"
+          }
+        },
+        "required": ["accessToken", "tenantId"]
       }
     }
   }

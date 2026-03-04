@@ -6,6 +6,7 @@ export default {
         empty: "No owners found.",
         table: {
             displayName: "Display Name",
+            email: "Email",
             userAccount: "User Account",
             linked: "Linked",
             unlinked: "Unlinked",
@@ -21,6 +22,15 @@ export default {
             success: "Owner created successfully",
             error: "Failed to create owner",
             required: "Display name is required",
+            emailLabel: "Email Address",
+            emailPlaceholder: "E.g. john@example.com",
+        },
+        invite: {
+            send: "Send Invite",
+            sending: "Sending...",
+            success: "Invitation sent successfully",
+            error: "Failed to send invitation",
+            noEmail: "No email address",
         },
     },
     units: {

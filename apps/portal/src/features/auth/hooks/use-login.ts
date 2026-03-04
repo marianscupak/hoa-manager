@@ -43,7 +43,7 @@ export function useLogin() {
                     const { success, hasTenant } = setSession(data.accessToken);
                     if (!success) return;
 
-                    if (hasTenant) {
+                    if (from.startsWith("/invites") || hasTenant) {
                         navigate(from, { replace: true });
                     } else {
                         navigate("/tenant", { replace: true });

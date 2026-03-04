@@ -17,9 +17,13 @@ export interface OwnerRepository {
     tenantId: string,
     displayName: string,
     userId: string | null,
+    email: string | null,
   ): Promise<Owner>;
+  findById(tenantId: string, ownerId: string): Promise<Owner | null>;
+  findByEmail(tenantId: string, email: string): Promise<Owner | null>;
   existsById(tenantId: string, ownerId: string): Promise<boolean>;
   listByTenant(tenantId: string): Promise<Owner[]>;
+  setUserId(tenantId: string, ownerId: string, userId: string): Promise<void>;
 }
 
 export const OWNER_REPOSITORY = Symbol('OWNER_REPOSITORY');

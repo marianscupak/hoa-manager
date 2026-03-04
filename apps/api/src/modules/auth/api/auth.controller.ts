@@ -20,6 +20,7 @@ import { ExchangeCodeDto } from './dto/exchange-code.dto';
 import { LoginDto } from './dto/login.dto';
 import { SwitchTenantDto } from './dto/switch-tenant.dto';
 import { AccessTokenAuthGuard } from '../../../shared/api/guards/access-token-auth.guard';
+import { setRefreshTokenCookie } from '../../../shared/api/utils/refresh-cookie';
 import { ExchangeGoogleCodeCommand } from '../application/commands/exchange-google-code.command';
 import { HandleGoogleCallbackCommand } from '../application/commands/handle-google-callback.command';
 import {
@@ -89,12 +90,7 @@ export class AuthController {
       HandleGoogleCallbackResult
     >(new HandleGoogleCallbackCommand(code, state));
 
-    res.cookie('refresh_token', result.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-    });
+    setRefreshTokenCookie(res, result.refreshToken);
 
     return res.redirect(result.redirectUrl);
   }

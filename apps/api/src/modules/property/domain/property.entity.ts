@@ -11,6 +11,7 @@ export interface Owner {
   id: string;
   tenantId: string;
   displayName: string;
+  email: string | null;
   userId: string | null;
   createdAt: Date;
   updatedAt: Date;

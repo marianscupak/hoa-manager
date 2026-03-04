@@ -5,7 +5,12 @@ import {
   InvalidTokenException,
   UnauthorizedException,
 } from '../../../../shared/application/exceptions/auth.exceptions';
+import { UserInactiveException } from '../../../../shared/application/exceptions/user.exceptions';
 import { AuthClaims } from '../../../../shared/domain/auth-claims';
+import {
+  USER_REPOSITORY,
+  type UserRepository,
+} from '../../../identity/application/ports/user.repository.port';
 import {
   MEMBERSHIP_REPOSITORY,
   type MembershipRepository,
@@ -22,14 +27,13 @@ import {
 } from '../ports/auth.utils.port';
 
 @CommandHandler(SwitchTenantCommand)
-export class SwitchTenantHandler
-  implements ICommandHandler<SwitchTenantCommand>
-{
+export class SwitchTenantHandler implements ICommandHandler<SwitchTenantCommand> {
   constructor(
     @Inject(TOKEN_VERIFIER) private readonly tokenVerifier: TokenVerifier,
     @Inject(TOKEN_SIGNER) private readonly tokenSigner: TokenSigner,
     @Inject(MEMBERSHIP_REPOSITORY)
     private readonly membershipRepository: MembershipRepository,
+    @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
   ) {}
 
   async execute(command: SwitchTenantCommand): Promise<SwitchTenantResult> {
@@ -40,6 +44,11 @@ export class SwitchTenantHandler
       );
     } catch {
       throw new InvalidTokenException();
+    }
+
+    const user = await this.userRepository.findById(claims.sub);
+    if (!user || !user.isActive) {
+      throw new UserInactiveException();
     }
 
     const membership = await this.membershipRepository.findByTenantAndUser(

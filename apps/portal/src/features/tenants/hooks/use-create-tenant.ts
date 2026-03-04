@@ -2,8 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { toast } from "@hoa-mngr/ui";
-
+import { showApiError } from "@/api/error-utils";
 import { useTenancyControllerCreateTenant } from "@/api/generated/tenancy/tenancy";
 import { useTenantSwitcher } from "@/auth/use-tenant-switcher";
 
@@ -32,9 +31,7 @@ export function useCreateTenant() {
                 onSuccess: (data) => {
                     switchTenant(data.tenantId, { redirectUrl: "/" });
                 },
-                onError: () => {
-                    toast.error("Failed to create community");
-                },
+                onError: showApiError,
             },
         );
     };

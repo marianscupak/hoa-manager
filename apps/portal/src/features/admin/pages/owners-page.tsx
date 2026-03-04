@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import { Button, DataTable, ColumnDef, toast } from "@hoa-mngr/ui";
 
+import { showApiError } from "@/api/error-utils";
 import type { OwnerResponseDto } from "@/api/generated/model";
 import {
     useOwnerControllerGetOwners,
@@ -25,9 +26,7 @@ export function OwnersPage() {
                 toast.success(t("owners.invite.success"));
                 refetch();
             },
-            onError: () => {
-                toast.error(t("owners.invite.error"));
-            },
+            onError: showApiError,
         },
     });
 
@@ -37,9 +36,7 @@ export function OwnersPage() {
                 toast.success(t("owners.invite.revokeSuccess"));
                 refetch();
             },
-            onError: () => {
-                toast.error(t("owners.invite.revokeError"));
-            },
+            onError: showApiError,
         },
     });
 

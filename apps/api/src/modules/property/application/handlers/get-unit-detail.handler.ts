@@ -1,6 +1,7 @@
-import { Inject, NotFoundException } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
+import { UnitNotFoundException } from '../../../../shared/application/exceptions/property.exceptions';
 import { Unit, UnitOwnership } from '../../domain/property.entity';
 import {
   UNIT_OWNERSHIP_REPOSITORY,
@@ -15,9 +16,10 @@ export interface UnitDetail extends Unit {
 }
 
 @QueryHandler(GetUnitDetailQuery)
-export class GetUnitDetailHandler
-  implements IQueryHandler<GetUnitDetailQuery, UnitDetail>
-{
+export class GetUnitDetailHandler implements IQueryHandler<
+  GetUnitDetailQuery,
+  UnitDetail
+> {
   constructor(
     @Inject(UNIT_REPOSITORY)
     private readonly unitRepo: UnitRepository,
@@ -29,9 +31,7 @@ export class GetUnitDetailHandler
     const unit = await this.unitRepo.findById(query.tenantId, query.unitId);
 
     if (!unit) {
-      throw new NotFoundException(
-        `Unit with id ${query.unitId} not found in this tenant`,
-      );
+      throw new UnitNotFoundException();
     }
 
     const ownerships = await this.ownershipRepo.listActiveByUnit(

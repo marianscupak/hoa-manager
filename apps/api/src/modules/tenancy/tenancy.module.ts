@@ -3,6 +3,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 
 import { TenancyController } from './api/tenancy.controller';
 import { AuthModule } from '../auth/auth.module';
+import { IdentityModule } from '../identity/identity.module';
 import { CreateTenantHandler } from './application/handlers/create-tenant.handler';
 import { GetUserTenantsHandler } from './application/handlers/get-user-tenants.handler';
 import {
@@ -15,7 +16,7 @@ import {
 } from './infrastructure/persistence/drizzle-tenant.repository';
 
 @Module({
-  imports: [CqrsModule, forwardRef(() => AuthModule)],
+  imports: [CqrsModule, IdentityModule, forwardRef(() => AuthModule)],
   controllers: [TenancyController],
   providers: [
     { provide: TENANT_REPOSITORY, useClass: DrizzleTenantRepository },

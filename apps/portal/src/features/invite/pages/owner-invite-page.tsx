@@ -1,4 +1,3 @@
-import { AxiosError } from "axios";
 import { useAtomValue } from "jotai";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -6,6 +5,7 @@ import { useSearchParams, useNavigate } from "react-router";
 
 import { toast } from "@hoa-mngr/ui";
 
+import { showApiError } from "@/api/error-utils";
 import {
     useInviteControllerAcceptInvite,
     useInviteControllerGetInviteStatus,
@@ -20,13 +20,6 @@ import { InviteActionPicker } from "../components/invite-action-picker";
 import { InviteInvalidState } from "../components/invite-invalid-state";
 import { InviteLoadingState } from "../components/invite-loading-state";
 import { InviteRegisterSection } from "../components/invite-register-section";
-
-function getErrorCode(err: unknown): string | undefined {
-    if (err instanceof AxiosError) {
-        return (err.response?.data as { code?: string })?.code;
-    }
-    return undefined;
-}
 
 export function OwnerInvitePage() {
     const { t } = useTranslation(["invite"]);
@@ -56,16 +49,7 @@ export function OwnerInvitePage() {
                 toast.success(t("accept.success"));
                 switchTenant(data.tenantId, { redirectUrl: "/" });
             },
-            onError: (err) => {
-                const code = getErrorCode(err);
-                if (code === "EMAIL_MISMATCH") {
-                    toast.error(t("accept.emailMismatch"));
-                } else if (code === "EMAIL_NOT_VERIFIED") {
-                    toast.error(t("accept.notVerified"));
-                } else {
-                    toast.error(t("accept.error"));
-                }
-            },
+            onError: showApiError,
         },
     });
 
@@ -79,14 +63,7 @@ export function OwnerInvitePage() {
                 toast.success(t("register.success"));
                 navigate("/");
             },
-            onError: (err) => {
-                const code = getErrorCode(err);
-                if (code === "ACCOUNT_EXISTS") {
-                    toast.error(t("register.accountExists"));
-                } else {
-                    toast.error(t("register.error"));
-                }
-            },
+            onError: showApiError,
         },
     });
 

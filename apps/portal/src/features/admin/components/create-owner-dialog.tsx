@@ -16,6 +16,7 @@ import {
     toast,
 } from "@hoa-mngr/ui";
 
+import { showApiError } from "@/api/error-utils";
 import { useOwnerControllerCreateOwner } from "@/api/generated/property-owners/property-owners";
 
 const ownerSchema = z.object({
@@ -46,9 +47,7 @@ export function CreateOwnerDialog({
                 form.reset();
                 onSuccess?.();
             },
-            onError: () => {
-                toast.error(t("owners.create.error"));
-            },
+            onError: showApiError,
         },
     });
 

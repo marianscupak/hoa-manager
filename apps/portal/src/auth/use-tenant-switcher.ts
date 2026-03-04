@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 
 import { toast } from "@hoa-mngr/ui";
 
+import { showApiError } from "@/api/error-utils";
 import { useAuthControllerSwitchTenant } from "@/api/generated/auth/auth";
 import { useSessionManager } from "@/auth/use-session-manager";
 
@@ -36,9 +37,7 @@ export function useTenantSwitcher() {
                         toast.success(t("tenantSwitcher.success"));
                     }
                 },
-                onError: () => {
-                    toast.error(t("tenantSwitcher.error"));
-                },
+                onError: showApiError,
             },
         );
     };

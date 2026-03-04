@@ -1,11 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { z } from "zod";
 
-import { toast } from "@hoa-mngr/ui";
-
+import { showApiError } from "@/api/error-utils";
 import { useAuthControllerLogin } from "@/api/generated/auth/auth";
 import { useSessionManager } from "@/auth/use-session-manager";
 import { STORAGE_KEYS } from "@/storage/keys";
@@ -19,7 +17,6 @@ const formSchema = z.object({
 export type LoginFormValues = z.infer<typeof formSchema>;
 
 export function useLogin() {
-    const { t } = useTranslation("auth");
     const navigate = useNavigate();
 
     const { setSession } = useSessionManager();
@@ -55,9 +52,7 @@ export function useLogin() {
                         }
                     }
                 },
-                onError: () => {
-                    toast.error(t("login.error"));
-                },
+                onError: showApiError,
             },
         );
     };

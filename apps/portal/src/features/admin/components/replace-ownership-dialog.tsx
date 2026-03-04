@@ -20,6 +20,7 @@ import {
     toast,
 } from "@hoa-mngr/ui";
 
+import { showApiError } from "@/api/error-utils";
 import { useOwnerControllerGetOwners } from "@/api/generated/property-owners/property-owners";
 import { useUnitControllerReplaceUnitOwnership } from "@/api/generated/property-units/property-units";
 
@@ -128,9 +129,7 @@ export function ReplaceOwnershipDialog({
                     onOpenChange(false);
                     onSuccess?.();
                 },
-                onError: () => {
-                    toast.error(t("units.ownershipEditor.error"));
-                },
+                onError: showApiError,
             },
         );
     };

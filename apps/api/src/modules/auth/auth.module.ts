@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { JwtModule } from '@nestjs/jwt';
@@ -42,7 +42,7 @@ import {
 @Module({
   imports: [
     CqrsModule,
-    TenancyModule,
+    forwardRef(() => TenancyModule),
     IdentityModule,
     ConfigModule,
     JwtModule.registerAsync({

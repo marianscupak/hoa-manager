@@ -1,6 +1,7 @@
-import { ConflictException, Inject } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
+import { DuplicateOwnerEmailException } from '../../../../shared/application/exceptions/property.exceptions';
 import { normalizeEmail } from '../../../../shared/application/utils/normalize-email';
 import { CreateOwnerCommand } from '../commands/create-owner.command';
 import {
@@ -9,9 +10,10 @@ import {
 } from '../ports/property.repository.port';
 
 @CommandHandler(CreateOwnerCommand)
-export class CreateOwnerHandler
-  implements ICommandHandler<CreateOwnerCommand, { ownerId: string }>
-{
+export class CreateOwnerHandler implements ICommandHandler<
+  CreateOwnerCommand,
+  { ownerId: string }
+> {
   constructor(
     @Inject(OWNER_REPOSITORY)
     private readonly ownerRepo: OwnerRepository,
@@ -26,9 +28,7 @@ export class CreateOwnerHandler
         email,
       );
       if (existing) {
-        throw new ConflictException(
-          'An owner with this email already exists in this community.',
-        );
+        throw new DuplicateOwnerEmailException();
       }
     }
 

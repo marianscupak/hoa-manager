@@ -1,4 +1,4 @@
-import { Inject, NotFoundException } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { addHours } from 'date-fns';
@@ -11,6 +11,7 @@ import {
   OwnerAlreadyClaimedException,
   OwnerEmailRequiredException,
 } from '../../../../shared/application/exceptions/invite.exceptions';
+import { OwnerNotFoundException } from '../../../../shared/application/exceptions/property.exceptions';
 import {
   CLOCK,
   type Clock,
@@ -37,9 +38,7 @@ import {
 const INVITE_TTL_HOURS = 72;
 
 @CommandHandler(SendOwnerInviteCommand)
-export class SendOwnerInviteHandler
-  implements ICommandHandler<SendOwnerInviteCommand>
-{
+export class SendOwnerInviteHandler implements ICommandHandler<SendOwnerInviteCommand> {
   constructor(
     @Inject(OWNER_REPOSITORY)
     private readonly ownerRepo: OwnerRepository,
@@ -62,7 +61,7 @@ export class SendOwnerInviteHandler
       command.ownerId,
     );
     if (!owner) {
-      throw new NotFoundException('Owner not found');
+      throw new OwnerNotFoundException();
     }
 
     if (!owner.email) {

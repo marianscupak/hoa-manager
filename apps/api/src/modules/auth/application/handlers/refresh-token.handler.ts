@@ -9,6 +9,7 @@ import {
   ReplayAttackException,
   UnauthorizedException,
 } from '../../../../shared/application/exceptions/auth.exceptions';
+import { UserInactiveException } from '../../../../shared/application/exceptions/user.exceptions';
 import {
   CLOCK,
   type Clock,
@@ -18,6 +19,10 @@ import {
   type UnitOfWork,
 } from '../../../../shared/application/ports/unit-of-work.port';
 import { AuthClaims } from '../../../../shared/domain/auth-claims';
+import {
+  USER_REPOSITORY,
+  type UserRepository,
+} from '../../../identity/application/ports/user.repository.port';
 import {
   MEMBERSHIP_REPOSITORY,
   type MembershipRepository,
@@ -40,9 +45,7 @@ import {
 } from '../ports/auth.utils.port';
 
 @CommandHandler(RefreshTokenCommand)
-export class RefreshTokenHandler
-  implements ICommandHandler<RefreshTokenCommand>
-{
+export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand> {
   private readonly REUSE_GRACE_PERIOD_MS = 30 * 1000;
 
   constructor(
@@ -51,6 +54,7 @@ export class RefreshTokenHandler
     private readonly authSessionRepository: AuthSessionRepository,
     @Inject(MEMBERSHIP_REPOSITORY)
     private readonly membershipRepository: MembershipRepository,
+    @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
     @Inject(TOKEN_SIGNER) private readonly tokenSigner: TokenSigner,
     @Inject(TOKEN_VERIFIER) private readonly tokenVerifier: TokenVerifier,
     @Inject(CLOCK) private readonly clock: Clock,
@@ -68,6 +72,11 @@ export class RefreshTokenHandler
       const userId = session.userId;
 
       await this.validateSessionStatus(session, userId);
+
+      const user = await this.userRepository.findById(userId);
+      if (!user || !user.isActive) {
+        throw new UserInactiveException();
+      }
 
       const scopedClaims = await this.resolveTenantScope(
         oldClaims ?? { sub: userId },

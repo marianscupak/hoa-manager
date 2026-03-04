@@ -8,7 +8,12 @@ import type { Request } from 'express';
 
 import { TOKEN_VERIFIER } from '../../../modules/auth/application/ports/auth.utils.port';
 import type { TokenVerifier } from '../../../modules/auth/application/ports/auth.utils.port';
+import {
+  USER_REPOSITORY,
+  type UserRepository,
+} from '../../../modules/identity/application/ports/user.repository.port';
 import { InvalidTokenException } from '../../application/exceptions/auth.exceptions';
+import { UserInactiveException } from '../../application/exceptions/user.exceptions';
 import { AuthClaims } from '../../domain/auth-claims';
 import { AuthPrincipal } from '../../domain/auth-principal';
 
@@ -16,6 +21,7 @@ import { AuthPrincipal } from '../../domain/auth-principal';
 export class AccessTokenAuthGuard implements CanActivate {
   constructor(
     @Inject(TOKEN_VERIFIER) private readonly tokenVerifier: TokenVerifier,
+    @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -33,6 +39,11 @@ export class AccessTokenAuthGuard implements CanActivate {
     try {
       const payload = await this.tokenVerifier.verifyToken<AuthClaims>(token);
 
+      const user = await this.userRepository.findById(payload.sub);
+      if (!user || !user.isActive) {
+        throw new UserInactiveException();
+      }
+
       const principal: AuthPrincipal = {
         userId: payload.sub,
         subject: payload.sub,
@@ -41,7 +52,10 @@ export class AccessTokenAuthGuard implements CanActivate {
 
       request['user'] = principal;
       request['authClaims'] = payload;
-    } catch {
+    } catch (err) {
+      if (err instanceof UserInactiveException) {
+        throw err;
+      }
       throw new InvalidTokenException();
     }
 

@@ -1,8 +1,14 @@
-import { Inject, NotFoundException, ConflictException } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { SystemClock } from '../../../../infrastructure/clock/system-clock';
 import { DrizzleUnitOfWork } from '../../../../infrastructure/db/drizzle.unit-of-work';
+import {
+  InvalidOwnershipShareException,
+  InvalidOwnershipSumException,
+  OwnerNotFoundException,
+  UnitNotFoundException,
+} from '../../../../shared/application/exceptions/property.exceptions';
 import { CLOCK } from '../../../../shared/application/ports/clock.port';
 import { ReplaceUnitOwnershipCommand } from '../commands/replace-unit-ownership.command';
 import {
@@ -15,9 +21,10 @@ import {
 } from '../ports/property.repository.port';
 
 @CommandHandler(ReplaceUnitOwnershipCommand)
-export class ReplaceUnitOwnershipHandler
-  implements ICommandHandler<ReplaceUnitOwnershipCommand, void>
-{
+export class ReplaceUnitOwnershipHandler implements ICommandHandler<
+  ReplaceUnitOwnershipCommand,
+  void
+> {
   constructor(
     @Inject(UNIT_REPOSITORY)
     private readonly unitRepo: UnitRepository,
@@ -36,9 +43,7 @@ export class ReplaceUnitOwnershipHandler
     // 1. Verify unit exists in tenant
     const unit = await this.unitRepo.findById(tenantId, unitId);
     if (!unit) {
-      throw new NotFoundException(
-        `Unit with id ${unitId} not found in this tenant`,
-      );
+      throw new UnitNotFoundException();
     }
 
     // 2. Verify all ownerIds exist in tenant
@@ -48,9 +53,7 @@ export class ReplaceUnitOwnershipHandler
         ownership.ownerId,
       );
       if (!ownerExists) {
-        throw new NotFoundException(
-          `Owner with id ${ownership.ownerId} not found in this tenant`,
-        );
+        throw new OwnerNotFoundException();
       }
     }
 
@@ -59,16 +62,14 @@ export class ReplaceUnitOwnershipHandler
     for (const ownership of ownerships) {
       const shareNum = parseFloat(ownership.share);
       if (isNaN(shareNum) || shareNum <= 0) {
-        throw new ConflictException('Each share must be greater than 0');
+        throw new InvalidOwnershipShareException();
       }
       totalShare += shareNum;
     }
 
     // Check sum(shares) == 1 with tolerance
     if (Math.abs(totalShare - 1.0) > 0.000001) {
-      throw new ConflictException(
-        `Sum of ownership shares must equal 1.0. Current sum: ${totalShare}`,
-      );
+      throw new InvalidOwnershipSumException();
     }
 
     // 4. Transaction: close active rows and insert new ones

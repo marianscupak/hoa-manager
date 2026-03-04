@@ -1,6 +1,10 @@
-import { Inject, ConflictException } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
+import {
+  DuplicateUnitNumberException,
+  InvalidOwnershipShareException,
+} from '../../../../shared/application/exceptions/property.exceptions';
 import { CreateUnitCommand } from '../commands/create-unit.command';
 import {
   UNIT_REPOSITORY,
@@ -8,9 +12,10 @@ import {
 } from '../ports/property.repository.port';
 
 @CommandHandler(CreateUnitCommand)
-export class CreateUnitHandler
-  implements ICommandHandler<CreateUnitCommand, { unitId: string }>
-{
+export class CreateUnitHandler implements ICommandHandler<
+  CreateUnitCommand,
+  { unitId: string }
+> {
   constructor(
     @Inject(UNIT_REPOSITORY)
     private readonly unitRepo: UnitRepository,
@@ -19,7 +24,7 @@ export class CreateUnitHandler
   async execute(command: CreateUnitCommand): Promise<{ unitId: string }> {
     const shareNum = parseFloat(command.buildingShare);
     if (isNaN(shareNum) || shareNum <= 0) {
-      throw new ConflictException('Building share must be greater than 0');
+      throw new InvalidOwnershipShareException();
     }
 
     try {
@@ -33,9 +38,7 @@ export class CreateUnitHandler
     } catch (error: any) {
       if (error.code === '23505') {
         // Postgres unique constraint violation
-        throw new ConflictException(
-          `Unit with number ${command.unitNo} already exists in this tenant`,
-        );
+        throw new DuplicateUnitNumberException();
       }
       throw error;
     }

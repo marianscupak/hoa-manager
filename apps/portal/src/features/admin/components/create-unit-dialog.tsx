@@ -22,6 +22,7 @@ import {
     toast,
 } from "@hoa-mngr/ui";
 
+import { showApiError } from "@/api/error-utils";
 import { useUnitControllerCreateUnit } from "@/api/generated/property-units/property-units";
 
 const createUnitSchema = (t: TFunction<"admin">) =>
@@ -56,9 +57,7 @@ export function CreateUnitDialog({
                 form.reset();
                 onSuccess?.();
             },
-            onError: () => {
-                toast.error(t("units.create.error"));
-            },
+            onError: showApiError,
         },
     });
 

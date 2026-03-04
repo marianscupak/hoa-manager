@@ -5,12 +5,14 @@ import { initReactI18next } from "react-i18next";
 import csAdmin from "./locales/cs/admin";
 import csAuth from "./locales/cs/auth";
 import csCommon from "./locales/cs/common";
+import csErrors from "./locales/cs/errors";
 import csHome from "./locales/cs/home";
 import csInvite from "./locales/cs/invite";
 import csNotFound from "./locales/cs/not-found";
 import enAdmin from "./locales/en/admin";
 import enAuth from "./locales/en/auth";
 import enCommon from "./locales/en/common";
+import enErrors from "./locales/en/errors";
 import enHome from "./locales/en/home";
 import enInvite from "./locales/en/invite";
 import enNotFound from "./locales/en/not-found";
@@ -25,6 +27,7 @@ declare module "i18next" {
             "auth": typeof enAuth;
             "admin": typeof enAdmin;
             "invite": typeof enInvite;
+            "errors": typeof enErrors;
         };
     }
 }
@@ -38,6 +41,7 @@ i18n.use(initReactI18next).init({
             "auth": enAuth,
             "admin": enAdmin,
             "invite": enInvite,
+            "errors": enErrors,
         },
         cs: {
             "home": csHome,
@@ -46,6 +50,7 @@ i18n.use(initReactI18next).init({
             "auth": csAuth,
             "admin": csAdmin,
             "invite": csInvite,
+            "errors": csErrors,
         },
     },
     lng: "en",

@@ -27,7 +27,9 @@ import { UserInactiveException } from '@/shared/application/exceptions/user.exce
 import { AuthClaims } from '@/shared/domain/auth-claims';
 
 @CommandHandler(SwitchTenantCommand)
-export class SwitchTenantHandler implements ICommandHandler<SwitchTenantCommand> {
+export class SwitchTenantHandler
+  implements ICommandHandler<SwitchTenantCommand>
+{
   constructor(
     @Inject(TOKEN_VERIFIER) private readonly tokenVerifier: TokenVerifier,
     @Inject(TOKEN_SIGNER) private readonly tokenSigner: TokenSigner,

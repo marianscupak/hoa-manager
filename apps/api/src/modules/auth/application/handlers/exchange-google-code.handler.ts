@@ -28,7 +28,9 @@ export interface ExchangeGoogleCodeResult {
 }
 
 @CommandHandler(ExchangeGoogleCodeCommand)
-export class ExchangeGoogleCodeHandler implements ICommandHandler<ExchangeGoogleCodeCommand> {
+export class ExchangeGoogleCodeHandler
+  implements ICommandHandler<ExchangeGoogleCodeCommand>
+{
   constructor(
     @Inject(UNIT_OF_WORK) private readonly uow: UnitOfWork,
     @Inject(AUTH_EXCHANGE_CODE_REPOSITORY)

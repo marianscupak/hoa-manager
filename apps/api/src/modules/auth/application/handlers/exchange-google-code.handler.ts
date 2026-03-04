@@ -12,6 +12,10 @@ import {
   TOKEN_SIGNER,
   type TokenSigner,
 } from '@/modules/auth/application/ports/auth.utils.port';
+import {
+  USER_REPOSITORY,
+  type UserRepository,
+} from '@/modules/identity/application/ports/user.repository.port';
 import { UnauthorizedException } from '@/shared/application/exceptions/auth.exceptions';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 import {
@@ -24,14 +28,13 @@ export interface ExchangeGoogleCodeResult {
 }
 
 @CommandHandler(ExchangeGoogleCodeCommand)
-export class ExchangeGoogleCodeHandler
-  implements ICommandHandler<ExchangeGoogleCodeCommand>
-{
+export class ExchangeGoogleCodeHandler implements ICommandHandler<ExchangeGoogleCodeCommand> {
   constructor(
     @Inject(UNIT_OF_WORK) private readonly uow: UnitOfWork,
     @Inject(AUTH_EXCHANGE_CODE_REPOSITORY)
     private readonly exchangeCodeRepository: AuthExchangeCodeRepository,
     @Inject(TOKEN_SIGNER) private readonly tokenSigner: TokenSigner,
+    @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
     @Inject(CLOCK) private readonly clock: Clock,
   ) {}
 
@@ -57,8 +60,12 @@ export class ExchangeGoogleCodeHandler
 
       await this.exchangeCodeRepository.markUsed(exchangeCode.id);
 
+      const user = await this.userRepository.findById(exchangeCode.userId);
+
       const accessTokenPayload = {
         sub: exchangeCode.userId,
+        email: user?.email,
+        fullName: user?.fullName,
         ...(exchangeCode.tenantId
           ? {
               tid: exchangeCode.tenantId,

@@ -13,6 +13,7 @@ import { LoginPage } from "@/features/auth/pages/login-page";
 import { SelectTenantPage } from "@/features/auth/pages/select-tenant-page";
 import { DashboardPage } from "@/features/dashboard/pages/dashboard-page";
 import { OwnerInvitePage } from "@/features/invite/pages/owner-invite-page";
+import { ProfilePage } from "@/features/profile/pages/profile-page";
 import { CreateTenantPage } from "@/features/tenants/pages/create-tenant-page";
 import { NotFoundPage } from "@/pages/not-found";
 
@@ -30,6 +31,10 @@ export const router = createBrowserRouter([
             {
                 index: true,
                 element: <DashboardPage />,
+            },
+            {
+                path: "profile",
+                element: <ProfilePage />,
             },
             {
                 path: "admin",

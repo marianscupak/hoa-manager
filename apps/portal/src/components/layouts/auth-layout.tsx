@@ -3,15 +3,14 @@ import { Navigate, Outlet, useLocation } from "react-router";
 
 import { useTenancyControllerGetUserTenants } from "@/api/generated/tenancy/tenancy";
 import { authStatusAtom } from "@/auth/atoms";
-import { LocaleSwitcher } from "@/components/locale-switcher";
-import { LogoutButton } from "@/components/logout-button";
-import { TenantSwitcher } from "@/components/tenant-switcher";
+import { MobileNav } from "@/components/mobile-nav";
 import { TopNav } from "@/components/top-nav";
+import { UserMenu } from "@/components/user-menu";
 
 export function AuthLayout() {
     const authStatus = useAtomValue(authStatusAtom);
     const location = useLocation();
-    const { data: tenants } = useTenancyControllerGetUserTenants();
+    useTenancyControllerGetUserTenants();
 
     if (authStatus === "anonymous") {
         return <Navigate to="/login" state={{ from: location }} replace />;
@@ -25,6 +24,7 @@ export function AuthLayout() {
         <div className="bg-muted flex min-h-screen flex-col">
             <header className="bg-card sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b px-4 shadow-sm sm:px-6 lg:px-8">
                 <div className="flex items-center gap-2">
+                    <MobileNav />
                     <div className="bg-primary text-primary-foreground flex h-8 w-8 items-center justify-center rounded-lg font-bold">
                         H
                     </div>
@@ -33,11 +33,7 @@ export function AuthLayout() {
                     </span>
                     <TopNav />
                 </div>
-                <div className="flex items-center gap-3">
-                    {(tenants?.length ?? 0) > 1 && <TenantSwitcher />}
-                    <LocaleSwitcher />
-                    <LogoutButton />
-                </div>
+                <UserMenu />
             </header>
             <main className="mx-auto w-full max-w-7xl flex-1 p-4 sm:p-6 lg:p-8">
                 <Outlet />

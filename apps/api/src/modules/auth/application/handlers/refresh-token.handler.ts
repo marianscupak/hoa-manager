@@ -42,9 +42,7 @@ import {
 import { AuthClaims } from '@/shared/domain/auth-claims';
 
 @CommandHandler(RefreshTokenCommand)
-export class RefreshTokenHandler
-  implements ICommandHandler<RefreshTokenCommand>
-{
+export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand> {
   private readonly REUSE_GRACE_PERIOD_MS = 30 * 1000;
 
   constructor(
@@ -81,6 +79,10 @@ export class RefreshTokenHandler
         oldClaims ?? { sub: userId },
         userId,
       );
+
+      // Add user identity to claims
+      scopedClaims.email = user.email;
+      scopedClaims.fullName = user.fullName;
 
       await this.authSessionRepository.markRevoked(session.id);
       const { rawToken, hash, expiresAt } = this.generateNewRefreshToken();

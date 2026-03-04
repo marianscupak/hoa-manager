@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 import { LogOut } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@hoa-mngr/ui";
 
@@ -14,6 +15,7 @@ import {
 import { StorageService } from "@/storage/storage";
 
 export function LogoutButton() {
+    const { t } = useTranslation(["common"]);
     const queryClient = useQueryClient();
 
     const setAccessToken = useSetAtom(accessTokenAtom);
@@ -38,14 +40,13 @@ export function LogoutButton() {
 
     return (
         <Button
-            variant="ghost"
-            size="icon"
+            variant="outline"
+            size="sm"
             onClick={handleLogout}
             disabled={logoutMutation.isPending}
-            title="Logout"
-            className="text-muted-foreground hover:text-foreground"
         >
-            <LogOut className="h-5 w-5" />
+            <LogOut className="mr-2 h-4 w-4" />
+            {t("common:logout")}
         </Button>
     );
 }

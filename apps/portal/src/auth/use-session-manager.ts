@@ -23,7 +23,11 @@ export function useSessionManager() {
             if (!payload) return { success: false, hasTenant: false };
 
             setAccessToken(token);
-            setUser({ userId: payload.sub, email: payload.email });
+            setUser({
+                userId: payload.sub,
+                email: payload.email,
+                fullName: payload.fullName,
+            });
 
             if (payload.tid && payload.mid) {
                 setTenantContext({

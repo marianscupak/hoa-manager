@@ -108,6 +108,8 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 
       const accessTokenPayload = {
         sub: user.id,
+        email: user.email,
+        fullName: user.fullName,
         ...(tenantId ? { tid: tenantId, mid: membershipId, roles } : {}),
       };
 

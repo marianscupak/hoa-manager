@@ -1,4 +1,5 @@
 import { useAtomValue } from "jotai";
+import { MailOpen } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams, useNavigate } from "react-router";
@@ -90,7 +91,9 @@ export function OwnerInvitePage() {
         <div className="flex min-h-[60vh] items-center justify-center">
             <div className="bg-card w-full max-w-md rounded-xl border p-8 shadow-sm">
                 <div className="mb-6 text-center">
-                    <div className="mb-4 text-4xl">📨</div>
+                    <div className="mb-4 flex justify-center">
+                        <MailOpen className="text-primary h-12 w-12" />
+                    </div>
                     <h1 className="text-foreground text-2xl font-bold tracking-tight">
                         {t("status.valid")}
                     </h1>

@@ -1,3 +1,4 @@
+import { CheckCircle2, Clock, LucideIcon, XCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
@@ -6,10 +7,10 @@ interface InviteInvalidStateProps {
     emailMasked?: string;
 }
 
-const STATUS_EMOJI: Record<string, string> = {
-    expired: "⏰",
-    accepted: "✅",
-    not_found: "❌",
+const STATUS_ICON: Record<string, { icon: LucideIcon; className: string }> = {
+    expired: { icon: Clock, className: "text-warning" },
+    accepted: { icon: CheckCircle2, className: "text-success" },
+    not_found: { icon: XCircle, className: "text-destructive" },
 };
 
 const STATUS_I18N_KEY = {
@@ -23,10 +24,13 @@ export function InviteInvalidState({
     emailMasked,
 }: InviteInvalidStateProps) {
     const { t } = useTranslation(["invite"]);
+    const { icon: StatusIcon, className: iconClass } = STATUS_ICON[status];
 
     return (
         <div className="bg-card w-full max-w-md rounded-xl border p-8 text-center shadow-sm">
-            <div className="mb-4 text-4xl">{STATUS_EMOJI[status]}</div>
+            <div className="mb-4 flex justify-center">
+                <StatusIcon className={`h-12 w-12 ${iconClass}`} />
+            </div>
             <h1 className="text-foreground text-xl font-bold">
                 {t(STATUS_I18N_KEY[status]!)}
             </h1>

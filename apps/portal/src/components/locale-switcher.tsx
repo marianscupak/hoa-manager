@@ -1,21 +1,38 @@
+import { Globe } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-const locales = ["en", "cs"] as const;
+import {
+    Button,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@hoa-mngr/ui";
+
+import { locales } from "@/i18n/locales";
 
 export function LocaleSwitcher() {
     const { i18n } = useTranslation();
 
     return (
-        <select
-            value={i18n.language}
-            onChange={(e) => i18n.changeLanguage(e.target.value)}
-            className="border-border bg-background text-foreground rounded-md border px-2 py-1 text-sm"
-        >
-            {locales.map((tag) => (
-                <option key={tag} value={tag}>
-                    {tag.toUpperCase()}
-                </option>
-            ))}
-        </select>
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                    <Globe className="mr-2 h-4 w-4" />
+                    {i18n.language.toUpperCase()}
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                {locales.map((locale) => (
+                    <DropdownMenuItem
+                        key={locale.tag}
+                        onClick={() => i18n.changeLanguage(locale.tag)}
+                        className="cursor-pointer"
+                    >
+                        {locale.label}
+                    </DropdownMenuItem>
+                ))}
+            </DropdownMenuContent>
+        </DropdownMenu>
     );
 }

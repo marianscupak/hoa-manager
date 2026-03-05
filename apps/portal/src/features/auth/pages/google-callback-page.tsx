@@ -16,7 +16,6 @@ import { parseJwt } from "@/auth/jwt";
 import { STORAGE_KEYS } from "@/storage/keys";
 import { StorageService } from "@/storage/storage";
 
-// TODO: Add missing translations
 export function GoogleCallbackPage() {
     const { t } = useTranslation("auth");
     const location = useLocation();
@@ -92,7 +91,7 @@ export function GoogleCallbackPage() {
         <div className="flex w-full items-center justify-center p-8">
             <div className="bg-card w-full max-w-sm rounded-xl border p-8 px-6 text-center shadow-sm sm:px-10">
                 <h1 className="text-foreground mb-4 text-2xl font-bold tracking-tight">
-                    Signing you in...
+                    {t("googleCallback.title")}
                 </h1>
 
                 {error ? (
@@ -103,15 +102,14 @@ export function GoogleCallbackPage() {
                             onClick={() => navigate("/login")}
                             className="font-semibold"
                         >
-                            Return to login
+                            {t("googleCallback.returnToLogin")}
                         </Button>
                     </div>
                 ) : (
                     <div className="flex animate-pulse flex-col items-center">
                         <div className="border-muted border-t-primary h-8 w-8 animate-spin rounded-full border-4" />
                         <p className="text-muted-foreground mt-4 text-sm">
-                            Please wait while we complete the Google
-                            authentication...
+                            {t("googleCallback.loading")}
                         </p>
                     </div>
                 )}

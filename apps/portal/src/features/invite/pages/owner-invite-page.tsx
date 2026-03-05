@@ -48,7 +48,7 @@ export function OwnerInvitePage() {
         mutation: {
             onSuccess: (data) => {
                 toast.success(t("accept.success"));
-                switchTenant(data.tenantId, { redirectUrl: "/" });
+                switchTenant(data.tenantId);
             },
             onError: showApiError,
         },

@@ -1,20 +1,22 @@
+import { useTranslation } from "react-i18next";
+
 import { Form, FormInput, Button } from "@hoa-mngr/ui";
 
 import { GoogleLoginButton } from "../components/google-login-button";
 import { useLogin } from "../hooks/use-login";
 
-// TODO: Add translations
 export function LoginPage() {
+    const { t } = useTranslation("auth");
     const { form, handleLogin, isPending, isError } = useLogin();
 
     return (
         <div className="bg-card w-full rounded-xl border p-8 px-6 shadow-sm sm:px-10">
             <div className="mb-6 text-center">
                 <h1 className="text-foreground text-2xl font-bold tracking-tight">
-                    Sign in
+                    {t("loginPage.title")}
                 </h1>
                 <p className="text-muted-foreground mt-2 text-sm">
-                    Welcome to the HOA Manager portal.
+                    {t("loginPage.subtitle")}
                 </p>
             </div>
 
@@ -25,16 +27,16 @@ export function LoginPage() {
                 >
                     <FormInput
                         name="email"
-                        label="Email Address"
+                        label={t("loginPage.emailLabel")}
                         type="email"
-                        placeholder="admin@hoa.local"
+                        placeholder={t("loginPage.emailPlaceholder")}
                         disabled={isPending}
                     />
                     <FormInput
                         name="password"
-                        label="Password"
+                        label={t("loginPage.passwordLabel")}
                         type="password"
-                        placeholder="••••••••"
+                        placeholder={t("loginPage.passwordPlaceholder")}
                         disabled={isPending}
                     />
 
@@ -44,11 +46,13 @@ export function LoginPage() {
                             disabled={isPending}
                             className="w-full"
                         >
-                            {isPending ? "Signing in..." : "Sign in"}
+                            {isPending
+                                ? t("loginPage.submitting")
+                                : t("loginPage.submit")}
                         </Button>
                         {isError && (
                             <p className="text-destructive mt-2 text-center text-sm">
-                                Login failed. Please check your credentials.
+                                {t("loginPage.error")}
                             </p>
                         )}
                     </div>
@@ -57,7 +61,7 @@ export function LoginPage() {
 
             <div className="mt-6 flex items-center justify-center">
                 <span className="bg-card text-muted-foreground px-2 text-sm">
-                    Or continue with
+                    {t("loginPage.dividerOauth")}
                 </span>
             </div>
 

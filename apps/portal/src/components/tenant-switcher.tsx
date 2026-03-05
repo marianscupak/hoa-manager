@@ -1,5 +1,6 @@
 import { useAtomValue } from "jotai";
 import { Check, ChevronsUpDown, Building } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import {
     DropdownMenu,
@@ -16,8 +17,8 @@ import { useTenancyControllerGetUserTenants } from "@/api/generated/tenancy/tena
 import { tenantContextAtom } from "@/auth/atoms";
 import { useTenantSwitcher } from "@/auth/use-tenant-switcher";
 
-// TODO: Add translation
 export function TenantSwitcher() {
+    const { t } = useTranslation("auth");
     const tenantContext = useAtomValue(tenantContextAtom);
     const { switchTenant, isSwitching } = useTenantSwitcher();
 
@@ -36,7 +37,7 @@ export function TenantSwitcher() {
         return (
             <div className="bg-card text-muted-foreground flex items-center gap-2 rounded-md border px-3 py-2 text-sm opacity-50 shadow-sm">
                 <Building className="h-4 w-4" />
-                <span>Loading tenants...</span>
+                <span>{t("tenantSwitcher.loading")}</span>
             </div>
         );
     }
@@ -47,14 +48,14 @@ export function TenantSwitcher() {
                 <div className="flex items-center gap-2">
                     <Building className="text-muted-foreground h-4 w-4" />
                     <span className="max-w-[200px] truncate">
-                        {activeTenant?.name || "Select Tenant"}
+                        {activeTenant?.name || t("tenantSwitcher.select")}
                     </span>
                 </div>
                 <ChevronsUpDown className="text-muted-foreground h-4 w-4" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[280px]">
                 <DropdownMenuLabel className="text-muted-foreground text-xs font-normal">
-                    Switch Community
+                    {t("tenantSwitcher.switch")}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {tenants.map((tenant: TenantResponseDto) => (

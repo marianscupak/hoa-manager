@@ -7,9 +7,38 @@ export default {
     tenantSwitcher: {
         success: "Successfully switched tenant.",
         error: "Failed to switch tenant.",
+        loading: "Loading associations...",
+        select: "Select Association",
+        switch: "Switch Association",
     },
     googleCallback: {
+        title: "Signing you in...",
+        loading: "Please wait while we complete the Google authentication...",
+        returnToLogin: "Return to login",
         error: "Failed to authenticate with Google.",
+    },
+    loginPage: {
+        title: "Sign in",
+        subtitle: "Welcome to the HOA Manager portal.",
+        emailLabel: "Email Address",
+        emailPlaceholder: "admin@hoa.local",
+        passwordLabel: "Password",
+        passwordPlaceholder: "••••••••",
+        submit: "Sign in",
+        submitting: "Signing in...",
+        error: "Login failed. Please check your credentials.",
+        dividerOauth: "Or continue with",
+        googleSignIn: "Sign in with Google",
+    },
+    createTenant: {
+        title: "Create an Association",
+        description:
+            "Start managing your HOA right away by creating a new association. You will automatically become an administrator.",
+        nameLabel: "Association Name",
+        namePlaceholder: "e.g. Sunny Vistas Association",
+        submit: "Create Association",
+        submitting: "Creating and joining...",
+        error: "Failed to create association. Please try again.",
     },
     selectTenant: {
         title: "Select an Association",

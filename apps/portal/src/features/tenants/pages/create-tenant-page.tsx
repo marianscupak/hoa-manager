@@ -1,19 +1,20 @@
+import { useTranslation } from "react-i18next";
+
 import { Form, FormInput, Button } from "@hoa-mngr/ui";
 
 import { useCreateTenant } from "../hooks/use-create-tenant";
 
-// TODO: Add translations
 export function CreateTenantPage() {
+    const { t } = useTranslation("auth");
     const { form, handleCreateTenant, isPending, isError } = useCreateTenant();
 
     return (
         <div className="bg-card w-full rounded-xl border p-8 shadow-sm">
             <h1 className="text-foreground mb-2 text-center text-2xl font-bold tracking-tight">
-                Create an Association
+                {t("createTenant.title")}
             </h1>
             <p className="text-muted-foreground mb-6 text-center text-sm">
-                Start managing your HOA right away by creating a new
-                association. You will automatically become an administrator.
+                {t("createTenant.description")}
             </p>
 
             <Form {...form}>
@@ -23,8 +24,8 @@ export function CreateTenantPage() {
                 >
                     <FormInput
                         name="name"
-                        label="Association Name"
-                        placeholder="e.g. Sunny Vistas Association"
+                        label={t("createTenant.nameLabel")}
+                        placeholder={t("createTenant.namePlaceholder")}
                         disabled={isPending}
                     />
 
@@ -35,12 +36,12 @@ export function CreateTenantPage() {
                             className="w-full"
                         >
                             {isPending
-                                ? "Creating and joining..."
-                                : "Create Association"}
+                                ? t("createTenant.submitting")
+                                : t("createTenant.submit")}
                         </Button>
                         {isError && (
                             <p className="text-destructive mt-2 text-center text-sm">
-                                Failed to create association. Please try again.
+                                {t("createTenant.error")}
                             </p>
                         )}
                     </div>

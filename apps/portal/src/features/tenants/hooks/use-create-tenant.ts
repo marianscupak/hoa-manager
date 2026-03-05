@@ -29,7 +29,7 @@ export function useCreateTenant() {
             { data: { name: values.name } },
             {
                 onSuccess: (data) => {
-                    switchTenant(data.tenantId, { redirectUrl: "/" });
+                    switchTenant(data.tenantId);
                 },
                 onError: showApiError,
             },

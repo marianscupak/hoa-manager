@@ -7,9 +7,38 @@ export default {
     tenantSwitcher: {
         success: "Úspěšně přepnuto.",
         error: "Přepnutí se nezdařilo.",
+        loading: "Načítání společenství...",
+        select: "Vyberte společenství",
+        switch: "Přepnout společenství",
     },
     googleCallback: {
+        title: "Přihlašuji...",
+        loading: "Čekejte prosím, dokončuje se ověření přes Google...",
+        returnToLogin: "Návrat k přihlášení",
         error: "Ověření pomocí Google se nezdařilo.",
+    },
+    loginPage: {
+        title: "Přihlášení",
+        subtitle: "Vítejte na portálu HOA Manager.",
+        emailLabel: "E-mailová adresa",
+        emailPlaceholder: "admin@hoa.local",
+        passwordLabel: "Heslo",
+        passwordPlaceholder: "••••••••",
+        submit: "Přihlásit se",
+        submitting: "Přihlašuji...",
+        error: "Přihlášení se nezdařilo. Zkontrolujte prosím své údaje.",
+        dividerOauth: "Nebo pokračujte pomocí",
+        googleSignIn: "Přihlásit se přes Google",
+    },
+    createTenant: {
+        title: "Vytvořit společenství",
+        description:
+            "Začněte ihned spravovat své společenství. Automaticky se stanete správcem.",
+        nameLabel: "Název společenství",
+        namePlaceholder: "např. Společenství Sluneční Vrch",
+        submit: "Vytvořit společenství",
+        submitting: "Vytváření a připojování...",
+        error: "Nepodařilo se vytvořit společenství. Zkuste to prosím znovu.",
     },
     selectTenant: {
         title: "Vyberte společenství",

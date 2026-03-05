@@ -1,10 +1,12 @@
 import { ButtonHTMLAttributes } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@hoa-mngr/ui";
 
 export function GoogleLoginButton(
     props: ButtonHTMLAttributes<HTMLButtonElement>,
 ) {
+    const { t } = useTranslation("auth");
     const handleGoogleLogin = () => {
         window.location.href = "/api/auth/google/start";
     };
@@ -36,8 +38,7 @@ export function GoogleLoginButton(
                 />
                 <path d="M1 1h22v22H1z" fill="none" />
             </svg>
-            {/* TODO: Add translations */}
-            Sign in with Google
+            {t("loginPage.googleSignIn")}
         </Button>
     );
 }

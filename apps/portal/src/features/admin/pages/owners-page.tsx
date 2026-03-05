@@ -87,12 +87,13 @@ export function OwnersPage() {
                 if (row.inviteStatus === "pending") {
                     return (
                         <div className="flex items-center gap-2">
-                            <span className="inline-flex items-center rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 ring-1 ring-amber-600/20 ring-inset">
+                            <span className="inline-flex h-8 items-center rounded-md bg-amber-50 px-2.5 text-xs leading-none font-medium text-amber-700 ring-1 ring-amber-600/20 ring-inset">
                                 {t("owners.invite.statusPending")}
                             </span>
                             <Button
                                 variant="outline"
                                 size="sm"
+                                className="h-8"
                                 onClick={() =>
                                     sendInvite.mutate({ ownerId: row.id })
                                 }
@@ -104,13 +105,13 @@ export function OwnersPage() {
                                     : t("owners.invite.resend")}
                             </Button>
                             <Button
-                                variant="ghost"
+                                variant="outline"
                                 size="sm"
+                                className="text-destructive hover:text-destructive/80 border-destructive/20 h-8"
                                 onClick={() =>
                                     revokeInvite.mutate({ ownerId: row.id })
                                 }
                                 disabled={isRevoking}
-                                className="text-destructive hover:text-destructive/80"
                             >
                                 <XIcon className="mr-1.5 h-3.5 w-3.5" />
                                 {t("owners.invite.revoke")}
@@ -122,12 +123,13 @@ export function OwnersPage() {
                 if (row.inviteStatus === "expired") {
                     return (
                         <div className="flex items-center gap-2">
-                            <span className="bg-destructive-muted text-destructive ring-destructive/20 inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset">
+                            <span className="bg-destructive-muted text-destructive ring-destructive/20 inline-flex h-8 items-center rounded-md px-2.5 text-xs leading-none font-medium ring-1 ring-inset">
                                 {t("owners.invite.statusExpired")}
                             </span>
                             <Button
                                 variant="outline"
                                 size="sm"
+                                className="h-8"
                                 onClick={() =>
                                     sendInvite.mutate({ ownerId: row.id })
                                 }
@@ -146,6 +148,7 @@ export function OwnersPage() {
                     <Button
                         variant="outline"
                         size="sm"
+                        className="h-8"
                         onClick={() => sendInvite.mutate({ ownerId: row.id })}
                         disabled={isSending}
                     >

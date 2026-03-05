@@ -82,7 +82,7 @@ export function UserMenu() {
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <button
-                    className="focus:ring-ring rounded-full transition-opacity outline-none hover:opacity-80 focus:ring-2 focus:ring-offset-2"
+                    className="focus:ring-ring cursor-pointer rounded-full transition-opacity outline-none hover:opacity-80 focus:ring-2 focus:ring-offset-2"
                     aria-label="User menu"
                 >
                     <Avatar>

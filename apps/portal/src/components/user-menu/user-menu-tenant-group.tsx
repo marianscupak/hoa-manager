@@ -40,7 +40,7 @@ export function UserMenuTenantGroup({ tenants }: UserMenuTenantGroupProps) {
             {tenants.map((tenant: TenantResponseDto) => (
                 <DropdownMenuItem
                     key={tenant.id}
-                    onClick={() => handleSwitchTenant(tenant.id)}
+                    onSelect={() => handleSwitchTenant(tenant.id)}
                     className={cn(
                         "cursor-pointer",
                         isSwitching && "pointer-events-none opacity-50",

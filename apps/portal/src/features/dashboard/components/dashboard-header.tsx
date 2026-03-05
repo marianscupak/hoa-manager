@@ -6,10 +6,10 @@ import { Badge } from "@hoa-mngr/ui";
 import { tenantContextAtom, userAtom } from "@/auth/atoms";
 
 interface DashboardHeaderProps {
-    communityName: string;
+    associationName: string;
 }
 
-export function DashboardHeader({ communityName }: DashboardHeaderProps) {
+export function DashboardHeader({ associationName }: DashboardHeaderProps) {
     const { t } = useTranslation(["home", "common"]);
     const user = useAtomValue(userAtom);
     const tenantCtx = useAtomValue(tenantContextAtom);
@@ -33,7 +33,7 @@ export function DashboardHeader({ communityName }: DashboardHeaderProps) {
                     <Badge variant="outline">{translatedRole}</Badge>
                 )}
             </div>
-            <p className="text-muted-foreground text-sm">{communityName}</p>
+            <p className="text-muted-foreground text-sm">{associationName}</p>
         </div>
     );
 }

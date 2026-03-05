@@ -15,31 +15,25 @@ export function useTenantSwitcher() {
 
     const { setSession } = useSessionManager();
 
-    const switchTenantMutation = useAuthControllerSwitchTenant();
+    const switchTenantMutation = useAuthControllerSwitchTenant({
+        mutation: {
+            onSuccess: (res) => {
+                const { success, hasTenant } = setSession(res.accessToken);
 
-    const switchTenant = (
-        tenantId: string,
-        options?: { redirectUrl?: string },
-    ) => {
-        switchTenantMutation.mutate(
-            { data: { tenantId } },
-            {
-                onSuccess: (res) => {
-                    const { success, hasTenant } = setSession(res.accessToken);
+                if (success && hasTenant) {
+                    queryClient.clear();
 
-                    if (success && hasTenant) {
-                        queryClient.clear();
+                    navigate("/", { replace: true });
 
-                        if (options?.redirectUrl) {
-                            navigate(options.redirectUrl, { replace: true });
-                        }
-
-                        toast.success(t("tenantSwitcher.success"));
-                    }
-                },
-                onError: showApiError,
+                    toast.success(t("tenantSwitcher.success"));
+                }
             },
-        );
+            onError: showApiError,
+        },
+    });
+
+    const switchTenant = (tenantId: string) => {
+        switchTenantMutation.mutate({ data: { tenantId } });
     };
 
     return {

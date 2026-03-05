@@ -4,7 +4,7 @@ export default {
     profile: "Profil",
     language: "Jazyk",
     logout: "Odhlásit se",
-    community: "Komunita",
+    community: "Společenství",
     roles: {
         ADMIN: "Administrátor",
         BOARD_MEMBER: "Člen výboru",

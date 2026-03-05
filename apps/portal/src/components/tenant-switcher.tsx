@@ -16,6 +16,7 @@ import { useTenancyControllerGetUserTenants } from "@/api/generated/tenancy/tena
 import { tenantContextAtom } from "@/auth/atoms";
 import { useTenantSwitcher } from "@/auth/use-tenant-switcher";
 
+// TODO: Add translation
 export function TenantSwitcher() {
     const tenantContext = useAtomValue(tenantContextAtom);
     const { switchTenant, isSwitching } = useTenantSwitcher();
@@ -59,7 +60,7 @@ export function TenantSwitcher() {
                 {tenants.map((tenant: TenantResponseDto) => (
                     <DropdownMenuItem
                         key={tenant.id}
-                        onClick={() => handleSwitch(tenant.id)}
+                        onSelect={() => handleSwitch(tenant.id)}
                         className={cn(
                             "flex cursor-pointer items-center justify-between py-2",
                             isSwitching && "pointer-events-none opacity-50",

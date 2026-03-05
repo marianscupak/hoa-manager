@@ -3,7 +3,7 @@ export default {
     greetingFallback: "Welcome back",
     membership: {
         title: "Membership",
-        community: "Community",
+        community: "Association",
         role: "Role",
         status: "Status",
         active: "Active",

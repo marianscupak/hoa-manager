@@ -12,11 +12,11 @@ export default {
         error: "Failed to authenticate with Google.",
     },
     selectTenant: {
-        title: "Select a Community",
-        loading: "Loading your communities...",
-        noCommunities: "No communities found.",
+        title: "Select an Association",
+        loading: "Loading your associations...",
+        noCommunities: "No associations found.",
         joining: "Joining...",
-        notFound: "Don't see your community?",
-        createNew: "Create a new community",
+        notFound: "Don't see your association?",
+        createNew: "Create a new association",
     },
 } as const;

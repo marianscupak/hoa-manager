@@ -40,25 +40,25 @@ export function DashboardPage() {
     const { data: tenants } = useTenancyControllerGetUserTenants();
 
     const activeTenant = tenants?.find((t) => t.id === tenantCtx?.tenantId);
-    const communityName = activeTenant?.name ?? "...";
+    const associationName = activeTenant?.name ?? "...";
 
     const isAdmin = tenantCtx?.roles.some((r) => ADMIN_ROLES.includes(r));
 
     return (
         <div className="flex flex-col gap-6">
-            <DashboardHeader communityName={communityName} />
+            <DashboardHeader associationName={associationName} />
 
             {isAdmin ? (
                 <>
                     <QuickStats />
                     <div className="grid gap-6 lg:grid-cols-2">
-                        <MembershipCard communityName={communityName} />
+                        <MembershipCard associationName={associationName} />
                         <QuickLinks />
                     </div>
                 </>
             ) : (
                 <div className="grid gap-6 lg:grid-cols-2">
-                    <MembershipCard communityName={communityName} />
+                    <MembershipCard associationName={associationName} />
                     <OwnerPlaceholder />
                 </div>
             )}

@@ -1,8 +1,9 @@
-import { Form, FormInput } from "@hoa-mngr/ui";
+import { Form, FormInput, Button } from "@hoa-mngr/ui";
 
 import { GoogleLoginButton } from "../components/google-login-button";
 import { useLogin } from "../hooks/use-login";
 
+// TODO: Add translations
 export function LoginPage() {
     const { form, handleLogin, isPending, isError } = useLogin();
 
@@ -38,13 +39,13 @@ export function LoginPage() {
                     />
 
                     <div className="pt-2">
-                        <button
+                        <Button
                             type="submit"
                             disabled={isPending}
-                            className="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:outline-primary flex w-full justify-center rounded-md px-3 py-1.5 text-sm leading-6 font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50"
+                            className="w-full"
                         >
                             {isPending ? "Signing in..." : "Sign in"}
-                        </button>
+                        </Button>
                         {isError && (
                             <p className="text-destructive mt-2 text-center text-sm">
                                 Login failed. Please check your credentials.

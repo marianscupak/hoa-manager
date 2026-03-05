@@ -7,10 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@hoa-mngr/ui";
 import { tenantContextAtom } from "@/auth/atoms";
 
 interface MembershipCardProps {
-    communityName: string;
+    associationName: string;
 }
 
-export function MembershipCard({ communityName }: MembershipCardProps) {
+export function MembershipCard({ associationName }: MembershipCardProps) {
     const { t } = useTranslation(["home", "common"]);
     const tenantCtx = useAtomValue(tenantContextAtom);
 
@@ -23,7 +23,7 @@ export function MembershipCard({ communityName }: MembershipCardProps) {
         {
             icon: Building,
             label: t("home:membership.community"),
-            value: communityName,
+            value: associationName,
         },
         {
             icon: Shield,

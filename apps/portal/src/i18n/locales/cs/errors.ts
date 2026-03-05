@@ -23,11 +23,11 @@ export default {
         "Nastala neočekávaná chyba. Zkuste to prosím později.",
     UNIT_NOT_FOUND: "Požadovaná jednotka nebyla nalezena.",
     OWNER_NOT_FOUND: "Požadovaný vlastník nebyl nalezen.",
-    TENANT_NOT_FOUND: "Požadovaná komunita nebyla nalezena.",
+    TENANT_NOT_FOUND: "Požadované společenství nebylo nalezeno.",
     DUPLICATE_UNIT_NUMBER:
-        "Jednotka s tímto číslem v této komunitě již existuje.",
+        "Jednotka s tímto číslem v tomto společenství již existuje.",
     DUPLICATE_OWNER_EMAIL:
-        "Vlastník s tímto e-mailem v této komunitě již existuje.",
+        "Vlastník s tímto e-mailem v tomto společenství již existuje.",
     INVALID_OWNERSHIP_SHARE: "Vlastnický podíl musí být kladné číslo.",
     INVALID_OWNERSHIP_SUM:
         "Součet vlastnických podílů musí být přesně 1.0 (100 %).",

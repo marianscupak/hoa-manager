@@ -13,16 +13,16 @@ export default {
     EMAIL_MISMATCH: "Your email does not match the one on the invitation.",
     EMAIL_NOT_VERIFIED: "Please verify your email before accepting.",
     ACCOUNT_EXISTS:
-        "An account with this email already exists but is not linked to this community invitation. Please log in with your existing account.",
+        "An account with this email already exists but is not linked to this association invitation. Please log in with your existing account.",
     USER_INACTIVE:
         "Your account is currently inactive or suspended. Please contact support.",
     UNIT_NOT_FOUND: "The requested property unit was not found.",
     OWNER_NOT_FOUND: "The requested property owner was not found.",
-    TENANT_NOT_FOUND: "The requested community was not found.",
+    TENANT_NOT_FOUND: "The requested association was not found.",
     DUPLICATE_UNIT_NUMBER:
-        "A unit with this number already exists in this community.",
+        "A unit with this number already exists in this association.",
     DUPLICATE_OWNER_EMAIL:
-        "An owner with this email already exists in this community.",
+        "An owner with this email already exists in this association.",
     INVALID_OWNERSHIP_SHARE: "Ownership share must be a positive number.",
     INVALID_OWNERSHIP_SUM:
         "Total ownership shares must sum exactly to 1.0 (100%).",

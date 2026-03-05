@@ -1,18 +1,19 @@
-import { Form, FormInput } from "@hoa-mngr/ui";
+import { Form, FormInput, Button } from "@hoa-mngr/ui";
 
 import { useCreateTenant } from "../hooks/use-create-tenant";
 
+// TODO: Add translations
 export function CreateTenantPage() {
     const { form, handleCreateTenant, isPending, isError } = useCreateTenant();
 
     return (
         <div className="bg-card w-full rounded-xl border p-8 shadow-sm">
             <h1 className="text-foreground mb-2 text-center text-2xl font-bold tracking-tight">
-                Create a Community
+                Create an Association
             </h1>
             <p className="text-muted-foreground mb-6 text-center text-sm">
-                Start managing your HOA right away by creating a new community.
-                You will automatically become an administrator.
+                Start managing your HOA right away by creating a new
+                association. You will automatically become an administrator.
             </p>
 
             <Form {...form}>
@@ -22,24 +23,24 @@ export function CreateTenantPage() {
                 >
                     <FormInput
                         name="name"
-                        label="Community Name"
-                        placeholder="e.g. Sunny Vistas Community"
+                        label="Association Name"
+                        placeholder="e.g. Sunny Vistas Association"
                         disabled={isPending}
                     />
 
                     <div className="pt-4">
-                        <button
+                        <Button
                             type="submit"
                             disabled={isPending}
-                            className="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:outline-primary flex w-full justify-center rounded-md px-3 py-2 text-sm leading-6 font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50"
+                            className="w-full"
                         >
                             {isPending
                                 ? "Creating and joining..."
-                                : "Create Community"}
-                        </button>
+                                : "Create Association"}
+                        </Button>
                         {isError && (
                             <p className="text-destructive mt-2 text-center text-sm">
-                                Failed to create community. Please try again.
+                                Failed to create association. Please try again.
                             </p>
                         )}
                     </div>

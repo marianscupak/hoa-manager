@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router";
 
-import { toast } from "@hoa-mngr/ui";
+import { toast, Button } from "@hoa-mngr/ui";
 
 import { useAuthControllerExchangeGoogleCode } from "@/api/generated/auth/auth";
 import {
@@ -16,6 +16,7 @@ import { parseJwt } from "@/auth/jwt";
 import { STORAGE_KEYS } from "@/storage/keys";
 import { StorageService } from "@/storage/storage";
 
+// TODO: Add missing translations
 export function GoogleCallbackPage() {
     const { t } = useTranslation("auth");
     const location = useLocation();
@@ -97,12 +98,13 @@ export function GoogleCallbackPage() {
                 {error ? (
                     <div className="text-destructive">
                         <p className="mb-4">{error}</p>
-                        <button
+                        <Button
+                            variant="secondary"
                             onClick={() => navigate("/login")}
-                            className="bg-muted text-foreground hover:bg-accent rounded-md px-4 py-2 text-sm font-semibold"
+                            className="font-semibold"
                         >
                             Return to login
-                        </button>
+                        </Button>
                     </div>
                 ) : (
                     <div className="flex animate-pulse flex-col items-center">

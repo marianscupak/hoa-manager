@@ -69,13 +69,14 @@ export function InviteRegisterSection({
             </Form>
 
             <div className="text-center">
-                <button
+                <Button
+                    variant="link"
                     type="button"
                     onClick={onCancel}
-                    className="text-muted-foreground text-sm underline"
+                    className="text-muted-foreground text-sm"
                 >
                     {t("actions.signInDescription")}
-                </button>
+                </Button>
             </div>
         </div>
     );

@@ -7,6 +7,7 @@ import { useNavigate } from "react-router";
 import {
     Avatar,
     AvatarFallback,
+    Button,
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
@@ -73,14 +74,16 @@ export function UserMenu() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <button
-                    className="focus:ring-ring cursor-pointer rounded-full transition-opacity outline-none hover:opacity-80 focus:ring-2 focus:ring-offset-2"
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="relative h-10 w-10 rounded-full"
                     aria-label="User menu"
                 >
-                    <Avatar>
+                    <Avatar className="h-10 w-10">
                         <AvatarFallback>{initials}</AvatarFallback>
                     </Avatar>
-                </button>
+                </Button>
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end" className="w-64">

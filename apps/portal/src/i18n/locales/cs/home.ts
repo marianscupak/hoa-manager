@@ -3,7 +3,7 @@ export default {
     greetingFallback: "Vítejte zpět",
     membership: {
         title: "Členství",
-        community: "Komunita",
+        community: "Společenství",
         role: "Role",
         status: "Stav",
         active: "Aktivní",

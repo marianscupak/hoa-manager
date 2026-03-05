@@ -19,7 +19,7 @@ export default {
     register: {
         title: "Create Your Account",
         description:
-            "Set a password to create your account and join the community.",
+            "Set a password to create your account and join the association.",
         passwordLabel: "Password",
         passwordPlaceholder: "Enter a password (min. 8 characters)",
         submit: "Create Account & Join",

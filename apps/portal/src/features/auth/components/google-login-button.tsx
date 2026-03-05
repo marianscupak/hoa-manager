@@ -1,5 +1,7 @@
 import { ButtonHTMLAttributes } from "react";
 
+import { Button } from "@hoa-mngr/ui";
+
 export function GoogleLoginButton(
     props: ButtonHTMLAttributes<HTMLButtonElement>,
 ) {
@@ -8,12 +10,12 @@ export function GoogleLoginButton(
     };
 
     return (
-        // TODO: Replace with Button component
-        <button
-            {...props}
+        <Button
+            variant="outline"
             type="button"
             onClick={handleGoogleLogin}
-            className={`bg-card text-foreground hover:bg-accent focus-visible:outline-primary flex w-full items-center justify-center gap-3 rounded-md border px-3 py-1.5 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50 ${props.className || ""}`}
+            className={`flex w-full items-center justify-center gap-3 font-semibold ${props.className || ""}`}
+            {...props}
         >
             <svg className="h-5 w-5" viewBox="0 0 24 24">
                 <path
@@ -34,7 +36,8 @@ export function GoogleLoginButton(
                 />
                 <path d="M1 1h22v22H1z" fill="none" />
             </svg>
+            {/* TODO: Add translations */}
             Sign in with Google
-        </button>
+        </Button>
     );
 }

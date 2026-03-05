@@ -4,7 +4,7 @@ export default {
     profile: "Profile",
     language: "Language",
     logout: "Log out",
-    community: "Community",
+    community: "Association",
     roles: {
         ADMIN: "Admin",
         BOARD_MEMBER: "Board Member",

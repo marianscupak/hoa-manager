@@ -1,6 +1,8 @@
 import { Component, ErrorInfo, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
+import { Button } from "@hoa-mngr/ui";
+
 interface Props {
     children?: ReactNode;
 }
@@ -48,12 +50,9 @@ function ErrorFallback({ error }: { error?: Error }) {
                     {error.message}
                 </pre>
             )}
-            <button
-                onClick={() => window.location.reload()}
-                className="bg-primary hover:bg-primary/90 mt-8 rounded px-4 py-2 font-medium text-white"
-            >
+            <Button onClick={() => window.location.reload()} className="mt-8">
                 {t("error.reload", "Reload page")}
-            </button>
+            </Button>
         </div>
     );
 }

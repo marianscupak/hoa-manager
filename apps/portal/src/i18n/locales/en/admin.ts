@@ -1,7 +1,7 @@
 export default {
     owners: {
         title: "Owners",
-        description: "Manage property owners in your community.",
+        description: "Manage property owners in your association.",
         addOwner: "Add Owner",
         empty: "No owners found.",
         table: {
@@ -41,7 +41,7 @@ export default {
     },
     units: {
         title: "Units",
-        description: "Manage the units in your community.",
+        description: "Manage the units in your association.",
         addUnit: "Add Unit",
         empty: "No units have been added yet.",
         table: {

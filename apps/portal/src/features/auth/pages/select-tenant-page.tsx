@@ -1,6 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
+import { Button } from "@hoa-mngr/ui";
+
 import { useTenancyControllerGetUserTenants } from "@/api/generated/tenancy/tenancy";
 import { useTenantSwitcher } from "@/auth/use-tenant-switcher";
 
@@ -10,7 +12,7 @@ export function SelectTenantPage() {
     const { data: tenants, isLoading } = useTenancyControllerGetUserTenants();
 
     const handleSwitch = (tenantId: string) => {
-        switchTenant(tenantId, { redirectUrl: "/" });
+        switchTenant(tenantId);
     };
 
     if (isLoading) {
@@ -28,16 +30,17 @@ export function SelectTenantPage() {
             </h1>
             <div className="flex flex-col space-y-3">
                 {tenants?.map((tenant) => (
-                    <button
+                    <Button
                         key={tenant.id}
+                        variant="outline"
                         onClick={() => handleSwitch(tenant.id)}
                         disabled={isSwitching}
-                        className="hover:border-primary hover:bg-accent focus:ring-ring rounded-md border p-4 text-left focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:opacity-50"
+                        className="h-auto w-full justify-start p-4 text-left font-normal"
                     >
                         <span className="text-foreground block font-medium">
                             {tenant.name || tenant.id}
                         </span>
-                    </button>
+                    </Button>
                 ))}
                 {(!tenants || tenants.length === 0) && (
                     <p className="text-muted-foreground text-center text-sm">

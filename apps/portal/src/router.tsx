@@ -15,6 +15,8 @@ import { DashboardPage } from "@/features/dashboard/pages/dashboard-page";
 import { OwnerInvitePage } from "@/features/invite/pages/owner-invite-page";
 import { ProfilePage } from "@/features/profile/pages/profile-page";
 import { CreateTenantPage } from "@/features/tenants/pages/create-tenant-page";
+import { VotingLayout } from "@/features/voting/components/voting-layout";
+import { VotingPage } from "@/features/voting/pages/voting-page";
 import { NotFoundPage } from "@/pages/not-found";
 
 import { UnitDetailPage } from "./features/admin/pages/unit-detail-page";
@@ -35,6 +37,16 @@ export const router = createBrowserRouter([
             {
                 path: "profile",
                 element: <ProfilePage />,
+            },
+            {
+                path: "voting",
+                element: <VotingLayout />,
+                children: [
+                    {
+                        index: true,
+                        element: <VotingPage />,
+                    },
+                ],
             },
             {
                 path: "admin",

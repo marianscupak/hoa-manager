@@ -11,6 +11,7 @@ import { IdentityModule } from '@/modules/identity/identity.module';
 import { InvitationModule } from '@/modules/invitation/invitation.module';
 import { PropertyModule } from '@/modules/property/property.module';
 import { TenancyModule } from '@/modules/tenancy/tenancy.module';
+import { VotingModule } from '@/modules/voting/voting.module';
 import { LoggingInterceptor } from '@/shared/api/interceptors/logging.interceptor';
 import { DomainExceptionFilter } from '@/shared/filters/domain-exception.filter';
 
@@ -31,6 +32,7 @@ import { DomainExceptionFilter } from '@/shared/filters/domain-exception.filter'
     AuthModule,
     PropertyModule,
     InvitationModule,
+    VotingModule,
   ],
   controllers: [],
   providers: [

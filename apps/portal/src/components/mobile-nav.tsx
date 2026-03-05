@@ -1,34 +1,14 @@
-import { useAtomValue } from "jotai";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
-import { Link, useLocation } from "react-router";
+import { Link } from "react-router";
 
 import { Button } from "@hoa-mngr/ui";
 
-import { tenantContextAtom } from "@/auth/atoms";
+import { useNavigation } from "./use-navigation";
 
 export function MobileNav() {
     const [isOpen, setIsOpen] = useState(false);
-    const tenantCtx = useAtomValue(tenantContextAtom);
-    const location = useLocation();
-
-    const isAdmin = tenantCtx?.roles.includes("ADMIN");
-
-    const links = [
-        {
-            name: "Dashboard",
-            path: "/",
-            active: location.pathname === "/",
-        },
-    ];
-
-    if (isAdmin) {
-        links.push({
-            name: "Admin",
-            path: "/admin",
-            active: location.pathname.startsWith("/admin"),
-        });
-    }
+    const { links } = useNavigation();
 
     return (
         <>

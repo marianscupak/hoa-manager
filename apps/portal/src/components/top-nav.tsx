@@ -1,29 +1,9 @@
-import { useAtomValue } from "jotai";
-import { Link, useLocation } from "react-router";
+import { Link } from "react-router";
 
-import { tenantContextAtom } from "@/auth/atoms";
+import { useNavigation } from "./use-navigation";
 
 export function TopNav() {
-    const tenantCtx = useAtomValue(tenantContextAtom);
-    const location = useLocation();
-
-    const isAdmin = tenantCtx?.roles.includes("ADMIN");
-
-    const links = [
-        {
-            name: "Dashboard",
-            path: "/",
-            active: location.pathname === "/",
-        },
-    ];
-
-    if (isAdmin) {
-        links.push({
-            name: "Admin",
-            path: "/admin",
-            active: location.pathname.startsWith("/admin"),
-        });
-    }
+    const { links } = useNavigation();
 
     return (
         <nav className="ml-6 hidden space-x-6 sm:flex">

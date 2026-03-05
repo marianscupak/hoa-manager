@@ -1,10 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { TFunction } from "i18next";
-import { PlusIcon, Trash2Icon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { z } from "zod";
 
 import {
     Button,
@@ -15,8 +13,6 @@ import {
     DialogHeader,
     DialogTitle,
     Form,
-    FormInput,
-    FormSelect,
     toast,
 } from "@hoa-mngr/ui";
 
@@ -24,45 +20,8 @@ import { showApiError } from "@/api/error-utils";
 import { useOwnerControllerGetOwners } from "@/api/generated/property-owners/property-owners";
 import { useUnitControllerReplaceUnitOwnership } from "@/api/generated/property-units/property-units";
 
-const replaceOwnershipSchema = (t: TFunction<"admin">) =>
-    z.object({
-        ownerships: z
-            .array(
-                z.object({
-                    ownerId: z
-                        .string()
-                        .min(1, t("units.ownershipEditor.ownerLabel")),
-                    share: z
-                        .string()
-                        .regex(
-                            /^\d+(\.\d+)?$/,
-                            t("units.ownershipEditor.invalidShareError"),
-                        ),
-                }),
-            )
-            .min(1)
-            .refine(
-                (items) => {
-                    const total = items.reduce(
-                        (acc, item) => acc + parseFloat(item.share || "0"),
-                        0,
-                    );
-                    return Math.abs(total - 1.0) < 0.0001;
-                },
-                { message: t("units.ownershipEditor.sumError") },
-            )
-            .refine(
-                (items) => {
-                    const ids = items.map((i) => i.ownerId);
-                    return new Set(ids).size === ids.length;
-                },
-                { message: t("units.ownershipEditor.duplicateError") },
-            ),
-    });
-
-type ReplaceOwnershipValues = z.infer<
-    ReturnType<typeof replaceOwnershipSchema>
->;
+import { ReplaceOwnershipFieldItem } from "./field-item";
+import { replaceOwnershipSchema, ReplaceOwnershipValues } from "./schema";
 
 interface ReplaceOwnershipDialogProps {
     unitId: string;
@@ -168,44 +127,13 @@ export function ReplaceOwnershipDialog({
                     >
                         <div className="space-y-4">
                             {fields.map((field, index) => (
-                                <div
+                                <ReplaceOwnershipFieldItem
                                     key={field.id}
-                                    className="border-border bg-muted/60 hover:border-primary/30 flex items-start gap-4 rounded-xl border p-4 transition-colors"
-                                >
-                                    <div className="flex-1">
-                                        <FormSelect
-                                            name={`ownerships.${index}.ownerId`}
-                                            label={t(
-                                                "units.ownershipEditor.ownerLabel",
-                                            )}
-                                            placeholder={t(
-                                                "units.ownershipEditor.ownerPlaceholder",
-                                            )}
-                                            options={ownerOptions}
-                                        />
-                                    </div>
-
-                                    <div className="w-32">
-                                        <FormInput
-                                            name={`ownerships.${index}.share`}
-                                            label={t(
-                                                "units.ownershipEditor.shareLabel",
-                                            )}
-                                            placeholder="0.5"
-                                        />
-                                    </div>
-
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="icon"
-                                        className="text-muted-foreground hover:text-destructive mt-5"
-                                        onClick={() => remove(index)}
-                                        disabled={fields.length <= 1}
-                                    >
-                                        <Trash2Icon className="h-4 w-4" />
-                                    </Button>
-                                </div>
+                                    index={index}
+                                    ownerOptions={ownerOptions}
+                                    onRemove={remove}
+                                    canRemove={fields.length > 1}
+                                />
                             ))}
                         </div>
 

@@ -1,18 +1,13 @@
-import { MailIcon, PlusIcon, SendIcon, XIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { Button, DataTable, ColumnDef, toast } from "@hoa-mngr/ui";
+import { Button, DataTable } from "@hoa-mngr/ui";
 
-import { showApiError } from "@/api/error-utils";
-import type { OwnerResponseDto } from "@/api/generated/model";
-import {
-    useOwnerControllerGetOwners,
-    useOwnerControllerSendInvite,
-    useOwnerControllerRevokeInvite,
-} from "@/api/generated/property-owners/property-owners";
+import { useOwnerControllerGetOwners } from "@/api/generated/property-owners/property-owners";
 
 import { CreateOwnerDialog } from "../components/create-owner-dialog";
+import { getOwnerColumns } from "../components/owners-table/owners-table-columns";
 
 export function OwnersPage() {
     const { t } = useTranslation(["admin"]);
@@ -20,147 +15,7 @@ export function OwnersPage() {
 
     const { data: owners, isLoading, refetch } = useOwnerControllerGetOwners();
 
-    const sendInvite = useOwnerControllerSendInvite({
-        mutation: {
-            onSuccess: () => {
-                toast.success(t("owners.invite.success"));
-                refetch();
-            },
-            onError: showApiError,
-        },
-    });
-
-    const revokeInvite = useOwnerControllerRevokeInvite({
-        mutation: {
-            onSuccess: () => {
-                toast.success(t("owners.invite.revokeSuccess"));
-                refetch();
-            },
-            onError: showApiError,
-        },
-    });
-
-    const columns: ColumnDef<OwnerResponseDto>[] = [
-        {
-            header: t("owners.table.displayName"),
-            accessorKey: "displayName",
-            className: "font-medium",
-        },
-        {
-            header: t("owners.table.email"),
-            cell: ({ row }) =>
-                row.email ? (
-                    <span className="text-muted-foreground flex items-center gap-1.5 text-sm">
-                        <MailIcon className="h-3.5 w-3.5" />
-                        {row.email}
-                    </span>
-                ) : (
-                    <span className="text-muted-foreground/50 text-sm">—</span>
-                ),
-        },
-        {
-            header: t("owners.table.userAccount"),
-            cell: ({ row }) =>
-                row.userId ? (
-                    <span className="bg-success-muted text-success ring-success/20 inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset">
-                        {t("owners.table.linked")}
-                    </span>
-                ) : (
-                    <span className="bg-muted text-muted-foreground ring-border inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset">
-                        {t("owners.table.unlinked")}
-                    </span>
-                ),
-        },
-        {
-            header: "",
-            cell: ({ row }) => {
-                if (row.userId || !row.email) return null;
-
-                const isSending =
-                    sendInvite.isPending &&
-                    sendInvite.variables?.ownerId === row.id;
-
-                const isRevoking =
-                    revokeInvite.isPending &&
-                    revokeInvite.variables?.ownerId === row.id;
-
-                if (row.inviteStatus === "pending") {
-                    return (
-                        <div className="flex items-center gap-2">
-                            <span className="inline-flex h-8 items-center rounded-md bg-amber-50 px-2.5 text-xs leading-none font-medium text-amber-700 ring-1 ring-amber-600/20 ring-inset">
-                                {t("owners.invite.statusPending")}
-                            </span>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-8"
-                                onClick={() =>
-                                    sendInvite.mutate({ ownerId: row.id })
-                                }
-                                disabled={isSending}
-                            >
-                                <SendIcon className="mr-1.5 h-3.5 w-3.5" />
-                                {isSending
-                                    ? t("owners.invite.sending")
-                                    : t("owners.invite.resend")}
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="text-destructive hover:text-destructive/80 border-destructive/20 h-8"
-                                onClick={() =>
-                                    revokeInvite.mutate({ ownerId: row.id })
-                                }
-                                disabled={isRevoking}
-                            >
-                                <XIcon className="mr-1.5 h-3.5 w-3.5" />
-                                {t("owners.invite.revoke")}
-                            </Button>
-                        </div>
-                    );
-                }
-
-                if (row.inviteStatus === "expired") {
-                    return (
-                        <div className="flex items-center gap-2">
-                            <span className="bg-destructive-muted text-destructive ring-destructive/20 inline-flex h-8 items-center rounded-md px-2.5 text-xs leading-none font-medium ring-1 ring-inset">
-                                {t("owners.invite.statusExpired")}
-                            </span>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-8"
-                                onClick={() =>
-                                    sendInvite.mutate({ ownerId: row.id })
-                                }
-                                disabled={isSending}
-                            >
-                                <SendIcon className="mr-1.5 h-3.5 w-3.5" />
-                                {isSending
-                                    ? t("owners.invite.sending")
-                                    : t("owners.invite.resend")}
-                            </Button>
-                        </div>
-                    );
-                }
-
-                return (
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-8"
-                        onClick={() => sendInvite.mutate({ ownerId: row.id })}
-                        disabled={isSending}
-                    >
-                        <SendIcon className="mr-1.5 h-3.5 w-3.5" />
-                        {isSending
-                            ? t("owners.invite.sending")
-                            : t("owners.invite.send")}
-                    </Button>
-                );
-            },
-        },
-    ];
+    const columns = getOwnerColumns(t, refetch);
 
     return (
         <div className="space-y-6">

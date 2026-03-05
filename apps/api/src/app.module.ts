@@ -1,5 +1,9 @@
+import crypto from 'node:crypto';
+
 import { Module } from '@nestjs/common';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import type { Request } from 'express';
+import { ClsModule } from 'nestjs-cls';
 
 import { InfrastructureModule } from '@/infrastructure/infrastructure.module';
 import { AuthModule } from '@/modules/auth/auth.module';
@@ -12,6 +16,15 @@ import { DomainExceptionFilter } from '@/shared/filters/domain-exception.filter'
 
 @Module({
   imports: [
+    ClsModule.forRoot({
+      global: true,
+      middleware: {
+        mount: true,
+        generateId: true,
+        idGenerator: (req: Request) =>
+          (req.headers['x-correlation-id'] as string) ?? crypto.randomUUID(),
+      },
+    }),
     InfrastructureModule,
     TenancyModule,
     IdentityModule,

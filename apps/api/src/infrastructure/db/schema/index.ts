@@ -9,3 +9,4 @@ export * from '@/infrastructure/db/schema/units';
 export * from '@/infrastructure/db/schema/owners';
 export * from '@/infrastructure/db/schema/owner-invites';
 export * from '@/infrastructure/db/schema/unit-ownerships';
+export * from '@/infrastructure/db/schema/voting';

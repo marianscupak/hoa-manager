@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
-import { VotingController } from './api/voting.controller';
+import { VotesController } from './api/votes.controller';
 
 @Module({
   imports: [CqrsModule],
-  controllers: [VotingController],
+  controllers: [VotesController],
   providers: [],
 })
 export class VotingModule {}

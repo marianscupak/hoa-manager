@@ -9,7 +9,6 @@ import { LocaleSwitcher } from "@/components/locale-switcher";
  * unconditionally.
  */
 export function InviteLayout() {
-    console.log("Invite layout");
     return (
         <div className="bg-muted relative flex min-h-screen flex-col items-center justify-center">
             <div className="absolute top-4 right-4">

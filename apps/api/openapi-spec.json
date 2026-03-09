@@ -721,6 +721,35 @@
         },
         "tags": ["Owner Invitations"]
       }
+    },
+    "/api/votes": {
+      "post": {
+        "operationId": "VotesController_createVote",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Function"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns the created vote",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateVoteResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Votes"]
+      }
     }
   },
   "info": {
@@ -1182,6 +1211,43 @@
           }
         },
         "required": ["accessToken", "tenantId"]
+      },
+      "Function": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateVoteResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "scheduledFrom": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "scheduledTo": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "description",
+          "scheduledFrom",
+          "scheduledTo",
+          "status"
+        ]
       }
     }
   }

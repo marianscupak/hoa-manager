@@ -71,6 +71,13 @@
       "when": 1773069047217,
       "tag": "0009_dashing_overlord",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1773070217819,
+      "tag": "0010_late_wolfsbane",
+      "breakpoints": true
     }
   ]
 }

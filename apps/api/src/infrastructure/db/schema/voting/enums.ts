@@ -2,8 +2,10 @@ import { pgEnum } from 'drizzle-orm/pg-core';
 
 export const voteStatusEnum = pgEnum('vote_status', [
   'DRAFT',
+  'SCHEDULED',
   'OPEN',
   'CLOSED',
+  'CANCELLED',
 ]);
 
 export const voteWeightBasisEnum = pgEnum('vote_weight_basis', [

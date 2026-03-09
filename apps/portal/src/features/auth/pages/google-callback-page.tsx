@@ -74,8 +74,6 @@ export function GoogleCallbackPage() {
     const code = params.get("code");
     const error = !code ? t("googleCallback.error") : mutationError;
 
-    console.log("Here");
-
     const hasFetched = useRef(false);
 
     useEffect(() => {

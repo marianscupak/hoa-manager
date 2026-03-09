@@ -21,7 +21,7 @@ import { useOwnerControllerCreateOwner } from "@/api/generated/property-owners/p
 
 const ownerSchema = z.object({
     displayName: z.string().min(1, "admin:owners.create.required"),
-    email: z.email().or(z.literal("")).optional(),
+    email: z.string().email().or(z.literal("")).optional(),
 });
 
 type CreateOwnerValues = z.infer<typeof ownerSchema>;

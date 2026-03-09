@@ -32,4 +32,6 @@ export default {
     INVALID_OWNERSHIP_SUM:
         "Součet vlastnických podílů musí být přesně 1.0 (100 %).",
     UNKNOWN: "Došlo k neočekávané chybě. Zkuste to prosím později.",
+    INVALID_VOTE_SCHEDULE:
+        "Harmonogram hlasování je neplatný. Ujistěte se, že datum ukončení je po datu zahájení a data nejsou v minulosti.",
 } as const;

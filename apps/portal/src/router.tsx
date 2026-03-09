@@ -15,7 +15,9 @@ import { DashboardPage } from "@/features/dashboard/pages/dashboard-page";
 import { OwnerInvitePage } from "@/features/invite/pages/owner-invite-page";
 import { ProfilePage } from "@/features/profile/pages/profile-page";
 import { CreateTenantPage } from "@/features/tenants/pages/create-tenant-page";
-import { VotingLayout } from "@/features/voting/components/voting-layout";
+import { VotingAdminGuard } from "@/features/voting/guards/voting-admin-guard";
+import { VotingLayout } from "@/features/voting/layouts/voting-layout";
+import { CreateVotePage } from "@/features/voting/pages/create-vote-page";
 import { VotingPage } from "@/features/voting/pages/voting-page";
 import { NotFoundPage } from "@/pages/not-found";
 
@@ -45,6 +47,16 @@ export const router = createBrowserRouter([
                     {
                         index: true,
                         element: <VotingPage />,
+                    },
+                    {
+                        path: "create",
+                        element: <VotingAdminGuard />,
+                        children: [
+                            {
+                                index: true,
+                                element: <CreateVotePage />,
+                            },
+                        ],
                     },
                 ],
             },

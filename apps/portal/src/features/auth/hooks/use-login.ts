@@ -10,7 +10,7 @@ import { STORAGE_KEYS } from "@/storage/keys";
 import { StorageService } from "@/storage/storage";
 
 const formSchema = z.object({
-    email: z.email("auth:login.invalidEmail"),
+    email: z.string().email("auth:login.invalidEmail"),
     password: z.string().min(1, "auth:login.invalidPassword"),
 });
 

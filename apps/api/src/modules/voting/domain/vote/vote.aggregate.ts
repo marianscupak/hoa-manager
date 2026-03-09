@@ -28,7 +28,10 @@ export class VoteAggregate {
   ): VoteAggregate {
     if (
       (data.scheduledFrom && data.scheduledFrom < now) ||
-      (data.scheduledTo && data.scheduledTo < now)
+      (data.scheduledTo && data.scheduledTo < now) ||
+      (data.scheduledFrom &&
+        data.scheduledTo &&
+        data.scheduledFrom >= data.scheduledTo)
     ) {
       throw new InvalidVoteScheduleException();
     }

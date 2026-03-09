@@ -9,6 +9,7 @@ import csErrors from "./locales/cs/errors";
 import csHome from "./locales/cs/home";
 import csInvite from "./locales/cs/invite";
 import csNotFound from "./locales/cs/not-found";
+import { voting as csVoting } from "./locales/cs/voting";
 import enAdmin from "./locales/en/admin";
 import enAuth from "./locales/en/auth";
 import enCommon from "./locales/en/common";
@@ -16,6 +17,7 @@ import enErrors from "./locales/en/errors";
 import enHome from "./locales/en/home";
 import enInvite from "./locales/en/invite";
 import enNotFound from "./locales/en/not-found";
+import { voting as enVoting } from "./locales/en/voting";
 
 declare module "i18next" {
     interface CustomTypeOptions {
@@ -28,6 +30,7 @@ declare module "i18next" {
             "admin": typeof enAdmin;
             "invite": typeof enInvite;
             "errors": typeof enErrors;
+            "voting": typeof enVoting;
         };
     }
 }
@@ -42,6 +45,7 @@ i18n.use(initReactI18next).init({
             "admin": enAdmin,
             "invite": enInvite,
             "errors": enErrors,
+            "voting": enVoting,
         },
         cs: {
             "home": csHome,
@@ -51,6 +55,7 @@ i18n.use(initReactI18next).init({
             "admin": csAdmin,
             "invite": csInvite,
             "errors": csErrors,
+            "voting": csVoting,
         },
     },
     lng: "en",

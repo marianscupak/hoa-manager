@@ -1,19 +1,18 @@
 import { useAtomValue } from "jotai";
+import { Navigate, Outlet } from "react-router";
 
 import { tenantContextAtom } from "@/auth/atoms";
 
-import { VotingAdminLayout } from "./voting-admin-layout";
-import { VotingUnitOwnerLayout } from "./voting-unit-owner-layout";
-
-export function VotingLayout() {
+export function VotingAdminGuard() {
     const tenantCtx = useAtomValue(tenantContextAtom);
+
     const isAdmin =
         tenantCtx?.roles.includes("ADMIN") ||
         tenantCtx?.roles.includes("BOARD_MEMBER");
 
-    if (isAdmin) {
-        return <VotingAdminLayout />;
+    if (!isAdmin) {
+        return <Navigate to="/voting" replace />;
     }
 
-    return <VotingUnitOwnerLayout />;
+    return <Outlet />;
 }

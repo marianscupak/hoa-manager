@@ -6,12 +6,12 @@ import {
 } from '@nestjs/common';
 import type { Request } from 'express';
 
-import { TOKEN_VERIFIER } from '@/modules/auth/application/ports/auth.utils.port';
-import type { TokenVerifier } from '@/modules/auth/application/ports/auth.utils.port';
+import { TOKEN_VERIFIER } from '@/modules/core/auth/application/ports/auth.utils.port';
+import type { TokenVerifier } from '@/modules/core/auth/application/ports/auth.utils.port';
 import {
   USER_REPOSITORY,
   type UserRepository,
-} from '@/modules/identity/application/ports/user.repository.port';
+} from '@/modules/core/identity/application/ports/user.repository.port';
 import { InvalidTokenException } from '@/shared/application/exceptions/auth.exceptions';
 import { UserInactiveException } from '@/shared/application/exceptions/user.exceptions';
 import { AuthClaims } from '@/shared/domain/auth-claims';

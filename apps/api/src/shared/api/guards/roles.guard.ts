@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
-import { TenantMembershipRole } from '@/modules/tenancy/domain/tenant.entity';
+import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
 import { TenantContext } from '@/shared/domain/tenant-context';
 
 export const ROLES_KEY = 'roles';

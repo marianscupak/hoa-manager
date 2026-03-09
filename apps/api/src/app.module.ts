@@ -6,11 +6,11 @@ import type { Request } from 'express';
 import { ClsModule } from 'nestjs-cls';
 
 import { InfrastructureModule } from '@/infrastructure/infrastructure.module';
-import { AuthModule } from '@/modules/auth/auth.module';
-import { IdentityModule } from '@/modules/identity/identity.module';
-import { InvitationModule } from '@/modules/invitation/invitation.module';
-import { PropertyModule } from '@/modules/property/property.module';
-import { TenancyModule } from '@/modules/tenancy/tenancy.module';
+import { AuthModule } from '@/modules/core/auth/auth.module';
+import { IdentityModule } from '@/modules/core/identity/identity.module';
+import { InvitationModule } from '@/modules/core/invitation/invitation.module';
+import { PropertyModule } from '@/modules/core/property/property.module';
+import { TenancyModule } from '@/modules/core/tenancy/tenancy.module';
 import { VotingModule } from '@/modules/voting/voting.module';
 import { LoggingInterceptor } from '@/shared/api/interceptors/logging.interceptor';
 import { DomainExceptionFilter } from '@/shared/filters/domain-exception.filter';

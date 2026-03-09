@@ -1,6 +1,12 @@
 import { type CreateVoteDto } from '@/modules/voting/api/dto/vote.dto';
-import { VoteStatus } from '@/modules/voting/domain/vote/vote.types';
-import { InvalidVoteScheduleException } from '@/shared/application/exceptions/vote.exceptions';
+import {
+  VoteRuleset,
+  VoteStatus,
+} from '@/modules/voting/domain/vote/vote.types';
+import {
+  InvalidVoteScheduleException,
+  VoteNotDraftException,
+} from '@/shared/application/exceptions/vote.exceptions';
 
 export class VoteAggregate {
   private constructor(
@@ -18,6 +24,7 @@ export class VoteAggregate {
     public readonly closedAt?: Date,
     public readonly closedByMembershipId?: string,
     public readonly updatedAt?: Date,
+    public ruleset?: VoteRuleset,
   ) {}
 
   static create(
@@ -45,7 +52,50 @@ export class VoteAggregate {
       now,
       createdByMembershipId,
       data.scheduledFrom,
-      data.scheduledTo,
     );
+  }
+
+  static rehydrate(props: {
+    id: string;
+    tenantId: string;
+    title: string;
+    description: string;
+    status: VoteStatus;
+    createdAt: Date;
+    createdByMembershipId: string;
+    scheduledFrom?: Date | null;
+    scheduledTo?: Date | null;
+    openedAt?: Date | null;
+    openedByMembershipId?: string | null;
+    closedAt?: Date | null;
+    closedByMembershipId?: string | null;
+    updatedAt?: Date | null;
+    ruleset?: VoteRuleset | null;
+  }): VoteAggregate {
+    return new VoteAggregate(
+      props.id,
+      props.tenantId,
+      props.title,
+      props.description,
+      props.status,
+      props.createdAt,
+      props.createdByMembershipId,
+      props.scheduledFrom ?? undefined,
+      props.scheduledTo ?? undefined,
+      props.openedAt ?? undefined,
+      props.openedByMembershipId ?? undefined,
+      props.closedAt ?? undefined,
+      props.closedByMembershipId ?? undefined,
+      props.updatedAt ?? undefined,
+      props.ruleset ?? undefined,
+    );
+  }
+
+  setRuleset(ruleset: VoteRuleset): void {
+    if (this.status !== VoteStatus.DRAFT) {
+      throw new VoteNotDraftException();
+    }
+
+    this.ruleset = ruleset;
   }
 }

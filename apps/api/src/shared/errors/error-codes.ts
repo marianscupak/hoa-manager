@@ -28,6 +28,8 @@ export const ErrorCode = {
   INVALID_OWNERSHIP_SHARE: 'INVALID_OWNERSHIP_SHARE',
   INVALID_OWNERSHIP_SUM: 'INVALID_OWNERSHIP_SUM',
   INVALID_VOTE_SCHEDULE: 'INVALID_VOTE_SCHEDULE',
+  VOTE_NOT_FOUND: 'VOTE_NOT_FOUND',
+  VOTE_NOT_DRAFT: 'VOTE_NOT_DRAFT',
 } as const;
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
@@ -60,4 +62,6 @@ export const ERROR_HTTP_STATUS: Record<ErrorCode, HttpStatus> = {
   [ErrorCode.INVALID_OWNERSHIP_SHARE]: HttpStatus.BAD_REQUEST,
   [ErrorCode.INVALID_OWNERSHIP_SUM]: HttpStatus.BAD_REQUEST,
   [ErrorCode.INVALID_VOTE_SCHEDULE]: HttpStatus.BAD_REQUEST,
+  [ErrorCode.VOTE_NOT_FOUND]: HttpStatus.NOT_FOUND,
+  [ErrorCode.VOTE_NOT_DRAFT]: HttpStatus.BAD_REQUEST,
 };

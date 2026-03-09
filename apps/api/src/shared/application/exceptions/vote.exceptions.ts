@@ -6,3 +6,15 @@ export class InvalidVoteScheduleException extends DomainException {
     super(ErrorCode.INVALID_VOTE_SCHEDULE);
   }
 }
+
+export class VoteNotFoundException extends DomainException {
+  constructor() {
+    super(ErrorCode.VOTE_NOT_FOUND);
+  }
+}
+
+export class VoteNotDraftException extends DomainException {
+  constructor() {
+    super(ErrorCode.VOTE_NOT_DRAFT);
+  }
+}

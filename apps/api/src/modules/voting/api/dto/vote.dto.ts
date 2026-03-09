@@ -13,8 +13,16 @@ import {
 export const createVoteSchema = z.object({
   title: z.string(),
   description: z.string(),
-  scheduledFrom: z.coerce.date().optional(),
-  scheduledTo: z.coerce.date().optional(),
+  scheduledFrom: z
+    .string()
+    .datetime()
+    .optional()
+    .transform((v) => (v ? new Date(v) : undefined)),
+  scheduledTo: z
+    .string()
+    .datetime()
+    .optional()
+    .transform((v) => (v ? new Date(v) : undefined)),
 });
 
 export class CreateVoteDto extends createZodDto(createVoteSchema) {}
@@ -43,9 +51,13 @@ export const setVoteRulesetSchema = z.object({
   weightBasis: z.nativeEnum(VoteWeightBasis),
   quorumMeasure: z.nativeEnum(QuorumMeasure),
   quorumElectorateBasis: z.nativeEnum(QuorumElectorateBasis),
-  quorumThreshold: z.number().positive(),
+  quorumThreshold: z.number().min(0),
   majorityRuleType: z.nativeEnum(MajorityRuleType),
-  majorityThreshold: z.number().positive().nullable(),
+  majorityThreshold: z
+    .number()
+    .min(0)
+    .optional()
+    .transform((v) => v ?? null),
   allowAbstain: z.boolean(),
   abstainExcludedFromMajorityDenominator: z.boolean(),
 });

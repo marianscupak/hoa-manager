@@ -1,10 +1,9 @@
 import { useAtomValue } from "jotai";
 import { useTranslation } from "react-i18next";
+import { Outlet } from "react-router";
 
 import { tenantContextAtom } from "@/auth/atoms";
-
-import { VotingAdminLayout } from "./voting-admin-layout";
-import { VotingPublicLayout } from "./voting-public-layout";
+import { SidebarLayout } from "@/components/layouts/sidebar-layout";
 
 export function VotingLayout() {
     const { t } = useTranslation(["voting"]);
@@ -14,7 +13,15 @@ export function VotingLayout() {
         tenantCtx?.roles.includes("ADMIN") ||
         tenantCtx?.roles.includes("BOARD_MEMBER");
 
-    const baseNavigation = [
+    const navigation = [
+        ...(isAdmin
+            ? [
+                  {
+                      name: t("voting:navigation.createVote"),
+                      href: "/voting/create",
+                  },
+              ]
+            : []),
         {
             name: t("voting:navigation.activeVotes"),
             href: "/voting",
@@ -25,19 +32,9 @@ export function VotingLayout() {
         },
     ];
 
-    if (isAdmin) {
-        return (
-            <VotingAdminLayout
-                navigation={[
-                    {
-                        name: t("voting:navigation.createVote", "Create Vote"),
-                        href: "/voting/create",
-                    },
-                    ...baseNavigation,
-                ]}
-            />
-        );
-    }
-
-    return <VotingPublicLayout navigation={baseNavigation} />;
+    return (
+        <SidebarLayout navigation={navigation}>
+            <Outlet />
+        </SidebarLayout>
+    );
 }

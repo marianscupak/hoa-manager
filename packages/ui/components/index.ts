@@ -15,3 +15,5 @@ export * from "./avatar";
 export * from "./skeleton";
 export * from "./calendar";
 export * from "./popover";
+export * from "./accordion";
+export * from "./checkbox";

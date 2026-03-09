@@ -13,7 +13,12 @@ import type {
     UseMutationResult,
 } from "@tanstack/react-query";
 
-import type { CreateVoteResponseDto, Function } from ".././model";
+import type {
+    CreateVoteDto,
+    CreateVoteResponseDto,
+    SetVoteRulesetDto,
+    SetVoteRulesetResponseDto,
+} from ".././model";
 
 import { customInstance } from "../../axios";
 import type { ErrorType, BodyType } from "../../axios";
@@ -21,7 +26,7 @@ import type { ErrorType, BodyType } from "../../axios";
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 export const votesControllerCreateVote = (
-    _function: BodyType<Function>,
+    createVoteDto: BodyType<CreateVoteDto>,
     options?: SecondParameter<typeof customInstance>,
     signal?: AbortSignal,
 ) => {
@@ -30,7 +35,7 @@ export const votesControllerCreateVote = (
             url: `/api/votes`,
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            data: _function,
+            data: createVoteDto,
             signal,
         },
         options,
@@ -44,14 +49,14 @@ export const getVotesControllerCreateVoteMutationOptions = <
     mutation?: UseMutationOptions<
         Awaited<ReturnType<typeof votesControllerCreateVote>>,
         TError,
-        { data: BodyType<Function> },
+        { data: BodyType<CreateVoteDto> },
         TContext
     >;
     request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
     Awaited<ReturnType<typeof votesControllerCreateVote>>,
     TError,
-    { data: BodyType<Function> },
+    { data: BodyType<CreateVoteDto> },
     TContext
 > => {
     const mutationKey = ["votesControllerCreateVote"];
@@ -65,7 +70,7 @@ export const getVotesControllerCreateVoteMutationOptions = <
 
     const mutationFn: MutationFunction<
         Awaited<ReturnType<typeof votesControllerCreateVote>>,
-        { data: BodyType<Function> }
+        { data: BodyType<CreateVoteDto> }
     > = (props) => {
         const { data } = props ?? {};
 
@@ -78,7 +83,7 @@ export const getVotesControllerCreateVoteMutationOptions = <
 export type VotesControllerCreateVoteMutationResult = NonNullable<
     Awaited<ReturnType<typeof votesControllerCreateVote>>
 >;
-export type VotesControllerCreateVoteMutationBody = BodyType<Function>;
+export type VotesControllerCreateVoteMutationBody = BodyType<CreateVoteDto>;
 export type VotesControllerCreateVoteMutationError = ErrorType<unknown>;
 
 export const useVotesControllerCreateVote = <
@@ -89,7 +94,7 @@ export const useVotesControllerCreateVote = <
         mutation?: UseMutationOptions<
             Awaited<ReturnType<typeof votesControllerCreateVote>>,
             TError,
-            { data: BodyType<Function> },
+            { data: BodyType<CreateVoteDto> },
             TContext
         >;
         request?: SecondParameter<typeof customInstance>;
@@ -98,11 +103,99 @@ export const useVotesControllerCreateVote = <
 ): UseMutationResult<
     Awaited<ReturnType<typeof votesControllerCreateVote>>,
     TError,
-    { data: BodyType<Function> },
+    { data: BodyType<CreateVoteDto> },
     TContext
 > => {
     return useMutation(
         getVotesControllerCreateVoteMutationOptions(options),
+        queryClient,
+    );
+};
+export const votesControllerSetVoteRuleset = (
+    id: string,
+    setVoteRulesetDto: BodyType<SetVoteRulesetDto>,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<SetVoteRulesetResponseDto>(
+        {
+            url: `/api/votes/${id}/ruleset`,
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            data: setVoteRulesetDto,
+            signal,
+        },
+        options,
+    );
+};
+
+export const getVotesControllerSetVoteRulesetMutationOptions = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof votesControllerSetVoteRuleset>>,
+        TError,
+        { id: string; data: BodyType<SetVoteRulesetDto> },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof votesControllerSetVoteRuleset>>,
+    TError,
+    { id: string; data: BodyType<SetVoteRulesetDto> },
+    TContext
+> => {
+    const mutationKey = ["votesControllerSetVoteRuleset"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof votesControllerSetVoteRuleset>>,
+        { id: string; data: BodyType<SetVoteRulesetDto> }
+    > = (props) => {
+        const { id, data } = props ?? {};
+
+        return votesControllerSetVoteRuleset(id, data, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type VotesControllerSetVoteRulesetMutationResult = NonNullable<
+    Awaited<ReturnType<typeof votesControllerSetVoteRuleset>>
+>;
+export type VotesControllerSetVoteRulesetMutationBody =
+    BodyType<SetVoteRulesetDto>;
+export type VotesControllerSetVoteRulesetMutationError = ErrorType<unknown>;
+
+export const useVotesControllerSetVoteRuleset = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof votesControllerSetVoteRuleset>>,
+            TError,
+            { id: string; data: BodyType<SetVoteRulesetDto> },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof votesControllerSetVoteRuleset>>,
+    TError,
+    { id: string; data: BodyType<SetVoteRulesetDto> },
+    TContext
+> => {
+    return useMutation(
+        getVotesControllerSetVoteRulesetMutationOptions(options),
         queryClient,
     );
 };

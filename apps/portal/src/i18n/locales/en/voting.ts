@@ -12,10 +12,10 @@ export const voting = {
                 title: "Basic Information",
                 description: "Provide the primary details for this vote.",
             },
-            rules: {
-                title: "Rules",
+            ruleset: {
+                title: "Vote Ruleset",
                 description:
-                    "Define the voting weight, quorum, and majority rules.",
+                    "Configure quorum, electoral thresholds, and weighting rules.",
             },
             questions: {
                 title: "Questions",
@@ -26,6 +26,9 @@ export const voting = {
             title: {
                 label: "Title",
                 placeholder: "e.g. Roof Repair Approval",
+                errors: {
+                    required: "Title is required",
+                },
             },
             description: {
                 label: "Description",
@@ -39,15 +42,76 @@ export const voting = {
                 label: "Scheduled To (Local Time)",
                 description: "When should the vote automatically close?",
             },
+            weightBasis: {
+                label: "Weight Basis",
+                placeholder: "Select weight basis",
+                options: {
+                    UNIT_SHARE: "Unit Share",
+                    ONE_UNIT_ONE_VOTE: "One Unit One Vote",
+                },
+            },
+            quorumElectorateBasis: {
+                label: "Quorum Electorate Basis",
+                placeholder: "Select basis",
+                options: {
+                    ALL_UNITS: "All Units",
+                    ELIGIBLE_UNITS_ONLY: "Eligible Units Only",
+                },
+            },
+            quorumMeasure: {
+                label: "Quorum Measure",
+                placeholder: "Select measure",
+                options: {
+                    UNIT_SHARE: "Unit Share",
+                    UNIT_COUNT: "Unit Count",
+                },
+            },
+            quorumThreshold: {
+                label: "Quorum Threshold",
+                placeholder: "Enter quorum threshold value",
+                errors: {
+                    positiveNumber: "Must be a positive number",
+                },
+            },
+            majorityRuleType: {
+                label: "Majority Rule Type",
+                placeholder: "Select rule type",
+                options: {
+                    SIMPLE_MAJORITY: "Simple Majority",
+                    QUALIFIED_MAJORITY: "Qualified Majority",
+                },
+            },
+            majorityThreshold: {
+                label: "Majority Threshold",
+                placeholder: "Enter majority threshold if qualified",
+                errors: {
+                    positiveNumber: "Must be a positive number",
+                },
+            },
+            allowAbstain: {
+                label: "Allow Abstain Options?",
+                description:
+                    "Enables voters to explicitly abstain from voting on questions.",
+            },
+            abstainExcluded: {
+                label: "Exclude Abstains From Majority?",
+                description:
+                    "If true, abstain votes are omitted from the denominator when evaluating majority thresholds.",
+            },
+            time: "Time",
         },
         actions: {
             next: "Next step",
             back: "Back",
-            submit: "Create Vote",
+            submit: "Apply Rules & Finish",
+            saved: "Saved",
+            saveNext: "Save and Continue",
+            finishLater: "Finish Later",
         },
         toast: {
             success: "Vote created successfully",
             error: "Failed to create vote",
+            rulesetError: "Failed to configure ruleset",
         },
     },
 };

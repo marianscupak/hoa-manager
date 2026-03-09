@@ -731,7 +731,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Function"
+                "$ref": "#/components/schemas/CreateVoteDto"
               }
             }
           }
@@ -743,6 +743,44 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CreateVoteResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Votes"]
+      }
+    },
+    "/api/votes/{id}/ruleset": {
+      "put": {
+        "operationId": "VotesController_setVoteRuleset",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetVoteRulesetDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns the configured vote ruleset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SetVoteRulesetResponseDto"
                 }
               }
             }
@@ -1212,9 +1250,27 @@
         },
         "required": ["accessToken", "tenantId"]
       },
-      "Function": {
+      "CreateVoteDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "scheduledFrom": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          },
+          "scheduledTo": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          }
+        },
+        "required": ["title", "description"]
       },
       "CreateVoteResponseDto": {
         "type": "object",
@@ -1247,6 +1303,94 @@
           "scheduledFrom",
           "scheduledTo",
           "status"
+        ]
+      },
+      "SetVoteRulesetDto": {
+        "type": "object",
+        "properties": {
+          "weightBasis": {
+            "type": "string",
+            "enum": ["UNIT_SHARE", "ONE_UNIT_ONE_VOTE"]
+          },
+          "quorumMeasure": {
+            "type": "string",
+            "enum": ["UNIT_SHARE", "UNIT_COUNT"]
+          },
+          "quorumElectorateBasis": {
+            "type": "string",
+            "enum": ["ALL_UNITS", "ELIGIBLE_UNITS_ONLY"]
+          },
+          "quorumThreshold": {
+            "type": "number",
+            "minimum": 0
+          },
+          "majorityRuleType": {
+            "type": "string",
+            "enum": ["SIMPLE_MAJORITY", "QUALIFIED_MAJORITY"]
+          },
+          "majorityThreshold": {
+            "type": "number",
+            "minimum": 0
+          },
+          "allowAbstain": {
+            "type": "boolean"
+          },
+          "abstainExcludedFromMajorityDenominator": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "weightBasis",
+          "quorumMeasure",
+          "quorumElectorateBasis",
+          "quorumThreshold",
+          "majorityRuleType",
+          "allowAbstain",
+          "abstainExcludedFromMajorityDenominator"
+        ]
+      },
+      "SetVoteRulesetResponseDto": {
+        "type": "object",
+        "properties": {
+          "weightBasis": {
+            "type": "string",
+            "enum": ["UNIT_SHARE", "ONE_UNIT_ONE_VOTE"]
+          },
+          "quorumMeasure": {
+            "type": "string",
+            "enum": ["UNIT_SHARE", "UNIT_COUNT"]
+          },
+          "quorumElectorateBasis": {
+            "type": "string",
+            "enum": ["ALL_UNITS", "ELIGIBLE_UNITS_ONLY"]
+          },
+          "quorumThreshold": {
+            "type": "number",
+            "minimum": 0
+          },
+          "majorityRuleType": {
+            "type": "string",
+            "enum": ["SIMPLE_MAJORITY", "QUALIFIED_MAJORITY"]
+          },
+          "majorityThreshold": {
+            "type": "number",
+            "minimum": 0
+          },
+          "allowAbstain": {
+            "type": "boolean"
+          },
+          "abstainExcludedFromMajorityDenominator": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "weightBasis",
+          "quorumMeasure",
+          "quorumElectorateBasis",
+          "quorumThreshold",
+          "majorityRuleType",
+          "allowAbstain",
+          "abstainExcludedFromMajorityDenominator"
         ]
       }
     }

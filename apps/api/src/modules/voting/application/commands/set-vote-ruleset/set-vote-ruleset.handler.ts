@@ -11,7 +11,9 @@ import { VOTE_WRITE_REPOSITORY } from '../../ports/vote-write.repository.port';
 import type { VoteWriteRepository } from '../../ports/vote-write.repository.port';
 
 @CommandHandler(SetVoteRulesetCommand)
-export class SetVoteRulesetHandler implements ICommandHandler<SetVoteRulesetCommand> {
+export class SetVoteRulesetHandler
+  implements ICommandHandler<SetVoteRulesetCommand>
+{
   constructor(
     @Inject(VOTE_WRITE_REPOSITORY)
     private readonly voteWriteRepository: VoteWriteRepository,

@@ -36,3 +36,31 @@ export interface VoteRuleset {
   allowAbstain: boolean;
   abstainExcludedFromMajorityDenominator: boolean;
 }
+
+export enum VoteQuestionType {
+  YES_NO = 'YES_NO',
+  SINGLE_CHOICE = 'SINGLE_CHOICE',
+}
+
+export enum VoteOptionSemantic {
+  YES = 'YES',
+  NO = 'NO',
+  ABSTAIN = 'ABSTAIN',
+  CUSTOM = 'CUSTOM',
+}
+
+export interface VoteOption {
+  id: string;
+  label: string;
+  sortOrder: number;
+  optionKey: VoteOptionSemantic;
+}
+
+export interface VoteQuestion {
+  id: string;
+  title: string;
+  description: string | null;
+  type: VoteQuestionType;
+  sortOrder: number;
+  options: VoteOption[];
+}

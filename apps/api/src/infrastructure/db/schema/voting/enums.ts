@@ -29,8 +29,8 @@ export const majorityRuleTypeEnum = pgEnum('majority_rule_type', [
 ]);
 
 export const questionTypeEnum = pgEnum('question_type', [
+  'YES_NO',
   'SINGLE_CHOICE',
-  'MULTIPLE_CHOICE',
 ]);
 
 export const voteUnitConsentStatusEnum = pgEnum('vote_unit_consent_status', [

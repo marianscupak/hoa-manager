@@ -6,6 +6,8 @@ import {
   MajorityRuleType,
   QuorumElectorateBasis,
   QuorumMeasure,
+  VoteOptionSemantic,
+  VoteQuestionType,
   VoteStatus,
   VoteWeightBasis,
 } from '@/modules/voting/domain/vote/vote.types';
@@ -65,3 +67,79 @@ export const setVoteRulesetSchema = z.object({
 export class SetVoteRulesetDto extends createZodDto(setVoteRulesetSchema) {}
 
 export class SetVoteRulesetResponseDto extends SetVoteRulesetDto {}
+
+export const createVoteQuestionOptionSchema = z.object({
+  label: z.string().min(1),
+  sortOrder: z.number().int().optional(),
+});
+export class CreateVoteQuestionOptionDto extends createZodDto(
+  createVoteQuestionOptionSchema,
+) {}
+
+export const createVoteQuestionSchema = z
+  .object({
+    title: z.string().min(1),
+    description: z
+      .string()
+      .optional()
+      .transform((v) => v ?? null),
+    type: z.nativeEnum(VoteQuestionType),
+    sortOrder: z.number().int().optional(),
+    options: z.array(createVoteQuestionOptionSchema).optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.type === VoteQuestionType.SINGLE_CHOICE) {
+        return data.options && data.options.length >= 2;
+      }
+      if (data.type === VoteQuestionType.YES_NO) {
+        return !data.options || data.options.length === 0;
+      }
+      return true;
+    },
+    {
+      message:
+        'SINGLE_CHOICE requires at least 2 options. YES_NO cannot have options.',
+      path: ['options'],
+    },
+  );
+export class CreateVoteQuestionDto extends createZodDto(
+  createVoteQuestionSchema,
+) {}
+
+export class UpdateVoteQuestionOptionDto extends CreateVoteQuestionOptionDto {}
+export class UpdateVoteQuestionDto extends CreateVoteQuestionDto {}
+
+export class VoteOptionResponseDto {
+  @ApiProperty()
+  id!: string;
+
+  @ApiProperty()
+  label!: string;
+
+  @ApiProperty()
+  sortOrder!: number;
+
+  @ApiProperty({ enum: VoteOptionSemantic })
+  optionKey!: VoteOptionSemantic;
+}
+
+export class VoteQuestionResponseDto {
+  @ApiProperty()
+  id!: string;
+
+  @ApiProperty()
+  title!: string;
+
+  @ApiProperty({ required: false, nullable: true })
+  description!: string | null;
+
+  @ApiProperty({ enum: VoteQuestionType })
+  type!: VoteQuestionType;
+
+  @ApiProperty()
+  sortOrder!: number;
+
+  @ApiProperty({ type: [VoteOptionResponseDto] })
+  options!: VoteOptionResponseDto[];
+}

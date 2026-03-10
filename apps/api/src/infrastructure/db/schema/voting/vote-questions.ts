@@ -23,6 +23,7 @@ export const voteQuestions = pgTable(
       .references(() => votes.id, { onDelete: 'cascade' }),
     questionType: questionTypeEnum('question_type').notNull(),
     title: text('title').notNull(),
+    description: text('description'),
     sortOrder: integer('sort_order').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' })
       .defaultNow()

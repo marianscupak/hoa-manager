@@ -5,14 +5,23 @@ import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
 
 import { VotesController } from './api/votes.controller';
 import { CreateVoteHandler } from './application/commands/create-vote/create-vote.handler';
+import { CreateVoteQuestionHandler } from './application/commands/create-vote-question/create-vote-question.handler';
+import { DeleteVoteQuestionHandler } from './application/commands/delete-vote-question/delete-vote-question.handler';
 import { SetVoteRulesetHandler } from './application/commands/set-vote-ruleset/set-vote-ruleset.handler';
+import { UpdateVoteQuestionHandler } from './application/commands/update-vote-question/update-vote-question.handler';
 import { VOTE_WRITE_REPOSITORY } from './application/ports/vote-write.repository.port';
 import { DrizzleVoteWriteRepository } from './infrastructure/persistence/drizzle-vote-write.repository';
 import { AuthModule } from '../core/auth/auth.module';
 import { IdentityModule } from '../core/identity/identity.module';
 import { TenancyModule } from '../core/tenancy/tenancy.module';
 
-const COMMAND_HANDLERS = [CreateVoteHandler, SetVoteRulesetHandler];
+const COMMAND_HANDLERS = [
+  CreateVoteHandler,
+  SetVoteRulesetHandler,
+  CreateVoteQuestionHandler,
+  UpdateVoteQuestionHandler,
+  DeleteVoteQuestionHandler,
+];
 const REPOSITORIES = [
   { provide: VOTE_WRITE_REPOSITORY, useClass: DrizzleVoteWriteRepository },
   DrizzleUnitOfWork,

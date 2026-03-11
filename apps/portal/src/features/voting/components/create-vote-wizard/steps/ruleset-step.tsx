@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -48,7 +47,6 @@ export function CreateVoteRulesetStep({
     onSuccess,
 }: CreateVoteRulesetStepProps) {
     const { t } = useTranslation(["voting", "errors"]);
-    const navigate = useNavigate();
 
     const rulesetForm = useForm<CreateVoteRulesetValues>({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -79,14 +77,8 @@ export function CreateVoteRulesetStep({
             },
             {
                 onSuccess: () => {
-                    toast.success(
-                        t(
-                            "voting:create.toast.rulesetSuccess",
-                            "Ruleset configured successfully",
-                        ),
-                    );
+                    toast.success(t("voting:create.toast.rulesetSuccess"));
                     onSuccess();
-                    navigate("/voting");
                 },
                 onError: showApiError,
             },
@@ -247,20 +239,12 @@ export function CreateVoteRulesetStep({
 
                 <div className="flex justify-end space-x-4 pt-4">
                     <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => navigate("/voting")}
-                        disabled={setRulesetMutation.isPending}
-                    >
-                        {t("voting:create.actions.finishLater")}
-                    </Button>
-                    <Button
                         type="submit"
                         disabled={setRulesetMutation.isPending}
                     >
                         {setRulesetMutation.isPending
                             ? "..."
-                            : t("voting:create.actions.submit")}
+                            : t("voting:create.actions.saveNext")}
                     </Button>
                 </div>
             </form>

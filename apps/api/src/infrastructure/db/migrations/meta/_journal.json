@@ -85,6 +85,13 @@
       "when": 1773137337272,
       "tag": "0011_loving_shiva",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1773222395040,
+      "tag": "0012_loving_hercules",
+      "breakpoints": true
     }
   ]
 }

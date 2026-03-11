@@ -27,6 +27,7 @@ export interface FormSelectProps {
     placeholder?: string;
     options: FormSelectOption[];
     disabled?: boolean;
+    onValueChange?: (value: string) => void;
 }
 
 export const FormSelect = ({
@@ -36,6 +37,7 @@ export const FormSelect = ({
     placeholder,
     options,
     disabled,
+    onValueChange,
 }: FormSelectProps) => {
     const { control } = useFormContext();
 
@@ -47,7 +49,10 @@ export const FormSelect = ({
                 <FormItem>
                     {label && <FormLabel>{label}</FormLabel>}
                     <Select
-                        onValueChange={field.onChange}
+                        onValueChange={(value) => {
+                            field.onChange(value);
+                            onValueChange?.(value);
+                        }}
                         defaultValue={field.value}
                         disabled={disabled}
                     >

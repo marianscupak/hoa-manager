@@ -35,7 +35,10 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
 
   async findById(tenantId: string, id: string): Promise<VoteAggregate | null> {
     const rows = await this.db
-      .select()
+      .select({
+        vote: votes,
+        ruleset: voteRulesets,
+      })
       .from(votes)
       .leftJoin(voteRulesets, eq(votes.id, voteRulesets.voteId))
       .where(and(eq(votes.tenantId, tenantId), eq(votes.id, id)))
@@ -45,7 +48,7 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
       return null;
     }
 
-    const { votes: vote, vote_rulesets: ruleset } = rows[0];
+    const { vote, ruleset } = rows[0];
 
     const questionRows = await this.db
       .select()
@@ -56,7 +59,7 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
       .orderBy(voteQuestions.sortOrder);
 
     const questionIds = questionRows.map((q) => q.id);
-    let optionRows: typeof voteOptions.$inferSelect[] = [];
+    let optionRows: (typeof voteOptions.$inferSelect)[] = [];
 
     if (questionIds.length > 0) {
       optionRows = await this.db
@@ -168,24 +171,30 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
       );
 
       if (questionsToRemove.length > 0) {
-        await tx.delete(voteOptions).where(
-          and(
-            eq(voteOptions.tenantId, vote.tenantId),
-            inArray(voteOptions.questionId, questionsToRemove),
-          ),
-        );
-        await tx.delete(voteQuestions).where(
-          and(
-            eq(voteQuestions.tenantId, vote.tenantId),
-            inArray(voteQuestions.id, questionsToRemove),
-          ),
-        );
+        await tx
+          .delete(voteOptions)
+          .where(
+            and(
+              eq(voteOptions.tenantId, vote.tenantId),
+              inArray(voteOptions.questionId, questionsToRemove),
+            ),
+          );
+        await tx
+          .delete(voteQuestions)
+          .where(
+            and(
+              eq(voteQuestions.tenantId, vote.tenantId),
+              inArray(voteQuestions.id, questionsToRemove),
+            ),
+          );
       }
 
       if (questionsToInsert.length > 0) {
-        await tx.insert(voteQuestions).values(
-          questionsToInsert.map((q) => this.mapQuestionInsert(q, vote)),
-        );
+        await tx
+          .insert(voteQuestions)
+          .values(
+            questionsToInsert.map((q) => this.mapQuestionInsert(q, vote)),
+          );
       }
 
       for (const q of questionsToUpdate) {
@@ -201,16 +210,18 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
       }
 
       for (const q of vote.questions) {
-        await tx.delete(voteOptions).where(
-          and(
-            eq(voteOptions.tenantId, vote.tenantId),
-            eq(voteOptions.questionId, q.id),
-          ),
-        );
-        if (q.options.length > 0) {
-          await tx.insert(voteOptions).values(
-            q.options.map((o) => this.mapOptionInsert(o, q, vote)),
+        await tx
+          .delete(voteOptions)
+          .where(
+            and(
+              eq(voteOptions.tenantId, vote.tenantId),
+              eq(voteOptions.questionId, q.id),
+            ),
           );
+        if (q.options.length > 0) {
+          await tx
+            .insert(voteOptions)
+            .values(q.options.map((o) => this.mapOptionInsert(o, q, vote)));
         }
       }
     });
@@ -342,4 +353,3 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
     };
   }
 }
-

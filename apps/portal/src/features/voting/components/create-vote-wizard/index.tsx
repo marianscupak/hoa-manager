@@ -10,9 +10,10 @@ import {
 } from "@hoa-mngr/ui";
 
 import { CreateVoteBasicInfoStep } from "./steps/basic-info-step";
+import { CreateVoteQuestionsStep } from "./steps/questions-step";
 import { CreateVoteRulesetStep } from "./steps/ruleset-step";
 
-export type CreateVoteStepId = "basic-info" | "ruleset";
+export type CreateVoteStepId = "basic-info" | "ruleset" | "questions";
 
 export function CreateVoteWizard() {
     const { t } = useTranslation(["voting"]);
@@ -27,7 +28,7 @@ export function CreateVoteWizard() {
     };
 
     const handleRulesetSuccess = () => {
-        // TODO: move to questions
+        setActiveStep("questions");
     };
 
     return (
@@ -44,7 +45,6 @@ export function CreateVoteWizard() {
             <Accordion
                 type="single"
                 value={activeStep}
-                onValueChange={(val) => setActiveStep(val as CreateVoteStepId)}
                 className="w-full space-y-4"
             >
                 <AccordionItem
@@ -53,7 +53,7 @@ export function CreateVoteWizard() {
                 >
                     <AccordionTrigger
                         hideChevron
-                        className="hover:no-underline"
+                        className="hover:no-underline pointer-events-none"
                     >
                         <div className="flex items-center space-x-3 text-left">
                             {createdVoteId ? (
@@ -88,13 +88,15 @@ export function CreateVoteWizard() {
                 >
                     <AccordionTrigger
                         hideChevron
-                        className="hover:no-underline"
+                        className="hover:no-underline pointer-events-none"
                     >
                         <div className="flex items-center space-x-3 text-left">
                             {activeStep === "ruleset" ? (
                                 <CircleDot className="text-primary h-5 w-5 shrink-0" />
-                            ) : (
+                            ) : activeStep === "basic-info" ? (
                                 <Circle className="text-muted-foreground h-5 w-5 shrink-0" />
+                            ) : (
+                                <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" />
                             )}
                             <h2 className="text-xl font-semibold">
                                 {t("voting:create.steps.ruleset.title")}
@@ -111,6 +113,36 @@ export function CreateVoteWizard() {
                             voteId={createdVoteId}
                             onSuccess={handleRulesetSuccess}
                         />
+                    </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem
+                    value="questions"
+                    className="bg-card rounded-lg border px-6 shadow-sm"
+                    disabled={!createdVoteId}
+                >
+                    <AccordionTrigger
+                        hideChevron
+                        className="hover:no-underline pointer-events-none"
+                    >
+                        <div className="flex items-center space-x-3 text-left">
+                            {activeStep === "questions" ? (
+                                <CircleDot className="text-primary h-5 w-5 shrink-0" />
+                            ) : (
+                                <Circle className="text-muted-foreground h-5 w-5 shrink-0" />
+                            )}
+                            <h2 className="text-xl font-semibold">
+                                {t("voting:create.steps.questions.title")}
+                            </h2>
+                        </div>
+                    </AccordionTrigger>
+
+                    <AccordionContent className="mt-2 border-t pt-4 pb-6">
+                        <p className="text-muted-foreground mb-6 text-sm">
+                            {t("voting:create.steps.questions.description")}
+                        </p>
+
+                        <CreateVoteQuestionsStep voteId={createdVoteId} />
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>

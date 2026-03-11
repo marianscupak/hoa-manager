@@ -34,4 +34,13 @@ export default {
     UNKNOWN: "Došlo k neočekávané chybě. Zkuste to prosím později.",
     INVALID_VOTE_SCHEDULE:
         "Harmonogram hlasování je neplatný. Ujistěte se, že datum ukončení je po datu zahájení a data nejsou v minulosti.",
+    VOTE_NOT_FOUND: "Hlasování nebylo nalezeno.",
+    VOTE_NOT_DRAFT: "Hlasování již není v režimu konceptu a nelze jej měnit.",
+    VOTE_RULESET_REQUIRED:
+        "Před přidáním otázek musí být nastavena pravidla hlasování.",
+    VOTE_QUESTION_NOT_FOUND: "Otázka nebyla nalezena.",
+    INVALID_VOTE_QUESTION:
+        "Neplatná otázka. Zkontrolujte prosím znění a možnosti.",
+    RULESET_CHANGE_BLOCKED:
+        "Pravidla hlasování již nelze měnit, protože hlasování bylo zahájeno nebo již obsahuje otázky.",
 } as const;

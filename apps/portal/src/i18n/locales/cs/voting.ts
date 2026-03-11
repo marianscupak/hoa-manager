@@ -20,6 +20,41 @@ export const voting = {
             questions: {
                 title: "Otázky",
                 description: "Přidejte otázky a možnosti pro toto hlasování.",
+                defaultTitle: "Nová otázka",
+                addQuestion: "Přidat otázku",
+                emptyState:
+                    "Zatím nebyly přidány žádné otázky. Přidejte první otázku kliknutím na tlačítko výše.",
+                loadError: "Nepodařilo se načíst detaily hlasování.",
+                createSuccess: "Otázka byla úspěšně přidána",
+                deleteConfirm: "Opravdu chcete smazat tuto otázku?",
+                deleteSuccess: "Otázka byla smazána",
+                updateSuccess: "Otázka byla aktualizována",
+                saving: "Ukládání změn...",
+                autoSave: "Změny jsou ukládány automaticky",
+                fields: {
+                    title: {
+                        label: "Znění otázky",
+                        placeholder: "Zadejte text otázky...",
+                    },
+                    description: {
+                        label: "Doplňující popis",
+                        placeholder: "Nepovinný doplňující text k otázce...",
+                    },
+                    type: {
+                        label: "Typ odpovědi",
+                        options: {
+                            YES_NO: "Ano / Ne",
+                            SINGLE_CHOICE: "Výběr z možností",
+                        },
+                    },
+                },
+                options: {
+                    title: "Možnosti",
+                    addOption: "Přidat možnost",
+                    placeholder: "Text možnosti...",
+                    defaultLabel: "Možnost",
+                    abstain: "Zdržel se (automaticky doplněno)",
+                },
             },
         },
         fields: {
@@ -107,11 +142,13 @@ export const voting = {
             saved: "Uloženo",
             saveNext: "Uložit a pokračovat",
             finishLater: "Dokončit později",
+            finish: "Ukončit",
         },
         toast: {
             success: "Hlasování bylo úspěšně vytvořeno",
             error: "Vytvoření hlasování se nezdařilo",
             rulesetError: "Nepodařilo se nastavit pravidla hlasování",
+            rulesetSuccess: "Pravidla byla úspěšně nastavena",
         },
     },
 };

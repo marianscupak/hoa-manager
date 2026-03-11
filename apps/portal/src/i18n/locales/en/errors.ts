@@ -29,4 +29,10 @@ export default {
     UNKNOWN: "An unexpected error occurred. Please try again later.",
     INVALID_VOTE_SCHEDULE:
         "The vote schedule is invalid. Make sure the end date is after the start date and the dates are not in the past.",
+    VOTE_NOT_FOUND: "Vote not found.",
+    VOTE_NOT_DRAFT: "The vote is no longer in draft mode and cannot be modified.",
+    VOTE_RULESET_REQUIRED: "Voting ruleset must be set before adding questions.",
+    VOTE_QUESTION_NOT_FOUND: "Question not found.",
+    INVALID_VOTE_QUESTION: "Invalid question. Please check the text and options.",
+    RULESET_CHANGE_BLOCKED: "Voting ruleset cannot be changed anymore as the vote has started or already contains questions.",
 } as const;

@@ -20,6 +20,41 @@ export const voting = {
             questions: {
                 title: "Questions",
                 description: "Add questions and options for this vote.",
+                defaultTitle: "New Question",
+                addQuestion: "Add Question",
+                emptyState:
+                    "No questions added yet. Add your first question using the button above.",
+                loadError: "Failed to load vote details.",
+                createSuccess: "Question added successfully",
+                deleteConfirm: "Are you sure you want to delete this question?",
+                deleteSuccess: "Question deleted",
+                updateSuccess: "Question updated",
+                saving: "Saving changes...",
+                autoSave: "Changes are saved automatically",
+                fields: {
+                    title: {
+                        label: "Question Text",
+                        placeholder: "Enter the question...",
+                    },
+                    description: {
+                        label: "Additional Description",
+                        placeholder: "Optional explanation for the question...",
+                    },
+                    type: {
+                        label: "Answer Type",
+                        options: {
+                            YES_NO: "Yes / No",
+                            SINGLE_CHOICE: "Single Choice",
+                        },
+                    },
+                },
+                options: {
+                    title: "Options",
+                    addOption: "Add Option",
+                    placeholder: "Option text...",
+                    defaultLabel: "Option",
+                    abstain: "Abstain (automatically added)",
+                },
             },
         },
         fields: {
@@ -107,11 +142,13 @@ export const voting = {
             saved: "Saved",
             saveNext: "Save and Continue",
             finishLater: "Finish Later",
+            finish: "Finish",
         },
         toast: {
             success: "Vote created successfully",
             error: "Failed to create vote",
             rulesetError: "Failed to configure ruleset",
+            rulesetSuccess: "Ruleset configured successfully",
         },
     },
 };

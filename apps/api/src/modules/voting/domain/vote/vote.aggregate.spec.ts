@@ -309,7 +309,7 @@ describe('VoteAggregate', () => {
         expect(q.options[2].optionKey).toBe(VoteOptionSemantic.CUSTOM);
       });
 
-      it('throws if fewer than 2 distinct options are provided', () => {
+      it('allows fewer than 2 distinct options', () => {
         aggregate.setRuleset(createValidRuleset({ allowAbstain: false }));
 
         expect(() => {
@@ -319,10 +319,10 @@ describe('VoteAggregate', () => {
             type: VoteQuestionType.SINGLE_CHOICE,
             options: [{ label: '1' }],
           });
-        }).toThrow(InvalidVoteQuestionException);
+        }).not.toThrow(InvalidVoteQuestionException);
       });
 
-      it('throws if options share duplicate labels', () => {
+      it('allows options to share duplicate labels', () => {
         aggregate.setRuleset(createValidRuleset({ allowAbstain: false }));
 
         expect(() => {
@@ -335,7 +335,7 @@ describe('VoteAggregate', () => {
               { label: '  red ', sortOrder: 2 }, // case-insensitive + whitespace
             ],
           });
-        }).toThrow(InvalidVoteQuestionException);
+        }).not.toThrow(InvalidVoteQuestionException);
       });
 
       it('adds abstain option correctly formatted to the end if allowed', () => {

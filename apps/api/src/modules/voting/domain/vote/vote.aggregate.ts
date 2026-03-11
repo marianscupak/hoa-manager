@@ -183,7 +183,7 @@ export class VoteAggregate {
       input.options,
     );
 
-    const updatedQuestion = {
+    const updatedQuestion: VoteQuestion = {
       id: questionId,
       title: input.title,
       description: input.description,
@@ -277,19 +277,8 @@ export class VoteAggregate {
 
       return defaultOptions;
     } else if (type === VoteQuestionType.SINGLE_CHOICE) {
-      if (!inputOptions || inputOptions.length < 2) {
-        throw new InvalidVoteQuestionException();
-      }
-
-      const labels = new Set(
-        inputOptions.map((o) => o.label.trim().toLowerCase()),
-      );
-      if (labels.size !== inputOptions.length) {
-        throw new InvalidVoteQuestionException();
-      }
-
       const builtOptions: VoteOption[] = [];
-      const suppliedInputOptions = [...inputOptions];
+      const suppliedInputOptions = [...(inputOptions ?? [])];
 
       suppliedInputOptions.sort((a, b) => {
         if (a.sortOrder === undefined && b.sortOrder === undefined) return 0;

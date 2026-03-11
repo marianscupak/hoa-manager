@@ -89,17 +89,13 @@ export const createVoteQuestionSchema = z
   })
   .refine(
     (data) => {
-      if (data.type === VoteQuestionType.SINGLE_CHOICE) {
-        return data.options && data.options.length >= 2;
-      }
       if (data.type === VoteQuestionType.YES_NO) {
         return !data.options || data.options.length === 0;
       }
       return true;
     },
     {
-      message:
-        'SINGLE_CHOICE requires at least 2 options. YES_NO cannot have options.',
+      message: 'YES_NO cannot have options.',
       path: ['options'],
     },
   );
@@ -142,4 +138,12 @@ export class VoteQuestionResponseDto {
 
   @ApiProperty({ type: [VoteOptionResponseDto] })
   options!: VoteOptionResponseDto[];
+}
+
+export class VoteDetailResponseDto extends CreateVoteResponseDto {
+  @ApiProperty({ type: SetVoteRulesetResponseDto, required: false, nullable: true })
+  ruleset!: SetVoteRulesetResponseDto | null;
+
+  @ApiProperty({ type: [VoteQuestionResponseDto] })
+  questions!: VoteQuestionResponseDto[];
 }

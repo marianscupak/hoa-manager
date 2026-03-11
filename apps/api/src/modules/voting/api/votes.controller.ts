@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpCode,
   HttpStatus,
   Param,
@@ -11,20 +12,8 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-
-import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
-import { CreateVoteCommand } from '@/modules/voting/application/commands/create-vote/create-vote.command';
-import { CreateVoteQuestionCommand } from '@/modules/voting/application/commands/create-vote-question/create-vote-question.command';
-import { DeleteVoteQuestionCommand } from '@/modules/voting/application/commands/delete-vote-question/delete-vote-question.command';
-import { SetVoteRulesetCommand } from '@/modules/voting/application/commands/set-vote-ruleset/set-vote-ruleset.command';
-import { UpdateVoteQuestionCommand } from '@/modules/voting/application/commands/update-vote-question/update-vote-question.command';
-import { Roles, Tenant } from '@/shared/api/decorators/auth.decorators';
-import { AccessTokenAuthGuard } from '@/shared/api/guards/access-token-auth.guard';
-import { RolesGuard } from '@/shared/api/guards/roles.guard';
-import { TenantContextGuard } from '@/shared/api/guards/tenant-context.guard';
-import { type TenantContext } from '@/shared/domain/tenant-context';
 
 import {
   CreateVoteDto,
@@ -33,12 +22,45 @@ import {
   SetVoteRulesetDto,
   SetVoteRulesetResponseDto,
   UpdateVoteQuestionDto,
+  VoteDetailResponseDto,
 } from './dto/vote.dto';
+import { Roles, Tenant } from '../../../shared/api/decorators/auth.decorators';
+import { AccessTokenAuthGuard } from '../../../shared/api/guards/access-token-auth.guard';
+import { RolesGuard } from '../../../shared/api/guards/roles.guard';
+import { TenantContextGuard } from '../../../shared/api/guards/tenant-context.guard';
+import { type TenantContext } from '../../../shared/domain/tenant-context';
+import { TenantMembershipRole } from '../../core/tenancy/domain/tenant.entity';
+import { CreateVoteCommand } from '../application/commands/create-vote/create-vote.command';
+import { CreateVoteQuestionCommand } from '../application/commands/create-vote-question/create-vote-question.command';
+import { DeleteVoteQuestionCommand } from '../application/commands/delete-vote-question/delete-vote-question.command';
+import { SetVoteRulesetCommand } from '../application/commands/set-vote-ruleset/set-vote-ruleset.command';
+import { UpdateVoteQuestionCommand } from '../application/commands/update-vote-question/update-vote-question.command';
+import { GetVoteDetailQuery } from '../application/queries/get-vote-detail/get-vote-detail.query';
 
 @ApiTags('Votes')
 @Controller('votes')
 export class VotesController {
-  constructor(private readonly commandBus: CommandBus) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
+  ) {}
+
+  @Get(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Returns the vote detail',
+    type: VoteDetailResponseDto,
+  })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  getVoteDetail(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Tenant() tenantCtx: TenantContext,
+  ) {
+    return this.queryBus.execute(
+      new GetVoteDetailQuery(tenantCtx.tenantId, id),
+    );
+  }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)

@@ -18,6 +18,7 @@ import { CreateTenantPage } from "@/features/tenants/pages/create-tenant-page";
 import { VotingAdminGuard } from "@/features/voting/guards/voting-admin-guard";
 import { VotingLayout } from "@/features/voting/layouts/voting-layout";
 import { CreateVotePage } from "@/features/voting/pages/create-vote-page";
+import { VoteDetailPage } from "@/features/voting/pages/vote-detail-page";
 import { VotingPage } from "@/features/voting/pages/voting-page";
 import { NotFoundPage } from "@/pages/not-found";
 
@@ -57,6 +58,10 @@ export const router = createBrowserRouter([
                                 element: <CreateVotePage />,
                             },
                         ],
+                    },
+                    {
+                        path: ":id",
+                        element: <VoteDetailPage />,
                     },
                 ],
             },

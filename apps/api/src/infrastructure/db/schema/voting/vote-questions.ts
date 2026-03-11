@@ -4,7 +4,6 @@ import {
   uuid,
   text,
   integer,
-  unique,
 } from 'drizzle-orm/pg-core';
 
 import { tenants } from '@/infrastructure/db/schema/tenants';
@@ -33,9 +32,5 @@ export const voteQuestions = pgTable(
       .notNull()
       .$onUpdate(() => new Date()),
   },
-  (table) => ({
-    unqVoteQuestionsVoteIdSortOrder: unique(
-      'unq_vote_questions_vote_id_sort_order',
-    ).on(table.voteId, table.sortOrder),
-  }),
+  (_table) => ({}),
 );

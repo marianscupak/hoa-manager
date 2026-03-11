@@ -126,12 +126,7 @@ export class AuthController {
       RefreshTokenResult
     >(new RefreshTokenCommand(refreshToken, oldAccessToken));
 
-    res.cookie('refresh_token', result.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-    });
+    setRefreshTokenCookie(res, result.refreshToken);
 
     return { accessToken: result.accessToken };
   }

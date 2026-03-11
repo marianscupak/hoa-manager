@@ -42,9 +42,7 @@ import {
 import { AuthClaims } from '@/shared/domain/auth-claims';
 
 @CommandHandler(RefreshTokenCommand)
-export class RefreshTokenHandler
-  implements ICommandHandler<RefreshTokenCommand>
-{
+export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand> {
   private readonly REUSE_GRACE_PERIOD_MS = 30 * 1000;
 
   constructor(
@@ -96,8 +94,17 @@ export class RefreshTokenHandler
         expiresAt,
       });
 
+      // Strip technical JWT fields if they exist from old token
+      const {
+        iat: _iat,
+        exp: _exp,
+        nbf: _nbf,
+        jti: _jti,
+        ...claimsToSign
+      } = scopedClaims as any;
+
       const newAccessToken = await this.tokenSigner.signToken(
-        scopedClaims,
+        claimsToSign,
         15 * 60,
       );
 
@@ -154,8 +161,6 @@ export class RefreshTokenHandler
       if (timeSinceRevoked > this.REUSE_GRACE_PERIOD_MS) {
         await this.authSessionRepository.revokeAllForUser(userId);
         throw new ReplayAttackException();
-      } else {
-        throw new InvalidTokenException();
       }
     }
   }

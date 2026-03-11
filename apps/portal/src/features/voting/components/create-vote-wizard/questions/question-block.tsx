@@ -2,7 +2,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronDown, ChevronUp, GripVertical, Trash2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, CSSProperties } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
@@ -53,7 +53,7 @@ export function QuestionBlock({
         isDragging,
     } = useSortable({ id: question.id });
 
-    const style = {
+    const style: CSSProperties = {
         transform: CSS.Transform.toString(transform),
         transition,
         zIndex: isDragging ? 10 : 1,
@@ -72,10 +72,7 @@ export function QuestionBlock({
         if (!form.formState.isDirty) {
             form.reset({
                 title: question.title,
-                description:
-                    typeof question.description === "string"
-                        ? question.description
-                        : "",
+                description: question.description ?? undefined,
                 type: question.type as CreateVoteQuestionDtoType,
             });
         }
@@ -106,7 +103,7 @@ export function QuestionBlock({
                 data: {
                     title: values.title,
                     type: values.type,
-                    description: values.description || undefined,
+                    description: values.description ?? undefined,
                     sortOrder: question.sortOrder,
                     ...(values.type === CreateVoteQuestionDtoType.YES_NO
                         ? {}

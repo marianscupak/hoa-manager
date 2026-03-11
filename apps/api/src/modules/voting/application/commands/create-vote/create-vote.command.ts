@@ -12,7 +12,7 @@ export class CreateVoteCommand {
 export type CreateVoteResult = {
   id: string;
   title: string;
-  description: string;
+  description: string | null;
   scheduledFrom?: Date;
   scheduledTo?: Date;
   status: VoteStatus;

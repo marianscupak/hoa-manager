@@ -46,7 +46,7 @@ export function CreateVoteBasicInfoStep({
             {
                 data: {
                     title: values.title,
-                    description: values.description || "",
+                    description: values.description || undefined,
                     scheduledFrom: values.scheduledFrom
                         ? new Date(values.scheduledFrom).toISOString()
                         : undefined,

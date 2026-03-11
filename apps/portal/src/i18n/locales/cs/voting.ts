@@ -57,6 +57,11 @@ export const voting = {
                 },
             },
         },
+        optionLabels: {
+            YES: "Pro",
+            NO: "Proti",
+            ABSTAIN: "Zdržel se",
+        },
         fields: {
             title: {
                 label: "Název",

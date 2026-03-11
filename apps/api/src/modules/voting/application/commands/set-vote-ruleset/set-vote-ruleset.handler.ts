@@ -1,6 +1,7 @@
 import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
+import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
 import { VoteNotFoundException } from '@/shared/application/exceptions/vote.exceptions';
 
 import {
@@ -17,6 +18,7 @@ export class SetVoteRulesetHandler
   constructor(
     @Inject(VOTE_WRITE_REPOSITORY)
     private readonly voteWriteRepository: VoteWriteRepository,
+    private readonly unitOfWork: DrizzleUnitOfWork,
   ) {}
 
   async execute(command: SetVoteRulesetCommand): Promise<SetVoteRulesetResult> {
@@ -30,8 +32,11 @@ export class SetVoteRulesetHandler
 
     aggregate.setRuleset(data);
 
-    await this.voteWriteRepository.save(aggregate);
+    await this.unitOfWork.execute(async () => {
+      await this.voteWriteRepository.save(aggregate);
+    });
 
     return aggregate.ruleset!;
   }
 }
+

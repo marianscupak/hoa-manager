@@ -57,6 +57,11 @@ export const voting = {
                 },
             },
         },
+        optionLabels: {
+            YES: "For",
+            NO: "Against",
+            ABSTAIN: "Abstained",
+        },
         fields: {
             title: {
                 label: "Title",

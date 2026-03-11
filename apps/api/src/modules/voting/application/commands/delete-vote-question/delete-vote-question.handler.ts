@@ -1,6 +1,7 @@
 import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
+import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
 import { VoteNotFoundException } from '@/shared/application/exceptions/vote.exceptions';
 
 import { DeleteVoteQuestionCommand } from './delete-vote-question.command';
@@ -14,6 +15,7 @@ export class DeleteVoteQuestionHandler
   constructor(
     @Inject(VOTE_WRITE_REPOSITORY)
     private readonly voteWriteRepository: VoteWriteRepository,
+    private readonly unitOfWork: DrizzleUnitOfWork,
   ) {}
 
   async execute(command: DeleteVoteQuestionCommand): Promise<void> {
@@ -27,6 +29,9 @@ export class DeleteVoteQuestionHandler
 
     aggregate.removeQuestion(questionId);
 
-    await this.voteWriteRepository.save(aggregate);
+    await this.unitOfWork.execute(async () => {
+      await this.voteWriteRepository.save(aggregate);
+    });
   }
 }
+

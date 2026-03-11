@@ -14,7 +14,10 @@ import {
 
 export const createVoteSchema = z.object({
   title: z.string(),
-  description: z.string(),
+  description: z
+    .string()
+    .optional()
+    .transform((v) => (v && v.trim() !== '' ? v : null)),
   scheduledFrom: z
     .string()
     .datetime()
@@ -36,14 +39,14 @@ export class CreateVoteResponseDto {
   @ApiProperty()
   title!: string;
 
-  @ApiProperty()
-  description!: string;
+  @ApiProperty({ type: 'string', required: false, nullable: true })
+  description!: string | null;
 
-  @ApiProperty()
-  scheduledFrom!: Date;
+  @ApiProperty({ required: false, nullable: true })
+  scheduledFrom!: Date | null;
 
-  @ApiProperty()
-  scheduledTo!: Date;
+  @ApiProperty({ required: false, nullable: true })
+  scheduledTo!: Date | null;
 
   @ApiProperty()
   status!: VoteStatus;
@@ -127,7 +130,7 @@ export class VoteQuestionResponseDto {
   @ApiProperty()
   title!: string;
 
-  @ApiProperty({ required: false, nullable: true })
+  @ApiProperty({ type: 'string', required: false, nullable: true })
   description!: string | null;
 
   @ApiProperty({ enum: VoteQuestionType })

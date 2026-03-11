@@ -48,9 +48,20 @@ export function OptionsList({ voteId, question, onRefresh }: OptionsListProps) {
     const updateQuestionMutation = useVotesControllerUpdateVoteQuestion();
 
     const isSingleChoice = type === CreateVoteQuestionDtoType.SINGLE_CHOICE;
-    const options = [...(question.options ?? [])].sort(
+    const allOptions = [...(question.options ?? [])].sort(
         (a, b) => a.sortOrder - b.sortOrder,
     );
+    const customOptions = allOptions.filter((o) => o.optionKey === "CUSTOM");
+    const systemOptions = allOptions.filter((o) => o.optionKey !== "CUSTOM");
+
+    const getOptionLabel = (o: { label: string; optionKey?: string }) => {
+        if (o.optionKey && o.optionKey !== "CUSTOM") {
+            return t(`voting:create.optionLabels.${o.optionKey}`, {
+                defaultValue: o.label,
+            });
+        }
+        return o.label;
+    };
 
     const handleUpdateOptions = (
         newOptions: { label: string; sortOrder: number; optionKey?: string }[],
@@ -71,7 +82,7 @@ export function OptionsList({ voteId, question, onRefresh }: OptionsListProps) {
                 data: {
                     title: String(question.title),
                     type: question.type as CreateVoteQuestionDtoType,
-                    description: typeof question.description === 'string' ? question.description : undefined,
+                    description: question.description ?? undefined,
                     sortOrder: question.sortOrder,
                     options: customOptions,
                 },
@@ -87,7 +98,6 @@ export function OptionsList({ voteId, question, onRefresh }: OptionsListProps) {
         const defaultLabel = t(
             "voting:create.steps.questions.options.defaultLabel",
         ) as string;
-        const customOptions = options.filter((o) => o.optionKey === "CUSTOM");
         const newOptions = [
             ...customOptions.map((o) => ({
                 label: o.label,
@@ -105,9 +115,9 @@ export function OptionsList({ voteId, question, onRefresh }: OptionsListProps) {
         const { active, over } = event;
 
         if (over && active.id !== over.id) {
-            const oldIndex = options.findIndex((o) => o.id === active.id);
-            const newIndex = options.findIndex((o) => o.id === over.id);
-            const reordered = arrayMove(options, oldIndex, newIndex).map(
+            const oldIndex = customOptions.findIndex((o) => o.id === active.id);
+            const newIndex = customOptions.findIndex((o) => o.id === over.id);
+            const reordered = arrayMove(customOptions, oldIndex, newIndex).map(
                 (o, idx) => ({
                     label: o.label,
                     sortOrder: idx + 1,
@@ -118,7 +128,7 @@ export function OptionsList({ voteId, question, onRefresh }: OptionsListProps) {
     };
 
     const handleOptionChange = (id: string, label: string) => {
-        const newOptions = options.map((o) =>
+        const newOptions = customOptions.map((o) =>
             o.id === id
                 ? { label, sortOrder: o.sortOrder, optionKey: o.optionKey }
                 : {
@@ -131,7 +141,7 @@ export function OptionsList({ voteId, question, onRefresh }: OptionsListProps) {
     };
 
     const handleOptionDelete = (id: string) => {
-        const newOptions = options.filter((o) => o.id !== id);
+        const newOptions = customOptions.filter((o) => o.id !== id);
         handleUpdateOptions(newOptions);
     };
 
@@ -142,12 +152,12 @@ export function OptionsList({ voteId, question, onRefresh }: OptionsListProps) {
                     {t("voting:create.steps.questions.options.title")}
                 </h4>
                 <div className="space-y-2 opacity-70">
-                    {options.map((option) => (
+                    {allOptions.map((option) => (
                         <div
                             key={option.id}
                             className="bg-muted rounded px-3 py-2 text-sm"
                         >
-                            {option.label}
+                            {getOptionLabel(option)}
                         </div>
                     ))}
                 </div>
@@ -178,11 +188,11 @@ export function OptionsList({ voteId, question, onRefresh }: OptionsListProps) {
                 onDragEnd={handleDragEnd}
             >
                 <SortableContext
-                    items={options.map((o) => o.id)}
+                    items={customOptions.map((o) => o.id)}
                     strategy={verticalListSortingStrategy}
                 >
                     <div className="space-y-2">
-                        {options.map((option) => (
+                        {customOptions.map((option) => (
                             <OptionItem
                                 key={option.id}
                                 option={option}
@@ -195,6 +205,19 @@ export function OptionsList({ voteId, question, onRefresh }: OptionsListProps) {
                     </div>
                 </SortableContext>
             </DndContext>
+
+            {systemOptions.length > 0 && (
+                <div className="space-y-2 opacity-70">
+                    {systemOptions.map((option) => (
+                        <div
+                            key={option.id}
+                            className="bg-muted rounded px-3 py-2 text-sm italic"
+                        >
+                            {getOptionLabel(option)}
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

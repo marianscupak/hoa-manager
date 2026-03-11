@@ -12,8 +12,10 @@ import { CreateVoteQuestionHandler } from './application/commands/create-vote-qu
 import { DeleteVoteQuestionHandler } from './application/commands/delete-vote-question/delete-vote-question.handler';
 import { SetVoteRulesetHandler } from './application/commands/set-vote-ruleset/set-vote-ruleset.handler';
 import { UpdateVoteQuestionHandler } from './application/commands/update-vote-question/update-vote-question.handler';
+import { VOTE_READ_REPOSITORY } from './application/ports/vote-read.repository.port';
 import { VOTE_WRITE_REPOSITORY } from './application/ports/vote-write.repository.port';
 import { GetVoteDetailHandler } from './application/queries/get-vote-detail/get-vote-detail.handler';
+import { DrizzleVoteReadRepository } from './infrastructure/persistence/drizzle-vote-read.repository';
 import { DrizzleVoteWriteRepository } from './infrastructure/persistence/drizzle-vote-write.repository';
 
 const COMMAND_HANDLERS = [
@@ -26,6 +28,7 @@ const COMMAND_HANDLERS = [
 const QUERY_HANDLERS = [GetVoteDetailHandler];
 const REPOSITORIES = [
   { provide: VOTE_WRITE_REPOSITORY, useClass: DrizzleVoteWriteRepository },
+  { provide: VOTE_READ_REPOSITORY, useClass: DrizzleVoteReadRepository },
   DrizzleUnitOfWork,
 ];
 

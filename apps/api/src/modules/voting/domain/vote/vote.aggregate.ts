@@ -1,4 +1,3 @@
-import { type CreateVoteDto } from '@/modules/voting/api/dto/vote.dto';
 import {
   VoteOption,
   VoteOptionSemantic,
@@ -15,6 +14,13 @@ import {
   VoteQuestionNotFoundException,
   VoteRulesetRequiredException,
 } from '@/shared/application/exceptions/vote.exceptions';
+
+export type CreateVoteInput = {
+  title: string;
+  description: string | null;
+  scheduledFrom?: Date;
+  scheduledTo?: Date;
+};
 
 export type AddVoteQuestionInput = {
   title: string;
@@ -33,7 +39,7 @@ export class VoteAggregate {
     public readonly id: string,
     public readonly tenantId: string,
     public readonly title: string,
-    public readonly description: string,
+    public readonly description: string | null,
     public readonly status: VoteStatus,
     public readonly createdAt: Date,
     public readonly createdByMembershipId: string,
@@ -53,7 +59,7 @@ export class VoteAggregate {
   }
 
   static create(
-    data: CreateVoteDto,
+    data: CreateVoteInput,
     tenantId: string,
     createdByMembershipId: string,
     now: Date,
@@ -240,7 +246,7 @@ export class VoteAggregate {
   private buildAbstainOption(sortOrder: number): VoteOption {
     return {
       id: crypto.randomUUID(),
-      label: 'Zdržel se',
+      label: 'ABSTAIN',
       sortOrder,
       optionKey: VoteOptionSemantic.ABSTAIN,
     };
@@ -260,13 +266,13 @@ export class VoteAggregate {
 
       defaultOptions.push({
         id: crypto.randomUUID(),
-        label: 'Pro',
+        label: 'YES',
         sortOrder: 1,
         optionKey: VoteOptionSemantic.YES,
       });
       defaultOptions.push({
         id: crypto.randomUUID(),
-        label: 'Proti',
+        label: 'NO',
         sortOrder: 2,
         optionKey: VoteOptionSemantic.NO,
       });

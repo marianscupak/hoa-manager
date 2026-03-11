@@ -8,7 +8,7 @@ import {
   VoteRulesetRequiredException,
 } from '@/shared/application/exceptions/vote.exceptions';
 
-import { VoteAggregate } from './vote.aggregate';
+import { VoteAggregate, type CreateVoteInput } from './vote.aggregate';
 import {
   MajorityRuleType,
   QuorumElectorateBasis,
@@ -19,7 +19,6 @@ import {
   VoteStatus,
   VoteWeightBasis,
 } from './vote.types';
-import { CreateVoteDto } from '../../api/dto/vote.dto';
 
 describe('VoteAggregate', () => {
   const defaultTenantId = 'tenant-1';
@@ -40,7 +39,7 @@ describe('VoteAggregate', () => {
 
   describe('create()', () => {
     it('creates a draft vote aggregate with correct properties', () => {
-      const data: CreateVoteDto = {
+      const data: CreateVoteInput = {
         title: 'Test Vote',
         description: 'Test description',
         scheduledFrom: defaultNow,
@@ -66,7 +65,7 @@ describe('VoteAggregate', () => {
     });
 
     it('throws InvalidVoteScheduleException if scheduledFrom is in the past', () => {
-      const data: CreateVoteDto = {
+      const data: CreateVoteInput = {
         title: 'Test Vote',
         description: 'Desc',
         scheduledFrom: addMilliseconds(defaultNow, -1),
@@ -84,7 +83,7 @@ describe('VoteAggregate', () => {
     });
 
     it('throws InvalidVoteScheduleException if scheduledTo is before scheduledFrom', () => {
-      const data: CreateVoteDto = {
+      const data: CreateVoteInput = {
         title: 'Test Vote',
         description: 'Desc',
         scheduledFrom: addDays(defaultNow, 1),
@@ -238,11 +237,11 @@ describe('VoteAggregate', () => {
         expect(q.title).toBe('Do you agree?');
         expect(q.options).toHaveLength(2);
 
-        expect(q.options[0].label).toBe('Pro');
+        expect(q.options[0].label).toBe('YES');
         expect(q.options[0].sortOrder).toBe(1);
         expect(q.options[0].optionKey).toBe(VoteOptionSemantic.YES);
 
-        expect(q.options[1].label).toBe('Proti');
+        expect(q.options[1].label).toBe('NO');
         expect(q.options[1].sortOrder).toBe(2);
         expect(q.options[1].optionKey).toBe(VoteOptionSemantic.NO);
       });
@@ -258,7 +257,7 @@ describe('VoteAggregate', () => {
 
         const q = aggregate.questions[0];
         expect(q.options).toHaveLength(3);
-        expect(q.options[2].label).toBe('Zdržel se');
+        expect(q.options[2].label).toBe('ABSTAIN');
         expect(q.options[2].sortOrder).toBe(3);
         expect(q.options[2].optionKey).toBe(VoteOptionSemantic.ABSTAIN);
       });
@@ -350,7 +349,7 @@ describe('VoteAggregate', () => {
 
         const q = aggregate.questions[0];
         expect(q.options).toHaveLength(3);
-        expect(q.options[2].label).toBe('Zdržel se');
+        expect(q.options[2].label).toBe('ABSTAIN');
         expect(q.options[2].sortOrder).toBe(3);
         expect(q.options[2].optionKey).toBe(VoteOptionSemantic.ABSTAIN);
       });

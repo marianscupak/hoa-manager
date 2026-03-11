@@ -9,6 +9,6 @@
 /**
  * @nullable
  */
-export type VoteQuestionResponseDtoDescription = {
+export type VoteDetailResponseDtoScheduledTo = {
     [key: string]: unknown;
 } | null;

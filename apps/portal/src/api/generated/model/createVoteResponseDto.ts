@@ -5,12 +5,17 @@
  * The HOA Manager API description
  * OpenAPI spec version: 1.0
  */
+import type { CreateVoteResponseDtoScheduledFrom } from "./createVoteResponseDtoScheduledFrom";
+import type { CreateVoteResponseDtoScheduledTo } from "./createVoteResponseDtoScheduledTo";
 
 export interface CreateVoteResponseDto {
     id: string;
     title: string;
-    description: string;
-    scheduledFrom: string;
-    scheduledTo: string;
+    /** @nullable */
+    description?: string | null;
+    /** @nullable */
+    scheduledFrom?: CreateVoteResponseDtoScheduledFrom;
+    /** @nullable */
+    scheduledTo?: CreateVoteResponseDtoScheduledTo;
     status: string;
 }

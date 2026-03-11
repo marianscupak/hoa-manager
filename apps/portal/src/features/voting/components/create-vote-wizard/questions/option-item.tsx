@@ -1,7 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { CSSProperties, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Button, Input, cn } from "@hoa-mngr/ui";
@@ -29,7 +29,7 @@ export function OptionItem({
         isDragging,
     } = useSortable({ id: option.id });
 
-    const style = {
+    const style: CSSProperties = {
         transform: CSS.Transform.toString(transform),
         transition,
         zIndex: isDragging ? 10 : 1,

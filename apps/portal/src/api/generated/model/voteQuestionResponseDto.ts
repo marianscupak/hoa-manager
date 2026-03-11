@@ -6,14 +6,13 @@
  * OpenAPI spec version: 1.0
  */
 import type { VoteOptionResponseDto } from "./voteOptionResponseDto";
-import type { VoteQuestionResponseDtoDescription } from "./voteQuestionResponseDtoDescription";
 import type { VoteQuestionResponseDtoType } from "./voteQuestionResponseDtoType";
 
 export interface VoteQuestionResponseDto {
     id: string;
     title: string;
     /** @nullable */
-    description?: VoteQuestionResponseDtoDescription;
+    description?: string | null;
     type: VoteQuestionResponseDtoType;
     sortOrder: number;
     options: VoteOptionResponseDto[];

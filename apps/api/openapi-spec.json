@@ -827,7 +827,7 @@
           }
         },
         "responses": {
-          "200": {
+          "201": {
             "description": "Returns the created vote",
             "content": {
               "application/json": {
@@ -1613,7 +1613,7 @@
             "type": "string"
           },
           "description": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "type": {
@@ -1651,15 +1651,16 @@
             "type": "string"
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "scheduledFrom": {
-            "format": "date-time",
-            "type": "string"
+            "type": "object",
+            "nullable": true
           },
           "scheduledTo": {
-            "format": "date-time",
-            "type": "string"
+            "type": "object",
+            "nullable": true
           },
           "status": {
             "type": "string"
@@ -1682,9 +1683,6 @@
         "required": [
           "id",
           "title",
-          "description",
-          "scheduledFrom",
-          "scheduledTo",
           "status",
           "questions"
         ]
@@ -1710,8 +1708,7 @@
           }
         },
         "required": [
-          "title",
-          "description"
+          "title"
         ]
       },
       "CreateVoteResponseDto": {
@@ -1724,15 +1721,16 @@
             "type": "string"
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "scheduledFrom": {
-            "format": "date-time",
-            "type": "string"
+            "type": "object",
+            "nullable": true
           },
           "scheduledTo": {
-            "format": "date-time",
-            "type": "string"
+            "type": "object",
+            "nullable": true
           },
           "status": {
             "type": "string"
@@ -1741,9 +1739,6 @@
         "required": [
           "id",
           "title",
-          "description",
-          "scheduledFrom",
-          "scheduledTo",
           "status"
         ]
       },

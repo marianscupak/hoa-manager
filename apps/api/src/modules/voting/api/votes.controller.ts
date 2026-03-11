@@ -13,7 +13,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 import {
   CreateVoteDto,
@@ -51,20 +51,19 @@ export class VotesController {
     description: 'Returns the vote detail',
     type: VoteDetailResponseDto,
   })
-  @UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
-  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard)
   getVoteDetail(
     @Param('id', ParseUUIDPipe) id: string,
     @Tenant() tenantCtx: TenantContext,
   ) {
     return this.queryBus.execute(
-      new GetVoteDetailQuery(tenantCtx.tenantId, id),
+      new GetVoteDetailQuery(tenantCtx.tenantId, id, tenantCtx.roles),
     );
   }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOkResponse({
+  @ApiCreatedResponse({
     description: 'Returns the created vote',
     type: CreateVoteResponseDto,
   })

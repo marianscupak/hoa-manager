@@ -6,14 +6,19 @@
  * OpenAPI spec version: 1.0
  */
 import type { SetVoteRulesetResponseDto } from "./setVoteRulesetResponseDto";
+import type { VoteDetailResponseDtoScheduledFrom } from "./voteDetailResponseDtoScheduledFrom";
+import type { VoteDetailResponseDtoScheduledTo } from "./voteDetailResponseDtoScheduledTo";
 import type { VoteQuestionResponseDto } from "./voteQuestionResponseDto";
 
 export interface VoteDetailResponseDto {
     id: string;
     title: string;
-    description: string;
-    scheduledFrom: string;
-    scheduledTo: string;
+    /** @nullable */
+    description?: string | null;
+    /** @nullable */
+    scheduledFrom?: VoteDetailResponseDtoScheduledFrom;
+    /** @nullable */
+    scheduledTo?: VoteDetailResponseDtoScheduledTo;
     status: string;
     ruleset?: SetVoteRulesetResponseDto | null;
     questions: VoteQuestionResponseDto[];

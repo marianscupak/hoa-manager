@@ -1,5 +1,5 @@
 import { CheckCircle2, Circle, CircleDot } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -21,6 +21,17 @@ export function CreateVoteWizard() {
     const [activeStep, setActiveStep] =
         useState<CreateVoteStepId>("basic-info");
     const [createdVoteId, setCreatedVoteId] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!createdVoteId) return;
+
+        const handler = (e: BeforeUnloadEvent) => {
+            e.preventDefault();
+        };
+
+        window.addEventListener("beforeunload", handler);
+        return () => window.removeEventListener("beforeunload", handler);
+    }, [createdVoteId]);
 
     const handleBasicInfoSuccess = (id: string) => {
         setCreatedVoteId(id);

@@ -10,7 +10,9 @@ import { TenancyModule } from '../core/tenancy/tenancy.module';
 import { CreateVoteHandler } from './application/commands/create-vote/create-vote.handler';
 import { CreateVoteQuestionHandler } from './application/commands/create-vote-question/create-vote-question.handler';
 import { DeleteVoteQuestionHandler } from './application/commands/delete-vote-question/delete-vote-question.handler';
+import { ScheduleVoteHandler } from './application/commands/schedule-vote/schedule-vote.handler';
 import { SetVoteRulesetHandler } from './application/commands/set-vote-ruleset/set-vote-ruleset.handler';
+import { UpdateVoteHandler } from './application/commands/update-vote/update-vote.handler';
 import { UpdateVoteQuestionHandler } from './application/commands/update-vote-question/update-vote-question.handler';
 import { VOTE_READ_REPOSITORY } from './application/ports/vote-read.repository.port';
 import { VOTE_WRITE_REPOSITORY } from './application/ports/vote-write.repository.port';
@@ -26,6 +28,8 @@ const COMMAND_HANDLERS = [
   CreateVoteQuestionHandler,
   UpdateVoteQuestionHandler,
   DeleteVoteQuestionHandler,
+  UpdateVoteHandler,
+  ScheduleVoteHandler,
 ];
 const QUERY_HANDLERS = [
   GetVoteDetailHandler,

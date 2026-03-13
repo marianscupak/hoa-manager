@@ -6,6 +6,7 @@ export const voting = {
     },
     create: {
         title: "Create Vote",
+        titleEdit: "Edit Vote",
         description: "Set up a new vote for the association.",
         steps: {
             basicInfo: {
@@ -26,7 +27,8 @@ export const voting = {
                 addQuestion: "Add Question",
                 emptyState:
                     "No questions added yet. Use the button above to add your first question.",
-                loadError: "System was unable to load vote details. Please try again.",
+                loadError:
+                    "System was unable to load vote details. Please try again.",
                 createSuccess: "Question added successfully",
                 deleteConfirm: "Are you sure you want to delete this question?",
                 deleteSuccess: "Question deleted",
@@ -168,6 +170,7 @@ export const voting = {
             error: "Failed to create vote",
             rulesetError: "Failed to configure ruleset",
             rulesetSuccess: "Ruleset configured successfully",
+            scheduleSuccess: "Vote scheduled successfully",
         },
     },
     list: {
@@ -203,6 +206,9 @@ export const voting = {
             completed: "Voting Completed",
             viewOutcomes: "View final outcomes",
             viewResults: "View Results",
+            draftStatus: "Draft Vote",
+            editDraft: "Configuration is incomplete",
+            editAction: "Edit Vote",
         },
     },
     detail: {
@@ -212,6 +218,14 @@ export const voting = {
         },
         description: {
             title: "Description",
+        },
+        actions: {
+            edit: "Edit Vote",
+            schedule: "Schedule Vote",
+            scheduleConfirmTitle: "Schedule Vote",
+            scheduleConfirmDescription: "Are you sure you want to schedule this vote? This action will make the vote visible to regular users and is irreversible. You will no longer be able to edit the vote details or ruleset.",
+            cancel: "Cancel",
+            confirm: "Yes, Schedule Vote",
         },
         documents: {
             title: "Documents",

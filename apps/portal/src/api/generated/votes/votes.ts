@@ -27,6 +27,7 @@ import type {
     CreateVoteResponseDto,
     SetVoteRulesetDto,
     SetVoteRulesetResponseDto,
+    UpdateVoteDto,
     UpdateVoteQuestionDto,
     VoteDetailResponseDto,
     VoteListItemResponseDto,
@@ -435,6 +436,93 @@ export function useVotesControllerGetVoteDetail<
     return { ...query, queryKey: queryOptions.queryKey };
 }
 
+export const votesControllerUpdateVote = (
+    id: string,
+    updateVoteDto: BodyType<UpdateVoteDto>,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<CreateVoteResponseDto>(
+        {
+            url: `/api/votes/${id}`,
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            data: updateVoteDto,
+            signal,
+        },
+        options,
+    );
+};
+
+export const getVotesControllerUpdateVoteMutationOptions = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof votesControllerUpdateVote>>,
+        TError,
+        { id: string; data: BodyType<UpdateVoteDto> },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof votesControllerUpdateVote>>,
+    TError,
+    { id: string; data: BodyType<UpdateVoteDto> },
+    TContext
+> => {
+    const mutationKey = ["votesControllerUpdateVote"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof votesControllerUpdateVote>>,
+        { id: string; data: BodyType<UpdateVoteDto> }
+    > = (props) => {
+        const { id, data } = props ?? {};
+
+        return votesControllerUpdateVote(id, data, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type VotesControllerUpdateVoteMutationResult = NonNullable<
+    Awaited<ReturnType<typeof votesControllerUpdateVote>>
+>;
+export type VotesControllerUpdateVoteMutationBody = BodyType<UpdateVoteDto>;
+export type VotesControllerUpdateVoteMutationError = ErrorType<unknown>;
+
+export const useVotesControllerUpdateVote = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof votesControllerUpdateVote>>,
+            TError,
+            { id: string; data: BodyType<UpdateVoteDto> },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof votesControllerUpdateVote>>,
+    TError,
+    { id: string; data: BodyType<UpdateVoteDto> },
+    TContext
+> => {
+    return useMutation(
+        getVotesControllerUpdateVoteMutationOptions(options),
+        queryClient,
+    );
+};
 export const votesControllerGetVoterStatus = (
     id: string,
     options?: SecondParameter<typeof customInstance>,
@@ -967,6 +1055,86 @@ export const useVotesControllerDeleteVoteQuestion = <
 > => {
     return useMutation(
         getVotesControllerDeleteVoteQuestionMutationOptions(options),
+        queryClient,
+    );
+};
+export const votesControllerScheduleVote = (
+    id: string,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<CreateVoteResponseDto>(
+        { url: `/api/votes/${id}/schedule`, method: "POST", signal },
+        options,
+    );
+};
+
+export const getVotesControllerScheduleVoteMutationOptions = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof votesControllerScheduleVote>>,
+        TError,
+        { id: string },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof votesControllerScheduleVote>>,
+    TError,
+    { id: string },
+    TContext
+> => {
+    const mutationKey = ["votesControllerScheduleVote"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof votesControllerScheduleVote>>,
+        { id: string }
+    > = (props) => {
+        const { id } = props ?? {};
+
+        return votesControllerScheduleVote(id, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type VotesControllerScheduleVoteMutationResult = NonNullable<
+    Awaited<ReturnType<typeof votesControllerScheduleVote>>
+>;
+
+export type VotesControllerScheduleVoteMutationError = ErrorType<unknown>;
+
+export const useVotesControllerScheduleVote = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof votesControllerScheduleVote>>,
+            TError,
+            { id: string },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof votesControllerScheduleVote>>,
+    TError,
+    { id: string },
+    TContext
+> => {
+    return useMutation(
+        getVotesControllerScheduleVoteMutationOptions(options),
         queryClient,
     );
 };

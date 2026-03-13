@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -7,7 +8,11 @@ import { z } from "zod";
 import { Button, FormDatetimePicker, FormInput } from "@hoa-mngr/ui";
 
 import { showApiError } from "@/api/error-utils";
-import { useVotesControllerCreateVote } from "@/api/generated/votes/votes";
+import { VoteDetailResponseDto } from "@/api/generated/model";
+import {
+    useVotesControllerCreateVote,
+    useVotesControllerUpdateVote,
+} from "@/api/generated/votes/votes";
 
 const createVoteFormSchema = z.object({
     title: z.string().min(1, "voting:create.fields.title.errors.required"),
@@ -21,48 +26,80 @@ type CreateVoteFormValues = z.infer<typeof createVoteFormSchema>;
 export interface CreateVoteBasicInfoStepProps {
     onSuccess: (id: string) => void;
     isSaved: boolean;
+    voteId?: string | null;
+    initialData?: VoteDetailResponseDto;
 }
 
 export function CreateVoteBasicInfoStep({
     onSuccess,
     isSaved,
+    voteId,
+    initialData,
 }: CreateVoteBasicInfoStepProps) {
     const { t } = useTranslation(["voting", "errors"]);
 
     const basicInfoForm = useForm<CreateVoteFormValues>({
         resolver: zodResolver(createVoteFormSchema),
         defaultValues: {
-            title: "",
-            description: "",
-            scheduledFrom: "",
-            scheduledTo: "",
+            title: initialData?.title ?? "",
+            description: initialData?.description ?? "",
+            scheduledFrom: initialData?.scheduledFrom ?? "",
+            scheduledTo: initialData?.scheduledTo ?? "",
         },
     });
 
+    useEffect(() => {
+        if (initialData) {
+            basicInfoForm.reset({
+                title: initialData.title ?? "",
+                description: initialData.description ?? "",
+                scheduledFrom: initialData.scheduledFrom ?? "",
+                scheduledTo: initialData.scheduledTo ?? "",
+            });
+        }
+    }, [initialData, basicInfoForm]);
+
     const createVoteMutation = useVotesControllerCreateVote();
+    const updateVoteMutation = useVotesControllerUpdateVote();
+
+    const isPending =
+        createVoteMutation.isPending || updateVoteMutation.isPending;
 
     const onSubmit = (values: CreateVoteFormValues) => {
-        createVoteMutation.mutate(
-            {
-                data: {
-                    title: values.title,
-                    description: values.description || undefined,
-                    scheduledFrom: values.scheduledFrom
-                        ? new Date(values.scheduledFrom).toISOString()
-                        : undefined,
-                    scheduledTo: values.scheduledTo
-                        ? new Date(values.scheduledTo).toISOString()
-                        : undefined,
+        const data = {
+            title: values.title,
+            description: values.description || undefined,
+            scheduledFrom: values.scheduledFrom
+                ? new Date(values.scheduledFrom).toISOString()
+                : undefined,
+            scheduledTo: values.scheduledTo
+                ? new Date(values.scheduledTo).toISOString()
+                : undefined,
+        };
+
+        if (voteId) {
+            updateVoteMutation.mutate(
+                { id: voteId, data },
+                {
+                    onSuccess: () => {
+                        toast.success(t("voting:create.toast.success"));
+                        onSuccess(voteId);
+                    },
+                    onError: showApiError,
                 },
-            },
-            {
-                onSuccess: (response) => {
-                    toast.success(t("voting:create.toast.success"));
-                    onSuccess(response.id);
+            );
+        } else {
+            createVoteMutation.mutate(
+                { data },
+                {
+                    onSuccess: (response) => {
+                        toast.success(t("voting:create.toast.success"));
+                        onSuccess(response.id);
+                    },
+                    onError: showApiError,
                 },
-                onError: showApiError,
-            },
-        );
+            );
+        }
     };
 
     return (
@@ -114,11 +151,11 @@ export function CreateVoteBasicInfoStep({
                 <div className="flex justify-end pt-4">
                     <Button
                         type="submit"
-                        disabled={createVoteMutation.isPending || isSaved}
+                        disabled={isPending || (isSaved && !voteId)}
                     >
-                        {createVoteMutation.isPending
+                        {isPending
                             ? "..."
-                            : isSaved
+                            : isSaved && !voteId
                               ? t("voting:create.actions.saved")
                               : t("voting:create.actions.saveNext")}
                     </Button>

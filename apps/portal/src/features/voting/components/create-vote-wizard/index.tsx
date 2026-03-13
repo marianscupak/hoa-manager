@@ -1,13 +1,32 @@
-import { CheckCircle2, Circle, CircleDot } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { CheckCircle2, Circle, CircleDot, Loader2, Send } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
+import { toast } from "sonner";
 
 import {
     Accordion,
     AccordionContent,
     AccordionItem,
     AccordionTrigger,
+    Button,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from "@hoa-mngr/ui";
+
+import { showApiError } from "@/api/error-utils";
+import { VoteDetailResponseDto } from "@/api/generated/model";
+import {
+    getVotesControllerGetVoteDetailQueryKey,
+    useVotesControllerGetVoteDetail,
+    useVotesControllerScheduleVote,
+} from "@/api/generated/votes/votes";
 
 import { CreateVoteBasicInfoStep } from "./steps/basic-info-step";
 import { CreateVoteQuestionsStep } from "./steps/questions-step";
@@ -15,12 +34,31 @@ import { CreateVoteRulesetStep } from "./steps/ruleset-step";
 
 export type CreateVoteStepId = "basic-info" | "ruleset" | "questions";
 
-export function CreateVoteWizard() {
+export interface CreateVoteWizardProps {
+    voteId?: string;
+}
+
+export function CreateVoteWizard({
+    voteId: initialVoteId,
+}: CreateVoteWizardProps) {
+    const navigate = useNavigate();
     const { t } = useTranslation(["voting"]);
+    const queryClient = useQueryClient();
 
     const [activeStep, setActiveStep] =
         useState<CreateVoteStepId>("basic-info");
-    const [createdVoteId, setCreatedVoteId] = useState<string | null>(null);
+    const [createdVoteId, setCreatedVoteId] = useState<string | null>(
+        initialVoteId ?? null,
+    );
+    const [isScheduleOpen, setIsScheduleOpen] = useState(false);
+
+    const voteQuery = useVotesControllerGetVoteDetail(createdVoteId ?? "", {
+        query: {
+            enabled: !!createdVoteId,
+        },
+    });
+
+    const voteData = voteQuery.data as VoteDetailResponseDto | undefined;
 
     useEffect(() => {
         if (!createdVoteId) return;
@@ -42,11 +80,35 @@ export function CreateVoteWizard() {
         setActiveStep("questions");
     };
 
+    const scheduleMutation = useVotesControllerScheduleVote();
+
+    const handleSchedule = () => {
+        if (!createdVoteId) return;
+        scheduleMutation.mutate(
+            { id: createdVoteId },
+            {
+                onSuccess: () => {
+                    toast.success(t("voting:create.toast.scheduleSuccess"));
+                    setIsScheduleOpen(false);
+                    queryClient.invalidateQueries({
+                        queryKey: getVotesControllerGetVoteDetailQueryKey(
+                            createdVoteId,
+                        ),
+                    });
+                    navigate(`/voting/${createdVoteId}`, { replace: true });
+                },
+                onError: showApiError,
+            },
+        );
+    };
+
     return (
         <div className="mx-auto max-w-3xl space-y-6">
             <div>
                 <h1 className="text-3xl font-bold tracking-tight">
-                    {t("voting:create.title")}
+                    {initialVoteId
+                        ? t("voting:create.titleEdit")
+                        : t("voting:create.title")}
                 </h1>
                 <p className="text-muted-foreground mt-2">
                     {t("voting:create.description")}
@@ -56,6 +118,11 @@ export function CreateVoteWizard() {
             <Accordion
                 type="single"
                 value={activeStep}
+                onValueChange={(value) => {
+                    if (value && createdVoteId) {
+                        setActiveStep(value as CreateVoteStepId);
+                    }
+                }}
                 className="w-full space-y-4"
             >
                 <AccordionItem
@@ -64,15 +131,17 @@ export function CreateVoteWizard() {
                 >
                     <AccordionTrigger
                         hideChevron
-                        className="pointer-events-none hover:no-underline"
+                        className={createdVoteId ? "hover:no-underline" : "pointer-events-none hover:no-underline"}
                     >
                         <div className="flex items-center space-x-3 text-left">
-                            {createdVoteId ? (
-                                <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" />
-                            ) : activeStep === "basic-info" ? (
-                                <CircleDot className="text-primary h-5 w-5 shrink-0" />
-                            ) : (
-                                <Circle className="text-muted-foreground h-5 w-5 shrink-0" />
+                            {!initialVoteId && (
+                                createdVoteId ? (
+                                    <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" />
+                                ) : activeStep === "basic-info" ? (
+                                    <CircleDot className="text-primary h-5 w-5 shrink-0" />
+                                ) : (
+                                    <Circle className="text-muted-foreground h-5 w-5 shrink-0" />
+                                )
                             )}
                             <h2 className="text-xl font-semibold">
                                 {t("voting:create.steps.basicInfo.title")}
@@ -88,6 +157,8 @@ export function CreateVoteWizard() {
                         <CreateVoteBasicInfoStep
                             onSuccess={handleBasicInfoSuccess}
                             isSaved={!!createdVoteId}
+                            voteId={createdVoteId}
+                            initialData={voteData}
                         />
                     </AccordionContent>
                 </AccordionItem>
@@ -99,15 +170,17 @@ export function CreateVoteWizard() {
                 >
                     <AccordionTrigger
                         hideChevron
-                        className="pointer-events-none hover:no-underline"
+                        className={createdVoteId ? "hover:no-underline" : "pointer-events-none hover:no-underline"}
                     >
                         <div className="flex items-center space-x-3 text-left">
-                            {activeStep === "ruleset" ? (
-                                <CircleDot className="text-primary h-5 w-5 shrink-0" />
-                            ) : activeStep === "basic-info" ? (
-                                <Circle className="text-muted-foreground h-5 w-5 shrink-0" />
-                            ) : (
-                                <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" />
+                            {!initialVoteId && (
+                                activeStep === "ruleset" ? (
+                                    <CircleDot className="text-primary h-5 w-5 shrink-0" />
+                                ) : activeStep === "basic-info" ? (
+                                    <Circle className="text-muted-foreground h-5 w-5 shrink-0" />
+                                ) : (
+                                    <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" />
+                                )
                             )}
                             <h2 className="text-xl font-semibold">
                                 {t("voting:create.steps.ruleset.title")}
@@ -123,6 +196,7 @@ export function CreateVoteWizard() {
                         <CreateVoteRulesetStep
                             voteId={createdVoteId}
                             onSuccess={handleRulesetSuccess}
+                            initialData={voteData?.ruleset}
                         />
                     </AccordionContent>
                 </AccordionItem>
@@ -130,17 +204,19 @@ export function CreateVoteWizard() {
                 <AccordionItem
                     value="questions"
                     className="bg-card rounded-lg border px-6 shadow-sm"
-                    disabled={!createdVoteId}
+                    disabled={!createdVoteId && !initialVoteId}
                 >
                     <AccordionTrigger
                         hideChevron
-                        className="pointer-events-none hover:no-underline"
+                        className={createdVoteId ? "hover:no-underline" : "pointer-events-none hover:no-underline"}
                     >
                         <div className="flex items-center space-x-3 text-left">
-                            {activeStep === "questions" ? (
-                                <CircleDot className="text-primary h-5 w-5 shrink-0" />
-                            ) : (
-                                <Circle className="text-muted-foreground h-5 w-5 shrink-0" />
+                            {!initialVoteId && (
+                                activeStep === "questions" ? (
+                                    <CircleDot className="text-primary h-5 w-5 shrink-0" />
+                                ) : (
+                                    <Circle className="text-muted-foreground h-5 w-5 shrink-0" />
+                                )
                             )}
                             <h2 className="text-xl font-semibold">
                                 {t("voting:create.steps.questions.title")}
@@ -157,6 +233,56 @@ export function CreateVoteWizard() {
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>
+
+            {initialVoteId && (
+                <div className="mt-8 flex justify-end gap-3 border-t pt-6">
+                    <Button
+                        variant="outline"
+                        onClick={() => navigate(`/voting/${initialVoteId}`)}
+                    >
+                        {t("voting:create.actions.back")}
+                    </Button>
+                    <Dialog open={isScheduleOpen} onOpenChange={setIsScheduleOpen}>
+                        <DialogTrigger asChild>
+                            <Button disabled={scheduleMutation.isPending}>
+                                {scheduleMutation.isPending ? (
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                ) : (
+                                    <Send className="mr-2 h-4 w-4" />
+                                )}
+                                {t("voting:detail.actions.schedule")}
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>
+                                    {t("voting:detail.actions.scheduleConfirmTitle")}
+                                </DialogTitle>
+                                <DialogDescription>
+                                    {t("voting:detail.actions.scheduleConfirmDescription")}
+                                </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setIsScheduleOpen(false)}
+                                >
+                                    {t("voting:detail.actions.cancel")}
+                                </Button>
+                                <Button
+                                    onClick={handleSchedule}
+                                    disabled={scheduleMutation.isPending}
+                                >
+                                    {scheduleMutation.isPending ? (
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    ) : null}
+                                    {t("voting:detail.actions.confirm")}
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                </div>
+            )}
         </div>
     );
 }

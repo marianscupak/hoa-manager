@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -12,6 +13,7 @@ import {
     SetVoteRulesetDtoQuorumElectorateBasis as QuorumElectorateBasis,
     SetVoteRulesetDtoQuorumMeasure as QuorumMeasure,
     SetVoteRulesetDtoWeightBasis as VoteWeightBasis,
+    VoteDetailResponseDto,
 } from "@/api/generated/model";
 import { useVotesControllerSetVoteRuleset } from "@/api/generated/votes/votes";
 
@@ -52,19 +54,27 @@ export const rulesetDefaultValues: CreateVoteRulesetValues = {
 export interface CreateVoteRulesetStepProps {
     voteId: string | null;
     onSuccess: () => void;
+    initialData?: VoteDetailResponseDto["ruleset"];
 }
 
 export function CreateVoteRulesetStep({
     voteId,
     onSuccess,
+    initialData,
 }: CreateVoteRulesetStepProps) {
     const { t } = useTranslation(["voting", "errors"]);
 
     const rulesetForm = useForm<CreateVoteRulesetValues>({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         resolver: zodResolver(createVoteRulesetSchema) as any,
-        defaultValues: rulesetDefaultValues,
+        defaultValues: (initialData as any) ?? rulesetDefaultValues,
     });
+
+    useEffect(() => {
+        if (initialData) {
+            rulesetForm.reset(initialData as any);
+        }
+    }, [initialData, rulesetForm]);
 
     const setRulesetMutation = useVotesControllerSetVoteRuleset();
 

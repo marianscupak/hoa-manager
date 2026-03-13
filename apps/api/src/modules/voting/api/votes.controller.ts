@@ -30,6 +30,7 @@ import {
   VoteDetailResponseDto,
   VoteListItemResponseDto,
   VoterStatusResponseDto,
+  UpdateVoteDto,
 } from './dto/vote.dto';
 import { Roles, Tenant } from '../../../shared/api/decorators/auth.decorators';
 import { AccessTokenAuthGuard } from '../../../shared/api/guards/access-token-auth.guard';
@@ -40,7 +41,9 @@ import { TenantMembershipRole } from '../../core/tenancy/domain/tenant.entity';
 import { CreateVoteCommand } from '../application/commands/create-vote/create-vote.command';
 import { CreateVoteQuestionCommand } from '../application/commands/create-vote-question/create-vote-question.command';
 import { DeleteVoteQuestionCommand } from '../application/commands/delete-vote-question/delete-vote-question.command';
+import { ScheduleVoteCommand } from '../application/commands/schedule-vote/schedule-vote.command';
 import { SetVoteRulesetCommand } from '../application/commands/set-vote-ruleset/set-vote-ruleset.command';
+import { UpdateVoteCommand } from '../application/commands/update-vote/update-vote.command';
 import { UpdateVoteQuestionCommand } from '../application/commands/update-vote-question/update-vote-question.command';
 import { GetVoteDetailQuery } from '../application/queries/get-vote-detail/get-vote-detail.query';
 import { GetVoterStatusQuery } from '../application/queries/get-voter-status/get-voter-status.query';
@@ -179,6 +182,41 @@ export class VotesController {
   ) {
     return this.commandBus.execute(
       new DeleteVoteQuestionCommand(tenantCtx.tenantId, id, questionId),
+    );
+  }
+
+  @Patch(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Returns the updated vote',
+    type: CreateVoteResponseDto,
+  })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  updateVote(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() body: UpdateVoteDto,
+    @Tenant() tenantCtx: TenantContext,
+  ) {
+    return this.commandBus.execute(
+      new UpdateVoteCommand(tenantCtx.tenantId, id, body),
+    );
+  }
+
+  @Post(':id/schedule')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Returns the scheduled vote',
+    type: CreateVoteResponseDto,
+  })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  scheduleVote(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Tenant() tenantCtx: TenantContext,
+  ) {
+    return this.commandBus.execute(
+      new ScheduleVoteCommand(tenantCtx.tenantId, id),
     );
   }
 }

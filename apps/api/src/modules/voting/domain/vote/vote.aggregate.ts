@@ -64,15 +64,7 @@ export class VoteAggregate {
     createdByMembershipId: string,
     now: Date,
   ): VoteAggregate {
-    if (
-      (data.scheduledFrom && data.scheduledFrom < now) ||
-      (data.scheduledTo && data.scheduledTo < now) ||
-      (data.scheduledFrom &&
-        data.scheduledTo &&
-        data.scheduledFrom >= data.scheduledTo)
-    ) {
-      throw new InvalidVoteScheduleException();
-    }
+    this.validateSchedule(data.scheduledFrom, data.scheduledTo, now);
 
     return new VoteAggregate(
       crypto.randomUUID(),
@@ -85,6 +77,50 @@ export class VoteAggregate {
       data.scheduledFrom,
       data.scheduledTo,
     );
+  }
+
+  update(data: CreateVoteInput, now: Date): void {
+    this.assertEditable();
+    VoteAggregate.validateSchedule(data.scheduledFrom, data.scheduledTo, now);
+
+    Object.assign(this, {
+      title: data.title,
+      description: data.description,
+      scheduledFrom: data.scheduledFrom,
+      scheduledTo: data.scheduledTo,
+      updatedAt: now,
+    });
+  }
+
+  schedule(): void {
+    this.assertEditable();
+
+    if (!this.ruleset) {
+      throw new VoteRulesetRequiredException();
+    }
+
+    if (this.questions.length === 0) {
+      throw new InvalidVoteQuestionException();
+    }
+
+    Object.assign(this, {
+      status: VoteStatus.SCHEDULED,
+      updatedAt: new Date(),
+    });
+  }
+
+  private static validateSchedule(
+    scheduledFrom: Date | undefined,
+    scheduledTo: Date | undefined,
+    now: Date,
+  ): void {
+    if (
+      (scheduledFrom && scheduledFrom < now) ||
+      (scheduledTo && scheduledTo < now) ||
+      (scheduledFrom && scheduledTo && scheduledFrom >= scheduledTo)
+    ) {
+      throw new InvalidVoteScheduleException();
+    }
   }
 
   static rehydrate(props: {

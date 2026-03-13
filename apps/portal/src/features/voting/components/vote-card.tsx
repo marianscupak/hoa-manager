@@ -1,5 +1,11 @@
 import { format } from "date-fns";
-import { ArrowRight, Calendar, CheckCircle2, Users } from "lucide-react";
+import {
+    ArrowRight,
+    Calendar,
+    CheckCircle2,
+    Pencil,
+    Users,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
@@ -26,6 +32,7 @@ export function VoteCard({ vote }: VoteCardProps) {
 
     const isVotingOpen = vote.status === "OPEN";
     const isScheduled = vote.status === "SCHEDULED";
+    const isDraft = vote.status === "DRAFT";
 
     const borderColor = isVotingOpen
         ? "border-l-emerald-500"
@@ -102,6 +109,27 @@ export function VoteCard({ vote }: VoteCardProps) {
                                 className="w-full border-slate-200"
                             >
                                 {t("voting:list.card.manageDelegation")}
+                            </Button>
+                        </>
+                    ) : isDraft ? (
+                        <>
+                            <div className="mb-4 flex flex-col items-center text-center">
+                                <Pencil className="mb-2 h-8 w-8 text-slate-500" />
+                                <span className="font-semibold text-slate-700">
+                                    {t("voting:list.card.draftStatus")}
+                                </span>
+                                <span className="text-sm text-slate-500">
+                                    {t("voting:list.card.editDraft")}
+                                </span>
+                            </div>
+                            <Button
+                                variant="outline"
+                                className="w-full"
+                                onClick={() =>
+                                    navigate(`/voting/${vote.id}/edit`)
+                                }
+                            >
+                                {t("voting:list.card.editAction")}
                             </Button>
                         </>
                     ) : (

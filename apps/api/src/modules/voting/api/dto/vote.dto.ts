@@ -31,6 +31,7 @@ export const createVoteSchema = z.object({
 });
 
 export class CreateVoteDto extends createZodDto(createVoteSchema) {}
+export class UpdateVoteDto extends createZodDto(createVoteSchema) {}
 
 export class CreateVoteResponseDto {
   @ApiProperty()

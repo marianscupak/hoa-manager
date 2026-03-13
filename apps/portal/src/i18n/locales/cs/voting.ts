@@ -191,4 +191,36 @@ export const voting = {
             viewResults: "Zobrazit výsledky",
         },
     },
+    detail: {
+        timeline: {
+            startDate: "DATUM ZAHÁJENÍ",
+            endDate: "DATUM UKONČENÍ",
+        },
+        description: {
+            title: "Popis",
+        },
+        documents: {
+            title: "Dokumenty",
+            uploaded: "Nahráno",
+        },
+        questions: {
+            title: "Položky k hlasování",
+            preview: "Náhled otázek, o kterých budete hlasovat",
+            majorityPrefix: "Vyžaduje",
+            majoritySuffix: "většinu všech podílů.",
+        },
+        statusSidebar: {
+            title: "Váš status hlasování",
+            closesIn: "Hlasování končí za",
+            owningUnits: "VLASTNĚNÉ JEDNOTKY",
+            share: "Podíl:",
+            statusReady: "Připraveno",
+            statusDelegation: "Vyžaduje delegaci",
+            delegationWarning: "{{unitName}} je ve spoluvlastnictví. Pro hlasování za tuto jednotku je vyžadován formulář delegace.",
+            manageDelegation: "Spravovat delegaci",
+            totalPower: "Celková síla hlasu:",
+            voteButton: "Hlasovat",
+            secureBoothHint: "Kliknutím na „Hlasovat“ vstoupíte do zabezpečené hlasovací místnosti.",
+        },
+    },
 };

@@ -15,6 +15,7 @@ import { UpdateVoteQuestionHandler } from './application/commands/update-vote-qu
 import { VOTE_READ_REPOSITORY } from './application/ports/vote-read.repository.port';
 import { VOTE_WRITE_REPOSITORY } from './application/ports/vote-write.repository.port';
 import { GetVoteDetailHandler } from './application/queries/get-vote-detail/get-vote-detail.handler';
+import { GetVoterStatusHandler } from './application/queries/get-voter-status/get-voter-status.handler';
 import { GetVotesHandler } from './application/queries/get-votes/get-votes.handler';
 import { DrizzleVoteReadRepository } from './infrastructure/persistence/drizzle-vote-read.repository';
 import { DrizzleVoteWriteRepository } from './infrastructure/persistence/drizzle-vote-write.repository';
@@ -26,7 +27,11 @@ const COMMAND_HANDLERS = [
   UpdateVoteQuestionHandler,
   DeleteVoteQuestionHandler,
 ];
-const QUERY_HANDLERS = [GetVoteDetailHandler, GetVotesHandler];
+const QUERY_HANDLERS = [
+  GetVoteDetailHandler,
+  GetVotesHandler,
+  GetVoterStatusHandler,
+];
 const REPOSITORIES = [
   { provide: VOTE_WRITE_REPOSITORY, useClass: DrizzleVoteWriteRepository },
   { provide: VOTE_READ_REPOSITORY, useClass: DrizzleVoteReadRepository },

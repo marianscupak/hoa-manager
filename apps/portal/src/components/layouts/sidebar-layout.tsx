@@ -41,8 +41,8 @@ export function SidebarLayout({ navigation, children }: SidebarLayoutProps) {
     );
 
     return (
-        <div className="flex flex-1 flex-col gap-8 lg:flex-row">
-            <div className="flex items-center gap-2 lg:hidden">
+        <div className="flex flex-1 flex-col lg:flex-row">
+            <div className="flex items-center gap-2 border-b bg-white p-4 lg:hidden">
                 <Button
                     variant="outline"
                     size="sm"
@@ -54,16 +54,16 @@ export function SidebarLayout({ navigation, children }: SidebarLayoutProps) {
             </div>
 
             {isMobileSidebarOpen && (
-                <div className="w-full lg:hidden">{navContent}</div>
+                <div className="w-full border-b bg-white p-4 lg:hidden">
+                    {navContent}
+                </div>
             )}
-            <aside className="hidden w-64 shrink-0 lg:block">
+            <aside className="hidden w-64 shrink-0 border-r bg-white px-6 py-8 lg:block">
                 {navContent}
             </aside>
 
-            <main className="flex-1">
-                <div className="bg-card rounded-xl border p-6 shadow-sm">
-                    {children}
-                </div>
+            <main className="mx-auto w-full flex-1 p-4 sm:p-6 lg:p-8">
+                {children}
             </main>
         </div>
     );

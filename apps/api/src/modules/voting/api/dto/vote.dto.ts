@@ -153,3 +153,38 @@ export class VoteDetailResponseDto extends CreateVoteResponseDto {
 
 export class VoteListItemResponseDto extends CreateVoteResponseDto {}
 
+export class OwningUnitStatusDto {
+  @ApiProperty()
+  id!: string;
+
+  @ApiProperty()
+  name!: string;
+
+  @ApiProperty()
+  share!: string;
+
+  @ApiProperty({ enum: ['READY', 'REQUIRES_DELEGATION', 'VOTED'] })
+  status!: 'READY' | 'REQUIRES_DELEGATION' | 'VOTED';
+
+  @ApiProperty({ type: 'string', required: false })
+  statusMessage?: string;
+}
+
+export class TotalVotingPowerDto {
+  @ApiProperty()
+  value!: number;
+
+  @ApiProperty()
+  maximum!: number;
+}
+
+export class VoterStatusResponseDto {
+  @ApiProperty()
+  canVote!: boolean;
+
+  @ApiProperty({ type: TotalVotingPowerDto })
+  totalVotingPower!: TotalVotingPowerDto;
+
+  @ApiProperty({ type: [OwningUnitStatusDto] })
+  owningUnits!: OwningUnitStatusDto[];
+}

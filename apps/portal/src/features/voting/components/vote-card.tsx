@@ -1,6 +1,7 @@
 import { format } from "date-fns";
 import { ArrowRight, Calendar, CheckCircle2, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 
 import {
     Button,
@@ -21,6 +22,8 @@ interface VoteCardProps {
 
 export function VoteCard({ vote }: VoteCardProps) {
     const { t } = useTranslation(["voting"]);
+    const navigate = useNavigate();
+
     const isVotingOpen = vote.status === "OPEN";
     const isScheduled = vote.status === "SCHEDULED";
 
@@ -75,7 +78,10 @@ export function VoteCard({ vote }: VoteCardProps) {
                                     {t("voting:list.card.voteRequired")}
                                 </span>
                             </div>
-                            <Button className="w-full cursor-pointer bg-blue-600 text-white hover:bg-blue-700">
+                            <Button
+                                className="w-full bg-blue-600 text-white hover:bg-blue-700"
+                                onClick={() => navigate(`/voting/${vote.id}`)}
+                            >
                                 {t("voting:list.card.voteAction")}{" "}
                                 <ArrowRight className="ml-2 h-4 w-4" />
                             </Button>

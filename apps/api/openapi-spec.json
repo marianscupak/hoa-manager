@@ -865,6 +865,36 @@
         ]
       }
     },
+    "/api/votes/{id}/voter-status": {
+      "get": {
+        "operationId": "VotesController_getVoterStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns the voter status for the given vote",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoterStatusResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Votes"
+        ]
+      }
+    },
     "/api/votes/{id}/ruleset": {
       "put": {
         "operationId": "VotesController_setVoteRuleset",
@@ -1742,6 +1772,74 @@
           "title",
           "status",
           "questions"
+        ]
+      },
+      "TotalVotingPowerDto": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "number"
+          },
+          "maximum": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "value",
+          "maximum"
+        ]
+      },
+      "OwningUnitStatusDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "share": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "READY",
+              "REQUIRES_DELEGATION",
+              "VOTED"
+            ]
+          },
+          "statusMessage": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "share",
+          "status"
+        ]
+      },
+      "VoterStatusResponseDto": {
+        "type": "object",
+        "properties": {
+          "canVote": {
+            "type": "boolean"
+          },
+          "totalVotingPower": {
+            "$ref": "#/components/schemas/TotalVotingPowerDto"
+          },
+          "owningUnits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OwningUnitStatusDto"
+            }
+          }
+        },
+        "required": [
+          "canVote",
+          "totalVotingPower",
+          "owningUnits"
         ]
       },
       "CreateVoteDto": {

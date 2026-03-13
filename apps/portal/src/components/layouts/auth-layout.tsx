@@ -35,7 +35,7 @@ export function AuthLayout() {
                 </div>
                 <UserMenu />
             </header>
-            <main className="mx-auto w-full max-w-7xl flex-1 p-4 sm:p-6 lg:p-8">
+            <main className="flex w-full flex-1 flex-col">
                 <Outlet />
             </main>
         </div>

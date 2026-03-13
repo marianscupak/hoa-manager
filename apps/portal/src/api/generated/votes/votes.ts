@@ -30,6 +30,7 @@ import type {
     UpdateVoteQuestionDto,
     VoteDetailResponseDto,
     VoteListItemResponseDto,
+    VoterStatusResponseDto,
 } from ".././model";
 
 import { customInstance } from "../../axios";
@@ -422,6 +423,170 @@ export function useVotesControllerGetVoteDetail<
     queryKey: DataTag<QueryKey, TData, TError>;
 } {
     const queryOptions = getVotesControllerGetVoteDetailQueryOptions(
+        id,
+        options,
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+        TData,
+        TError
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+    return { ...query, queryKey: queryOptions.queryKey };
+}
+
+export const votesControllerGetVoterStatus = (
+    id: string,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<VoterStatusResponseDto>(
+        { url: `/api/votes/${id}/voter-status`, method: "GET", signal },
+        options,
+    );
+};
+
+export const getVotesControllerGetVoterStatusQueryKey = (id: string) => {
+    return [`/api/votes/${id}/voter-status`] as const;
+};
+
+export const getVotesControllerGetVoterStatusQueryOptions = <
+    TData = Awaited<ReturnType<typeof votesControllerGetVoterStatus>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof votesControllerGetVoterStatus>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ?? getVotesControllerGetVoterStatusQueryKey(id);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof votesControllerGetVoterStatus>>
+    > = ({ signal }) =>
+        votesControllerGetVoterStatus(id, requestOptions, signal);
+
+    return {
+        queryKey,
+        queryFn,
+        enabled: !!id,
+        ...queryOptions,
+    } as UseQueryOptions<
+        Awaited<ReturnType<typeof votesControllerGetVoterStatus>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type VotesControllerGetVoterStatusQueryResult = NonNullable<
+    Awaited<ReturnType<typeof votesControllerGetVoterStatus>>
+>;
+export type VotesControllerGetVoterStatusQueryError = ErrorType<unknown>;
+
+export function useVotesControllerGetVoterStatus<
+    TData = Awaited<ReturnType<typeof votesControllerGetVoterStatus>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof votesControllerGetVoterStatus>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof votesControllerGetVoterStatus>>,
+                    TError,
+                    Awaited<ReturnType<typeof votesControllerGetVoterStatus>>
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useVotesControllerGetVoterStatus<
+    TData = Awaited<ReturnType<typeof votesControllerGetVoterStatus>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof votesControllerGetVoterStatus>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof votesControllerGetVoterStatus>>,
+                    TError,
+                    Awaited<ReturnType<typeof votesControllerGetVoterStatus>>
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useVotesControllerGetVoterStatus<
+    TData = Awaited<ReturnType<typeof votesControllerGetVoterStatus>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof votesControllerGetVoterStatus>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useVotesControllerGetVoterStatus<
+    TData = Awaited<ReturnType<typeof votesControllerGetVoterStatus>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof votesControllerGetVoterStatus>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
+    const queryOptions = getVotesControllerGetVoterStatusQueryOptions(
         id,
         options,
     );

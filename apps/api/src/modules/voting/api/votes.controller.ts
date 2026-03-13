@@ -24,6 +24,7 @@ import {
   UpdateVoteQuestionDto,
   VoteDetailResponseDto,
   VoteListItemResponseDto,
+  VoterStatusResponseDto,
 } from './dto/vote.dto';
 import { Roles, Tenant } from '../../../shared/api/decorators/auth.decorators';
 import { AccessTokenAuthGuard } from '../../../shared/api/guards/access-token-auth.guard';
@@ -37,6 +38,7 @@ import { DeleteVoteQuestionCommand } from '../application/commands/delete-vote-q
 import { SetVoteRulesetCommand } from '../application/commands/set-vote-ruleset/set-vote-ruleset.command';
 import { UpdateVoteQuestionCommand } from '../application/commands/update-vote-question/update-vote-question.command';
 import { GetVoteDetailQuery } from '../application/queries/get-vote-detail/get-vote-detail.query';
+import { GetVoterStatusQuery } from '../application/queries/get-voter-status/get-voter-status.query';
 import { GetVotesQuery } from '../application/queries/get-votes/get-votes.query';
 
 @ApiTags('Votes')
@@ -73,6 +75,22 @@ export class VotesController {
   ) {
     return this.queryBus.execute(
       new GetVoteDetailQuery(tenantCtx.tenantId, id, tenantCtx.roles),
+    );
+  }
+
+  @Get(':id/voter-status')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Returns the voter status for the given vote',
+    type: VoterStatusResponseDto,
+  })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard)
+  getVoterStatus(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Tenant() tenantCtx: TenantContext,
+  ) {
+    return this.queryBus.execute(
+      new GetVoterStatusQuery(tenantCtx.tenantId, id, tenantCtx.membershipId),
     );
   }
 

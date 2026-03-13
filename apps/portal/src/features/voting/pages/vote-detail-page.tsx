@@ -1,9 +1,17 @@
-import { useParams } from "react-router";
 import { Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { useParams } from "react-router";
 
 import { useVotesControllerGetVoteDetail } from "@/api/generated/votes/votes";
 
+import { StatusBadge } from "../components/status-badge";
+import { VoteDetailTimeline } from "../components/vote-detail-timeline";
+import { VoteDocuments } from "../components/vote-documents";
+import { VoteQuestionsList } from "../components/vote-questions-list";
+import { VoterStatusSidebar } from "../components/voter-status-sidebar";
+
 export function VoteDetailPage() {
+    const { t } = useTranslation(["voting"]);
     const { id } = useParams<{ id: string }>();
 
     const voteQuery = useVotesControllerGetVoteDetail(id ?? "", {
@@ -15,15 +23,15 @@ export function VoteDetailPage() {
     if (voteQuery.isLoading) {
         return (
             <div className="flex min-h-[400px] items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <Loader2 className="text-primary h-8 w-8 animate-spin" />
             </div>
         );
     }
 
     if (voteQuery.isError || !voteQuery.data) {
         return (
-            <div className="p-8 text-center text-destructive">
-                Failed to load vote details.
+            <div className="text-destructive p-8 text-center">
+                {t("voting:list.error")}
             </div>
         );
     }
@@ -32,20 +40,37 @@ export function VoteDetailPage() {
 
     return (
         <div className="container mx-auto py-8">
-            <h1 className="mb-6 text-3xl font-bold">{vote.title}</h1>
+            <div className="mb-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+                <h1 className="text-3xl font-bold">{vote.title}</h1>
+                <StatusBadge status={vote.status} />
+            </div>
 
-            <div className="rounded-lg border bg-slate-950 p-6 shadow-sm">
-                <div className="mb-4 flex items-center justify-between border-b border-slate-800 pb-2">
-                    <span className="text-sm font-medium text-slate-400">
-                        Debug: Full Vote Data
-                    </span>
-                    <span className="rounded bg-slate-800 px-2 py-0.5 text-xs text-slate-300">
-                        JSON
-                    </span>
+            <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
+                <div className="lg:col-span-2">
+                    <VoteDetailTimeline
+                        scheduledFrom={vote.scheduledFrom ?? null}
+                        scheduledTo={vote.scheduledTo ?? null}
+                    />
+
+                    {vote.description && (
+                        <div className="mb-10">
+                            <h2 className="mb-4 text-xl font-bold">
+                                {t("voting:detail.description.title")}
+                            </h2>
+                            <div className="leading-relaxed whitespace-pre-wrap text-slate-600">
+                                {vote.description}
+                            </div>
+                        </div>
+                    )}
+
+                    <VoteDocuments />
+
+                    <VoteQuestionsList questions={vote.questions} />
                 </div>
-                <pre className="overflow-x-auto text-sm text-slate-200">
-                    {JSON.stringify(vote, null, 2)}
-                </pre>
+
+                <div>
+                    <VoterStatusSidebar />
+                </div>
             </div>
         </div>
     );

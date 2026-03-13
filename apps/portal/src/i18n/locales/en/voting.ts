@@ -191,4 +191,36 @@ export const voting = {
             viewResults: "View Results",
         },
     },
+    detail: {
+        timeline: {
+            startDate: "START DATE",
+            endDate: "END DATE",
+        },
+        description: {
+            title: "Description",
+        },
+        documents: {
+            title: "Documents",
+            uploaded: "Uploaded",
+        },
+        questions: {
+            title: "Voting Items",
+            preview: "Preview of questions you will vote on",
+            majorityPrefix: "Requires",
+            majoritySuffix: "majority of all shares.",
+        },
+        statusSidebar: {
+            title: "Your Voting Status",
+            closesIn: "Voting closes in",
+            owningUnits: "OWNING UNITS",
+            share: "Share:",
+            statusReady: "Ready",
+            statusDelegation: "Requires delegation",
+            delegationWarning: "{{unitName}} is co-owned. A delegation form is required to vote for this unit.",
+            manageDelegation: "Manage Delegation",
+            totalPower: "Total Voting Power:",
+            voteButton: "Vote",
+            secureBoothHint: "By clicking \"Vote\", you will enter the secure voting booth.",
+        },
+    },
 };

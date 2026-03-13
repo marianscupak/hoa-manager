@@ -6,7 +6,10 @@ import { type ErrorCode } from '@/shared/errors/error-codes';
  * The global DomainExceptionFilter maps this to an HTTP response.
  */
 export class DomainException extends Error {
-  constructor(public readonly code: ErrorCode) {
+  constructor(
+    public readonly code: ErrorCode,
+    public readonly details?: { code: ErrorCode; param?: string }[],
+  ) {
     super(code);
     this.name = 'DomainException';
   }

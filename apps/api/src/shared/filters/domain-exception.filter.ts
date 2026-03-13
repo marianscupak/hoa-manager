@@ -45,7 +45,9 @@ export class DomainExceptionFilter implements ExceptionFilter {
         statusCode,
       });
 
-      return response.status(statusCode).json({ code: err.code });
+      return response
+        .status(statusCode)
+        .json({ code: err.code, details: err.details });
     }
 
     if (err instanceof HttpException) {

@@ -43,4 +43,6 @@ export default {
         "Neplatná otázka. Zkontrolujte prosím znění a možnosti.",
     RULESET_CHANGE_BLOCKED:
         "Pravidla hlasování již nelze měnit, protože hlasování bylo zahájeno nebo již obsahuje otázky.",
+    VOTE_SCHEDULE_IN_PAST: "Naplánovaná data nemohou být v minulosti.",
+    VOTE_SCHEDULE_INVALID_RANGE: "Harmonogram hlasování je neplatný.",
 } as const;

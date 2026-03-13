@@ -66,7 +66,12 @@ export function VoteCard({ vote }: VoteCardProps) {
                             </div>
                         )}
                     </div>
-                    <CardTitle className="mb-2 text-xl">{vote.title}</CardTitle>
+                    <CardTitle
+                        className="mb-2 cursor-pointer text-xl hover:underline"
+                        onClick={() => navigate(`/voting/${vote.id}`)}
+                    >
+                        {vote.title}
+                    </CardTitle>
                     <CardDescription className="leading-relaxed text-slate-500">
                         {vote.description ||
                             t("voting:list.card.noDescription")}

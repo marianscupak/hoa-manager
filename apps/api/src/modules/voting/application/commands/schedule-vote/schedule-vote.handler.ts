@@ -6,6 +6,8 @@ import {
   VOTE_WRITE_REPOSITORY,
   type VoteWriteRepository,
 } from '@/modules/voting/application/ports/vote-write.repository.port';
+import { VoteNotFoundException } from '@/shared/application/exceptions/vote.exceptions';
+import { type Clock, CLOCK } from '@/shared/application/ports/clock.port';
 
 import {
   ScheduleVoteCommand,
@@ -18,6 +20,8 @@ export class ScheduleVoteHandler implements ICommandHandler<ScheduleVoteCommand>
     @Inject(VOTE_WRITE_REPOSITORY)
     private readonly voteRepository: VoteWriteRepository,
     private readonly unitOfWork: DrizzleUnitOfWork,
+    @Inject(CLOCK)
+    private readonly clock: Clock,
   ) {}
 
   async execute(command: ScheduleVoteCommand): Promise<ScheduleVoteResult> {
@@ -27,10 +31,10 @@ export class ScheduleVoteHandler implements ICommandHandler<ScheduleVoteCommand>
     );
 
     if (!vote) {
-      throw new NotFoundException('Vote not found');
+      throw new VoteNotFoundException();
     }
 
-    vote.schedule();
+    vote.schedule(this.clock.now());
 
     await this.unitOfWork.execute(async () => {
       await this.voteRepository.save(vote);

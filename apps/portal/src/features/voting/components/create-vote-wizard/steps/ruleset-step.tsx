@@ -67,12 +67,12 @@ export function CreateVoteRulesetStep({
     const rulesetForm = useForm<CreateVoteRulesetValues>({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         resolver: zodResolver(createVoteRulesetSchema) as any,
-        defaultValues: (initialData as any) ?? rulesetDefaultValues,
+        defaultValues: initialData ?? rulesetDefaultValues,
     });
 
     useEffect(() => {
-        if (initialData) {
-            rulesetForm.reset(initialData as any);
+        if (initialData && !rulesetForm.formState.isDirty) {
+            rulesetForm.reset(initialData);
         }
     }, [initialData, rulesetForm]);
 
@@ -92,6 +92,7 @@ export function CreateVoteRulesetStep({
             {
                 onSuccess: () => {
                     toast.success(t("voting:create.toast.rulesetSuccess"));
+                    rulesetForm.reset(values);
                     onSuccess();
                 },
                 onError: showApiError,

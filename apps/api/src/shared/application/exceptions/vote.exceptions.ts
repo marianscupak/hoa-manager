@@ -42,3 +42,41 @@ export class RulesetChangeBlockedException extends DomainException {
     super(ErrorCode.RULESET_CHANGE_BLOCKED);
   }
 }
+
+export class IncompleteVoteException extends DomainException {
+  constructor(details: { code: ErrorCode; param?: string }[]) {
+    super(ErrorCode.INCOMPLETE_VOTE, details);
+  }
+}
+
+export class VoteScheduleMissingDatesException extends DomainException {
+  constructor() {
+    super(ErrorCode.VOTE_SCHEDULE_MISSING_DATES);
+  }
+}
+
+export class VoteScheduleInPastException extends DomainException {
+  constructor() {
+    super(ErrorCode.VOTE_SCHEDULE_IN_PAST);
+  }
+}
+
+export class VoteScheduleInvalidRangeException extends DomainException {
+  constructor() {
+    super(ErrorCode.VOTE_SCHEDULE_INVALID_RANGE);
+  }
+}
+
+export class VoteMissingQuestionsException extends DomainException {
+  constructor() {
+    super(ErrorCode.VOTE_MISSING_QUESTIONS);
+  }
+}
+
+export class VoteQuestionMissingOptionsException extends DomainException {
+  constructor(questionTitle: string) {
+    super(ErrorCode.VOTE_QUESTION_MISSING_OPTIONS, [
+      { code: ErrorCode.VOTE_QUESTION_MISSING_OPTIONS, param: questionTitle },
+    ]);
+  }
+}

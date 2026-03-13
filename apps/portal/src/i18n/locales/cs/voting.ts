@@ -164,10 +164,12 @@ export const voting = {
             finish: "Ukončit",
         },
         toast: {
-            success: "Hlasování bylo úspěšně vytvořeno",
+            createSuccess: "Hlasování bylo úspěšně vytvořeno",
+            updateSuccess: "Hlasování bylo úspěšně uloženo",
             error: "Vytvoření hlasování se nezdařilo",
             rulesetError: "Nepodařilo se nastavit pravidla hlasování",
             rulesetSuccess: "Pravidla byla úspěšně nastavena",
+            scheduleSuccess: "Hlasování bylo úspěšně naplánováno",
         },
     },
     list: {
@@ -212,6 +214,35 @@ export const voting = {
         },
         description: {
             title: "Popis",
+        },
+        actions: {
+            edit: "Upravit hlasování",
+            schedule: "Naplánovat hlasování",
+            scheduleConfirmTitle: "Naplánovat hlasování",
+            scheduleConfirmDescription:
+                "Opravdu chcete toto hlasování naplánovat? Tato akce zpřístupní hlasování běžným uživatelům a nelze ji vzít zpět. Po naplánování již nebude možné upravovat detaily hlasování ani ruleset.",
+            cancel: "Zrušit",
+            confirm: "Ano, naplánovat hlasování",
+        },
+        validation: {
+            title: "Neúplná konfigurace hlasování",
+            description:
+                "Před naplánováním tohoto hlasování je nutné vyřešit následující problémy:",
+            goToEdit: "Přejít na úpravu",
+            close: "Zavřít",
+            errors: {
+                VOTE_SCHEDULE_MISSING_DATES:
+                    "Je nutné nastavit datum začátku i konce.",
+                VOTE_SCHEDULE_IN_PAST:
+                    "Naplánovaná data nemohou být v minulosti.",
+                VOTE_SCHEDULE_INVALID_RANGE:
+                    "Datum začátku musí být před datem konce.",
+                VOTE_MISSING_QUESTIONS:
+                    "K hlasování musí být přidána alespoň jedna otázka.",
+                VOTE_QUESTION_MISSING_OPTIONS:
+                    "Otázka „{{param}}“ musí mít alespoň dvě možnosti odpovědi.",
+                VOTE_RULESET_REQUIRED: "Musí být nastaven výchozí ruleset.",
+            },
         },
         documents: {
             title: "Dokumenty",

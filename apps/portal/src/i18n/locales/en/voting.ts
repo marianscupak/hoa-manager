@@ -91,11 +91,11 @@ export const voting = {
                 placeholder: "e.g. Describe the purpose of this vote.",
             },
             scheduledFrom: {
-                label: "Scheduled From (Local Time)",
+                label: "Scheduled From",
                 description: "When should the vote automatically open?",
             },
             scheduledTo: {
-                label: "Scheduled To (Local Time)",
+                label: "Scheduled To",
                 description: "When should the vote automatically close?",
             },
             weightBasis: {
@@ -166,7 +166,8 @@ export const voting = {
             finish: "Finish",
         },
         toast: {
-            success: "Vote created successfully",
+            createSuccess: "Vote created successfully",
+            updateSuccess: "Vote updated successfully",
             error: "Failed to create vote",
             rulesetError: "Failed to configure ruleset",
             rulesetSuccess: "Ruleset configured successfully",
@@ -223,9 +224,29 @@ export const voting = {
             edit: "Edit Vote",
             schedule: "Schedule Vote",
             scheduleConfirmTitle: "Schedule Vote",
-            scheduleConfirmDescription: "Are you sure you want to schedule this vote? This action will make the vote visible to regular users and is irreversible. You will no longer be able to edit the vote details or ruleset.",
+            scheduleConfirmDescription:
+                "Are you sure you want to schedule this vote? This action will make the vote visible to regular users and is irreversible. You will no longer be able to edit the vote details or ruleset.",
             cancel: "Cancel",
             confirm: "Yes, Schedule Vote",
+        },
+        validation: {
+            title: "Incomplete Vote Configuration",
+            description:
+                "The following issues must be resolved before this vote can be scheduled:",
+            goToEdit: "Go to Edit",
+            close: "Close",
+            errors: {
+                VOTE_SCHEDULE_MISSING_DATES:
+                    "Both start and end dates must be scheduled.",
+                VOTE_SCHEDULE_IN_PAST: "Scheduled dates cannot be in the past.",
+                VOTE_SCHEDULE_INVALID_RANGE:
+                    "The start date must be before the end date.",
+                VOTE_MISSING_QUESTIONS:
+                    "At least one question must be added to the vote.",
+                VOTE_QUESTION_MISSING_OPTIONS:
+                    'Question "{{param}}" requires at least two answer options.',
+                VOTE_RULESET_REQUIRED: "A default ruleset must be configured.",
+            },
         },
         documents: {
             title: "Documents",

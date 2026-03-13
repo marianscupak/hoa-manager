@@ -8,11 +8,14 @@ import {
 } from '@/modules/voting/domain/vote/vote.types';
 import {
   InvalidVoteQuestionException,
-  InvalidVoteScheduleException,
   VoteNotDraftException,
   VoteQuestionNotFoundException,
   VoteRulesetRequiredException,
+  IncompleteVoteException,
+  VoteScheduleInPastException,
+  VoteScheduleInvalidRangeException,
 } from '@/shared/application/exceptions/vote.exceptions';
+import { ErrorCode } from '@/shared/errors/error-codes';
 
 export type CreateVoteInput = {
   title: string;
@@ -92,20 +95,49 @@ export class VoteAggregate {
     });
   }
 
-  schedule(): void {
+  schedule(now: Date): void {
     this.assertEditable();
 
+    const errors: { code: ErrorCode; param?: string }[] = [];
+
     if (!this.ruleset) {
-      throw new VoteRulesetRequiredException();
+      errors.push({ code: ErrorCode.VOTE_RULESET_REQUIRED });
+    }
+
+    if (!this.scheduledFrom || !this.scheduledTo) {
+      errors.push({ code: ErrorCode.VOTE_SCHEDULE_MISSING_DATES });
+    } else {
+      if (this.scheduledFrom < now) {
+        errors.push({ code: ErrorCode.VOTE_SCHEDULE_IN_PAST });
+      }
+      if (this.scheduledTo < now) {
+        errors.push({ code: ErrorCode.VOTE_SCHEDULE_IN_PAST });
+      }
+      if (this.scheduledFrom >= this.scheduledTo) {
+        errors.push({ code: ErrorCode.VOTE_SCHEDULE_INVALID_RANGE });
+      }
     }
 
     if (this.questions.length === 0) {
-      throw new InvalidVoteQuestionException();
+      errors.push({ code: ErrorCode.VOTE_MISSING_QUESTIONS });
+    } else {
+      for (const question of this.questions) {
+        if (question.options.length < 2) {
+          errors.push({
+            code: ErrorCode.VOTE_QUESTION_MISSING_OPTIONS,
+            param: question.title,
+          });
+        }
+      }
+    }
+
+    if (errors.length > 0) {
+      throw new IncompleteVoteException(errors);
     }
 
     Object.assign(this, {
       status: VoteStatus.SCHEDULED,
-      updatedAt: new Date(),
+      updatedAt: now,
     });
   }
 
@@ -114,12 +146,16 @@ export class VoteAggregate {
     scheduledTo: Date | undefined,
     now: Date,
   ): void {
-    if (
-      (scheduledFrom && scheduledFrom < now) ||
-      (scheduledTo && scheduledTo < now) ||
-      (scheduledFrom && scheduledTo && scheduledFrom >= scheduledTo)
-    ) {
-      throw new InvalidVoteScheduleException();
+    if (!scheduledFrom || !scheduledTo) {
+      return; // Allow partial dates during draft phase
+    }
+
+    if (scheduledFrom < now || scheduledTo < now) {
+      throw new VoteScheduleInPastException();
+    }
+
+    if (scheduledFrom >= scheduledTo) {
+      throw new VoteScheduleInvalidRangeException();
     }
   }
 

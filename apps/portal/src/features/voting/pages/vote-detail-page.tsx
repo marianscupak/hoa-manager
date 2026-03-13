@@ -1,9 +1,7 @@
 import { useAtomValue } from "jotai";
 import { Edit2, Loader2, Send } from "lucide-react";
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
-import { toast } from "sonner";
 
 import {
     Button,
@@ -16,25 +14,22 @@ import {
     DialogTrigger,
 } from "@hoa-mngr/ui";
 
-import { showApiError } from "@/api/error-utils";
-import {
-    useVotesControllerGetVoteDetail,
-    useVotesControllerScheduleVote,
-} from "@/api/generated/votes/votes";
+import { useVotesControllerGetVoteDetail } from "@/api/generated/votes/votes";
 import { tenantContextAtom } from "@/auth/atoms";
 
+import { ScheduleValidationModal } from "../components/schedule-validation-modal";
 import { StatusBadge } from "../components/status-badge";
 import { VoteDetailTimeline } from "../components/vote-detail-timeline";
 import { VoteDocuments } from "../components/vote-documents";
 import { VoteQuestionsList } from "../components/vote-questions-list";
 import { VoterStatusSidebar } from "../components/voter-status-sidebar";
+import { useScheduleVote } from "../hooks/use-schedule-vote";
 
 export function VoteDetailPage() {
     const { t } = useTranslation(["voting"]);
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const tenantCtx = useAtomValue(tenantContextAtom);
-    const [isScheduleOpen, setIsScheduleOpen] = useState(false);
 
     const isAdmin =
         tenantCtx?.roles.includes("ADMIN") ||
@@ -46,22 +41,19 @@ export function VoteDetailPage() {
         },
     });
 
-    const scheduleMutation = useVotesControllerScheduleVote();
-
-    const handleSchedule = () => {
-        if (!id) return;
-        scheduleMutation.mutate(
-            { id },
-            {
-                onSuccess: () => {
-                    toast.success(t("voting:create.toast.scheduleSuccess"));
-                    setIsScheduleOpen(false);
-                    voteQuery.refetch();
-                },
-                onError: showApiError,
-            },
-        );
-    };
+    const {
+        handleSchedule,
+        isConfirmOpen,
+        setIsConfirmOpen,
+        isValidationOpen,
+        setIsValidationOpen,
+        validationErrors,
+        isPending,
+    } = useScheduleVote(id ?? "", {
+        onSuccess: () => {
+            voteQuery.refetch();
+        },
+    });
 
     const handleEdit = () => {
         navigate(`/voting/${id}/edit`);
@@ -103,7 +95,10 @@ export function VoteDetailPage() {
                             <Edit2 className="mr-2 h-4 w-4" />
                             {t("voting:detail.actions.edit")}
                         </Button>
-                        <Dialog open={isScheduleOpen} onOpenChange={setIsScheduleOpen}>
+                        <Dialog
+                            open={isConfirmOpen}
+                            onOpenChange={setIsConfirmOpen}
+                        >
                             <DialogTrigger asChild>
                                 <Button size="sm">
                                     <Send className="mr-2 h-4 w-4" />
@@ -113,24 +108,28 @@ export function VoteDetailPage() {
                             <DialogContent>
                                 <DialogHeader>
                                     <DialogTitle>
-                                        {t("voting:detail.actions.scheduleConfirmTitle")}
+                                        {t(
+                                            "voting:detail.actions.scheduleConfirmTitle",
+                                        )}
                                     </DialogTitle>
                                     <DialogDescription>
-                                        {t("voting:detail.actions.scheduleConfirmDescription")}
+                                        {t(
+                                            "voting:detail.actions.scheduleConfirmDescription",
+                                        )}
                                     </DialogDescription>
                                 </DialogHeader>
                                 <DialogFooter>
                                     <Button
                                         variant="outline"
-                                        onClick={() => setIsScheduleOpen(false)}
+                                        onClick={() => setIsConfirmOpen(false)}
                                     >
                                         {t("voting:detail.actions.cancel")}
                                     </Button>
                                     <Button
                                         onClick={handleSchedule}
-                                        disabled={scheduleMutation.isPending}
+                                        disabled={isPending}
                                     >
-                                        {scheduleMutation.isPending ? (
+                                        {isPending ? (
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                         ) : null}
                                         {t("voting:detail.actions.confirm")}
@@ -141,6 +140,14 @@ export function VoteDetailPage() {
                     </div>
                 )}
             </div>
+
+            <ScheduleValidationModal
+                open={isValidationOpen}
+                onOpenChange={setIsValidationOpen}
+                errors={validationErrors}
+                voteId={id ?? ""}
+                isAlreadyOnEditPage={false}
+            />
 
             <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
                 <div className="lg:col-span-2">

@@ -39,4 +39,6 @@ export default {
         "Invalid question. Please check the text and options.",
     RULESET_CHANGE_BLOCKED:
         "Voting ruleset cannot be changed anymore as the vote has started or already contains questions.",
+    VOTE_SCHEDULE_IN_PAST: "Scheduled dates cannot be in the past.",
+    VOTE_SCHEDULE_INVALID_RANGE: "Invalid vote schedule range.",
 } as const;

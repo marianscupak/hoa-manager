@@ -49,7 +49,7 @@ export function CreateVoteBasicInfoStep({
     });
 
     useEffect(() => {
-        if (initialData) {
+        if (initialData && !basicInfoForm.formState.isDirty) {
             basicInfoForm.reset({
                 title: initialData.title ?? "",
                 description: initialData.description ?? "",
@@ -82,7 +82,8 @@ export function CreateVoteBasicInfoStep({
                 { id: voteId, data },
                 {
                     onSuccess: () => {
-                        toast.success(t("voting:create.toast.success"));
+                        toast.success(t("voting:create.toast.updateSuccess"));
+                        basicInfoForm.reset(values);
                         onSuccess(voteId);
                     },
                     onError: showApiError,
@@ -93,7 +94,8 @@ export function CreateVoteBasicInfoStep({
                 { data },
                 {
                     onSuccess: (response) => {
-                        toast.success(t("voting:create.toast.success"));
+                        toast.success(t("voting:create.toast.createSuccess"));
+                        basicInfoForm.reset(values);
                         onSuccess(response.id);
                     },
                     onError: showApiError,

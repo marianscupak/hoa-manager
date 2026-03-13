@@ -29,6 +29,7 @@ import type {
     SetVoteRulesetResponseDto,
     UpdateVoteQuestionDto,
     VoteDetailResponseDto,
+    VoteListItemResponseDto,
 } from ".././model";
 
 import { customInstance } from "../../axios";
@@ -36,6 +37,239 @@ import type { ErrorType, BodyType } from "../../axios";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
+export const votesControllerGetVotes = (
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<VoteListItemResponseDto[]>(
+        { url: `/api/votes`, method: "GET", signal },
+        options,
+    );
+};
+
+export const getVotesControllerGetVotesQueryKey = () => {
+    return [`/api/votes`] as const;
+};
+
+export const getVotesControllerGetVotesQueryOptions = <
+    TData = Awaited<ReturnType<typeof votesControllerGetVotes>>,
+    TError = ErrorType<unknown>,
+>(options?: {
+    query?: Partial<
+        UseQueryOptions<
+            Awaited<ReturnType<typeof votesControllerGetVotes>>,
+            TError,
+            TData
+        >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ?? getVotesControllerGetVotesQueryKey();
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof votesControllerGetVotes>>
+    > = ({ signal }) => votesControllerGetVotes(requestOptions, signal);
+
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof votesControllerGetVotes>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type VotesControllerGetVotesQueryResult = NonNullable<
+    Awaited<ReturnType<typeof votesControllerGetVotes>>
+>;
+export type VotesControllerGetVotesQueryError = ErrorType<unknown>;
+
+export function useVotesControllerGetVotes<
+    TData = Awaited<ReturnType<typeof votesControllerGetVotes>>,
+    TError = ErrorType<unknown>,
+>(
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof votesControllerGetVotes>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof votesControllerGetVotes>>,
+                    TError,
+                    Awaited<ReturnType<typeof votesControllerGetVotes>>
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useVotesControllerGetVotes<
+    TData = Awaited<ReturnType<typeof votesControllerGetVotes>>,
+    TError = ErrorType<unknown>,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof votesControllerGetVotes>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof votesControllerGetVotes>>,
+                    TError,
+                    Awaited<ReturnType<typeof votesControllerGetVotes>>
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useVotesControllerGetVotes<
+    TData = Awaited<ReturnType<typeof votesControllerGetVotes>>,
+    TError = ErrorType<unknown>,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof votesControllerGetVotes>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useVotesControllerGetVotes<
+    TData = Awaited<ReturnType<typeof votesControllerGetVotes>>,
+    TError = ErrorType<unknown>,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof votesControllerGetVotes>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
+    const queryOptions = getVotesControllerGetVotesQueryOptions(options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+        TData,
+        TError
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+    return { ...query, queryKey: queryOptions.queryKey };
+}
+
+export const votesControllerCreateVote = (
+    createVoteDto: BodyType<CreateVoteDto>,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<CreateVoteResponseDto>(
+        {
+            url: `/api/votes`,
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            data: createVoteDto,
+            signal,
+        },
+        options,
+    );
+};
+
+export const getVotesControllerCreateVoteMutationOptions = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof votesControllerCreateVote>>,
+        TError,
+        { data: BodyType<CreateVoteDto> },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof votesControllerCreateVote>>,
+    TError,
+    { data: BodyType<CreateVoteDto> },
+    TContext
+> => {
+    const mutationKey = ["votesControllerCreateVote"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof votesControllerCreateVote>>,
+        { data: BodyType<CreateVoteDto> }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return votesControllerCreateVote(data, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type VotesControllerCreateVoteMutationResult = NonNullable<
+    Awaited<ReturnType<typeof votesControllerCreateVote>>
+>;
+export type VotesControllerCreateVoteMutationBody = BodyType<CreateVoteDto>;
+export type VotesControllerCreateVoteMutationError = ErrorType<unknown>;
+
+export const useVotesControllerCreateVote = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof votesControllerCreateVote>>,
+            TError,
+            { data: BodyType<CreateVoteDto> },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof votesControllerCreateVote>>,
+    TError,
+    { data: BodyType<CreateVoteDto> },
+    TContext
+> => {
+    return useMutation(
+        getVotesControllerCreateVoteMutationOptions(options),
+        queryClient,
+    );
+};
 export const votesControllerGetVoteDetail = (
     id: string,
     options?: SecondParameter<typeof customInstance>,
@@ -200,92 +434,6 @@ export function useVotesControllerGetVoteDetail<
     return { ...query, queryKey: queryOptions.queryKey };
 }
 
-export const votesControllerCreateVote = (
-    createVoteDto: BodyType<CreateVoteDto>,
-    options?: SecondParameter<typeof customInstance>,
-    signal?: AbortSignal,
-) => {
-    return customInstance<CreateVoteResponseDto>(
-        {
-            url: `/api/votes`,
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            data: createVoteDto,
-            signal,
-        },
-        options,
-    );
-};
-
-export const getVotesControllerCreateVoteMutationOptions = <
-    TError = ErrorType<unknown>,
-    TContext = unknown,
->(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof votesControllerCreateVote>>,
-        TError,
-        { data: BodyType<CreateVoteDto> },
-        TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-    Awaited<ReturnType<typeof votesControllerCreateVote>>,
-    TError,
-    { data: BodyType<CreateVoteDto> },
-    TContext
-> => {
-    const mutationKey = ["votesControllerCreateVote"];
-    const { mutation: mutationOptions, request: requestOptions } = options
-        ? options.mutation &&
-          "mutationKey" in options.mutation &&
-          options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey }, request: undefined };
-
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof votesControllerCreateVote>>,
-        { data: BodyType<CreateVoteDto> }
-    > = (props) => {
-        const { data } = props ?? {};
-
-        return votesControllerCreateVote(data, requestOptions);
-    };
-
-    return { mutationFn, ...mutationOptions };
-};
-
-export type VotesControllerCreateVoteMutationResult = NonNullable<
-    Awaited<ReturnType<typeof votesControllerCreateVote>>
->;
-export type VotesControllerCreateVoteMutationBody = BodyType<CreateVoteDto>;
-export type VotesControllerCreateVoteMutationError = ErrorType<unknown>;
-
-export const useVotesControllerCreateVote = <
-    TError = ErrorType<unknown>,
-    TContext = unknown,
->(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof votesControllerCreateVote>>,
-            TError,
-            { data: BodyType<CreateVoteDto> },
-            TContext
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient,
-): UseMutationResult<
-    Awaited<ReturnType<typeof votesControllerCreateVote>>,
-    TError,
-    { data: BodyType<CreateVoteDto> },
-    TContext
-> => {
-    return useMutation(
-        getVotesControllerCreateVoteMutationOptions(options),
-        queryClient,
-    );
-};
 export const votesControllerSetVoteRuleset = (
     id: string,
     setVoteRulesetDto: BodyType<SetVoteRulesetDto>,

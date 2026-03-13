@@ -42,10 +42,10 @@ export class CreateVoteResponseDto {
   @ApiProperty({ type: 'string', required: false, nullable: true })
   description!: string | null;
 
-  @ApiProperty({ required: false, nullable: true })
+  @ApiProperty({ type: 'string', format: 'date-time', required: false, nullable: true })
   scheduledFrom!: Date | null;
 
-  @ApiProperty({ required: false, nullable: true })
+  @ApiProperty({ type: 'string', format: 'date-time', required: false, nullable: true })
   scheduledTo!: Date | null;
 
   @ApiProperty()
@@ -150,3 +150,6 @@ export class VoteDetailResponseDto extends CreateVoteResponseDto {
   @ApiProperty({ type: [VoteQuestionResponseDto] })
   questions!: VoteQuestionResponseDto[];
 }
+
+export class VoteListItemResponseDto extends CreateVoteResponseDto {}
+

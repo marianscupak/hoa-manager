@@ -23,6 +23,7 @@ import {
   SetVoteRulesetResponseDto,
   UpdateVoteQuestionDto,
   VoteDetailResponseDto,
+  VoteListItemResponseDto,
 } from './dto/vote.dto';
 import { Roles, Tenant } from '../../../shared/api/decorators/auth.decorators';
 import { AccessTokenAuthGuard } from '../../../shared/api/guards/access-token-auth.guard';
@@ -36,6 +37,7 @@ import { DeleteVoteQuestionCommand } from '../application/commands/delete-vote-q
 import { SetVoteRulesetCommand } from '../application/commands/set-vote-ruleset/set-vote-ruleset.command';
 import { UpdateVoteQuestionCommand } from '../application/commands/update-vote-question/update-vote-question.command';
 import { GetVoteDetailQuery } from '../application/queries/get-vote-detail/get-vote-detail.query';
+import { GetVotesQuery } from '../application/queries/get-votes/get-votes.query';
 
 @ApiTags('Votes')
 @Controller('votes')
@@ -44,6 +46,19 @@ export class VotesController {
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
   ) {}
+
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Returns a list of votes',
+    type: [VoteListItemResponseDto],
+  })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard)
+  getVotes(@Tenant() tenantCtx: TenantContext) {
+    return this.queryBus.execute(
+      new GetVotesQuery(tenantCtx.tenantId, tenantCtx.roles),
+    );
+  }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)

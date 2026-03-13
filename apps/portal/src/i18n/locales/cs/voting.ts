@@ -156,4 +156,39 @@ export const voting = {
             rulesetSuccess: "Pravidla byla úspěšně nastavena",
         },
     },
+    list: {
+        title: "Aktivní a naplánovaná hlasování",
+        description:
+            "Přehled všech nadcházejících hlasování, která vyžadují vaši pozornost nebo brzy začnou.",
+        error: "Nepodařilo se načíst hlasování.",
+        filters: {
+            all: "Vše",
+            open: "Otevřená",
+            scheduled: "Naplánovaná",
+            closed: "Ukončená",
+        },
+        empty: {
+            all: "Nebyla nalezena žádná hlasování.",
+            filtered: "Nebyla nalezena žádná {{status}} hlasování.",
+        },
+        status: {
+            OPEN: "Otevřené",
+            SCHEDULED: "Naplánované",
+            CLOSED: "Ukončené",
+        },
+        card: {
+            endsOn: "Končí ",
+            startsOn: "Začíná ",
+            noDescription: "Nebyl poskytnut žádný popis.",
+            canVote: "Můžete hlasovat",
+            voteRequired: "Váš hlas je vyžadován.",
+            voteAction: "Hlasovat",
+            delegationNeeded: "Je potřeba delegace",
+            fromCoOwners: "Od spoluvlastníků",
+            manageDelegation: "Spravovat delegaci",
+            completed: "Hlasování dokončeno",
+            viewOutcomes: "Zobrazit konečné výsledky",
+            viewResults: "Zobrazit výsledky",
+        },
+    },
 };

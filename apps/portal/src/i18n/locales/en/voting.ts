@@ -156,4 +156,39 @@ export const voting = {
             rulesetSuccess: "Ruleset configured successfully",
         },
     },
+    list: {
+        title: "Active & Scheduled Votings",
+        description:
+            "Overview of all upcoming votings requiring you attention or upcoming soon.",
+        error: "Failed to load votes.",
+        filters: {
+            all: "All",
+            open: "Open",
+            scheduled: "Scheduled",
+            closed: "Closed",
+        },
+        empty: {
+            all: "No votes found.",
+            filtered: "No {{status}} votes found.",
+        },
+        status: {
+            OPEN: "Open",
+            SCHEDULED: "Scheduled",
+            CLOSED: "Closed",
+        },
+        card: {
+            endsOn: "Ends on ",
+            startsOn: "Starts on ",
+            noDescription: "No description provided.",
+            canVote: "You can vote",
+            voteRequired: "Your vote is required.",
+            voteAction: "Vote",
+            delegationNeeded: "Delegation needed",
+            fromCoOwners: "From co-owners",
+            manageDelegation: "Manage Delegation",
+            completed: "Voting Completed",
+            viewOutcomes: "View final outcomes",
+            viewResults: "View Results",
+        },
+    },
 };

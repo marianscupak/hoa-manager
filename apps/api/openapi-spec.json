@@ -782,26 +782,20 @@
         ]
       }
     },
-    "/api/votes/{id}": {
+    "/api/votes": {
       "get": {
-        "operationId": "VotesController_getVoteDetail",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "operationId": "VotesController_getVotes",
+        "parameters": [],
         "responses": {
           "200": {
-            "description": "Returns the vote detail",
+            "description": "Returns a list of votes",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/VoteDetailResponseDto"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VoteListItemResponseDto"
+                  }
                 }
               }
             }
@@ -810,9 +804,7 @@
         "tags": [
           "Votes"
         ]
-      }
-    },
-    "/api/votes": {
+      },
       "post": {
         "operationId": "VotesController_createVote",
         "parameters": [],
@@ -833,6 +825,36 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CreateVoteResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Votes"
+        ]
+      }
+    },
+    "/api/votes/{id}": {
+      "get": {
+        "operationId": "VotesController_getVoteDetail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns the vote detail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoteDetailResponseDto"
                 }
               }
             }
@@ -1518,6 +1540,39 @@
           "tenantId"
         ]
       },
+      "VoteListItemResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "scheduledFrom": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "scheduledTo": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "status"
+        ]
+      },
       "SetVoteRulesetResponseDto": {
         "type": "object",
         "properties": {
@@ -1655,11 +1710,13 @@
             "nullable": true
           },
           "scheduledFrom": {
-            "type": "object",
+            "type": "string",
+            "format": "date-time",
             "nullable": true
           },
           "scheduledTo": {
-            "type": "object",
+            "type": "string",
+            "format": "date-time",
             "nullable": true
           },
           "status": {
@@ -1725,11 +1782,13 @@
             "nullable": true
           },
           "scheduledFrom": {
-            "type": "object",
+            "type": "string",
+            "format": "date-time",
             "nullable": true
           },
           "scheduledTo": {
-            "type": "object",
+            "type": "string",
+            "format": "date-time",
             "nullable": true
           },
           "status": {

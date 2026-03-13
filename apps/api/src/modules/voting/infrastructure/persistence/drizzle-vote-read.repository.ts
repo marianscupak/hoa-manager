@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, desc, eq, inArray } from 'drizzle-orm';
 
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
 import {
@@ -10,6 +10,7 @@ import {
 } from '@/infrastructure/db/schema';
 import {
   type VoteDetailResponseDto,
+  type VoteListItemResponseDto,
   type VoteQuestionResponseDto,
 } from '@/modules/voting/api/dto/vote.dto';
 import { type VoteReadRepository } from '@/modules/voting/application/ports/vote-read.repository.port';
@@ -118,4 +119,37 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       questions,
     };
   }
+
+  async findVotes(
+    tenantId: string,
+    statuses?: VoteStatus[],
+  ): Promise<VoteListItemResponseDto[]> {
+    const whereClause = statuses && statuses.length > 0
+      ? and(eq(votes.tenantId, tenantId), inArray(votes.status, statuses))
+      : eq(votes.tenantId, tenantId);
+
+    const rows = await this.drizzle.db
+      .select({
+        id: votes.id,
+        title: votes.title,
+        description: votes.description,
+        status: votes.status,
+        scheduledFrom: votes.scheduledFrom,
+        scheduledTo: votes.scheduledTo,
+        createdAt: votes.createdAt,
+      })
+      .from(votes)
+      .where(whereClause)
+      .orderBy((votes) => [desc(votes.createdAt)]);
+
+    return rows.map((row) => ({
+      id: row.id,
+      title: row.title,
+      description: row.description ?? null,
+      status: row.status as VoteStatus,
+      scheduledFrom: row.scheduledFrom ?? null,
+      scheduledTo: row.scheduledTo ?? null,
+    }));
+  }
 }
+

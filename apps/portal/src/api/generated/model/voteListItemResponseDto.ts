@@ -5,10 +5,8 @@
  * The HOA Manager API description
  * OpenAPI spec version: 1.0
  */
-import type { SetVoteRulesetResponseDto } from "./setVoteRulesetResponseDto";
-import type { VoteQuestionResponseDto } from "./voteQuestionResponseDto";
 
-export interface VoteDetailResponseDto {
+export interface VoteListItemResponseDto {
     id: string;
     title: string;
     /** @nullable */
@@ -18,6 +16,4 @@ export interface VoteDetailResponseDto {
     /** @nullable */
     scheduledTo?: string | null;
     status: string;
-    ruleset?: SetVoteRulesetResponseDto | null;
-    questions: VoteQuestionResponseDto[];
 }

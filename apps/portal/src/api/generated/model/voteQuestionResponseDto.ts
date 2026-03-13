@@ -5,6 +5,7 @@
  * The HOA Manager API description
  * OpenAPI spec version: 1.0
  */
+import type { SetVoteRulesetResponseDto } from "./setVoteRulesetResponseDto";
 import type { VoteOptionResponseDto } from "./voteOptionResponseDto";
 import type { VoteQuestionResponseDtoType } from "./voteQuestionResponseDtoType";
 
@@ -16,4 +17,6 @@ export interface VoteQuestionResponseDto {
     type: VoteQuestionResponseDtoType;
     sortOrder: number;
     options: VoteOptionResponseDto[];
+    rulesetOverride?: SetVoteRulesetResponseDto | null;
+    effectiveRuleset?: SetVoteRulesetResponseDto | null;
 }

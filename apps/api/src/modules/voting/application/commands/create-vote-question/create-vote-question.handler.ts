@@ -33,6 +33,7 @@ export class CreateVoteQuestionHandler
       type: data.type,
       sortOrder: data.sortOrder,
       options: data.options,
+      rulesetOverride: data.rulesetOverride,
     });
 
     await this.unitOfWork.execute(async () => {
@@ -40,4 +41,3 @@ export class CreateVoteQuestionHandler
     });
   }
 }
-

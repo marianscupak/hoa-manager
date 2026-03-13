@@ -1,10 +1,4 @@
-import {
-  pgTable,
-  timestamp,
-  uuid,
-  text,
-  integer,
-} from 'drizzle-orm/pg-core';
+import { pgTable, timestamp, uuid, text, integer } from 'drizzle-orm/pg-core';
 
 import { tenants } from '@/infrastructure/db/schema/tenants';
 import { questionTypeEnum } from '@/infrastructure/db/schema/voting/enums';

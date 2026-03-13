@@ -14,6 +14,7 @@ import {
   quorumMeasureEnum,
   voteWeightBasisEnum,
 } from '@/infrastructure/db/schema/voting/enums';
+import { voteQuestions } from '@/infrastructure/db/schema/voting/vote-questions';
 import { votes } from '@/infrastructure/db/schema/voting/votes';
 
 export const voteRulesets = pgTable(
@@ -26,6 +27,9 @@ export const voteRulesets = pgTable(
     voteId: uuid('vote_id')
       .notNull()
       .references(() => votes.id, { onDelete: 'cascade' }),
+    questionId: uuid('question_id').references(() => voteQuestions.id, {
+      onDelete: 'cascade',
+    }),
     weightBasis: voteWeightBasisEnum('weight_basis').notNull(),
     quorumMeasure: quorumMeasureEnum('quorum_measure').notNull(),
     quorumElectorateBasis: quorumElectorateBasisEnum(
@@ -53,6 +57,8 @@ export const voteRulesets = pgTable(
       .$onUpdate(() => new Date()),
   },
   (table) => ({
-    unqVoteRulesetsVoteId: unique('unq_vote_rulesets_vote_id').on(table.voteId),
+    unqVoteRulesetsVoteIdQuestionId: unique(
+      'unq_vote_rulesets_vote_id_question_id',
+    ).on(table.voteId, table.questionId),
   }),
 );

@@ -4,10 +4,9 @@ import { GetVoterStatusQuery } from './get-voter-status.query';
 import { VoterStatusResponseDto } from '../../../api/dto/vote.dto';
 
 @QueryHandler(GetVoterStatusQuery)
-export class GetVoterStatusHandler implements IQueryHandler<
-  GetVoterStatusQuery,
-  VoterStatusResponseDto
-> {
+export class GetVoterStatusHandler
+  implements IQueryHandler<GetVoterStatusQuery, VoterStatusResponseDto>
+{
   async execute(_query: GetVoterStatusQuery): Promise<VoterStatusResponseDto> {
     // TODO: This is currently mocked for membershipId: ${_query.membershipId}.
     // In a real implementation, we would query the read models to determine

@@ -42,7 +42,9 @@ import {
 import { AuthClaims } from '@/shared/domain/auth-claims';
 
 @CommandHandler(RefreshTokenCommand)
-export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand> {
+export class RefreshTokenHandler
+  implements ICommandHandler<RefreshTokenCommand>
+{
   private readonly REUSE_GRACE_PERIOD_MS = 30 * 1000;
 
   constructor(

@@ -16,6 +16,8 @@ export const voting = {
                 title: "Vote Ruleset",
                 description:
                     "Configure quorum, electoral thresholds, and weighting rules.",
+                defaultDescription:
+                    "These rules will apply to all questions by default. You can override them per question later.",
             },
             questions: {
                 title: "Questions",
@@ -54,6 +56,18 @@ export const voting = {
                     placeholder: "Option text...",
                     defaultLabel: "Option",
                     abstain: "Abstain (automatically added)",
+                },
+                override: {
+                    toggleActive: "Hide custom rules",
+                    toggleInactive: "Customize rules for this question",
+                    description:
+                        "These settings override the vote-level defaults for this question only. Other questions will continue using the default ruleset.",
+                    apply: "Apply Custom Rules",
+                    update: "Update Ruleset",
+                    remove: "Remove Custom Ruleset",
+                    badge: "Custom rules",
+                    defaultHint:
+                        "This question uses the vote-level default ruleset. Click to customize.",
                 },
             },
         },
@@ -208,6 +222,7 @@ export const voting = {
             preview: "Preview of questions you will vote on",
             majorityPrefix: "Requires",
             majoritySuffix: "majority of all shares.",
+            customRules: "(custom rules)",
         },
         statusSidebar: {
             title: "Your Voting Status",
@@ -216,11 +231,24 @@ export const voting = {
             share: "Share:",
             statusReady: "Ready",
             statusDelegation: "Requires delegation",
-            delegationWarning: "{{unitName}} is co-owned. A delegation form is required to vote for this unit.",
+            statusVoted: "Voted",
+            delegationWarning:
+                "{{unitName}} is co-owned. A delegation form is required to vote for this unit.",
             manageDelegation: "Manage Delegation",
             totalPower: "Total Voting Power:",
             voteButton: "Vote",
-            secureBoothHint: "By clicking \"Vote\", you will enter the secure voting booth.",
+            secureBoothHint:
+                'By clicking "Vote", you will enter the secure voting booth.',
+            help: {
+                title: "Have Questions?",
+                description:
+                    "If you have questions about the questions, contact the chairman.",
+                contact: "Contact chairman",
+            },
+            time: {
+                hour: "hour",
+                hours: "hours",
+            },
         },
     },
 };

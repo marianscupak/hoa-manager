@@ -1,4 +1,7 @@
-import { type VoteDetailResponseDto, type VoteListItemResponseDto } from '@/modules/voting/api/dto/vote.dto';
+import {
+  type VoteDetailResponseDto,
+  type VoteListItemResponseDto,
+} from '@/modules/voting/api/dto/vote.dto';
 import { type VoteStatus } from '@/modules/voting/domain/vote/vote.types';
 
 export interface VoteReadRepository {

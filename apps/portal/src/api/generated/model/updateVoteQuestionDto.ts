@@ -6,6 +6,7 @@
  * OpenAPI spec version: 1.0
  */
 import type { UpdateVoteQuestionDtoOptionsItem } from "./updateVoteQuestionDtoOptionsItem";
+import type { UpdateVoteQuestionDtoRulesetOverride } from "./updateVoteQuestionDtoRulesetOverride";
 import type { UpdateVoteQuestionDtoType } from "./updateVoteQuestionDtoType";
 
 export interface UpdateVoteQuestionDto {
@@ -19,4 +20,5 @@ export interface UpdateVoteQuestionDto {
      */
     sortOrder?: number;
     options?: UpdateVoteQuestionDtoOptionsItem[];
+    rulesetOverride?: UpdateVoteQuestionDtoRulesetOverride;
 }

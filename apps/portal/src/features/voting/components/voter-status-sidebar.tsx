@@ -55,9 +55,9 @@ export function VoterStatusSidebar() {
                     <h3 className="text-lg font-bold">
                         {t("voting:detail.statusSidebar.title")}
                     </h3>
-                    {/* Hardcoded time for the mockup, would be dynamic normally */}
                     <p className="text-sm text-slate-500">
-                        {t("voting:detail.statusSidebar.closesIn")} 1 hour
+                        {t("voting:detail.statusSidebar.closesIn")} 1{" "}
+                        {t("voting:detail.statusSidebar.time.hour")}
                     </p>
                 </div>
 
@@ -111,7 +111,9 @@ export function VoterStatusSidebar() {
                                             </span>
                                         ) : (
                                             <span className="shrink-0 rounded border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-800">
-                                                Voted
+                                                {t(
+                                                    "voting:detail.statusSidebar.statusVoted",
+                                                )}
                                             </span>
                                         )}
                                     </div>
@@ -184,16 +186,17 @@ export function VoterStatusSidebar() {
 
             {/* Help Card */}
             <div className="flex flex-col gap-3 rounded-lg border bg-white p-6 shadow-sm">
-                <h3 className="font-bold">Have Questions?</h3>
+                <h3 className="font-bold">
+                    {t("voting:detail.statusSidebar.help.title")}
+                </h3>
                 <p className="text-sm text-slate-500">
-                    If you have questions about the questions, contact the
-                    chairman.
+                    {t("voting:detail.statusSidebar.help.description")}
                 </p>
                 <a
                     href="#"
                     className="inline-flex items-center text-sm font-medium text-blue-600 hover:underline"
                 >
-                    Contact chairman{" "}
+                    {t("voting:detail.statusSidebar.help.contact")}{" "}
                     <ExternalLink className="ml-1 h-3.5 w-3.5" />
                 </a>
             </div>

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, eq, inArray, isNull, isNotNull } from 'drizzle-orm';
 
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
 import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
@@ -13,13 +13,14 @@ import {
 import { VoteWriteRepository } from '../../application/ports/vote-write.repository.port';
 import { VoteAggregate } from '../../domain/vote/vote.aggregate';
 import {
-  MajorityRuleType,
-  QuorumElectorateBasis,
-  QuorumMeasure,
+  type MajorityRuleType,
+  type QuorumElectorateBasis,
+  type QuorumMeasure,
   VoteOptionSemantic,
   VoteQuestionType,
   VoteStatus,
-  VoteWeightBasis,
+  type VoteRuleset,
+  type VoteWeightBasis,
   type VoteQuestion,
   type VoteOption,
 } from '../../domain/vote/vote.types';
@@ -40,7 +41,10 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
         ruleset: voteRulesets,
       })
       .from(votes)
-      .leftJoin(voteRulesets, eq(votes.id, voteRulesets.voteId))
+      .leftJoin(
+        voteRulesets,
+        and(eq(votes.id, voteRulesets.voteId), isNull(voteRulesets.questionId)),
+      )
       .where(and(eq(votes.tenantId, tenantId), eq(votes.id, id)))
       .limit(1);
 
@@ -60,6 +64,7 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
 
     const questionIds = questionRows.map((q) => q.id);
     let optionRows: (typeof voteOptions.$inferSelect)[] = [];
+    let questionRulesetRows: (typeof voteRulesets.$inferSelect)[] = [];
 
     if (questionIds.length > 0) {
       optionRows = await this.db
@@ -72,6 +77,17 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
           ),
         )
         .orderBy(voteOptions.sortOrder);
+
+      questionRulesetRows = await this.db
+        .select()
+        .from(voteRulesets)
+        .where(
+          and(
+            eq(voteRulesets.tenantId, tenantId),
+            eq(voteRulesets.voteId, id),
+            isNotNull(voteRulesets.questionId),
+          ),
+        );
     }
 
     const questions: VoteQuestion[] = questionRows.map((q) => {
@@ -84,6 +100,8 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
           optionKey: o.optionKey as VoteOptionSemantic,
         }));
 
+      const qRuleset = questionRulesetRows.find((r) => r.questionId === q.id);
+
       return {
         id: q.id,
         title: q.title,
@@ -91,6 +109,7 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
         type: q.questionType as VoteQuestionType,
         sortOrder: q.sortOrder,
         options: qOptions,
+        rulesetOverride: qRuleset ? this.mapRulesetRow(qRuleset) : undefined,
       };
     });
 
@@ -98,23 +117,7 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
       ...vote,
       status: vote.status as VoteStatus,
       description: vote.description ?? '',
-      ruleset: ruleset
-        ? {
-            weightBasis: ruleset.weightBasis as VoteWeightBasis,
-            quorumMeasure: ruleset.quorumMeasure as QuorumMeasure,
-            quorumElectorateBasis:
-              ruleset.quorumElectorateBasis as QuorumElectorateBasis,
-            quorumThreshold: Number(ruleset.quorumThreshold),
-            majorityRuleType: ruleset.majorityRuleType as MajorityRuleType,
-            majorityThreshold:
-              ruleset.majorityThreshold !== null
-                ? Number(ruleset.majorityThreshold)
-                : null,
-            allowAbstain: ruleset.allowAbstain,
-            abstainExcludedFromMajorityDenominator:
-              ruleset.abstainExcludedFromMajorityDenominator,
-          }
-        : null,
+      ruleset: ruleset ? this.mapRulesetRow(ruleset) : null,
       questions,
     });
   }
@@ -129,23 +132,95 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
         set: voteUpdate,
       });
 
-      if (vote.ruleset) {
-        const rulesetInsert = this.mapRulesetInsert(vote);
-        const rulesetUpdate = this.mapRulesetUpdate(vote);
+      // --- Handle Rulesets (Vote-level and Per-question) ---
 
-        await tx.insert(voteRulesets).values(rulesetInsert).onConflictDoUpdate({
-          target: voteRulesets.voteId,
-          set: rulesetUpdate,
-        });
-      } else {
+      // 1. Fetch all existing rulesets for this vote to determine what to update/insert/delete
+      const existingRulesets = await tx
+        .select()
+        .from(voteRulesets)
+        .where(
+          and(
+            eq(voteRulesets.tenantId, vote.tenantId),
+            eq(voteRulesets.voteId, vote.id),
+          ),
+        );
+
+      // 2. Handle Vote-level Ruleset
+      const existingVoteRuleset = existingRulesets.find(
+        (r) => r.questionId === null,
+      );
+      if (vote.ruleset) {
+        const rulesetValues = this.mapRulesetUpdate(vote);
+        if (existingVoteRuleset) {
+          await tx
+            .update(voteRulesets)
+            .set({ ...rulesetValues, updatedAt: new Date() })
+            .where(eq(voteRulesets.id, existingVoteRuleset.id));
+        } else {
+          await tx.insert(voteRulesets).values(this.mapRulesetInsert(vote));
+        }
+      } else if (existingVoteRuleset) {
         await tx
           .delete(voteRulesets)
-          .where(
-            and(
-              eq(voteRulesets.tenantId, vote.tenantId),
-              eq(voteRulesets.voteId, vote.id),
-            ),
-          );
+          .where(eq(voteRulesets.id, existingVoteRuleset.id));
+      }
+
+      // 3. Handle Per-question Overrides
+      const currentQuestionIds = vote.questions.map((q) => q.id);
+
+      // Update or Insert current overrides
+      for (const q of vote.questions) {
+        const existingOverride = existingRulesets.find(
+          (r) => r.questionId === q.id,
+        );
+
+        if (q.rulesetOverride) {
+          const overrideValues = {
+            weightBasis: q.rulesetOverride.weightBasis,
+            quorumMeasure: q.rulesetOverride.quorumMeasure,
+            quorumElectorateBasis: q.rulesetOverride.quorumElectorateBasis,
+            quorumThreshold: q.rulesetOverride.quorumThreshold.toString(),
+            majorityRuleType: q.rulesetOverride.majorityRuleType,
+            majorityThreshold:
+              q.rulesetOverride.majorityThreshold !== null
+                ? q.rulesetOverride.majorityThreshold.toString()
+                : null,
+            allowAbstain: q.rulesetOverride.allowAbstain,
+            abstainExcludedFromMajorityDenominator:
+              q.rulesetOverride.abstainExcludedFromMajorityDenominator,
+            updatedAt: new Date(),
+          };
+
+          if (existingOverride) {
+            await tx
+              .update(voteRulesets)
+              .set(overrideValues)
+              .where(eq(voteRulesets.id, existingOverride.id));
+          } else {
+            await tx
+              .insert(voteRulesets)
+              .values(this.mapQuestionRulesetInsert(q, vote));
+          }
+        } else if (existingOverride) {
+          // Override removed from an existing question
+          await tx
+            .delete(voteRulesets)
+            .where(eq(voteRulesets.id, existingOverride.id));
+        }
+      }
+
+      // 4. Cleanup orphaned overrides (for questions that were deleted)
+      const orphanedOverrides = existingRulesets.filter(
+        (r) =>
+          r.questionId !== null && !currentQuestionIds.includes(r.questionId),
+      );
+      if (orphanedOverrides.length > 0) {
+        await tx.delete(voteRulesets).where(
+          inArray(
+            voteRulesets.id,
+            orphanedOverrides.map((r) => r.id),
+          ),
+        );
       }
 
       const existingQuestionRows = await tx
@@ -264,6 +339,21 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
     };
   }
 
+  private mapRulesetRow(row: typeof voteRulesets.$inferSelect): VoteRuleset {
+    return {
+      weightBasis: row.weightBasis as VoteWeightBasis,
+      quorumMeasure: row.quorumMeasure as QuorumMeasure,
+      quorumElectorateBasis: row.quorumElectorateBasis as QuorumElectorateBasis,
+      quorumThreshold: Number(row.quorumThreshold),
+      majorityRuleType: row.majorityRuleType as MajorityRuleType,
+      majorityThreshold:
+        row.majorityThreshold !== null ? Number(row.majorityThreshold) : null,
+      allowAbstain: row.allowAbstain,
+      abstainExcludedFromMajorityDenominator:
+        row.abstainExcludedFromMajorityDenominator,
+    };
+  }
+
   private mapRulesetInsert(
     vote: VoteAggregate,
   ): typeof voteRulesets.$inferInsert {
@@ -350,6 +440,30 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
       label: option.label,
       optionKey: option.optionKey,
       sortOrder: option.sortOrder,
+    };
+  }
+
+  private mapQuestionRulesetInsert(
+    question: VoteQuestion,
+    vote: VoteAggregate,
+  ): typeof voteRulesets.$inferInsert {
+    const override = question.rulesetOverride!;
+    return {
+      tenantId: vote.tenantId,
+      voteId: vote.id,
+      questionId: question.id,
+      weightBasis: override.weightBasis,
+      quorumMeasure: override.quorumMeasure,
+      quorumElectorateBasis: override.quorumElectorateBasis,
+      quorumThreshold: override.quorumThreshold.toString(),
+      majorityRuleType: override.majorityRuleType,
+      majorityThreshold:
+        override.majorityThreshold !== null
+          ? override.majorityThreshold.toString()
+          : null,
+      allowAbstain: override.allowAbstain,
+      abstainExcludedFromMajorityDenominator:
+        override.abstainExcludedFromMajorityDenominator,
     };
   }
 }

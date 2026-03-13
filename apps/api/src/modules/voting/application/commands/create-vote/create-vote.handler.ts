@@ -44,4 +44,3 @@ export class CreateVoteHandler implements ICommandHandler<CreateVoteCommand> {
     return vote;
   }
 }
-

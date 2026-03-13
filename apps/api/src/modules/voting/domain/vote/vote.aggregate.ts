@@ -9,7 +9,6 @@ import {
 import {
   InvalidVoteQuestionException,
   InvalidVoteScheduleException,
-  RulesetChangeBlockedException,
   VoteNotDraftException,
   VoteQuestionNotFoundException,
   VoteRulesetRequiredException,
@@ -28,6 +27,7 @@ export type AddVoteQuestionInput = {
   type: VoteQuestionType;
   sortOrder?: number;
   options?: { label: string; sortOrder?: number }[];
+  rulesetOverride?: VoteRuleset;
 };
 
 export type UpdateVoteQuestionInput = AddVoteQuestionInput;
@@ -127,19 +127,13 @@ export class VoteAggregate {
 
   setRuleset(ruleset: VoteRuleset): void {
     this.assertEditable();
-
-    if (this.questions.length > 0 && this.ruleset) {
-      if (this.ruleset.allowAbstain !== ruleset.allowAbstain) {
-        throw new RulesetChangeBlockedException();
-      }
-    }
-
     this.ruleset = ruleset;
   }
 
   addQuestion(input: AddVoteQuestionInput): void {
     this.assertEditable();
-    const ruleset = this.assertRulesetPresent();
+    const defaultRuleset = this.assertRulesetPresent();
+    const effectiveRuleset = input.rulesetOverride ?? defaultRuleset;
 
     if (!input.title || input.title.trim() === '') {
       throw new InvalidVoteQuestionException();
@@ -147,7 +141,7 @@ export class VoteAggregate {
 
     const options = this.buildOptionsForQuestion(
       input.type,
-      ruleset.allowAbstain,
+      effectiveRuleset.allowAbstain,
       input.options,
     );
 
@@ -158,6 +152,7 @@ export class VoteAggregate {
       type: input.type,
       sortOrder: 0, // Assigned correctly during normalization
       options,
+      rulesetOverride: input.rulesetOverride,
     };
 
     let targetIndex = this.questions.length;
@@ -172,7 +167,8 @@ export class VoteAggregate {
 
   updateQuestion(questionId: string, input: UpdateVoteQuestionInput): void {
     this.assertEditable();
-    const ruleset = this.assertRulesetPresent();
+    const defaultRuleset = this.assertRulesetPresent();
+    const effectiveRuleset = input.rulesetOverride ?? defaultRuleset;
 
     const currentIndex = this.questions.findIndex((q) => q.id === questionId);
     if (currentIndex === -1) {
@@ -185,7 +181,7 @@ export class VoteAggregate {
 
     const options = this.buildOptionsForQuestion(
       input.type,
-      ruleset.allowAbstain,
+      effectiveRuleset.allowAbstain,
       input.options,
     );
 
@@ -196,6 +192,7 @@ export class VoteAggregate {
       type: input.type,
       sortOrder: 0,
       options,
+      rulesetOverride: input.rulesetOverride,
     };
 
     this.questions.splice(currentIndex, 1);

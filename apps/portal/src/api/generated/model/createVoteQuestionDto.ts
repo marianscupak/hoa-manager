@@ -6,6 +6,7 @@
  * OpenAPI spec version: 1.0
  */
 import type { CreateVoteQuestionDtoOptionsItem } from "./createVoteQuestionDtoOptionsItem";
+import type { CreateVoteQuestionDtoRulesetOverride } from "./createVoteQuestionDtoRulesetOverride";
 import type { CreateVoteQuestionDtoType } from "./createVoteQuestionDtoType";
 
 export interface CreateVoteQuestionDto {
@@ -19,4 +20,5 @@ export interface CreateVoteQuestionDto {
      */
     sortOrder?: number;
     options?: CreateVoteQuestionDtoOptionsItem[];
+    rulesetOverride?: CreateVoteQuestionDtoRulesetOverride;
 }

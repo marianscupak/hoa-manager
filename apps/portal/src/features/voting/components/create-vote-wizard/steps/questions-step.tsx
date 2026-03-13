@@ -136,7 +136,7 @@ export function CreateVoteQuestionsStep({
                 <div className="flex justify-end">
                     <Button
                         onClick={() => navigate(`/voting/${vote.id}`)}
-                        className="bg-emerald-600 hover:bg-emerald-700 h-11 px-8 text-lg"
+                        className="h-11 bg-emerald-600 px-8 text-lg hover:bg-emerald-700"
                     >
                         <Flag className="mr-2 h-5 w-5" />
                         {t("voting:create.actions.finish")}

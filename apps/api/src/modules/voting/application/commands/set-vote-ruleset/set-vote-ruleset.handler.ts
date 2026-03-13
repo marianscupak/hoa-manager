@@ -39,4 +39,3 @@ export class SetVoteRulesetHandler
     return aggregate.ruleset!;
   }
 }
-

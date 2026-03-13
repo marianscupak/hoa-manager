@@ -6,6 +6,22 @@ interface VoteQuestionsListProps {
     questions: VoteDetailResponseDto["questions"];
 }
 
+function formatMajorityRule(question: VoteDetailResponseDto["questions"][0]) {
+    const ruleset = question.effectiveRuleset;
+    if (!ruleset) return null;
+
+    if (ruleset.majorityRuleType === "SIMPLE_MAJORITY") {
+        return ">50%";
+    }
+    if (
+        ruleset.majorityRuleType === "QUALIFIED_MAJORITY" &&
+        ruleset.majorityThreshold
+    ) {
+        return `≥${ruleset.majorityThreshold}%`;
+    }
+    return ">50%";
+}
+
 export function VoteQuestionsList({ questions }: VoteQuestionsListProps) {
     const { t } = useTranslation(["voting"]);
 
@@ -33,14 +49,20 @@ export function VoteQuestionsList({ questions }: VoteQuestionsListProps) {
                                 <h3 className="font-semibold text-slate-900">
                                     {question.title}
                                 </h3>
-                                {/* Assuming >50% majority for now as per layout, in future this could be derived from vote ruleset based on question type */}
                                 <p className="text-sm text-slate-500">
                                     {t(
                                         "voting:detail.questions.majorityPrefix",
                                     )}{" "}
-                                    {">50% "}
+                                    {formatMajorityRule(question)}{" "}
                                     {t(
                                         "voting:detail.questions.majoritySuffix",
+                                    )}
+                                    {question.rulesetOverride && (
+                                        <span className="text-primary ml-2 text-xs font-medium">
+                                            {t(
+                                                "voting:detail.questions.customRules",
+                                            )}
+                                        </span>
                                     )}
                                 </p>
                             </div>

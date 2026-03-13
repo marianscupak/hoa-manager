@@ -1,6 +1,6 @@
 {
-  "id": "fc1491e4-619b-4933-86a9-59194f10023a",
-  "prevId": "6f79a210-f0a7-4ffc-b76d-465c188670f4",
+  "id": "814deab8-faf7-4361-b8a5-141131e8fd71",
+  "prevId": "67e1ee32-d98c-4557-8a44-a20d756f4a1f",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -1120,6 +1120,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "question_id": {
+          "name": "question_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
         "weight_basis": {
           "name": "weight_basis",
           "type": "vote_weight_basis",
@@ -1206,14 +1212,23 @@
           "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
+        },
+        "vote_rulesets_question_id_vote_questions_id_fk": {
+          "name": "vote_rulesets_question_id_vote_questions_id_fk",
+          "tableFrom": "vote_rulesets",
+          "tableTo": "vote_questions",
+          "columnsFrom": ["question_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "unq_vote_rulesets_vote_id": {
-          "name": "unq_vote_rulesets_vote_id",
+        "unq_vote_rulesets_vote_id_question_id": {
+          "name": "unq_vote_rulesets_vote_id_question_id",
           "nullsNotDistinct": false,
-          "columns": ["vote_id"]
+          "columns": ["vote_id", "question_id"]
         }
       },
       "policies": {},
@@ -1305,13 +1320,7 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "unq_vote_questions_vote_id_sort_order": {
-          "name": "unq_vote_questions_vote_id_sort_order",
-          "nullsNotDistinct": false,
-          "columns": ["vote_id", "sort_order"]
-        }
-      },
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -1394,13 +1403,7 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "unq_vote_options_question_id_sort_order": {
-          "name": "unq_vote_options_question_id_sort_order",
-          "nullsNotDistinct": false,
-          "columns": ["question_id", "sort_order"]
-        }
-      },
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false

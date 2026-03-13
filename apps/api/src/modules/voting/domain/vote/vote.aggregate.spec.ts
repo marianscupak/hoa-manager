@@ -3,7 +3,6 @@ import { addDays, addMilliseconds } from 'date-fns';
 import {
   InvalidVoteQuestionException,
   InvalidVoteScheduleException,
-  RulesetChangeBlockedException,
   VoteNotDraftException,
   VoteRulesetRequiredException,
 } from '@/shared/application/exceptions/vote.exceptions';
@@ -36,6 +35,19 @@ describe('VoteAggregate', () => {
     abstainExcludedFromMajorityDenominator: true,
     ...opts,
   });
+
+  const createDraftAggregate = () =>
+    VoteAggregate.create(
+      {
+        title: 'Test',
+        description: 'Test',
+        scheduledFrom: defaultNow,
+        scheduledTo: addDays(defaultNow, 1),
+      },
+      defaultTenantId,
+      defaultMembershipId,
+      defaultNow,
+    );
 
   describe('create()', () => {
     it('creates a draft vote aggregate with correct properties', () => {
@@ -103,18 +115,7 @@ describe('VoteAggregate', () => {
 
   describe('setRuleset()', () => {
     it('sets the ruleset if vote is draft and no questions exist', () => {
-      const aggregate = VoteAggregate.create(
-        {
-          title: 'Test',
-          description: 'Test',
-          scheduledFrom: defaultNow,
-          scheduledTo: addDays(defaultNow, 1),
-        },
-        defaultTenantId,
-        defaultMembershipId,
-        defaultNow,
-      );
-
+      const aggregate = createDraftAggregate();
       const ruleset = createValidRuleset();
       aggregate.setRuleset(ruleset);
 
@@ -137,19 +138,8 @@ describe('VoteAggregate', () => {
       }).toThrow(VoteNotDraftException);
     });
 
-    it('throws RulesetChangeBlockedException if changing allowAbstain when questions exist', () => {
-      const aggregate = VoteAggregate.create(
-        {
-          title: 'Test',
-          description: 'Test',
-          scheduledFrom: defaultNow,
-          scheduledTo: addDays(defaultNow, 1),
-        },
-        defaultTenantId,
-        defaultMembershipId,
-        defaultNow,
-      );
-
+    it('allows changing allowAbstain on vote-level ruleset even when questions exist', () => {
+      const aggregate = createDraftAggregate();
       aggregate.setRuleset(createValidRuleset({ allowAbstain: false }));
       aggregate.addQuestion({
         title: 'Q1',
@@ -159,22 +149,13 @@ describe('VoteAggregate', () => {
 
       expect(() => {
         aggregate.setRuleset(createValidRuleset({ allowAbstain: true }));
-      }).toThrow(RulesetChangeBlockedException);
+      }).not.toThrow();
+
+      expect(aggregate.ruleset?.allowAbstain).toBe(true);
     });
 
-    it('allows changing ruleset when questions exist if allowAbstain does not change', () => {
-      const aggregate = VoteAggregate.create(
-        {
-          title: 'Test',
-          description: 'Test',
-          scheduledFrom: defaultNow,
-          scheduledTo: addDays(defaultNow, 1),
-        },
-        defaultTenantId,
-        defaultMembershipId,
-        defaultNow,
-      );
-
+    it('allows changing other ruleset fields when questions exist', () => {
+      const aggregate = createDraftAggregate();
       aggregate.setRuleset(
         createValidRuleset({ allowAbstain: false, quorumThreshold: 10 }),
       );
@@ -184,11 +165,9 @@ describe('VoteAggregate', () => {
         type: VoteQuestionType.YES_NO,
       });
 
-      expect(() => {
-        aggregate.setRuleset(
-          createValidRuleset({ allowAbstain: false, quorumThreshold: 20 }),
-        );
-      }).not.toThrow();
+      aggregate.setRuleset(
+        createValidRuleset({ allowAbstain: false, quorumThreshold: 20 }),
+      );
 
       expect(aggregate.ruleset?.quorumThreshold).toBe(20);
     });
@@ -198,17 +177,7 @@ describe('VoteAggregate', () => {
     let aggregate: VoteAggregate;
 
     beforeEach(() => {
-      aggregate = VoteAggregate.create(
-        {
-          title: 'Test',
-          description: 'Test',
-          scheduledFrom: defaultNow,
-          scheduledTo: addDays(defaultNow, 1),
-        },
-        defaultTenantId,
-        defaultMembershipId,
-        defaultNow,
-      );
+      aggregate = createDraftAggregate();
     });
 
     it('throws VoteRulesetRequiredException if trying to add question before setting ruleset', () => {
@@ -246,7 +215,7 @@ describe('VoteAggregate', () => {
         expect(q.options[1].optionKey).toBe(VoteOptionSemantic.NO);
       });
 
-      it('adds abstain option if allowed', () => {
+      it('adds abstain option if allowed by vote-level default', () => {
         aggregate.setRuleset(createValidRuleset({ allowAbstain: true }));
 
         aggregate.addQuestion({
@@ -383,8 +352,6 @@ describe('VoteAggregate', () => {
           sortOrder: 2,
         });
 
-        // Current order: Q1 (1), Q2 (2), Q3 (3)
-        // Inserting at index 1 -> NEW Q gets index 1, old index 1 (Q2) gets shifted.
         expect(aggregate.questions.map((q) => q.title)).toEqual([
           'Q1',
           'NEW Q',
@@ -422,6 +389,228 @@ describe('VoteAggregate', () => {
         expect(aggregate.questions.map((q) => q.title)).toEqual(['Q1', 'Q3']);
         expect(aggregate.questions.map((q) => q.sortOrder)).toEqual([1, 2]);
       });
+    });
+  });
+
+  describe('Per-question ruleset overrides', () => {
+    let aggregate: VoteAggregate;
+
+    beforeEach(() => {
+      aggregate = createDraftAggregate();
+      aggregate.setRuleset(createValidRuleset({ allowAbstain: false }));
+    });
+
+    it('question without override uses vote-level default (no abstain)', () => {
+      aggregate.addQuestion({
+        title: 'Q without override',
+        description: null,
+        type: VoteQuestionType.YES_NO,
+      });
+
+      const q = aggregate.questions[0];
+      expect(q.rulesetOverride).toBeUndefined();
+      expect(q.options).toHaveLength(2); // YES, NO only
+      expect(q.options.map((o) => o.optionKey)).toEqual([
+        VoteOptionSemantic.YES,
+        VoteOptionSemantic.NO,
+      ]);
+    });
+
+    it('question with override uses override allowAbstain=true instead of vote-level false', () => {
+      aggregate.addQuestion({
+        title: 'Q with abstain override',
+        description: null,
+        type: VoteQuestionType.YES_NO,
+        rulesetOverride: createValidRuleset({ allowAbstain: true }),
+      });
+
+      const q = aggregate.questions[0];
+      expect(q.rulesetOverride).toBeDefined();
+      expect(q.rulesetOverride!.allowAbstain).toBe(true);
+      expect(q.options).toHaveLength(3); // YES, NO, ABSTAIN
+      expect(q.options[2].optionKey).toBe(VoteOptionSemantic.ABSTAIN);
+    });
+
+    it('question with override allowAbstain=false when vote-level is true gets no abstain', () => {
+      aggregate.setRuleset(createValidRuleset({ allowAbstain: true }));
+
+      aggregate.addQuestion({
+        title: 'Q suppressing abstain',
+        description: null,
+        type: VoteQuestionType.YES_NO,
+        rulesetOverride: createValidRuleset({ allowAbstain: false }),
+      });
+
+      const q = aggregate.questions[0];
+      expect(q.rulesetOverride!.allowAbstain).toBe(false);
+      expect(q.options).toHaveLength(2); // YES, NO — override suppresses abstain
+    });
+
+    it('multiple questions can have different overrides independently', () => {
+      aggregate.addQuestion({
+        title: 'Q1 no override',
+        description: null,
+        type: VoteQuestionType.YES_NO,
+      });
+
+      aggregate.addQuestion({
+        title: 'Q2 with abstain',
+        description: null,
+        type: VoteQuestionType.YES_NO,
+        rulesetOverride: createValidRuleset({ allowAbstain: true }),
+      });
+
+      aggregate.addQuestion({
+        title: 'Q3 different majority',
+        description: null,
+        type: VoteQuestionType.YES_NO,
+        rulesetOverride: createValidRuleset({
+          allowAbstain: false,
+          majorityRuleType: MajorityRuleType.QUALIFIED_MAJORITY,
+          majorityThreshold: 66.67,
+        }),
+      });
+
+      const [q1, q2, q3] = aggregate.questions;
+
+      // Q1: default (no abstain)
+      expect(q1.rulesetOverride).toBeUndefined();
+      expect(q1.options).toHaveLength(2);
+
+      // Q2: override with abstain
+      expect(q2.rulesetOverride!.allowAbstain).toBe(true);
+      expect(q2.options).toHaveLength(3);
+
+      // Q3: override with different majority but no abstain
+      expect(q3.rulesetOverride!.majorityRuleType).toBe(
+        MajorityRuleType.QUALIFIED_MAJORITY,
+      );
+      expect(q3.rulesetOverride!.majorityThreshold).toBe(66.67);
+      expect(q3.options).toHaveLength(2);
+    });
+
+    it('updateQuestion preserves override when provided', () => {
+      aggregate.addQuestion({
+        title: 'Q1',
+        description: null,
+        type: VoteQuestionType.YES_NO,
+        rulesetOverride: createValidRuleset({ allowAbstain: true }),
+      });
+
+      const q = aggregate.questions[0];
+      expect(q.options).toHaveLength(3);
+
+      aggregate.updateQuestion(q.id, {
+        title: 'Q1 updated',
+        description: null,
+        type: VoteQuestionType.YES_NO,
+        rulesetOverride: createValidRuleset({ allowAbstain: true }),
+      });
+
+      const updated = aggregate.questions[0];
+      expect(updated.title).toBe('Q1 updated');
+      expect(updated.rulesetOverride!.allowAbstain).toBe(true);
+      expect(updated.options).toHaveLength(3);
+    });
+
+    it('updateQuestion can remove override by not passing it', () => {
+      aggregate.addQuestion({
+        title: 'Q1',
+        description: null,
+        type: VoteQuestionType.YES_NO,
+        rulesetOverride: createValidRuleset({ allowAbstain: true }),
+      });
+
+      const q = aggregate.questions[0];
+      expect(q.options).toHaveLength(3);
+
+      // Update without override → falls back to vote-level default
+      aggregate.updateQuestion(q.id, {
+        title: 'Q1 updated',
+        description: null,
+        type: VoteQuestionType.YES_NO,
+      });
+
+      const updated = aggregate.questions[0];
+      expect(updated.rulesetOverride).toBeUndefined();
+      expect(updated.options).toHaveLength(2); // vote-level allowAbstain=false
+    });
+
+    it('updateQuestion can add override to previously un-overridden question', () => {
+      aggregate.addQuestion({
+        title: 'Q1',
+        description: null,
+        type: VoteQuestionType.YES_NO,
+      });
+
+      const q = aggregate.questions[0];
+      expect(q.options).toHaveLength(2);
+
+      aggregate.updateQuestion(q.id, {
+        title: 'Q1',
+        description: null,
+        type: VoteQuestionType.YES_NO,
+        rulesetOverride: createValidRuleset({ allowAbstain: true }),
+      });
+
+      const updated = aggregate.questions[0];
+      expect(updated.rulesetOverride!.allowAbstain).toBe(true);
+      expect(updated.options).toHaveLength(3);
+    });
+
+    it('SINGLE_CHOICE question respects override for abstain option', () => {
+      aggregate.addQuestion({
+        title: 'Pick one',
+        description: null,
+        type: VoteQuestionType.SINGLE_CHOICE,
+        options: [{ label: 'A' }, { label: 'B' }],
+        rulesetOverride: createValidRuleset({ allowAbstain: true }),
+      });
+
+      const q = aggregate.questions[0];
+      expect(q.options).toHaveLength(3); // A, B, ABSTAIN
+      expect(q.options[2].optionKey).toBe(VoteOptionSemantic.ABSTAIN);
+    });
+
+    it('rehydrate preserves rulesetOverride on questions', () => {
+      const override = createValidRuleset({
+        allowAbstain: true,
+        majorityRuleType: MajorityRuleType.QUALIFIED_MAJORITY,
+        majorityThreshold: 75,
+      });
+
+      const rehydrated = VoteAggregate.rehydrate({
+        id: 'v1',
+        tenantId: defaultTenantId,
+        title: 'Vote',
+        description: 'Desc',
+        status: VoteStatus.DRAFT,
+        createdAt: defaultNow,
+        createdByMembershipId: defaultMembershipId,
+        ruleset: createValidRuleset({ allowAbstain: false }),
+        questions: [
+          {
+            id: 'q1',
+            title: 'Q without override',
+            description: null,
+            type: VoteQuestionType.YES_NO,
+            sortOrder: 1,
+            options: [],
+          },
+          {
+            id: 'q2',
+            title: 'Q with override',
+            description: null,
+            type: VoteQuestionType.YES_NO,
+            sortOrder: 2,
+            options: [],
+            rulesetOverride: override,
+          },
+        ],
+      });
+
+      expect(rehydrated.questions[0].rulesetOverride).toBeUndefined();
+      expect(rehydrated.questions[1].rulesetOverride).toEqual(override);
     });
   });
 });

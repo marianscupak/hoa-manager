@@ -58,6 +58,14 @@ export function QuestionsList({ vote, onRefresh }: QuestionsListProps) {
                         type: movedQuestion.type,
                         description: movedQuestion.description || undefined,
                         sortOrder: newIndex + 1,
+                        rulesetOverride: movedQuestion.rulesetOverride
+                            ? {
+                                  ...movedQuestion.rulesetOverride,
+                                  majorityThreshold:
+                                      movedQuestion.rulesetOverride
+                                          .majorityThreshold ?? undefined,
+                              }
+                            : undefined,
                         ...(movedQuestion.type === "SINGLE_CHOICE"
                             ? {
                                   options: movedQuestion.options

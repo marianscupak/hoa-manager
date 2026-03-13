@@ -9,7 +9,9 @@ import { VOTE_WRITE_REPOSITORY } from '../../ports/vote-write.repository.port';
 import type { VoteWriteRepository } from '../../ports/vote-write.repository.port';
 
 @CommandHandler(UpdateVoteQuestionCommand)
-export class UpdateVoteQuestionHandler implements ICommandHandler<UpdateVoteQuestionCommand> {
+export class UpdateVoteQuestionHandler
+  implements ICommandHandler<UpdateVoteQuestionCommand>
+{
   constructor(
     @Inject(VOTE_WRITE_REPOSITORY)
     private readonly voteWriteRepository: VoteWriteRepository,
@@ -31,6 +33,7 @@ export class UpdateVoteQuestionHandler implements ICommandHandler<UpdateVoteQues
       type: data.type,
       sortOrder: data.sortOrder,
       options: data.options,
+      rulesetOverride: data.rulesetOverride,
     });
 
     await this.unitOfWork.execute(async () => {
@@ -38,4 +41,3 @@ export class UpdateVoteQuestionHandler implements ICommandHandler<UpdateVoteQues
     });
   }
 }
-

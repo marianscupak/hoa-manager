@@ -42,10 +42,20 @@ export class CreateVoteResponseDto {
   @ApiProperty({ type: 'string', required: false, nullable: true })
   description!: string | null;
 
-  @ApiProperty({ type: 'string', format: 'date-time', required: false, nullable: true })
+  @ApiProperty({
+    type: 'string',
+    format: 'date-time',
+    required: false,
+    nullable: true,
+  })
   scheduledFrom!: Date | null;
 
-  @ApiProperty({ type: 'string', format: 'date-time', required: false, nullable: true })
+  @ApiProperty({
+    type: 'string',
+    format: 'date-time',
+    required: false,
+    nullable: true,
+  })
   scheduledTo!: Date | null;
 
   @ApiProperty()
@@ -89,6 +99,7 @@ export const createVoteQuestionSchema = z
     type: z.nativeEnum(VoteQuestionType),
     sortOrder: z.number().int().optional(),
     options: z.array(createVoteQuestionOptionSchema).optional(),
+    rulesetOverride: setVoteRulesetSchema.optional(),
   })
   .refine(
     (data) => {
@@ -141,10 +152,28 @@ export class VoteQuestionResponseDto {
 
   @ApiProperty({ type: [VoteOptionResponseDto] })
   options!: VoteOptionResponseDto[];
+
+  @ApiProperty({
+    type: SetVoteRulesetResponseDto,
+    required: false,
+    nullable: true,
+  })
+  rulesetOverride!: SetVoteRulesetResponseDto | null;
+
+  @ApiProperty({
+    type: SetVoteRulesetResponseDto,
+    required: false,
+    nullable: true,
+  })
+  effectiveRuleset!: SetVoteRulesetResponseDto | null;
 }
 
 export class VoteDetailResponseDto extends CreateVoteResponseDto {
-  @ApiProperty({ type: SetVoteRulesetResponseDto, required: false, nullable: true })
+  @ApiProperty({
+    type: SetVoteRulesetResponseDto,
+    required: false,
+    nullable: true,
+  })
   ruleset!: SetVoteRulesetResponseDto | null;
 
   @ApiProperty({ type: [VoteQuestionResponseDto] })

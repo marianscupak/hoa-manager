@@ -64,7 +64,7 @@ export function CreateVoteWizard() {
                 >
                     <AccordionTrigger
                         hideChevron
-                        className="hover:no-underline pointer-events-none"
+                        className="pointer-events-none hover:no-underline"
                     >
                         <div className="flex items-center space-x-3 text-left">
                             {createdVoteId ? (
@@ -99,7 +99,7 @@ export function CreateVoteWizard() {
                 >
                     <AccordionTrigger
                         hideChevron
-                        className="hover:no-underline pointer-events-none"
+                        className="pointer-events-none hover:no-underline"
                     >
                         <div className="flex items-center space-x-3 text-left">
                             {activeStep === "ruleset" ? (
@@ -134,7 +134,7 @@ export function CreateVoteWizard() {
                 >
                     <AccordionTrigger
                         hideChevron
-                        className="hover:no-underline pointer-events-none"
+                        className="pointer-events-none hover:no-underline"
                     >
                         <div className="flex items-center space-x-3 text-left">
                             {activeStep === "questions" ? (

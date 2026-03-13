@@ -63,4 +63,5 @@ export interface VoteQuestion {
   type: VoteQuestionType;
   sortOrder: number;
   options: VoteOption[];
+  rulesetOverride?: VoteRuleset;
 }

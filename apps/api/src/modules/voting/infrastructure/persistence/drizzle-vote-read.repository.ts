@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { and, desc, eq, inArray } from 'drizzle-orm';
+import { and, desc, eq, inArray, isNull, isNotNull } from 'drizzle-orm';
 
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
 import {
@@ -38,7 +38,10 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
         ruleset: voteRulesets,
       })
       .from(votes)
-      .leftJoin(voteRulesets, eq(votes.id, voteRulesets.voteId))
+      .leftJoin(
+        voteRulesets,
+        and(eq(votes.id, voteRulesets.voteId), isNull(voteRulesets.questionId)),
+      )
       .where(and(eq(votes.tenantId, tenantId), eq(votes.id, id)))
       .limit(1);
 
@@ -58,6 +61,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
 
     const questionIds = questionRows.map((q) => q.id);
     let optionRows: (typeof voteOptions.$inferSelect)[] = [];
+    let questionRulesetRows: (typeof voteRulesets.$inferSelect)[] = [];
 
     if (questionIds.length > 0) {
       optionRows = await this.drizzle.db
@@ -70,7 +74,36 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
           ),
         )
         .orderBy(voteOptions.sortOrder);
+
+      questionRulesetRows = await this.drizzle.db
+        .select()
+        .from(voteRulesets)
+        .where(
+          and(
+            eq(voteRulesets.tenantId, tenantId),
+            eq(voteRulesets.voteId, id),
+            isNotNull(voteRulesets.questionId),
+          ),
+        );
     }
+
+    const mappedDefaultRuleset = ruleset
+      ? {
+          weightBasis: ruleset.weightBasis as VoteWeightBasis,
+          quorumMeasure: ruleset.quorumMeasure as QuorumMeasure,
+          quorumElectorateBasis:
+            ruleset.quorumElectorateBasis as QuorumElectorateBasis,
+          quorumThreshold: Number(ruleset.quorumThreshold),
+          majorityRuleType: ruleset.majorityRuleType as MajorityRuleType,
+          majorityThreshold:
+            ruleset.majorityThreshold !== null
+              ? Number(ruleset.majorityThreshold)
+              : null,
+          allowAbstain: ruleset.allowAbstain,
+          abstainExcludedFromMajorityDenominator:
+            ruleset.abstainExcludedFromMajorityDenominator,
+        }
+      : null;
 
     const questions: VoteQuestionResponseDto[] = questionRows.map((q) => {
       const qOptions = optionRows
@@ -82,6 +115,27 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
           optionKey: o.optionKey as VoteOptionSemantic,
         }));
 
+      const qRulesetRow = questionRulesetRows.find(
+        (r) => r.questionId === q.id,
+      );
+      const qRulesetOverride = qRulesetRow
+        ? {
+            weightBasis: qRulesetRow.weightBasis as VoteWeightBasis,
+            quorumMeasure: qRulesetRow.quorumMeasure as QuorumMeasure,
+            quorumElectorateBasis:
+              qRulesetRow.quorumElectorateBasis as QuorumElectorateBasis,
+            quorumThreshold: Number(qRulesetRow.quorumThreshold),
+            majorityRuleType: qRulesetRow.majorityRuleType as MajorityRuleType,
+            majorityThreshold:
+              qRulesetRow.majorityThreshold !== null
+                ? Number(qRulesetRow.majorityThreshold)
+                : null,
+            allowAbstain: qRulesetRow.allowAbstain,
+            abstainExcludedFromMajorityDenominator:
+              qRulesetRow.abstainExcludedFromMajorityDenominator,
+          }
+        : null;
+
       return {
         id: q.id,
         title: q.title,
@@ -89,6 +143,8 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
         type: q.questionType as VoteQuestionType,
         sortOrder: q.sortOrder,
         options: qOptions,
+        rulesetOverride: qRulesetOverride,
+        effectiveRuleset: qRulesetOverride ?? mappedDefaultRuleset,
       };
     });
 
@@ -99,23 +155,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       scheduledFrom: vote.scheduledFrom ?? null,
       scheduledTo: vote.scheduledTo ?? null,
       status: vote.status as VoteStatus,
-      ruleset: ruleset
-        ? {
-            weightBasis: ruleset.weightBasis as VoteWeightBasis,
-            quorumMeasure: ruleset.quorumMeasure as QuorumMeasure,
-            quorumElectorateBasis:
-              ruleset.quorumElectorateBasis as QuorumElectorateBasis,
-            quorumThreshold: Number(ruleset.quorumThreshold),
-            majorityRuleType: ruleset.majorityRuleType as MajorityRuleType,
-            majorityThreshold:
-              ruleset.majorityThreshold !== null
-                ? Number(ruleset.majorityThreshold)
-                : null,
-            allowAbstain: ruleset.allowAbstain,
-            abstainExcludedFromMajorityDenominator:
-              ruleset.abstainExcludedFromMajorityDenominator,
-          }
-        : null,
+      ruleset: mappedDefaultRuleset,
       questions,
     };
   }
@@ -124,9 +164,10 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
     tenantId: string,
     statuses?: VoteStatus[],
   ): Promise<VoteListItemResponseDto[]> {
-    const whereClause = statuses && statuses.length > 0
-      ? and(eq(votes.tenantId, tenantId), inArray(votes.status, statuses))
-      : eq(votes.tenantId, tenantId);
+    const whereClause =
+      statuses && statuses.length > 0
+        ? and(eq(votes.tenantId, tenantId), inArray(votes.status, statuses))
+        : eq(votes.tenantId, tenantId);
 
     const rows = await this.drizzle.db
       .select({
@@ -152,4 +193,3 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
     }));
   }
 }
-

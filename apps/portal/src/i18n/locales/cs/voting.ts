@@ -16,6 +16,8 @@ export const voting = {
                 title: "Pravidla hlasování",
                 description:
                     "Nastavte usnášeníschopnost, volební limity a pravidla vah.",
+                defaultDescription:
+                    "Tato pravidla se použijí jako výchozí pro všechny otázky. U jednotlivých otázek je můžete později přepsat.",
             },
             questions: {
                 title: "Otázky",
@@ -54,6 +56,18 @@ export const voting = {
                     placeholder: "Text možnosti...",
                     defaultLabel: "Možnost",
                     abstain: "Zdržel se (automaticky doplněno)",
+                },
+                override: {
+                    toggleActive: "Skrýt vlastní pravidla",
+                    toggleInactive: "Přizpůsobit pravidla pro tuto otázku",
+                    description:
+                        "Tato nastavení přepíší výchozí pravidla hlasování pouze pro tuto otázku. Ostatní otázky budou nadále používat výchozí pravidla.",
+                    apply: "Použít vlastní pravidla",
+                    update: "Aktualizovat pravidla",
+                    remove: "Odstranit vlastní pravidla",
+                    badge: "Vlastní pravidla",
+                    defaultHint:
+                        "Tato otázka používá výchozí pravidla hlasování. Klikněte pro přizpůsobení.",
                 },
             },
         },
@@ -208,6 +222,7 @@ export const voting = {
             preview: "Náhled otázek, o kterých budete hlasovat",
             majorityPrefix: "Vyžaduje",
             majoritySuffix: "většinu všech podílů.",
+            customRules: "(vlastní pravidla)",
         },
         statusSidebar: {
             title: "Váš status hlasování",
@@ -216,11 +231,24 @@ export const voting = {
             share: "Podíl:",
             statusReady: "Připraveno",
             statusDelegation: "Vyžaduje delegaci",
-            delegationWarning: "{{unitName}} je ve spoluvlastnictví. Pro hlasování za tuto jednotku je vyžadován formulář delegace.",
+            statusVoted: "Odhlasováno",
+            delegationWarning:
+                "{{unitName}} je ve spoluvlastnictví. Pro hlasování za tuto jednotku je vyžadován formulář delegace.",
             manageDelegation: "Spravovat delegaci",
             totalPower: "Celková síla hlasu:",
             voteButton: "Hlasovat",
-            secureBoothHint: "Kliknutím na „Hlasovat“ vstoupíte do zabezpečené hlasovací místnosti.",
+            secureBoothHint:
+                "Kliknutím na „Hlasovat“ vstoupíte do zabezpečené hlasovací místnosti.",
+            help: {
+                title: "Máte dotazy?",
+                description:
+                    "Pokud máte dotazy k jednotlivým bodům, kontaktujte předsedu.",
+                contact: "Kontaktovat předsedu",
+            },
+            time: {
+                hour: "hodina",
+                hours: "hodin",
+            },
         },
     },
 };

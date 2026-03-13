@@ -17,10 +17,7 @@ export class GetVoteDetailHandler implements IQueryHandler<GetVoteDetailQuery> {
   ) {}
 
   async execute(query: GetVoteDetailQuery) {
-    const vote = await this.repository.findDetailById(
-      query.tenantId,
-      query.id,
-    );
+    const vote = await this.repository.findDetailById(query.tenantId, query.id);
 
     if (!vote) {
       throw new VoteNotFoundException();
@@ -36,4 +33,3 @@ export class GetVoteDetailHandler implements IQueryHandler<GetVoteDetailQuery> {
     return vote;
   }
 }
-

@@ -13,10 +13,14 @@ import {
 import { useMemo } from "react";
 
 import { showApiError } from "@/api/error-utils";
-import { VoteDetailResponseDto } from "@/api/generated/model";
+import {
+    CreateVoteQuestionDtoType,
+    VoteDetailResponseDto,
+} from "@/api/generated/model";
 import { useVotesControllerUpdateVoteQuestion } from "@/api/generated/votes/votes";
 
 import { QuestionBlock } from "./question-block";
+import { mapQuestionToUpdateDto } from "../shared/voting-wizard.utils";
 
 interface QuestionsListProps {
     vote: VoteDetailResponseDto;
@@ -53,30 +57,16 @@ export function QuestionsList({ vote, onRefresh }: QuestionsListProps) {
                 {
                     id: vote.id,
                     questionId: active.id as string,
-                    data: {
+                    data: mapQuestionToUpdateDto({
                         title: movedQuestion.title,
-                        type: movedQuestion.type,
-                        description: movedQuestion.description || undefined,
+                        type: movedQuestion.type as CreateVoteQuestionDtoType,
+                        description: movedQuestion.description ?? undefined,
                         sortOrder: newIndex + 1,
-                        rulesetOverride: movedQuestion.rulesetOverride
-                            ? {
-                                  ...movedQuestion.rulesetOverride,
-                                  majorityThreshold:
-                                      movedQuestion.rulesetOverride
-                                          .majorityThreshold ?? undefined,
-                              }
-                            : undefined,
-                        ...(movedQuestion.type === "SINGLE_CHOICE"
-                            ? {
-                                  options: movedQuestion.options
-                                      .filter((o) => o.optionKey === "CUSTOM")
-                                      .map((o) => ({
-                                          label: o.label,
-                                          sortOrder: o.sortOrder,
-                                      })),
-                              }
-                            : {}),
-                    },
+                        useCustomRuleset: !!movedQuestion.rulesetOverride,
+                        rulesetValues:
+                            movedQuestion.rulesetOverride ?? undefined,
+                        options: movedQuestion.options,
+                    }),
                 },
                 {
                     onSuccess: () => onRefresh(),

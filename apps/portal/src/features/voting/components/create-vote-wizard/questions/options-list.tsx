@@ -24,7 +24,9 @@ import {
 } from "@/api/generated/model";
 import { useVotesControllerUpdateVoteQuestion } from "@/api/generated/votes/votes";
 
+import { QuestionFormValues } from "./hooks/use-question-form";
 import { OptionItem } from "./option-item";
+import { mapQuestionToUpdateDto } from "../shared/voting-wizard.utils";
 
 interface OptionsListProps {
     voteId: string;
@@ -34,7 +36,7 @@ interface OptionsListProps {
 
 export function OptionsList({ voteId, question, onRefresh }: OptionsListProps) {
     const { t } = useTranslation(["voting"]);
-    const { watch } = useFormContext();
+    const { watch, getValues } = useFormContext();
     const type = watch("type");
 
     const sensors = useSensors(
@@ -66,26 +68,32 @@ export function OptionsList({ voteId, question, onRefresh }: OptionsListProps) {
     const handleUpdateOptions = (
         newOptions: { label: string; sortOrder: number; optionKey?: string }[],
     ) => {
+        const formValues = getValues() as QuestionFormValues;
+
         // Only send CUSTOM options to the API
         // If an option doesn't have a key yet, it's a new custom option
-        const customOptions = newOptions
+        const filteredOptions = newOptions
             .filter((opt) => !opt.optionKey || opt.optionKey === "CUSTOM")
             .map((opt) => ({
                 label: opt.label.trim(),
                 sortOrder: opt.sortOrder,
+                optionKey: "CUSTOM",
             }));
 
         updateQuestionMutation.mutate(
             {
                 id: voteId,
                 questionId: question.id,
-                data: {
-                    title: String(question.title),
-                    type: question.type as CreateVoteQuestionDtoType,
-                    description: question.description ?? undefined,
+                data: mapQuestionToUpdateDto({
+                    title: formValues.title,
+                    type: formValues.type,
+                    description: formValues.description,
                     sortOrder: question.sortOrder,
-                    options: customOptions,
-                },
+                    useCustomRuleset: formValues.useCustomRuleset,
+                    rulesetValues: formValues,
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    options: filteredOptions as any,
+                }),
             },
             {
                 onSuccess: onRefresh,

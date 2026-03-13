@@ -25,37 +25,37 @@ export const voting = {
                 defaultTitle: "New Question",
                 addQuestion: "Add Question",
                 emptyState:
-                    "No questions added yet. Add your first question using the button above.",
-                loadError: "Failed to load vote details.",
+                    "No questions added yet. Use the button above to add your first question.",
+                loadError: "System was unable to load vote details. Please try again.",
                 createSuccess: "Question added successfully",
                 deleteConfirm: "Are you sure you want to delete this question?",
                 deleteSuccess: "Question deleted",
                 updateSuccess: "Question updated",
                 saving: "Saving changes...",
-                autoSave: "Changes are saved automatically",
+                autoSave: "All changes are saved automatically",
                 fields: {
                     title: {
                         label: "Question Text",
-                        placeholder: "Enter the question...",
+                        placeholder: "e.g. Do you agree with the 2026 budget?",
                     },
                     description: {
-                        label: "Additional Description",
-                        placeholder: "Optional explanation for the question...",
+                        label: "Explanatory Note (Optional)",
+                        placeholder: "Provide additional context for voters...",
                     },
                     type: {
                         label: "Answer Type",
                         options: {
-                            YES_NO: "Yes / No",
-                            SINGLE_CHOICE: "Single Choice",
+                            YES_NO: "Yes / No / Abstain",
+                            SINGLE_CHOICE: "Multiple Choice (Single Answer)",
                         },
                     },
                 },
                 options: {
-                    title: "Options",
+                    title: "Answer Options",
                     addOption: "Add Option",
-                    placeholder: "Option text...",
+                    placeholder: "Enter option text...",
                     defaultLabel: "Option",
-                    abstain: "Abstain (automatically added)",
+                    abstain: "Abstain (automatically added when enabled)",
                 },
                 override: {
                     toggleActive: "Hide custom rules",
@@ -63,8 +63,8 @@ export const voting = {
                     description:
                         "These settings override the vote-level defaults for this question only. Other questions will continue using the default ruleset.",
                     apply: "Apply Custom Rules",
-                    update: "Update Ruleset",
-                    remove: "Remove Custom Ruleset",
+                    update: "Update Custom Rules",
+                    remove: "Revert to Default Rules",
                     badge: "Custom rules",
                     defaultHint:
                         "This question uses the vote-level default ruleset. Click to customize.",

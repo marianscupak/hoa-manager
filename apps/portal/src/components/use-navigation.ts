@@ -1,9 +1,17 @@
 import { useAtomValue } from "jotai";
+import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router";
 
 import { tenantContextAtom } from "@/auth/atoms";
 
+interface NavLink {
+    name: string;
+    path: string;
+    active: boolean;
+}
+
 export function useNavigation() {
+    const { t } = useTranslation(["common"]);
     const tenantCtx = useAtomValue(tenantContextAtom);
     const location = useLocation();
 
@@ -11,14 +19,14 @@ export function useNavigation() {
         tenantCtx?.roles.includes("ADMIN") ||
         tenantCtx?.roles.includes("BOARD_MEMBER");
 
-    const links = [
+    const links: NavLink[] = [
         {
-            name: "Dashboard",
+            name: t("common:nav.dashboard"),
             path: "/",
             active: location.pathname === "/",
         },
         {
-            name: "Voting",
+            name: t("common:nav.voting"),
             path: "/voting",
             active: location.pathname.startsWith("/voting"),
         },
@@ -26,7 +34,7 @@ export function useNavigation() {
 
     if (isAdminOrBoardMember) {
         links.push({
-            name: "Admin",
+            name: t("common:nav.admin"),
             path: "/admin",
             active: location.pathname.startsWith("/admin"),
         });

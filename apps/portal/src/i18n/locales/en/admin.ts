@@ -98,4 +98,8 @@ export default {
             invalidShareError: "Share must be a positive number",
         },
     },
+    nav: {
+        units: "Units",
+        owners: "Owners",
+    },
 } as const;

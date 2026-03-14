@@ -10,4 +10,10 @@ export default {
         BOARD_MEMBER: "Board Member",
         UNIT_OWNER: "Unit Owner",
     },
+    nav: {
+        dashboard: "Nástěnka",
+        voting: "Hlasování",
+        admin: "Administrace",
+    },
+    menu: "Menu",
 } as const;

@@ -6,6 +6,7 @@ export const voting = {
     },
     create: {
         title: "Vytvořit hlasování",
+        titleEdit: "Upravit hlasování",
         description: "Nastavte nové hlasování pro společenství.",
         steps: {
             basicInfo: {
@@ -191,6 +192,7 @@ export const voting = {
             OPEN: "Otevřené",
             SCHEDULED: "Naplánované",
             CLOSED: "Ukončené",
+            DRAFT: "Koncept",
         },
         card: {
             endsOn: "Končí ",
@@ -205,6 +207,9 @@ export const voting = {
             completed: "Hlasování dokončeno",
             viewOutcomes: "Zobrazit konečné výsledky",
             viewResults: "Zobrazit výsledky",
+            draftStatus: "Koncept hlasování",
+            editDraft: "Konfigurace není kompletní",
+            editAction: "Upravit hlasování",
         },
     },
     detail: {

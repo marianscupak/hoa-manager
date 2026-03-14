@@ -28,7 +28,11 @@ export function UserMenuLocaleGroup() {
                     onClick={() => changeLanguage(locale.tag)}
                     className="cursor-pointer"
                 >
-                    <span className="mr-2">{locale.flag}</span>
+                    <img
+                        src={locale.flag}
+                        alt=""
+                        className="mr-2 h-3.5 w-5 shrink-0 object-cover"
+                    />
                     <span>{locale.label}</span>
                     {i18n.language === locale.tag && (
                         <Check className="ml-auto h-4 w-4 shrink-0" />

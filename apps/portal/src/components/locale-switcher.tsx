@@ -22,7 +22,11 @@ export function LocaleSwitcher() {
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm">
-                    <span className="mr-2">{currentLocale.flag}</span>
+                    <img
+                        src={currentLocale.flag}
+                        alt=""
+                        className="mr-2 h-3.5 w-5 shrink-0 object-cover"
+                    />
                     {currentLocale.label}
                 </Button>
             </DropdownMenuTrigger>
@@ -33,7 +37,11 @@ export function LocaleSwitcher() {
                         onClick={() => changeLanguage(locale.tag)}
                         className="cursor-pointer"
                     >
-                        <span className="mr-2">{locale.flag}</span>
+                        <img
+                            src={locale.flag}
+                            alt=""
+                            className="mr-2 h-3.5 w-5 shrink-0 object-cover"
+                        />
                         {locale.label}
                     </DropdownMenuItem>
                 ))}

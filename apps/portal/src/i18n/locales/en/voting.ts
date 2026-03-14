@@ -193,6 +193,7 @@ export const voting = {
             OPEN: "Open",
             SCHEDULED: "Scheduled",
             CLOSED: "Closed",
+            DRAFT: "Draft",
         },
         card: {
             endsOn: "Ends on ",

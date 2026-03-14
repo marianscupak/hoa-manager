@@ -98,4 +98,8 @@ export default {
             invalidShareError: "Podíl musí být kladné číslo",
         },
     },
+    nav: {
+        units: "Jednotky",
+        owners: "Vlastníci",
+    },
 } as const;

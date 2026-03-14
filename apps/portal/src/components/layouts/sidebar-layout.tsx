@@ -1,5 +1,6 @@
 import { Menu } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router";
 
 import { Button } from "@hoa-mngr/ui";
@@ -15,6 +16,7 @@ export interface SidebarLayoutProps {
 }
 
 export function SidebarLayout({ navigation, children }: SidebarLayoutProps) {
+    const { t } = useTranslation(["common"]);
     const location = useLocation();
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
@@ -49,7 +51,7 @@ export function SidebarLayout({ navigation, children }: SidebarLayoutProps) {
                     onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
                 >
                     <Menu className="mr-2 h-4 w-4" />
-                    Menu
+                    {t("common:menu")}
                 </Button>
             </div>
 

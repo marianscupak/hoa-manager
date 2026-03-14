@@ -101,12 +101,12 @@ export function CreateVoteWizard({
     const handleRulesetSuccess = () => {
         if (createdVoteId) {
             queryClient.invalidateQueries({
-                queryKey: getVotesControllerGetVoteDetailQueryKey(createdVoteId),
+                queryKey:
+                    getVotesControllerGetVoteDetailQueryKey(createdVoteId),
             });
         }
         setActiveStep("questions");
     };
-
 
     return (
         <div className="mx-auto max-w-3xl space-y-6">

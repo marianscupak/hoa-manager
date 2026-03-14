@@ -12,9 +12,7 @@ import {
     VoteDetailResponseDto,
     VoteQuestionResponseDto,
 } from "@/api/generated/model";
-import {
-    useVotesControllerDeleteVoteQuestion,
-} from "@/api/generated/votes/votes";
+import { useVotesControllerDeleteVoteQuestion } from "@/api/generated/votes/votes";
 
 import { QuestionHeader } from "./components/question-header";
 import { QuestionRulesetOverride } from "./components/question-ruleset-override";
@@ -36,13 +34,8 @@ export function QuestionBlock({
     const [isExpanded, setIsExpanded] = useState(true);
     const [isOverrideVisible, setIsOverrideVisible] = useState(false);
 
-    const {
-        form,
-        handleSave,
-        handleBlurSave,
-        isUpdating,
-        hasOverride,
-    } = useQuestionForm({ vote, question, onRefresh });
+    const { form, handleSave, handleBlurSave, isUpdating, hasOverride } =
+        useQuestionForm({ vote, question, onRefresh });
 
     const {
         attributes,
@@ -172,7 +165,9 @@ export function QuestionBlock({
                         <QuestionRulesetOverride
                             hasOverride={hasOverride}
                             isOverrideVisible={isOverrideVisible}
-                            onToggleVisibility={() => setIsOverrideVisible(!isOverrideVisible)}
+                            onToggleVisibility={() =>
+                                setIsOverrideVisible(!isOverrideVisible)
+                            }
                             onApplyCustomRules={handleApplyCustomRules}
                             onUpdateRuleset={() => handleSave(form.getValues())}
                             onRemoveOverride={handleRemoveOverride}

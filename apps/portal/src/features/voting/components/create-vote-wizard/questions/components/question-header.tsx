@@ -1,5 +1,14 @@
-import { DraggableAttributes, DraggableSyntheticListeners } from "@dnd-kit/core";
-import { ChevronDown, ChevronUp, GripVertical, Settings2, Trash2 } from "lucide-react";
+import {
+    DraggableAttributes,
+    DraggableSyntheticListeners,
+} from "@dnd-kit/core";
+import {
+    ChevronDown,
+    ChevronUp,
+    GripVertical,
+    Settings2,
+    Trash2,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@hoa-mngr/ui";

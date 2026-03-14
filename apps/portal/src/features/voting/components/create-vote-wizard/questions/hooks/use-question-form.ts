@@ -12,7 +12,10 @@ import {
 import { useVotesControllerUpdateVoteQuestion } from "@/api/generated/votes/votes";
 
 import { mapQuestionToUpdateDto } from "../../shared/voting-wizard.utils";
-import { createVoteRulesetSchema, rulesetDefaultValues } from "../../steps/ruleset-step";
+import {
+    createVoteRulesetSchema,
+    rulesetDefaultValues,
+} from "../../steps/ruleset-step";
 
 const questionSchema = z.object({
     title: z.string().min(1),
@@ -38,9 +41,13 @@ interface UseQuestionFormParams {
     onRefresh: () => void;
 }
 
-export function useQuestionForm({ vote, question, onRefresh }: UseQuestionFormParams) {
+export function useQuestionForm({
+    vote,
+    question,
+    onRefresh,
+}: UseQuestionFormParams) {
     const hasOverride = !!question.rulesetOverride;
-    
+
     const form = useForm<QuestionFormValues>({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         resolver: zodResolver(questionSchema) as any,

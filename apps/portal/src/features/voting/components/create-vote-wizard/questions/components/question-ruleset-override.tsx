@@ -41,7 +41,9 @@ export function QuestionRulesetOverride({
                 <Settings2 className="h-4 w-4" />
                 {isOverrideVisible
                     ? t("voting:create.steps.questions.override.toggleActive")
-                    : t("voting:create.steps.questions.override.toggleInactive")}
+                    : t(
+                          "voting:create.steps.questions.override.toggleInactive",
+                      )}
             </button>
 
             {!hasOverride && (
@@ -54,7 +56,9 @@ export function QuestionRulesetOverride({
                 <div className="mt-4 rounded-md border bg-slate-50/50 p-4">
                     <div className="mb-4 flex items-center justify-between">
                         <p className="text-muted-foreground text-sm">
-                            {t("voting:create.steps.questions.override.description")}
+                            {t(
+                                "voting:create.steps.questions.override.description",
+                            )}
                         </p>
                         {hasOverride && (
                             <Button
@@ -65,13 +69,15 @@ export function QuestionRulesetOverride({
                                 onClick={onRemoveOverride}
                             >
                                 <Trash2 className="mr-1 h-3 w-3" />
-                                {t("voting:create.steps.questions.override.remove")}
+                                {t(
+                                    "voting:create.steps.questions.override.remove",
+                                )}
                             </Button>
                         )}
                     </div>
-                    
+
                     <RulesetFormFields />
-                    
+
                     <div className="mt-4 flex justify-end">
                         {!hasOverride ? (
                             <Button
@@ -80,7 +86,9 @@ export function QuestionRulesetOverride({
                                 onClick={onApplyCustomRules}
                                 disabled={isUpdating}
                             >
-                                {t("voting:create.steps.questions.override.apply")}
+                                {t(
+                                    "voting:create.steps.questions.override.apply",
+                                )}
                             </Button>
                         ) : (
                             <Button
@@ -89,7 +97,9 @@ export function QuestionRulesetOverride({
                                 onClick={onUpdateRuleset}
                                 disabled={isUpdating}
                             >
-                                {t("voting:create.steps.questions.override.update")}
+                                {t(
+                                    "voting:create.steps.questions.override.update",
+                                )}
                             </Button>
                         )}
                     </div>

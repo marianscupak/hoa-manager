@@ -85,6 +85,7 @@ export class RefreshTokenHandler
       // Add user identity to claims
       scopedClaims.email = user.email;
       scopedClaims.fullName = user.fullName;
+      scopedClaims.preferredLanguage = user.preferredLanguage;
 
       await this.authSessionRepository.markRevoked(session.id);
       const { rawToken, hash, expiresAt } = this.generateNewRefreshToken();

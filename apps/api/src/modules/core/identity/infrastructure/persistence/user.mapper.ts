@@ -1,4 +1,4 @@
-import { users } from '@/infrastructure/db/schema/users';
+import { users } from '@/infrastructure/db/schema/core/users';
 import { User } from '@/modules/core/identity/domain/user.entity';
 
 export const UserMapper = {
@@ -9,6 +9,7 @@ export const UserMapper = {
       fullName: row.fullName,
       isEmailVerified: row.isEmailVerified,
       isActive: row.isActive,
+      preferredLanguage: row.preferredLanguage,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     });

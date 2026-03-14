@@ -1,6 +1,6 @@
 import { pgTable, timestamp, uuid, text, integer } from 'drizzle-orm/pg-core';
 
-import { tenants } from '@/infrastructure/db/schema/tenants';
+import { tenants } from '@/infrastructure/db/schema/core/tenants';
 import { voteQuestions } from '@/infrastructure/db/schema/voting/vote-questions';
 
 export const voteOptions = pgTable(

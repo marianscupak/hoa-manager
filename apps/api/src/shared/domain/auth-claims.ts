@@ -4,6 +4,7 @@ export interface AuthClaims {
   sub: string;
   email?: string;
   fullName?: string;
+  preferredLanguage?: string;
   tid?: string;
   mid?: string;
   roles?: TenantMembershipRole[];

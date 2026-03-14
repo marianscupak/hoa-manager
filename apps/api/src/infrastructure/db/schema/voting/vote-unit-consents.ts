@@ -1,9 +1,9 @@
 import { pgTable, timestamp, uuid, text } from 'drizzle-orm/pg-core';
 
-import { owners } from '@/infrastructure/db/schema/owners';
-import { tenantMemberships } from '@/infrastructure/db/schema/tenant-memberships';
-import { tenants } from '@/infrastructure/db/schema/tenants';
-import { units } from '@/infrastructure/db/schema/units';
+import { owners } from '@/infrastructure/db/schema/core/owners';
+import { tenantMemberships } from '@/infrastructure/db/schema/core/tenant-memberships';
+import { tenants } from '@/infrastructure/db/schema/core/tenants';
+import { units } from '@/infrastructure/db/schema/core/units';
 import { voteUnitConsentStatusEnum } from '@/infrastructure/db/schema/voting/enums';
 import { votes } from '@/infrastructure/db/schema/voting/votes';
 

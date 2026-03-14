@@ -66,6 +66,7 @@ export class SwitchTenantHandler
       sub: claims.sub,
       email: user.email,
       fullName: user.fullName,
+      preferredLanguage: user.preferredLanguage,
       tid: command.targetTenantId,
       mid: membership.id,
       roles: [membership.role],

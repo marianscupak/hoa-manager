@@ -1,8 +1,8 @@
 import { pgTable, timestamp, uuid, numeric, index } from 'drizzle-orm/pg-core';
 
-import { owners } from '@/infrastructure/db/schema/owners';
-import { tenants } from '@/infrastructure/db/schema/tenants';
-import { units } from '@/infrastructure/db/schema/units';
+import { owners } from '@/infrastructure/db/schema/core/owners';
+import { tenants } from '@/infrastructure/db/schema/core/tenants';
+import { units } from '@/infrastructure/db/schema/core/units';
 
 export const unitOwnerships = pgTable(
   'unit_ownerships',

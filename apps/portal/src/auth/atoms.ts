@@ -1,5 +1,7 @@
 import { atom } from "jotai";
 
+import { TenantResponseDtoRole } from "../api/generated/model/tenantResponseDtoRole";
+
 export type AuthStatus =
     | "initializing"
     | "anonymous"
@@ -9,13 +11,14 @@ export type AuthStatus =
 export type TenantCtx = {
     tenantId: string;
     membershipId: string;
-    roles: string[];
+    roles: TenantResponseDtoRole[];
 };
 
 export type UserSummary = {
     userId: string;
     email?: string;
     fullName?: string;
+    preferredLanguage?: string;
 };
 
 // Access token is memory-only

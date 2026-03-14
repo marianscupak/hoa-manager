@@ -1,23 +1,22 @@
 import { Inject } from '@nestjs/common';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-
 import {
-  USER_REPOSITORY,
-  type UserRepository,
-} from '@/modules/core/identity/application/ports/user.repository.port';
+  CommandBus,
+  CommandHandler,
+  ICommandHandler,
+  QueryBus,
+} from '@nestjs/cqrs';
+
+import { GetUserByIdQuery } from '@/modules/core/identity/application/queries/get-user-by-id.query';
 import { AcceptOwnerInviteCommand } from '@/modules/core/invitation/application/commands/accept-owner-invite.command';
 import {
   OWNER_INVITE_REPOSITORY,
   type OwnerInviteRepository,
 } from '@/modules/core/invitation/application/ports/owner-invite.repository.port';
-import {
-  OWNER_REPOSITORY,
-  type OwnerRepository,
-} from '@/modules/core/property/application/ports/property.repository.port';
-import {
-  MEMBERSHIP_REPOSITORY,
-  type MembershipRepository,
-} from '@/modules/core/tenancy/application/ports/tenant.repository.port';
+import { SetOwnerUserIdCommand } from '@/modules/core/property/application/commands/set-owner-user-id.command';
+import { GetOwnerByIdQuery } from '@/modules/core/property/application/queries/get-owner-by-id.query';
+import { CreateMembershipCommand } from '@/modules/core/tenancy/application/commands/create-membership.command';
+import { UpdateMembershipStatusCommand } from '@/modules/core/tenancy/application/commands/update-membership-status.command';
+import { GetMembershipByTenantAndUserQuery } from '@/modules/core/tenancy/application/queries/get-membership-by-tenant-and-user.query';
 import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
 import {
   InviteNotFoundException,
@@ -47,12 +46,8 @@ export class AcceptOwnerInviteHandler
     @Inject(UNIT_OF_WORK) private readonly uow: UnitOfWork,
     @Inject(OWNER_INVITE_REPOSITORY)
     private readonly inviteRepo: OwnerInviteRepository,
-    @Inject(OWNER_REPOSITORY)
-    private readonly ownerRepo: OwnerRepository,
-    @Inject(USER_REPOSITORY)
-    private readonly userRepo: UserRepository,
-    @Inject(MEMBERSHIP_REPOSITORY)
-    private readonly membershipRepo: MembershipRepository,
+    private readonly queryBus: QueryBus,
+    private readonly commandBus: CommandBus,
     @Inject(CLOCK)
     private readonly clock: Clock,
   ) {}
@@ -78,7 +73,9 @@ export class AcceptOwnerInviteHandler
       }
 
       // Validate the user
-      const user = await this.userRepo.findById(command.userId);
+      const user = await this.queryBus.execute(
+        new GetUserByIdQuery(command.userId),
+      );
       if (!user) {
         throw new EmailMismatchException();
       }
@@ -92,9 +89,8 @@ export class AcceptOwnerInviteHandler
       }
 
       // Load owner and link
-      const owner = await this.ownerRepo.findById(
-        invite.tenantId,
-        invite.ownerId,
+      const owner = await this.queryBus.execute(
+        new GetOwnerByIdQuery(invite.tenantId, invite.ownerId),
       );
       if (!owner) {
         throw new InviteNotFoundException();
@@ -105,27 +101,28 @@ export class AcceptOwnerInviteHandler
       }
 
       if (!owner.userId) {
-        await this.ownerRepo.setUserId(
-          invite.tenantId,
-          invite.ownerId,
-          user.id,
+        await this.commandBus.execute(
+          new SetOwnerUserIdCommand(invite.tenantId, invite.ownerId, user.id),
         );
       }
 
       // Ensure membership exists
-      const existing = await this.membershipRepo.findByTenantAndUser(
-        invite.tenantId,
-        user.id,
+      const existing = await this.queryBus.execute(
+        new GetMembershipByTenantAndUserQuery(invite.tenantId, user.id),
       );
       if (!existing) {
-        await this.membershipRepo.create({
-          tenantId: invite.tenantId,
-          userId: user.id,
-          role: TenantMembershipRole.UNIT_OWNER,
-          status: 'ACTIVE',
-        });
+        await this.commandBus.execute(
+          new CreateMembershipCommand(
+            invite.tenantId,
+            user.id,
+            TenantMembershipRole.UNIT_OWNER,
+            'ACTIVE',
+          ),
+        );
       } else if (existing.status !== 'ACTIVE') {
-        await this.membershipRepo.updateStatus(existing.id, 'ACTIVE');
+        await this.commandBus.execute(
+          new UpdateMembershipStatusCommand(existing.id, 'ACTIVE'),
+        );
       }
 
       // Mark invite as accepted

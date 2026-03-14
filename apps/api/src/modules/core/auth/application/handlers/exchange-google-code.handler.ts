@@ -68,6 +68,7 @@ export class ExchangeGoogleCodeHandler
         sub: exchangeCode.userId,
         email: user?.email,
         fullName: user?.fullName,
+        preferredLanguage: user?.preferredLanguage,
         ...(exchangeCode.tenantId
           ? {
               tid: exchangeCode.tenantId,

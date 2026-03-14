@@ -273,6 +273,28 @@
         "tags": ["Identity"]
       }
     },
+    "/api/identity/users/me/language": {
+      "put": {
+        "operationId": "IdentityController_updateLanguage",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserLanguageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Language updated"
+          }
+        },
+        "tags": ["Identity"]
+      }
+    },
     "/api/auth/login": {
       "post": {
         "operationId": "AuthController_login",
@@ -1081,6 +1103,18 @@
         },
         "required": ["tenantId"]
       },
+      "ErrorResponseDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "details": {
+            "type": "object"
+          }
+        },
+        "required": ["code"]
+      },
       "CreateUserDto": {
         "type": "object",
         "properties": {
@@ -1122,6 +1156,17 @@
           }
         },
         "required": ["id", "email"]
+      },
+      "UpdateUserLanguageDto": {
+        "type": "object",
+        "properties": {
+          "language": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 5
+          }
+        },
+        "required": ["language"]
       },
       "LoginDto": {
         "type": "object",

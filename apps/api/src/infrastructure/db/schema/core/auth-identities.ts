@@ -7,7 +7,7 @@ import {
   unique,
 } from 'drizzle-orm/pg-core';
 
-import { users } from '@/infrastructure/db/schema/users';
+import { users } from '@/infrastructure/db/schema/core/users';
 
 export const providerEnum = pgEnum('provider', ['LOCAL', 'OIDC_GOOGLE']);
 

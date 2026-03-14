@@ -2,7 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useAtomValue, useSetAtom } from "jotai";
 import { LogOut, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
+import { Link } from "react-router";
 
 import {
     Avatar,
@@ -44,7 +44,6 @@ function getInitials(name?: string, email?: string): string {
 
 export function UserMenu() {
     const { t } = useTranslation(["common"]);
-    const navigate = useNavigate();
     const queryClient = useQueryClient();
 
     const user = useAtomValue(userAtom);
@@ -107,12 +106,11 @@ export function UserMenu() {
                     </>
                 )}
 
-                <DropdownMenuItem
-                    onClick={() => navigate("/profile")}
-                    className="cursor-pointer"
-                >
-                    <User className="mr-2 h-4 w-4" />
-                    {t("common:profile")}
+                <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link to="/profile">
+                        <User className="mr-2 h-4 w-4" />
+                        {t("common:profile")}
+                    </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
 

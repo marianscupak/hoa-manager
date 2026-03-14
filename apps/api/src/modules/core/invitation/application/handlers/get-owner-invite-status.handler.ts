@@ -6,11 +6,12 @@ import {
   type OwnerInviteRepository,
 } from '@/modules/core/invitation/application/ports/owner-invite.repository.port';
 import { GetOwnerInviteStatusQuery } from '@/modules/core/invitation/application/queries/get-owner-invite-status.query';
+import { InviteStatus } from '@/modules/core/invitation/domain/invite-status';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 import { hashToken } from '@/shared/application/utils/token.utils';
 
 export interface InviteStatusResult {
-  status: 'valid' | 'expired' | 'accepted' | 'not_found';
+  status: InviteStatus;
   emailMasked?: string;
   expiresAt?: Date;
 }

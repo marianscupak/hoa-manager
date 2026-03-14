@@ -110,6 +110,7 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
         sub: user.id,
         email: user.email,
         fullName: user.fullName,
+        preferredLanguage: user.preferredLanguage,
         ...(tenantId ? { tid: tenantId, mid: membershipId, roles } : {}),
       };
 

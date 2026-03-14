@@ -7,10 +7,12 @@ import {
     DropdownMenuSeparator,
 } from "@hoa-mngr/ui";
 
-import { locales } from "@/i18n/locales";
+import { useChangeLanguage } from "../../hooks/use-change-language";
+import { locales } from "../../i18n/locales";
 
 export function UserMenuLocaleGroup() {
     const { t, i18n } = useTranslation(["common"]);
+    const { changeLanguage } = useChangeLanguage();
 
     return (
         <>
@@ -23,9 +25,10 @@ export function UserMenuLocaleGroup() {
             {locales.map((locale) => (
                 <DropdownMenuItem
                     key={locale.tag}
-                    onClick={() => i18n.changeLanguage(locale.tag)}
+                    onClick={() => changeLanguage(locale.tag)}
                     className="cursor-pointer"
                 >
+                    <span className="mr-2">{locale.flag}</span>
                     <span>{locale.label}</span>
                     {i18n.language === locale.tag && (
                         <Check className="ml-auto h-4 w-4 shrink-0" />

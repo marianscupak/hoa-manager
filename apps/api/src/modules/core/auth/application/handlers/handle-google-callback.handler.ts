@@ -120,6 +120,7 @@ export class HandleGoogleCallbackHandler
           fullName: idToken.name ?? idToken.email!,
           isEmailVerified: true,
           isActive: true,
+          preferredLanguage: 'cs',
         });
 
         identity = await this.authIdentityRepository.create({

@@ -1,8 +1,8 @@
 import { pgTable, timestamp, uuid, numeric, unique } from 'drizzle-orm/pg-core';
 
-import { tenantMemberships } from '@/infrastructure/db/schema/tenant-memberships';
-import { tenants } from '@/infrastructure/db/schema/tenants';
-import { units } from '@/infrastructure/db/schema/units';
+import { tenantMemberships } from '@/infrastructure/db/schema/core/tenant-memberships';
+import { tenants } from '@/infrastructure/db/schema/core/tenants';
+import { units } from '@/infrastructure/db/schema/core/units';
 import {
   electorateEligibilityStatusEnum,
   electorateIneligibleReasonEnum,

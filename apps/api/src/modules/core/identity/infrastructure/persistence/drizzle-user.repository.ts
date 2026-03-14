@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm';
 
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
 import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
-import { users } from '@/infrastructure/db/schema/users';
+import { users } from '@/infrastructure/db/schema/core/users';
 import { UserRepository } from '@/modules/core/identity/application/ports/user.repository.port';
 import { User } from '@/modules/core/identity/domain/user.entity';
 import { UserMapper } from '@/modules/core/identity/infrastructure/persistence/user.mapper';
@@ -40,6 +40,7 @@ export class DrizzleUserRepository implements UserRepository {
         fullName: user.fullName,
         isEmailVerified: user.isEmailVerified,
         isActive: user.isActive,
+        preferredLanguage: user.preferredLanguage,
       })
       .returning();
 
@@ -56,6 +57,9 @@ export class DrizzleUserRepository implements UserRepository {
           isEmailVerified: updates.isEmailVerified,
         }),
         ...(updates.isActive !== undefined && { isActive: updates.isActive }),
+        ...(updates.preferredLanguage && {
+          preferredLanguage: updates.preferredLanguage,
+        }),
       })
       .where(eq(users.id, id))
       .returning();

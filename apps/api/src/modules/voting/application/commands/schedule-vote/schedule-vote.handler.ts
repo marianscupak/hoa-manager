@@ -15,7 +15,9 @@ import {
 } from './schedule-vote.command';
 
 @CommandHandler(ScheduleVoteCommand)
-export class ScheduleVoteHandler implements ICommandHandler<ScheduleVoteCommand> {
+export class ScheduleVoteHandler
+  implements ICommandHandler<ScheduleVoteCommand>
+{
   constructor(
     @Inject(VOTE_WRITE_REPOSITORY)
     private readonly voteRepository: VoteWriteRepository,

@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from "react-router";
 import { toast, Button } from "@hoa-mngr/ui";
 
 import { useAuthControllerExchangeGoogleCode } from "@/api/generated/auth/auth";
+import { TenantResponseDtoRole } from "@/api/generated/model";
 import {
     accessTokenAtom,
     authStatusAtom,
@@ -50,7 +51,7 @@ export function GoogleCallbackPage() {
                     setTenantContext({
                         tenantId: payload.tid,
                         membershipId: payload.mid,
-                        roles: payload.roles || [],
+                        roles: (payload.roles ?? []) as TenantResponseDtoRole[],
                     });
                     setAuthStatus("authenticated");
                     StorageService.setString(

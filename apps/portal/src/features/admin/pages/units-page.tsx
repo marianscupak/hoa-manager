@@ -1,7 +1,7 @@
 import { PencilIcon, PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
+import { Link } from "react-router";
 
 import { Button, ColumnDef, DataTable } from "@hoa-mngr/ui";
 
@@ -16,8 +16,6 @@ export function UnitsPage() {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
 
     const { data: units, isLoading, refetch } = useUnitControllerGetUnits();
-
-    const navigate = useNavigate();
 
     const columns: ColumnDef<UnitResponseDto>[] = [
         {
@@ -36,14 +34,10 @@ export function UnitsPage() {
             cell: ({ row }) => {
                 return (
                     <div className="flex items-center gap-2">
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => {
-                                navigate(`/admin/units/${row.id}`);
-                            }}
-                        >
-                            <PencilIcon className="h-4 w-4" />
+                        <Button variant="outline" size="icon" asChild>
+                            <Link to={`/admin/units/${row.id}`}>
+                                <PencilIcon className="h-4 w-4" />
+                            </Link>
                         </Button>
                     </div>
                 );

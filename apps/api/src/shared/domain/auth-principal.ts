@@ -3,4 +3,5 @@ export interface AuthPrincipal {
   subject: string;
   authMethod: 'JWT' | 'OIDC';
   sessionId?: string;
+  preferredLanguage?: string;
 }

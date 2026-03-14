@@ -120,6 +120,7 @@ export class RegisterFromInviteHandler
         fullName: owner.displayName,
         isEmailVerified: true,
         isActive: true,
+        preferredLanguage: 'cs',
       });
 
       // Create LOCAL auth identity
@@ -148,6 +149,9 @@ export class RegisterFromInviteHandler
       // Create auth session with tenant-scoped token
       const session = await this.authSessionService.createSession(user.id, {
         sub: user.id,
+        email: user.email,
+        fullName: user.fullName,
+        preferredLanguage: user.preferredLanguage,
         tid: invite.tenantId,
         mid: membership.id,
         roles: [TenantMembershipRole.UNIT_OWNER],

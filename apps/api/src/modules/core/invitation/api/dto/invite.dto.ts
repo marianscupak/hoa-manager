@@ -2,6 +2,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
+import { InviteStatus } from '@/modules/core/invitation/domain/invite-status';
+
 export class SendOwnerInviteResponseDto {
   @ApiProperty()
   success!: boolean;
@@ -15,7 +17,7 @@ export class GetInviteStatusDto extends createZodDto(getInviteStatusSchema) {}
 
 export class InviteStatusResponseDto {
   @ApiProperty({ enum: ['valid', 'expired', 'accepted', 'not_found'] })
-  status!: 'valid' | 'expired' | 'accepted' | 'not_found';
+  status!: InviteStatus;
 
   @ApiProperty({ nullable: true, type: String, required: false })
   emailMasked?: string;

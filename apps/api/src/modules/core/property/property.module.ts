@@ -9,10 +9,12 @@ import { OwnerController } from '@/modules/core/property/api/owner.controller';
 import { UnitController } from '@/modules/core/property/api/unit.controller';
 import { CreateOwnerHandler } from '@/modules/core/property/application/handlers/create-owner.handler';
 import { CreateUnitHandler } from '@/modules/core/property/application/handlers/create-unit.handler';
+import { GetOwnerByIdHandler } from '@/modules/core/property/application/handlers/get-owner-by-id.handler';
 import { GetUnitDetailHandler } from '@/modules/core/property/application/handlers/get-unit-detail.handler';
 import { ListOwnersHandler } from '@/modules/core/property/application/handlers/list-owners.handler';
 import { ListUnitsHandler } from '@/modules/core/property/application/handlers/list-units.handler';
 import { ReplaceUnitOwnershipHandler } from '@/modules/core/property/application/handlers/replace-unit-ownership.handler';
+import { SetOwnerUserIdHandler } from '@/modules/core/property/application/handlers/set-owner-user-id.handler';
 import {
   OWNER_REPOSITORY,
   UNIT_OWNERSHIP_REPOSITORY,
@@ -29,12 +31,14 @@ const CommandHandlers = [
   CreateOwnerHandler,
   CreateUnitHandler,
   ReplaceUnitOwnershipHandler,
+  SetOwnerUserIdHandler,
 ];
 
 const QueryHandlers = [
   ListOwnersHandler,
   ListUnitsHandler,
   GetUnitDetailHandler,
+  GetOwnerByIdHandler,
 ];
 
 const Repositories = [

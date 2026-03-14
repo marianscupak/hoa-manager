@@ -4,8 +4,11 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { AuthModule } from '@/modules/core/auth/auth.module';
 import { IdentityModule } from '@/modules/core/identity/identity.module';
 import { TenancyController } from '@/modules/core/tenancy/api/tenancy.controller';
+import { CreateMembershipHandler } from '@/modules/core/tenancy/application/handlers/create-membership.handler';
 import { CreateTenantHandler } from '@/modules/core/tenancy/application/handlers/create-tenant.handler';
+import { GetMembershipByTenantAndUserHandler } from '@/modules/core/tenancy/application/handlers/get-membership-by-tenant-and-user.handler';
 import { GetUserTenantsHandler } from '@/modules/core/tenancy/application/handlers/get-user-tenants.handler';
+import { UpdateMembershipStatusHandler } from '@/modules/core/tenancy/application/handlers/update-membership-status.handler';
 import {
   MEMBERSHIP_REPOSITORY,
   TENANT_REPOSITORY,
@@ -23,6 +26,9 @@ import {
     { provide: MEMBERSHIP_REPOSITORY, useClass: DrizzleMembershipRepository },
     GetUserTenantsHandler,
     CreateTenantHandler,
+    CreateMembershipHandler,
+    UpdateMembershipStatusHandler,
+    GetMembershipByTenantAndUserHandler,
   ],
   exports: [TENANT_REPOSITORY, MEMBERSHIP_REPOSITORY],
 })

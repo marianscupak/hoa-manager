@@ -6,6 +6,7 @@ export const users = pgTable('users', {
   fullName: text('full_name').notNull(),
   isEmailVerified: boolean('is_email_verified').default(false).notNull(),
   isActive: boolean('is_active').default(true).notNull(),
+  preferredLanguage: text('preferred_language').default('cs').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' })
     .defaultNow()
     .notNull(),

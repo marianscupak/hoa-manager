@@ -1,6 +1,6 @@
 import { pgTable, uuid, numeric, integer } from 'drizzle-orm/pg-core';
 
-import { tenants } from '@/infrastructure/db/schema/tenants';
+import { tenants } from '@/infrastructure/db/schema/core/tenants';
 import { voteOptions } from '@/infrastructure/db/schema/voting/vote-options';
 import { voteQuestionResults } from '@/infrastructure/db/schema/voting/vote-question-results';
 

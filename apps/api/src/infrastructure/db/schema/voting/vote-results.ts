@@ -8,7 +8,7 @@ import {
   unique,
 } from 'drizzle-orm/pg-core';
 
-import { tenants } from '@/infrastructure/db/schema/tenants';
+import { tenants } from '@/infrastructure/db/schema/core/tenants';
 import { voteResultStatusEnum } from '@/infrastructure/db/schema/voting/enums';
 import { votes } from '@/infrastructure/db/schema/voting/votes';
 

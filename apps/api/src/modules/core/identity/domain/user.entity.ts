@@ -5,6 +5,7 @@ export class User {
     public fullName: string,
     public isEmailVerified: boolean,
     public isActive: boolean,
+    public preferredLanguage: string,
     public readonly createdAt: Date,
     public updatedAt: Date,
   ) {}
@@ -16,6 +17,7 @@ export class User {
       params.fullName,
       false,
       true,
+      'cs',
       new Date(),
       new Date(),
     );
@@ -27,6 +29,7 @@ export class User {
     fullName: string;
     isEmailVerified: boolean;
     isActive: boolean;
+    preferredLanguage: string;
     createdAt: Date;
     updatedAt: Date;
   }): User {
@@ -36,6 +39,7 @@ export class User {
       raw.fullName,
       raw.isEmailVerified,
       raw.isActive,
+      raw.preferredLanguage,
       raw.createdAt,
       raw.updatedAt,
     );

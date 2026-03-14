@@ -58,8 +58,8 @@ i18n.use(initReactI18next).init({
             "voting": csVoting,
         },
     },
-    lng: "en",
-    fallbackLng: "en",
+    lng: "cs",
+    fallbackLng: "cs",
     interpolation: {
         escapeValue: false,
     },

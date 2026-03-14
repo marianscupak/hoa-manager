@@ -1,7 +1,7 @@
 import { pgTable, timestamp, uuid, text, index } from 'drizzle-orm/pg-core';
 
-import { tenantMemberships } from '@/infrastructure/db/schema/tenant-memberships';
-import { tenants } from '@/infrastructure/db/schema/tenants';
+import { tenantMemberships } from '@/infrastructure/db/schema/core/tenant-memberships';
+import { tenants } from '@/infrastructure/db/schema/core/tenants';
 import { voteStatusEnum } from '@/infrastructure/db/schema/voting/enums';
 
 export const votes = pgTable(

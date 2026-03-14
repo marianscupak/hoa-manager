@@ -24,6 +24,7 @@ import type {
 import type {
     CreateUserDto,
     CreateUserResponseDto,
+    UpdateUserLanguageDto,
     UserResponseDto,
 } from ".././model";
 
@@ -278,3 +279,91 @@ export function useIdentityControllerGetUser<
 
     return { ...query, queryKey: queryOptions.queryKey };
 }
+
+export const identityControllerUpdateLanguage = (
+    updateUserLanguageDto: BodyType<UpdateUserLanguageDto>,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<void>(
+        {
+            url: `/api/identity/users/me/language`,
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            data: updateUserLanguageDto,
+            signal,
+        },
+        options,
+    );
+};
+
+export const getIdentityControllerUpdateLanguageMutationOptions = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof identityControllerUpdateLanguage>>,
+        TError,
+        { data: BodyType<UpdateUserLanguageDto> },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof identityControllerUpdateLanguage>>,
+    TError,
+    { data: BodyType<UpdateUserLanguageDto> },
+    TContext
+> => {
+    const mutationKey = ["identityControllerUpdateLanguage"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof identityControllerUpdateLanguage>>,
+        { data: BodyType<UpdateUserLanguageDto> }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return identityControllerUpdateLanguage(data, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type IdentityControllerUpdateLanguageMutationResult = NonNullable<
+    Awaited<ReturnType<typeof identityControllerUpdateLanguage>>
+>;
+export type IdentityControllerUpdateLanguageMutationBody =
+    BodyType<UpdateUserLanguageDto>;
+export type IdentityControllerUpdateLanguageMutationError = ErrorType<unknown>;
+
+export const useIdentityControllerUpdateLanguage = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof identityControllerUpdateLanguage>>,
+            TError,
+            { data: BodyType<UpdateUserLanguageDto> },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof identityControllerUpdateLanguage>>,
+    TError,
+    { data: BodyType<UpdateUserLanguageDto> },
+    TContext
+> => {
+    return useMutation(
+        getIdentityControllerUpdateLanguageMutationOptions(options),
+        queryClient,
+    );
+};

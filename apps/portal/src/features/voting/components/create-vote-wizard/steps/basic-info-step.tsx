@@ -5,7 +5,12 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { Button, FormDatetimePicker, FormInput, FormTextarea } from "@hoa-mngr/ui";
+import {
+    Button,
+    FormDatetimePicker,
+    FormInput,
+    FormTextarea,
+} from "@hoa-mngr/ui";
 
 import { showApiError } from "@/api/error-utils";
 import { VoteDetailResponseDto } from "@/api/generated/model";

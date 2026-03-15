@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@hoa-mngr/ui";
 
-import { useTenancyControllerGetUserTenants } from "@/api/generated/tenancy/tenancy";
+import { useTenancyControllerGetUserTenants } from "@/api/generated/tenants/tenants";
 import { tenantContextAtom, userAtom } from "@/auth/atoms";
 
 const localeNames: Record<string, string> = {

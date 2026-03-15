@@ -5,6 +5,7 @@ export * from "./input";
 export * from "./label";
 export * from "./sonner";
 export * from "./table";
+export * from "./textarea";
 export * from "./dialog";
 export * from "./form-controls";
 export * from "./select";

@@ -1,7 +1,7 @@
 import { useAtomValue } from "jotai";
 import { Navigate, Outlet, useLocation } from "react-router";
 
-import { useTenancyControllerGetUserTenants } from "@/api/generated/tenancy/tenancy";
+import { useTenancyControllerGetUserTenants } from "@/api/generated/tenants/tenants";
 import { authStatusAtom } from "@/auth/atoms";
 import { MobileNav } from "@/components/mobile-nav";
 import { TopNav } from "@/components/top-nav";

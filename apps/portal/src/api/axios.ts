@@ -85,5 +85,5 @@ export const customInstance = <T>(
     }).then(({ data }) => data);
 };
 
-export type ErrorType = AxiosError<ApiError>;
+export type ErrorType<_> = AxiosError<ApiError>;
 export type BodyType<BodyData> = BodyData;

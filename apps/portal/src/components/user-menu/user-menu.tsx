@@ -17,7 +17,7 @@ import {
 } from "@hoa-mngr/ui";
 
 import { useAuthControllerLogout } from "@/api/generated/auth/auth";
-import { useTenancyControllerGetUserTenants } from "@/api/generated/tenancy/tenancy";
+import { useTenancyControllerGetUserTenants } from "@/api/generated/tenants/tenants";
 import {
     accessTokenAtom,
     authStatusAtom,

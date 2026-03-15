@@ -1,3 +1,4 @@
+import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 import { FormCheckbox, FormInput, FormSelect } from "@hoa-mngr/ui";
@@ -19,6 +20,11 @@ import {
  */
 export function RulesetFormFields() {
     const { t } = useTranslation(["voting"]);
+    const { watch } = useFormContext();
+
+    const majorityRuleType = watch("majorityRuleType");
+    const isMajorityThresholdDisabled =
+        majorityRuleType === MajorityRuleType.SIMPLE_MAJORITY;
 
     return (
         <div className="space-y-6">
@@ -135,6 +141,7 @@ export function RulesetFormFields() {
                     placeholder={t(
                         "voting:create.fields.majorityThreshold.placeholder",
                     )}
+                    disabled={isMajorityThresholdDisabled}
                 />
             </div>
 

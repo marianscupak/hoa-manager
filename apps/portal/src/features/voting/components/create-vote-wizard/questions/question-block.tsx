@@ -4,7 +4,7 @@ import { useState, CSSProperties } from "react";
 import { FormProvider } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
-import { cn, FormInput, FormSelect } from "@hoa-mngr/ui";
+import { cn, FormInput, FormSelect, FormTextarea } from "@hoa-mngr/ui";
 
 import { showApiError } from "@/api/error-utils";
 import {
@@ -145,7 +145,7 @@ export function QuestionBlock({
                             />
                         </div>
 
-                        <FormInput
+                        <FormTextarea
                             name="description"
                             label={t(
                                 "voting:create.steps.questions.fields.description.label",
@@ -154,6 +154,7 @@ export function QuestionBlock({
                                 "voting:create.steps.questions.fields.description.placeholder",
                             )}
                             onBlur={handleBlurSave}
+                            rows={2}
                         />
 
                         <OptionsList

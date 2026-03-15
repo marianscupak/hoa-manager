@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { showApiError } from "@/api/error-utils";
-import { useTenancyControllerCreateTenant } from "@/api/generated/tenancy/tenancy";
+import { useTenancyControllerCreateTenant } from "@/api/generated/tenants/tenants";
 import { useTenantSwitcher } from "@/auth/use-tenant-switcher";
 
 const formSchema = z.object({

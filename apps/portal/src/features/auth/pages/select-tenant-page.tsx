@@ -3,7 +3,7 @@ import { Link } from "react-router";
 
 import { Button } from "@hoa-mngr/ui";
 
-import { useTenancyControllerGetUserTenants } from "@/api/generated/tenancy/tenancy";
+import { useTenancyControllerGetUserTenants } from "@/api/generated/tenants/tenants";
 import { useTenantSwitcher } from "@/auth/use-tenant-switcher";
 
 export function SelectTenantPage() {

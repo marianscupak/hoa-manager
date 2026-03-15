@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import { Card, CardContent } from "@hoa-mngr/ui";
 
-import { useTenancyControllerGetUserTenants } from "@/api/generated/tenancy/tenancy";
+import { useTenancyControllerGetUserTenants } from "@/api/generated/tenants/tenants";
 import { tenantContextAtom } from "@/auth/atoms";
 import { DashboardHeader } from "@/features/dashboard/components/dashboard-header";
 import { MembershipCard } from "@/features/dashboard/components/membership-card";

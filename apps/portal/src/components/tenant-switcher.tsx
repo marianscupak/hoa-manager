@@ -13,7 +13,7 @@ import {
 import { cn } from "@hoa-mngr/ui/lib/utils";
 
 import { TenantResponseDto } from "@/api/generated/model";
-import { useTenancyControllerGetUserTenants } from "@/api/generated/tenancy/tenancy";
+import { useTenancyControllerGetUserTenants } from "@/api/generated/tenants/tenants";
 import { tenantContextAtom } from "@/auth/atoms";
 import { useTenantSwitcher } from "@/auth/use-tenant-switcher";
 

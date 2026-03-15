@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { Button, FormDatetimePicker, FormInput } from "@hoa-mngr/ui";
+import { Button, FormDatetimePicker, FormInput, FormTextarea } from "@hoa-mngr/ui";
 
 import { showApiError } from "@/api/error-utils";
 import { VoteDetailResponseDto } from "@/api/generated/model";
@@ -119,12 +119,13 @@ export function CreateVoteBasicInfoStep({
                         )}
                     />
 
-                    <FormInput
+                    <FormTextarea
                         name="description"
                         label={t("voting:create.fields.description.label")}
                         placeholder={t(
                             "voting:create.fields.description.placeholder",
                         )}
+                        rows={3}
                     />
 
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

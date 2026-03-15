@@ -27,6 +27,7 @@ import {
   Tenant,
   CurrentAuthUser,
 } from '@/shared/api/decorators/auth.decorators';
+import { ApiErrorResponses } from '@/shared/api/decorators/error.decorators';
 import { AccessTokenAuthGuard } from '@/shared/api/guards/access-token-auth.guard';
 import { RolesGuard } from '@/shared/api/guards/roles.guard';
 import { TenantContextGuard } from '@/shared/api/guards/tenant-context.guard';
@@ -34,6 +35,7 @@ import type { AuthPrincipal } from '@/shared/domain/auth-principal';
 import type { TenantContext } from '@/shared/domain/tenant-context';
 
 @ApiTags('Property Owners')
+@ApiErrorResponses()
 @Controller('owners')
 @UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
 export class OwnerController {

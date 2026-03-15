@@ -2,7 +2,12 @@ import { randomBytes, createHash } from 'crypto';
 
 import { Inject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import {
+  CommandBus,
+  CommandHandler,
+  ICommandHandler,
+  QueryBus,
+} from '@nestjs/cqrs';
 import { addDays, addMinutes } from 'date-fns';
 
 import { HandleGoogleCallbackCommand } from '@/modules/core/auth/application/commands/handle-google-callback.command';
@@ -20,14 +25,10 @@ import {
   GOOGLE_OIDC_SERVICE,
   type GoogleOidcService,
 } from '@/modules/core/auth/application/ports/google-oidc.service.port';
-import {
-  USER_REPOSITORY,
-  type UserRepository,
-} from '@/modules/core/identity/application/ports/user.repository.port';
-import {
-  MEMBERSHIP_REPOSITORY,
-  type MembershipRepository,
-} from '@/modules/core/tenancy/application/ports/tenant.repository.port';
+import { CreateUserCommand } from '@/modules/core/identity/application/commands/create-user.command';
+import { GetUserByEmailQuery } from '@/modules/core/identity/application/queries/get-user-by-email.query';
+import { GetUserByIdQuery } from '@/modules/core/identity/application/queries/get-user-by-id.query';
+import { GetMembershipsByUserIdQuery } from '@/modules/core/tenancy/application/queries/get-memberships-by-user-id.query';
 import { UnauthorizedException } from '@/shared/application/exceptions/auth.exceptions';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 import {
@@ -46,9 +47,6 @@ export class HandleGoogleCallbackHandler
 {
   constructor(
     @Inject(UNIT_OF_WORK) private readonly uow: UnitOfWork,
-    @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
-    @Inject(MEMBERSHIP_REPOSITORY)
-    private readonly membershipRepository: MembershipRepository,
     @Inject(AUTH_IDENTITY_REPOSITORY)
     private readonly authIdentityRepository: AuthIdentityRepository,
     @Inject(AUTH_SESSION_REPOSITORY)
@@ -61,6 +59,8 @@ export class HandleGoogleCallbackHandler
     private readonly googleOidcService: GoogleOidcService,
     @Inject(CLOCK) private readonly clock: Clock,
     private readonly configService: ConfigService,
+    private readonly queryBus: QueryBus,
+    private readonly commandBus: CommandBus,
   ) {}
 
   async execute(
@@ -96,12 +96,12 @@ export class HandleGoogleCallbackHandler
         idToken.sub,
       );
       let user = identity
-        ? await this.userRepository.findById(identity.userId)
+        ? await this.queryBus.execute(new GetUserByIdQuery(identity.userId))
         : null;
 
       if (!identity && !user) {
-        user = await this.userRepository.findByEmail(
-          idToken.email!.toLowerCase(),
+        user = await this.queryBus.execute(
+          new GetUserByEmailQuery(idToken.email!.toLowerCase()),
         );
 
         if (user) {
@@ -115,13 +115,16 @@ export class HandleGoogleCallbackHandler
       }
 
       if (!user) {
-        user = await this.userRepository.create({
-          email: idToken.email!.toLowerCase(),
-          fullName: idToken.name ?? idToken.email!,
-          isEmailVerified: true,
-          isActive: true,
-          preferredLanguage: 'cs',
-        });
+        const userResult = await this.commandBus.execute(
+          new CreateUserCommand(
+            idToken.email!.toLowerCase(),
+            idToken.name ?? idToken.email!,
+          ),
+        );
+        const userId = (userResult as { id: string }).id;
+
+        // Fetch the newly created user to match original logic (which used the created object)
+        user = await this.queryBus.execute(new GetUserByIdQuery(userId));
 
         identity = await this.authIdentityRepository.create({
           userId: user.id,
@@ -137,8 +140,10 @@ export class HandleGoogleCallbackHandler
 
       await this.authIdentityRepository.updateLastUsed(identity!.id);
 
-      const memberships = await this.membershipRepository.findByUserId(user.id);
-      const activeMemberships = memberships.filter(
+      const memberships = await this.queryBus.execute(
+        new GetMembershipsByUserIdQuery(user.id),
+      );
+      const activeMemberships = (memberships as any[]).filter(
         (m) => m.status === 'ACTIVE',
       );
 

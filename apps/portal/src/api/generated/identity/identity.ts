@@ -24,6 +24,7 @@ import type {
 import type {
     CreateUserDto,
     CreateUserResponseDto,
+    ErrorResponseDto,
     UpdateUserLanguageDto,
     UserResponseDto,
 } from ".././model";
@@ -51,7 +52,7 @@ export const identityControllerRegisterUser = (
 };
 
 export const getIdentityControllerRegisterUserMutationOptions = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(options?: {
     mutation?: UseMutationOptions<
@@ -93,10 +94,11 @@ export type IdentityControllerRegisterUserMutationResult = NonNullable<
 >;
 export type IdentityControllerRegisterUserMutationBody =
     BodyType<CreateUserDto>;
-export type IdentityControllerRegisterUserMutationError = ErrorType<unknown>;
+export type IdentityControllerRegisterUserMutationError =
+    ErrorType<ErrorResponseDto>;
 
 export const useIdentityControllerRegisterUser = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(
     options?: {
@@ -137,7 +139,7 @@ export const getIdentityControllerGetUserQueryKey = (id: string) => {
 
 export const getIdentityControllerGetUserQueryOptions = <
     TData = Awaited<ReturnType<typeof identityControllerGetUser>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     id: string,
     options?: {
@@ -175,11 +177,11 @@ export const getIdentityControllerGetUserQueryOptions = <
 export type IdentityControllerGetUserQueryResult = NonNullable<
     Awaited<ReturnType<typeof identityControllerGetUser>>
 >;
-export type IdentityControllerGetUserQueryError = ErrorType<unknown>;
+export type IdentityControllerGetUserQueryError = ErrorType<ErrorResponseDto>;
 
 export function useIdentityControllerGetUser<
     TData = Awaited<ReturnType<typeof identityControllerGetUser>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     id: string,
     options: {
@@ -206,7 +208,7 @@ export function useIdentityControllerGetUser<
 };
 export function useIdentityControllerGetUser<
     TData = Awaited<ReturnType<typeof identityControllerGetUser>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     id: string,
     options?: {
@@ -233,7 +235,7 @@ export function useIdentityControllerGetUser<
 };
 export function useIdentityControllerGetUser<
     TData = Awaited<ReturnType<typeof identityControllerGetUser>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     id: string,
     options?: {
@@ -253,7 +255,7 @@ export function useIdentityControllerGetUser<
 
 export function useIdentityControllerGetUser<
     TData = Awaited<ReturnType<typeof identityControllerGetUser>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     id: string,
     options?: {
@@ -298,7 +300,7 @@ export const identityControllerUpdateLanguage = (
 };
 
 export const getIdentityControllerUpdateLanguageMutationOptions = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(options?: {
     mutation?: UseMutationOptions<
@@ -340,10 +342,11 @@ export type IdentityControllerUpdateLanguageMutationResult = NonNullable<
 >;
 export type IdentityControllerUpdateLanguageMutationBody =
     BodyType<UpdateUserLanguageDto>;
-export type IdentityControllerUpdateLanguageMutationError = ErrorType<unknown>;
+export type IdentityControllerUpdateLanguageMutationError =
+    ErrorType<ErrorResponseDto>;
 
 export const useIdentityControllerUpdateLanguage = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(
     options?: {

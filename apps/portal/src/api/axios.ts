@@ -15,6 +15,8 @@ import { refreshAccessToken } from "@/auth/refresh";
 import { env } from "@/config/env";
 import { StorageService } from "@/storage/storage";
 
+import { ApiError } from "./types";
+
 export const AXIOS_INSTANCE = Axios.create({
     baseURL: env.VITE_API_URL,
     withCredentials: true,
@@ -83,5 +85,5 @@ export const customInstance = <T>(
     }).then(({ data }) => data);
 };
 
-export type ErrorType<Error> = AxiosError<Error>;
+export type ErrorType = AxiosError<ApiError>;
 export type BodyType<BodyData> = BodyData;

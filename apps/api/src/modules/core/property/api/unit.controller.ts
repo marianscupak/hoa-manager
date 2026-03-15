@@ -25,12 +25,14 @@ import { GetUnitDetailQuery } from '@/modules/core/property/application/queries/
 import { ListUnitsQuery } from '@/modules/core/property/application/queries/list-units.query';
 import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
 import { Roles, Tenant } from '@/shared/api/decorators/auth.decorators';
+import { ApiErrorResponses } from '@/shared/api/decorators/error.decorators';
 import { AccessTokenAuthGuard } from '@/shared/api/guards/access-token-auth.guard';
 import { RolesGuard } from '@/shared/api/guards/roles.guard';
 import { TenantContextGuard } from '@/shared/api/guards/tenant-context.guard';
 import type { TenantContext } from '@/shared/domain/tenant-context';
 
 @ApiTags('Property Units')
+@ApiErrorResponses()
 @Controller('units')
 @UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
 export class UnitController {

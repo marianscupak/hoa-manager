@@ -1,8 +1,10 @@
+import { Role } from "./roles";
+
 export interface JwtPayload {
     sub: string;
     tid?: string;
     mid?: string;
-    roles?: string[];
+    roles?: Role[];
     email?: string;
     fullName?: string;
     preferredLanguage?: string;

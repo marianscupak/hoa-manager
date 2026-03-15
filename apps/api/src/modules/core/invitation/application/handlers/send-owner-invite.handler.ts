@@ -1,6 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { addHours } from 'date-fns';
 
 import {
@@ -12,14 +12,8 @@ import {
   OWNER_INVITE_REPOSITORY,
   type OwnerInviteRepository,
 } from '@/modules/core/invitation/application/ports/owner-invite.repository.port';
-import {
-  OWNER_REPOSITORY,
-  type OwnerRepository,
-} from '@/modules/core/property/application/ports/property.repository.port';
-import {
-  TENANT_REPOSITORY,
-  type TenantRepository,
-} from '@/modules/core/tenancy/application/ports/tenant.repository.port';
+import { GetOwnerByIdQuery } from '@/modules/core/property/application/queries/get-owner-by-id.query';
+import { GetTenantByIdQuery } from '@/modules/core/tenancy/application/queries/get-tenant-by-id.query';
 import {
   OwnerAlreadyClaimedException,
   OwnerEmailRequiredException,
@@ -39,25 +33,21 @@ export class SendOwnerInviteHandler
   implements ICommandHandler<SendOwnerInviteCommand>
 {
   constructor(
-    @Inject(OWNER_REPOSITORY)
-    private readonly ownerRepo: OwnerRepository,
     @Inject(OWNER_INVITE_REPOSITORY)
     private readonly inviteRepo: OwnerInviteRepository,
-    @Inject(TENANT_REPOSITORY)
-    private readonly tenantRepo: TenantRepository,
     @Inject(EMAIL_SENDER)
     private readonly emailSender: EmailSender,
     @Inject(CLOCK)
     private readonly clock: Clock,
     private readonly configService: ConfigService,
+    private readonly queryBus: QueryBus,
   ) {}
 
   async execute(
     command: SendOwnerInviteCommand,
   ): Promise<{ success: boolean }> {
-    const owner = await this.ownerRepo.findById(
-      command.tenantId,
-      command.ownerId,
+    const owner = await this.queryBus.execute(
+      new GetOwnerByIdQuery(command.tenantId, command.ownerId),
     );
     if (!owner) {
       throw new OwnerNotFoundException();
@@ -86,7 +76,9 @@ export class SendOwnerInviteHandler
       createdByUserId: command.senderUserId,
     });
 
-    const tenant = await this.tenantRepo.findById(command.tenantId);
+    const tenant = await this.queryBus.execute(
+      new GetTenantByIdQuery(command.tenantId),
+    );
     const tenantName = tenant?.name ?? 'Unknown Community';
 
     const appUrl = this.configService.get<string>(

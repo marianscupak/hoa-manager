@@ -26,12 +26,14 @@ import { CreateUserCommand } from '@/modules/core/identity/application/commands/
 import { UpdateUserLanguageCommand } from '@/modules/core/identity/application/commands/update-user-language.command';
 import { GetUserByIdQuery } from '@/modules/core/identity/application/queries/get-user-by-id.query';
 import { CurrentAuthUser } from '@/shared/api/decorators/auth.decorators';
+import { ApiErrorResponses } from '@/shared/api/decorators/error.decorators';
 import { ErrorResponseDto } from '@/shared/api/dto/error-response.dto';
 import { AccessTokenAuthGuard } from '@/shared/api/guards/access-token-auth.guard';
 import type { AuthPrincipal } from '@/shared/domain/auth-principal';
 
 @ApiTags('Identity')
 @ApiExtraModels(ErrorResponseDto)
+@ApiErrorResponses()
 @Controller('identity/users')
 export class IdentityController {
   constructor(

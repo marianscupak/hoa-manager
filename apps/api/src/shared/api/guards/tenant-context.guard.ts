@@ -1,23 +1,16 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  Inject,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { QueryBus } from '@nestjs/cqrs';
 import type { Request } from 'express';
 
-import { MEMBERSHIP_REPOSITORY } from '@/modules/core/tenancy/application/ports/tenant.repository.port';
-import type { MembershipRepository } from '@/modules/core/tenancy/application/ports/tenant.repository.port';
+import { GetMembershipByTenantAndUserQuery } from '@/modules/core/tenancy/application/queries/get-membership-by-tenant-and-user.query';
+import { TenantMembership } from '@/modules/core/tenancy/domain/tenant.entity';
 import { UnauthorizedException } from '@/shared/application/exceptions/auth.exceptions';
 import { AuthClaims } from '@/shared/domain/auth-claims';
 import { TenantContext } from '@/shared/domain/tenant-context';
 
 @Injectable()
 export class TenantContextGuard implements CanActivate {
-  constructor(
-    @Inject(MEMBERSHIP_REPOSITORY)
-    private readonly membershipRepository: MembershipRepository,
-  ) {}
+  constructor(private readonly queryBus: QueryBus) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context
@@ -35,10 +28,10 @@ export class TenantContextGuard implements CanActivate {
       throw new UnauthorizedException();
     }
 
-    const membership = await this.membershipRepository.findByTenantAndUser(
-      claims.tid,
-      claims.sub,
-    );
+    const membership = await this.queryBus.execute<
+      GetMembershipByTenantAndUserQuery,
+      TenantMembership | null
+    >(new GetMembershipByTenantAndUserQuery(claims.tid, claims.sub));
 
     if (!membership || membership.status !== 'ACTIVE') {
       throw new UnauthorizedException();

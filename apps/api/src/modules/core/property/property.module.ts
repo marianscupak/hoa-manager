@@ -61,6 +61,6 @@ const Repositories = [
   ],
   controllers: [OwnerController, UnitController],
   providers: [...CommandHandlers, ...QueryHandlers, ...Repositories],
-  exports: [OWNER_REPOSITORY],
+  exports: [],
 })
 export class PropertyModule {}

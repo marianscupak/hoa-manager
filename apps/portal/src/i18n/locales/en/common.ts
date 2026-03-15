@@ -11,9 +11,9 @@ export default {
         UNIT_OWNER: "Unit Owner",
     },
     nav: {
-        dashboard: "Nástěnka",
-        voting: "Hlasování",
-        admin: "Administrace",
+        dashboard: "Dashboard",
+        voting: "Voting",
+        admin: "Admin",
     },
     menu: "Menu",
 } as const;

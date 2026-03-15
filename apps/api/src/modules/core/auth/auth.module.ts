@@ -4,6 +4,8 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { JwtModule } from '@nestjs/jwt';
 
 import { AuthController } from '@/modules/core/auth/api/auth.controller';
+import { CreateAuthIdentityHandler } from '@/modules/core/auth/application/handlers/create-auth-identity.handler';
+import { CreateSessionHandler } from '@/modules/core/auth/application/handlers/create-session.handler';
 import { ExchangeGoogleCodeHandler } from '@/modules/core/auth/application/handlers/exchange-google-code.handler';
 import { HandleGoogleCallbackHandler } from '@/modules/core/auth/application/handlers/handle-google-callback.handler';
 import { LoginHandler } from '@/modules/core/auth/application/handlers/login.handler';
@@ -86,14 +88,9 @@ import { TenancyModule } from '@/modules/core/tenancy/tenancy.module';
     StartGoogleLoginHandler,
     HandleGoogleCallbackHandler,
     ExchangeGoogleCodeHandler,
+    CreateAuthIdentityHandler,
+    CreateSessionHandler,
   ],
-  exports: [
-    TOKEN_VERIFIER,
-    TOKEN_SIGNER,
-    PASSWORD_HASHER,
-    AUTH_IDENTITY_REPOSITORY,
-    AUTH_SESSION_REPOSITORY,
-    AUTH_SESSION_SERVICE,
-  ],
+  exports: [TOKEN_VERIFIER, TOKEN_SIGNER, PASSWORD_HASHER],
 })
 export class AuthModule {}

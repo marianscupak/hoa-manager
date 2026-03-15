@@ -24,6 +24,7 @@ import type {
 import type {
     CreateTenantDto,
     CreateTenantResponseDto,
+    ErrorResponseDto,
     TenantResponseDto,
 } from ".././model";
 
@@ -48,7 +49,7 @@ export const getTenancyControllerGetUserTenantsQueryKey = () => {
 
 export const getTenancyControllerGetUserTenantsQueryOptions = <
     TData = Awaited<ReturnType<typeof tenancyControllerGetUserTenants>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(options?: {
     query?: Partial<
         UseQueryOptions<
@@ -78,11 +79,12 @@ export const getTenancyControllerGetUserTenantsQueryOptions = <
 export type TenancyControllerGetUserTenantsQueryResult = NonNullable<
     Awaited<ReturnType<typeof tenancyControllerGetUserTenants>>
 >;
-export type TenancyControllerGetUserTenantsQueryError = ErrorType<unknown>;
+export type TenancyControllerGetUserTenantsQueryError =
+    ErrorType<ErrorResponseDto>;
 
 export function useTenancyControllerGetUserTenants<
     TData = Awaited<ReturnType<typeof tenancyControllerGetUserTenants>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     options: {
         query: Partial<
@@ -108,7 +110,7 @@ export function useTenancyControllerGetUserTenants<
 };
 export function useTenancyControllerGetUserTenants<
     TData = Awaited<ReturnType<typeof tenancyControllerGetUserTenants>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     options?: {
         query?: Partial<
@@ -134,7 +136,7 @@ export function useTenancyControllerGetUserTenants<
 };
 export function useTenancyControllerGetUserTenants<
     TData = Awaited<ReturnType<typeof tenancyControllerGetUserTenants>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     options?: {
         query?: Partial<
@@ -153,7 +155,7 @@ export function useTenancyControllerGetUserTenants<
 
 export function useTenancyControllerGetUserTenants<
     TData = Awaited<ReturnType<typeof tenancyControllerGetUserTenants>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     options?: {
         query?: Partial<
@@ -198,7 +200,7 @@ export const tenancyControllerCreateTenant = (
 };
 
 export const getTenancyControllerCreateTenantMutationOptions = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(options?: {
     mutation?: UseMutationOptions<
@@ -240,10 +242,11 @@ export type TenancyControllerCreateTenantMutationResult = NonNullable<
 >;
 export type TenancyControllerCreateTenantMutationBody =
     BodyType<CreateTenantDto>;
-export type TenancyControllerCreateTenantMutationError = ErrorType<unknown>;
+export type TenancyControllerCreateTenantMutationError =
+    ErrorType<ErrorResponseDto>;
 
 export const useTenancyControllerCreateTenant = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(
     options?: {

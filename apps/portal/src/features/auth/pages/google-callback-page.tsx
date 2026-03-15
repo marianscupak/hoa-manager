@@ -1,7 +1,7 @@
 import { useSetAtom } from "jotai";
 import { useEffect, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate, Link } from "react-router";
 
 import { toast, Button } from "@hoa-mngr/ui";
 
@@ -98,10 +98,12 @@ export function GoogleCallbackPage() {
                         <p className="mb-4">{error}</p>
                         <Button
                             variant="secondary"
-                            onClick={() => navigate("/login")}
                             className="font-semibold"
+                            asChild
                         >
-                            {t("googleCallback.returnToLogin")}
+                            <Link to="/login">
+                                {t("googleCallback.returnToLogin")}
+                            </Link>
                         </Button>
                     </div>
                 ) : (

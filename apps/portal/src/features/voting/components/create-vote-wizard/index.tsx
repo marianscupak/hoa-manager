@@ -2,7 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, Circle, CircleDot, Loader2, Send } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router";
 
 import {
     Accordion,
@@ -25,11 +25,11 @@ import {
     useVotesControllerGetVoteDetail,
 } from "@/api/generated/votes/votes";
 
-import { useScheduleVote } from "../../hooks/use-schedule-vote";
 import { ScheduleValidationModal } from "../schedule-validation-modal";
 import { CreateVoteBasicInfoStep } from "./steps/basic-info-step";
 import { CreateVoteQuestionsStep } from "./steps/questions-step";
 import { CreateVoteRulesetStep } from "./steps/ruleset-step";
+import { useScheduleVote } from "../../hooks/use-schedule-vote";
 
 export type CreateVoteStepId = "basic-info" | "ruleset" | "questions";
 
@@ -112,12 +112,10 @@ export function CreateVoteWizard({
         <div className="mx-auto max-w-3xl space-y-6">
             <div>
                 <h1 className="text-3xl font-bold tracking-tight">
-                    {initialVoteId
-                        ? t("voting:create.titleEdit")
-                        : t("voting:create.title")}
+                    {initialVoteId ? t("create.titleEdit") : t("create.title")}
                 </h1>
                 <p className="text-muted-foreground mt-2">
-                    {t("voting:create.description")}
+                    {t("create.description")}
                 </p>
             </div>
 
@@ -153,14 +151,14 @@ export function CreateVoteWizard({
                                     <Circle className="text-muted-foreground h-5 w-5 shrink-0" />
                                 ))}
                             <h2 className="text-xl font-semibold">
-                                {t("voting:create.steps.basicInfo.title")}
+                                {t("create.steps.basicInfo.title")}
                             </h2>
                         </div>
                     </AccordionTrigger>
 
                     <AccordionContent className="mt-2 border-t pt-4 pb-6">
                         <p className="text-muted-foreground mb-6 text-sm">
-                            {t("voting:create.steps.basicInfo.description")}
+                            {t("create.steps.basicInfo.description")}
                         </p>
 
                         <CreateVoteBasicInfoStep
@@ -195,14 +193,14 @@ export function CreateVoteWizard({
                                     <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" />
                                 ))}
                             <h2 className="text-xl font-semibold">
-                                {t("voting:create.steps.ruleset.title")}
+                                {t("create.steps.ruleset.title")}
                             </h2>
                         </div>
                     </AccordionTrigger>
 
                     <AccordionContent className="mt-2 border-t pt-4 pb-6">
                         <p className="text-muted-foreground mb-6 text-sm">
-                            {t("voting:create.steps.ruleset.description")}
+                            {t("create.steps.ruleset.description")}
                         </p>
 
                         <CreateVoteRulesetStep
@@ -234,14 +232,14 @@ export function CreateVoteWizard({
                                     <Circle className="text-muted-foreground h-5 w-5 shrink-0" />
                                 ))}
                             <h2 className="text-xl font-semibold">
-                                {t("voting:create.steps.questions.title")}
+                                {t("create.steps.questions.title")}
                             </h2>
                         </div>
                     </AccordionTrigger>
 
                     <AccordionContent className="mt-2 border-t pt-4 pb-6">
                         <p className="text-muted-foreground mb-6 text-sm">
-                            {t("voting:create.steps.questions.description")}
+                            {t("create.steps.questions.description")}
                         </p>
 
                         <CreateVoteQuestionsStep voteId={createdVoteId} />
@@ -251,11 +249,10 @@ export function CreateVoteWizard({
 
             {initialVoteId && (
                 <div className="mt-8 flex justify-end gap-3 border-t pt-6">
-                    <Button
-                        variant="outline"
-                        onClick={() => navigate(`/voting/${initialVoteId}`)}
-                    >
-                        {t("voting:create.actions.back")}
+                    <Button variant="outline" asChild>
+                        <Link to={`/voting/${initialVoteId}`}>
+                            {t("create.actions.back")}
+                        </Link>
                     </Button>
                     <Dialog
                         open={isConfirmOpen}
@@ -268,19 +265,17 @@ export function CreateVoteWizard({
                                 ) : (
                                     <Send className="mr-2 h-4 w-4" />
                                 )}
-                                {t("voting:detail.actions.schedule")}
+                                {t("detail.actions.schedule")}
                             </Button>
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
                                 <DialogTitle>
-                                    {t(
-                                        "voting:detail.actions.scheduleConfirmTitle",
-                                    )}
+                                    {t("detail.actions.scheduleConfirmTitle")}
                                 </DialogTitle>
                                 <DialogDescription>
                                     {t(
-                                        "voting:detail.actions.scheduleConfirmDescription",
+                                        "detail.actions.scheduleConfirmDescription",
                                     )}
                                 </DialogDescription>
                             </DialogHeader>
@@ -289,7 +284,7 @@ export function CreateVoteWizard({
                                     variant="outline"
                                     onClick={() => setIsConfirmOpen(false)}
                                 >
-                                    {t("voting:detail.actions.cancel")}
+                                    {t("detail.actions.cancel")}
                                 </Button>
                                 <Button
                                     onClick={handleSchedule}
@@ -298,7 +293,7 @@ export function CreateVoteWizard({
                                     {isPending ? (
                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                     ) : null}
-                                    {t("voting:detail.actions.confirm")}
+                                    {t("detail.actions.confirm")}
                                 </Button>
                             </DialogFooter>
                         </DialogContent>

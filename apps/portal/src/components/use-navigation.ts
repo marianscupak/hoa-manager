@@ -21,12 +21,12 @@ export function useNavigation() {
 
     const links: NavLink[] = [
         {
-            name: t("common:nav.dashboard"),
+            name: t("nav.dashboard"),
             path: "/",
             active: location.pathname === "/",
         },
         {
-            name: t("common:nav.voting"),
+            name: t("nav.voting"),
             path: "/voting",
             active: location.pathname.startsWith("/voting"),
         },
@@ -34,7 +34,7 @@ export function useNavigation() {
 
     if (isAdminOrBoardMember) {
         links.push({
-            name: t("common:nav.admin"),
+            name: t("nav.admin"),
             path: "/admin",
             active: location.pathname.startsWith("/admin"),
         });

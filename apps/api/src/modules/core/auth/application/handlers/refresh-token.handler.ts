@@ -1,7 +1,7 @@
 import { randomBytes, createHash } from 'crypto';
 
 import { Inject } from '@nestjs/common';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { addDays, differenceInMilliseconds } from 'date-fns';
 
 import {
@@ -19,14 +19,10 @@ import {
   type TokenVerifier,
 } from '@/modules/core/auth/application/ports/auth.utils.port';
 import { AuthSession } from '@/modules/core/auth/domain/auth-identity.entity';
-import {
-  USER_REPOSITORY,
-  type UserRepository,
-} from '@/modules/core/identity/application/ports/user.repository.port';
-import {
-  MEMBERSHIP_REPOSITORY,
-  type MembershipRepository,
-} from '@/modules/core/tenancy/application/ports/tenant.repository.port';
+import { type GetUserByIdResult } from '@/modules/core/identity/application/handlers/get-user-by-id.handler';
+import { GetUserByIdQuery } from '@/modules/core/identity/application/queries/get-user-by-id.query';
+import { GetMembershipByTenantAndUserQuery } from '@/modules/core/tenancy/application/queries/get-membership-by-tenant-and-user.query';
+import { GetMembershipsByUserIdQuery } from '@/modules/core/tenancy/application/queries/get-memberships-by-user-id.query';
 import { TenantMembership } from '@/modules/core/tenancy/domain/tenant.entity';
 import {
   InvalidTokenException,
@@ -51,9 +47,7 @@ export class RefreshTokenHandler
     @Inject(UNIT_OF_WORK) private readonly uow: UnitOfWork,
     @Inject(AUTH_SESSION_REPOSITORY)
     private readonly authSessionRepository: AuthSessionRepository,
-    @Inject(MEMBERSHIP_REPOSITORY)
-    private readonly membershipRepository: MembershipRepository,
-    @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
+    private readonly queryBus: QueryBus,
     @Inject(TOKEN_SIGNER) private readonly tokenSigner: TokenSigner,
     @Inject(TOKEN_VERIFIER) private readonly tokenVerifier: TokenVerifier,
     @Inject(CLOCK) private readonly clock: Clock,
@@ -70,9 +64,11 @@ export class RefreshTokenHandler
 
       const userId = session.userId;
 
-      await this.validateSessionStatus(session, userId);
+      const user = await this.queryBus.execute<
+        GetUserByIdQuery,
+        GetUserByIdResult
+      >(new GetUserByIdQuery(userId));
 
-      const user = await this.userRepository.findById(userId);
       if (!user || !user.isActive) {
         throw new UserInactiveException();
       }
@@ -184,16 +180,21 @@ export class RefreshTokenHandler
     });
 
     if (claims.tid) {
-      const membership = await this.membershipRepository.findByTenantAndUser(
-        claims.tid,
-        userId,
-      );
+      const membership = await this.queryBus.execute<
+        GetMembershipByTenantAndUserQuery,
+        TenantMembership | null
+      >(new GetMembershipByTenantAndUserQuery(claims.tid, userId));
+
       if (!membership || membership.status !== 'ACTIVE') {
         throw new UnauthorizedException();
       }
       return makeClaimsFromMemberShip(membership);
     } else {
-      const memberships = await this.membershipRepository.findByUserId(userId);
+      const memberships = await this.queryBus.execute<
+        GetMembershipsByUserIdQuery,
+        TenantMembership[]
+      >(new GetMembershipsByUserIdQuery(userId));
+
       if (memberships.length === 1) {
         const membership = memberships[0];
         if (membership.status !== 'ACTIVE') {

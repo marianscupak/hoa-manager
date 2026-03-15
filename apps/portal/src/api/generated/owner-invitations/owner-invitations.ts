@@ -24,6 +24,7 @@ import type {
 import type {
     AcceptInviteDto,
     AcceptInviteResponseDto,
+    ErrorResponseDto,
     InviteControllerGetInviteStatusParams,
     InviteStatusResponseDto,
     RegisterFromInviteDto,
@@ -54,7 +55,7 @@ export const getInviteControllerGetInviteStatusQueryKey = (
 
 export const getInviteControllerGetInviteStatusQueryOptions = <
     TData = Awaited<ReturnType<typeof inviteControllerGetInviteStatus>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     params: InviteControllerGetInviteStatusParams,
     options?: {
@@ -89,11 +90,12 @@ export const getInviteControllerGetInviteStatusQueryOptions = <
 export type InviteControllerGetInviteStatusQueryResult = NonNullable<
     Awaited<ReturnType<typeof inviteControllerGetInviteStatus>>
 >;
-export type InviteControllerGetInviteStatusQueryError = ErrorType<unknown>;
+export type InviteControllerGetInviteStatusQueryError =
+    ErrorType<ErrorResponseDto>;
 
 export function useInviteControllerGetInviteStatus<
     TData = Awaited<ReturnType<typeof inviteControllerGetInviteStatus>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     params: InviteControllerGetInviteStatusParams,
     options: {
@@ -120,7 +122,7 @@ export function useInviteControllerGetInviteStatus<
 };
 export function useInviteControllerGetInviteStatus<
     TData = Awaited<ReturnType<typeof inviteControllerGetInviteStatus>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     params: InviteControllerGetInviteStatusParams,
     options?: {
@@ -147,7 +149,7 @@ export function useInviteControllerGetInviteStatus<
 };
 export function useInviteControllerGetInviteStatus<
     TData = Awaited<ReturnType<typeof inviteControllerGetInviteStatus>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     params: InviteControllerGetInviteStatusParams,
     options?: {
@@ -167,7 +169,7 @@ export function useInviteControllerGetInviteStatus<
 
 export function useInviteControllerGetInviteStatus<
     TData = Awaited<ReturnType<typeof inviteControllerGetInviteStatus>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     params: InviteControllerGetInviteStatusParams,
     options?: {
@@ -215,7 +217,7 @@ export const inviteControllerAcceptInvite = (
 };
 
 export const getInviteControllerAcceptInviteMutationOptions = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(options?: {
     mutation?: UseMutationOptions<
@@ -257,10 +259,11 @@ export type InviteControllerAcceptInviteMutationResult = NonNullable<
 >;
 export type InviteControllerAcceptInviteMutationBody =
     BodyType<AcceptInviteDto>;
-export type InviteControllerAcceptInviteMutationError = ErrorType<unknown>;
+export type InviteControllerAcceptInviteMutationError =
+    ErrorType<ErrorResponseDto>;
 
 export const useInviteControllerAcceptInvite = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(
     options?: {
@@ -302,7 +305,7 @@ export const inviteControllerRegisterFromInvite = (
 };
 
 export const getInviteControllerRegisterFromInviteMutationOptions = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(options?: {
     mutation?: UseMutationOptions<
@@ -345,10 +348,10 @@ export type InviteControllerRegisterFromInviteMutationResult = NonNullable<
 export type InviteControllerRegisterFromInviteMutationBody =
     BodyType<RegisterFromInviteDto>;
 export type InviteControllerRegisterFromInviteMutationError =
-    ErrorType<unknown>;
+    ErrorType<ErrorResponseDto>;
 
 export const useInviteControllerRegisterFromInvite = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(
     options?: {

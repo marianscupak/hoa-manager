@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 
-import { TenantResponseDtoRole } from "../api/generated/model/tenantResponseDtoRole";
+import { Role } from "./roles";
 
 export type AuthStatus =
     | "initializing"
@@ -11,7 +11,7 @@ export type AuthStatus =
 export type TenantCtx = {
     tenantId: string;
     membershipId: string;
-    roles: TenantResponseDtoRole[];
+    roles: Role[];
 };
 
 export type UserSummary = {

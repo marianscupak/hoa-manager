@@ -3,8 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Navigate, Outlet } from "react-router";
 
 import { tenantContextAtom } from "@/auth/atoms";
-
-import { SidebarLayout } from "../../../components/layouts/sidebar-layout";
+import { SidebarLayout } from "@/components/layouts/sidebar-layout";
 
 export function AdminLayout() {
     const { t } = useTranslation(["admin"]);
@@ -19,8 +18,8 @@ export function AdminLayout() {
     }
 
     const navigation = [
-        { name: t("admin:nav.units"), href: "/admin/units" },
-        { name: t("admin:nav.owners"), href: "/admin/owners" },
+        { name: t("nav.units"), href: "/admin/units" },
+        { name: t("nav.owners"), href: "/admin/owners" },
     ];
 
     return (

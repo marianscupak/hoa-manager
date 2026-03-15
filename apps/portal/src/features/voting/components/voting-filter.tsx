@@ -13,10 +13,10 @@ export function VotingFilter({ filter, onFilterChange }: VotingFilterProps) {
     const { t } = useTranslation(["voting"]);
 
     const filters: { key: FilterType; label: string }[] = [
-        { key: "ALL", label: t("voting:list.filters.all") },
-        { key: "OPEN", label: t("voting:list.filters.open") },
-        { key: "SCHEDULED", label: t("voting:list.filters.scheduled") },
-        { key: "CLOSED", label: t("voting:list.filters.closed") },
+        { key: "ALL", label: t("list.filters.all") },
+        { key: "OPEN", label: t("list.filters.open") },
+        { key: "SCHEDULED", label: t("list.filters.scheduled") },
+        { key: "CLOSED", label: t("list.filters.closed") },
     ];
 
     return (

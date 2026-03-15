@@ -1,7 +1,7 @@
 import { randomBytes, createHash } from 'crypto';
 
 import { Inject } from '@nestjs/common';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { addDays } from 'date-fns';
 
 import {
@@ -20,14 +20,8 @@ import {
   type PasswordHasher,
   type TokenSigner,
 } from '@/modules/core/auth/application/ports/auth.utils.port';
-import {
-  USER_REPOSITORY,
-  type UserRepository,
-} from '@/modules/core/identity/application/ports/user.repository.port';
-import {
-  MEMBERSHIP_REPOSITORY,
-  type MembershipRepository,
-} from '@/modules/core/tenancy/application/ports/tenant.repository.port';
+import { GetUserByEmailQuery } from '@/modules/core/identity/application/queries/get-user-by-email.query';
+import { GetMembershipsByUserIdQuery } from '@/modules/core/tenancy/application/queries/get-memberships-by-user-id.query';
 import {
   UnauthorizedException,
   InvalidCredentialsException,
@@ -42,9 +36,6 @@ import {
 export class LoginHandler implements ICommandHandler<LoginCommand> {
   constructor(
     @Inject(UNIT_OF_WORK) private readonly uow: UnitOfWork,
-    @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
-    @Inject(MEMBERSHIP_REPOSITORY)
-    private readonly membershipRepository: MembershipRepository,
     @Inject(AUTH_IDENTITY_REPOSITORY)
     private readonly authIdentityRepository: AuthIdentityRepository,
     @Inject(AUTH_SESSION_REPOSITORY)
@@ -52,11 +43,14 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
     @Inject(PASSWORD_HASHER) private readonly passwordHasher: PasswordHasher,
     @Inject(TOKEN_SIGNER) private readonly tokenSigner: TokenSigner,
     @Inject(CLOCK) private readonly clock: Clock,
+    private readonly queryBus: QueryBus,
   ) {}
 
   async execute(command: LoginCommand): Promise<LoginResult> {
     return this.uow.execute(async () => {
-      const user = await this.userRepository.findByEmail(command.email);
+      const user = await this.queryBus.execute(
+        new GetUserByEmailQuery(command.email),
+      );
       if (!user) {
         throw new InvalidCredentialsException();
       }
@@ -91,8 +85,10 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 
       await this.authIdentityRepository.updateLastUsed(identity.id);
 
-      const memberships = await this.membershipRepository.findByUserId(user.id);
-      const activeMemberships = memberships.filter(
+      const memberships = await this.queryBus.execute(
+        new GetMembershipsByUserIdQuery(user.id),
+      );
+      const activeMemberships = (memberships as any[]).filter(
         (m) => m.status === 'ACTIVE',
       );
 

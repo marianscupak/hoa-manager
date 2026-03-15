@@ -29,7 +29,7 @@ export function VotingPage() {
     if (error) {
         return (
             <div className="text-destructive rounded-md border p-4">
-                {t("voting:list.error")}
+                {t("list.error")}
             </div>
         );
     }
@@ -39,11 +39,9 @@ export function VotingPage() {
             <div className="flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between">
                 <div className="flex flex-col gap-1">
                     <h1 className="text-3xl font-bold tracking-tight">
-                        {t("voting:list.title")}
+                        {t("list.title")}
                     </h1>
-                    <p className="text-slate-500">
-                        {t("voting:list.description")}
-                    </p>
+                    <p className="text-slate-500">{t("list.description")}</p>
                 </div>
 
                 <VotingFilter filter={filter} onFilterChange={setFilter} />
@@ -52,13 +50,13 @@ export function VotingPage() {
             {!filteredVotes || filteredVotes.length === 0 ? (
                 <div className="rounded-lg border border-dashed p-12 text-center text-slate-500">
                     {filter === "ALL"
-                        ? t("voting:list.empty.all")
-                        : t("voting:list.empty.filtered", {
-                              status: (filter === "OPEN"
-                                  ? t("voting:list.filters.open")
-                                  : filter === "SCHEDULED"
-                                    ? t("voting:list.filters.scheduled")
-                                    : t("voting:list.filters.closed")
+                        ? t("list.empty.all")
+                        : t("list.empty.filtered", {
+                              status: t(
+                                  `list.filters.${filter.toLowerCase()}` as
+                                      | "list.filters.open"
+                                      | "list.filters.scheduled"
+                                      | "list.filters.closed",
                               ).toLowerCase(),
                           })}
                 </div>

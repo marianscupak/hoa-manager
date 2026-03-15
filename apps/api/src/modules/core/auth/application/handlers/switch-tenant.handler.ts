@@ -1,5 +1,5 @@
 import { Inject } from '@nestjs/common';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 
 import {
   SwitchTenantCommand,
@@ -11,14 +11,10 @@ import {
   type TokenSigner,
   type TokenVerifier,
 } from '@/modules/core/auth/application/ports/auth.utils.port';
-import {
-  USER_REPOSITORY,
-  type UserRepository,
-} from '@/modules/core/identity/application/ports/user.repository.port';
-import {
-  MEMBERSHIP_REPOSITORY,
-  type MembershipRepository,
-} from '@/modules/core/tenancy/application/ports/tenant.repository.port';
+import { type GetUserByIdResult } from '@/modules/core/identity/application/handlers/get-user-by-id.handler';
+import { GetUserByIdQuery } from '@/modules/core/identity/application/queries/get-user-by-id.query';
+import { GetMembershipByTenantAndUserQuery } from '@/modules/core/tenancy/application/queries/get-membership-by-tenant-and-user.query';
+import { TenantMembership } from '@/modules/core/tenancy/domain/tenant.entity';
 import {
   InvalidTokenException,
   UnauthorizedException,
@@ -33,9 +29,7 @@ export class SwitchTenantHandler
   constructor(
     @Inject(TOKEN_VERIFIER) private readonly tokenVerifier: TokenVerifier,
     @Inject(TOKEN_SIGNER) private readonly tokenSigner: TokenSigner,
-    @Inject(MEMBERSHIP_REPOSITORY)
-    private readonly membershipRepository: MembershipRepository,
-    @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
+    private readonly queryBus: QueryBus,
   ) {}
 
   async execute(command: SwitchTenantCommand): Promise<SwitchTenantResult> {
@@ -48,14 +42,20 @@ export class SwitchTenantHandler
       throw new InvalidTokenException();
     }
 
-    const user = await this.userRepository.findById(claims.sub);
+    const user = await this.queryBus.execute<
+      GetUserByIdQuery,
+      GetUserByIdResult
+    >(new GetUserByIdQuery(claims.sub));
+
     if (!user || !user.isActive) {
       throw new UserInactiveException();
     }
 
-    const membership = await this.membershipRepository.findByTenantAndUser(
-      command.targetTenantId,
-      claims.sub,
+    const membership = await this.queryBus.execute<
+      GetMembershipByTenantAndUserQuery,
+      TenantMembership | null
+    >(
+      new GetMembershipByTenantAndUserQuery(command.targetTenantId, claims.sub),
     );
 
     if (!membership || membership.status !== 'ACTIVE') {

@@ -24,6 +24,7 @@ import type {
 import type {
     CreateOwnerDto,
     CreateOwnerResponseDto,
+    ErrorResponseDto,
     OwnerResponseDto,
 } from ".././model";
 
@@ -48,7 +49,7 @@ export const getOwnerControllerGetOwnersQueryKey = () => {
 
 export const getOwnerControllerGetOwnersQueryOptions = <
     TData = Awaited<ReturnType<typeof ownerControllerGetOwners>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(options?: {
     query?: Partial<
         UseQueryOptions<
@@ -78,11 +79,11 @@ export const getOwnerControllerGetOwnersQueryOptions = <
 export type OwnerControllerGetOwnersQueryResult = NonNullable<
     Awaited<ReturnType<typeof ownerControllerGetOwners>>
 >;
-export type OwnerControllerGetOwnersQueryError = ErrorType<unknown>;
+export type OwnerControllerGetOwnersQueryError = ErrorType<ErrorResponseDto>;
 
 export function useOwnerControllerGetOwners<
     TData = Awaited<ReturnType<typeof ownerControllerGetOwners>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     options: {
         query: Partial<
@@ -108,7 +109,7 @@ export function useOwnerControllerGetOwners<
 };
 export function useOwnerControllerGetOwners<
     TData = Awaited<ReturnType<typeof ownerControllerGetOwners>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     options?: {
         query?: Partial<
@@ -134,7 +135,7 @@ export function useOwnerControllerGetOwners<
 };
 export function useOwnerControllerGetOwners<
     TData = Awaited<ReturnType<typeof ownerControllerGetOwners>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     options?: {
         query?: Partial<
@@ -153,7 +154,7 @@ export function useOwnerControllerGetOwners<
 
 export function useOwnerControllerGetOwners<
     TData = Awaited<ReturnType<typeof ownerControllerGetOwners>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     options?: {
         query?: Partial<
@@ -197,7 +198,7 @@ export const ownerControllerCreateOwner = (
 };
 
 export const getOwnerControllerCreateOwnerMutationOptions = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(options?: {
     mutation?: UseMutationOptions<
@@ -238,10 +239,11 @@ export type OwnerControllerCreateOwnerMutationResult = NonNullable<
     Awaited<ReturnType<typeof ownerControllerCreateOwner>>
 >;
 export type OwnerControllerCreateOwnerMutationBody = BodyType<CreateOwnerDto>;
-export type OwnerControllerCreateOwnerMutationError = ErrorType<unknown>;
+export type OwnerControllerCreateOwnerMutationError =
+    ErrorType<ErrorResponseDto>;
 
 export const useOwnerControllerCreateOwner = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(
     options?: {
@@ -277,7 +279,7 @@ export const ownerControllerSendInvite = (
 };
 
 export const getOwnerControllerSendInviteMutationOptions = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(options?: {
     mutation?: UseMutationOptions<
@@ -318,10 +320,11 @@ export type OwnerControllerSendInviteMutationResult = NonNullable<
     Awaited<ReturnType<typeof ownerControllerSendInvite>>
 >;
 
-export type OwnerControllerSendInviteMutationError = ErrorType<unknown>;
+export type OwnerControllerSendInviteMutationError =
+    ErrorType<ErrorResponseDto>;
 
 export const useOwnerControllerSendInvite = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(
     options?: {
@@ -357,7 +360,7 @@ export const ownerControllerRevokeInvite = (
 };
 
 export const getOwnerControllerRevokeInviteMutationOptions = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(options?: {
     mutation?: UseMutationOptions<
@@ -398,10 +401,11 @@ export type OwnerControllerRevokeInviteMutationResult = NonNullable<
     Awaited<ReturnType<typeof ownerControllerRevokeInvite>>
 >;
 
-export type OwnerControllerRevokeInviteMutationError = ErrorType<unknown>;
+export type OwnerControllerRevokeInviteMutationError =
+    ErrorType<ErrorResponseDto>;
 
 export const useOwnerControllerRevokeInvite = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(
     options?: {

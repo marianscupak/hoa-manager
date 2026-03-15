@@ -1,7 +1,7 @@
 import { createHash } from 'crypto';
 
 import { Inject } from '@nestjs/common';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 
 import { ExchangeGoogleCodeCommand } from '@/modules/core/auth/application/commands/exchange-google-code.command';
 import {
@@ -12,10 +12,8 @@ import {
   TOKEN_SIGNER,
   type TokenSigner,
 } from '@/modules/core/auth/application/ports/auth.utils.port';
-import {
-  USER_REPOSITORY,
-  type UserRepository,
-} from '@/modules/core/identity/application/ports/user.repository.port';
+import { type GetUserByIdResult } from '@/modules/core/identity/application/handlers/get-user-by-id.handler';
+import { GetUserByIdQuery } from '@/modules/core/identity/application/queries/get-user-by-id.query';
 import { UnauthorizedException } from '@/shared/application/exceptions/auth.exceptions';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 import {
@@ -36,7 +34,7 @@ export class ExchangeGoogleCodeHandler
     @Inject(AUTH_EXCHANGE_CODE_REPOSITORY)
     private readonly exchangeCodeRepository: AuthExchangeCodeRepository,
     @Inject(TOKEN_SIGNER) private readonly tokenSigner: TokenSigner,
-    @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
+    private readonly queryBus: QueryBus,
     @Inject(CLOCK) private readonly clock: Clock,
   ) {}
 
@@ -62,7 +60,10 @@ export class ExchangeGoogleCodeHandler
 
       await this.exchangeCodeRepository.markUsed(exchangeCode.id);
 
-      const user = await this.userRepository.findById(exchangeCode.userId);
+      const user = await this.queryBus.execute<
+        GetUserByIdQuery,
+        GetUserByIdResult
+      >(new GetUserByIdQuery(exchangeCode.userId));
 
       const accessTokenPayload = {
         sub: exchangeCode.userId,

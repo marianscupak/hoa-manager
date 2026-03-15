@@ -7,7 +7,7 @@ import {
     Users,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
+import { Link } from "react-router";
 
 import {
     Button,
@@ -18,7 +18,7 @@ import {
 } from "@hoa-mngr/ui";
 import { cn } from "@hoa-mngr/ui/lib/utils";
 
-import { type VoteListItemResponseDto } from "@/api/generated/model";
+import { VoteListItemResponseDto } from "@/api/generated/model";
 
 import { StatusBadge } from "./status-badge";
 
@@ -28,7 +28,6 @@ interface VoteCardProps {
 
 export function VoteCard({ vote }: VoteCardProps) {
     const { t } = useTranslation(["voting"]);
-    const navigate = useNavigate();
 
     const isVotingOpen = vote.status === "OPEN";
     const isScheduled = vote.status === "SCHEDULED";
@@ -56,8 +55,8 @@ export function VoteCard({ vote }: VoteCardProps) {
                                 <Calendar className="h-4 w-4" />
                                 <span>
                                     {isVotingOpen
-                                        ? t("voting:list.card.endsOn")
-                                        : t("voting:list.card.startsOn")}
+                                        ? t("list.card.endsOn")
+                                        : t("list.card.startsOn")}
                                     {format(
                                         new Date(vote.scheduledFrom),
                                         "d. M. yyyy HH:mm",
@@ -66,15 +65,13 @@ export function VoteCard({ vote }: VoteCardProps) {
                             </div>
                         )}
                     </div>
-                    <CardTitle
-                        className="mb-2 cursor-pointer text-xl hover:underline"
-                        onClick={() => navigate(`/voting/${vote.id}`)}
-                    >
-                        {vote.title}
-                    </CardTitle>
+                    <Link to={`/voting/${vote.id}`}>
+                        <CardTitle className="mb-2 cursor-pointer text-xl hover:underline">
+                            {vote.title}
+                        </CardTitle>
+                    </Link>
                     <CardDescription className="leading-relaxed text-slate-500">
-                        {vote.description ||
-                            t("voting:list.card.noDescription")}
+                        {vote.description || t("list.card.noDescription")}
                     </CardDescription>
                 </CardContent>
 
@@ -84,18 +81,20 @@ export function VoteCard({ vote }: VoteCardProps) {
                             <div className="mb-4 flex flex-col items-center text-center">
                                 <CheckCircle2 className="mb-2 h-8 w-8 text-emerald-500" />
                                 <span className="font-semibold text-emerald-700">
-                                    {t("voting:list.card.canVote")}
+                                    {t("list.card.canVote")}
                                 </span>
                                 <span className="text-sm text-emerald-600">
-                                    {t("voting:list.card.voteRequired")}
+                                    {t("list.card.voteRequired")}
                                 </span>
                             </div>
                             <Button
                                 className="w-full bg-blue-600 text-white hover:bg-blue-700"
-                                onClick={() => navigate(`/voting/${vote.id}`)}
+                                asChild
                             >
-                                {t("voting:list.card.voteAction")}{" "}
-                                <ArrowRight className="ml-2 h-4 w-4" />
+                                <Link to={`/voting/${vote.id}`}>
+                                    {t("list.card.voteAction")}{" "}
+                                    <ArrowRight className="ml-2 h-4 w-4" />
+                                </Link>
                             </Button>
                         </>
                     ) : isScheduled ? (
@@ -103,17 +102,17 @@ export function VoteCard({ vote }: VoteCardProps) {
                             <div className="mb-4 flex flex-col items-center text-center">
                                 <Users className="mb-2 h-8 w-8 text-orange-500" />
                                 <span className="font-semibold text-orange-800">
-                                    {t("voting:list.card.delegationNeeded")}
+                                    {t("list.card.delegationNeeded")}
                                 </span>
                                 <span className="text-sm text-orange-600">
-                                    {t("voting:list.card.fromCoOwners")}
+                                    {t("list.card.fromCoOwners")}
                                 </span>
                             </div>
                             <Button
                                 variant="outline"
                                 className="w-full border-slate-200"
                             >
-                                {t("voting:list.card.manageDelegation")}
+                                {t("list.card.manageDelegation")}
                             </Button>
                         </>
                     ) : isDraft ? (
@@ -121,37 +120,37 @@ export function VoteCard({ vote }: VoteCardProps) {
                             <div className="mb-4 flex flex-col items-center text-center">
                                 <Pencil className="mb-2 h-8 w-8 text-slate-500" />
                                 <span className="font-semibold text-slate-700">
-                                    {t("voting:list.card.draftStatus")}
+                                    {t("list.card.draftStatus")}
                                 </span>
                                 <span className="text-sm text-slate-500">
-                                    {t("voting:list.card.editDraft")}
+                                    {t("list.card.editDraft")}
                                 </span>
                             </div>
                             <Button
                                 variant="outline"
                                 className="w-full"
-                                onClick={() =>
-                                    navigate(`/voting/${vote.id}/edit`)
-                                }
+                                asChild
                             >
-                                {t("voting:list.card.editAction")}
+                                <Link to={`/voting/${vote.id}/edit`}>
+                                    {t("list.card.editAction")}
+                                </Link>
                             </Button>
                         </>
                     ) : (
                         <>
                             <div className="mb-4 flex flex-col items-center text-center">
                                 <span className="font-semibold text-slate-700">
-                                    {t("voting:list.card.completed")}
+                                    {t("list.card.completed")}
                                 </span>
                                 <span className="text-sm text-slate-500">
-                                    {t("voting:list.card.viewOutcomes")}
+                                    {t("list.card.viewOutcomes")}
                                 </span>
                             </div>
                             <Button
                                 variant="outline"
                                 className="w-full border-slate-200"
                             >
-                                {t("voting:list.card.viewResults")}
+                                {t("list.card.viewResults")}
                             </Button>
                         </>
                     )}

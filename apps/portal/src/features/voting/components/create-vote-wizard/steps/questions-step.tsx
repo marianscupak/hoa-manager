@@ -1,7 +1,7 @@
 import { useIsMutating } from "@tanstack/react-query";
 import { Loader2, Plus, CheckCircle2, Flag } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
+import { Link } from "react-router";
 
 import { Button } from "@hoa-mngr/ui";
 
@@ -25,7 +25,6 @@ export function CreateVoteQuestionsStep({
     voteId,
 }: CreateVoteQuestionsStepProps) {
     const { t } = useTranslation(["voting"]);
-    const navigate = useNavigate();
 
     const voteQuery = useVotesControllerGetVoteDetail(voteId ?? "", {
         query: { enabled: !!voteId },
@@ -47,7 +46,7 @@ export function CreateVoteQuestionsStep({
             {
                 id: voteId,
                 data: {
-                    title: t("voting:create.steps.questions.defaultTitle"),
+                    title: t("create.steps.questions.defaultTitle"),
                     type: CreateVoteQuestionDtoType.YES_NO,
                 },
             },
@@ -75,7 +74,7 @@ export function CreateVoteQuestionsStep({
     if (voteQuery.isError) {
         return (
             <div className="text-destructive py-8 text-center">
-                {t("voting:create.steps.questions.loadError")}
+                {t("create.steps.questions.loadError")}
             </div>
         );
     }
@@ -90,15 +89,13 @@ export function CreateVoteQuestionsStep({
                     {isMutating > 0 ? (
                         <>
                             <Loader2 className="h-4 w-4 animate-spin" />
-                            <span>
-                                {t("voting:create.steps.questions.saving")}
-                            </span>
+                            <span>{t("create.steps.questions.saving")}</span>
                         </>
                     ) : (
                         <>
                             <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                             <span className="text-muted-foreground font-normal">
-                                {t("voting:create.steps.questions.autoSave")}
+                                {t("create.steps.questions.autoSave")}
                             </span>
                         </>
                     )}
@@ -108,10 +105,10 @@ export function CreateVoteQuestionsStep({
             <div className="flex items-center justify-between">
                 <div>
                     <h3 className="text-lg font-medium">
-                        {t("voting:create.steps.questions.title")}
+                        {t("create.steps.questions.title")}
                     </h3>
                     <p className="text-muted-foreground text-sm">
-                        {t("voting:create.steps.questions.description")}
+                        {t("create.steps.questions.description")}
                     </p>
                 </div>
                 <Button
@@ -120,7 +117,7 @@ export function CreateVoteQuestionsStep({
                     size="sm"
                 >
                     <Plus className="mr-2 h-4 w-4" />
-                    {t("voting:create.steps.questions.addQuestion")}
+                    {t("create.steps.questions.addQuestion")}
                 </Button>
             </div>
 
@@ -128,18 +125,20 @@ export function CreateVoteQuestionsStep({
 
             {questions.length === 0 && (
                 <div className="text-muted-foreground rounded-lg border-2 border-dashed p-12 text-center">
-                    {t("voting:create.steps.questions.emptyState")}
+                    {t("create.steps.questions.emptyState")}
                 </div>
             )}
 
             <div className="border-t pt-6">
                 <div className="flex justify-end">
                     <Button
-                        onClick={() => navigate(`/voting/${vote.id}`)}
                         className="h-11 bg-emerald-600 px-8 text-lg hover:bg-emerald-700"
+                        asChild
                     >
-                        <Flag className="mr-2 h-5 w-5" />
-                        {t("voting:create.actions.finish")}
+                        <Link to={`/voting/${vote.id}`}>
+                            <Flag className="mr-2 h-5 w-5" />
+                            {t("create.actions.finish")}
+                        </Link>
                     </Button>
                 </div>
             </div>

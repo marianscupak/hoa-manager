@@ -27,11 +27,13 @@ import { type InviteStatusResult } from '@/modules/core/invitation/application/h
 import { type RegisterFromInviteResult } from '@/modules/core/invitation/application/handlers/register-from-invite.handler';
 import { GetOwnerInviteStatusQuery } from '@/modules/core/invitation/application/queries/get-owner-invite-status.query';
 import { CurrentAuthUser } from '@/shared/api/decorators/auth.decorators';
+import { ApiErrorResponses } from '@/shared/api/decorators/error.decorators';
 import { AccessTokenAuthGuard } from '@/shared/api/guards/access-token-auth.guard';
 import { setRefreshTokenCookie } from '@/shared/api/utils/refresh-cookie';
 import type { AuthPrincipal } from '@/shared/domain/auth-principal';
 
 @ApiTags('Owner Invitations')
+@ApiErrorResponses()
 @Controller()
 export class InviteController {
   constructor(

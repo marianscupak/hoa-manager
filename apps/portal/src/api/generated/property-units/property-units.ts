@@ -24,6 +24,7 @@ import type {
 import type {
     CreateUnitDto,
     CreateUnitResponseDto,
+    ErrorResponseDto,
     ReplaceOwnershipsDto,
     UnitDetailResponseDto,
     UnitResponseDto,
@@ -50,7 +51,7 @@ export const getUnitControllerGetUnitsQueryKey = () => {
 
 export const getUnitControllerGetUnitsQueryOptions = <
     TData = Awaited<ReturnType<typeof unitControllerGetUnits>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(options?: {
     query?: Partial<
         UseQueryOptions<
@@ -80,11 +81,11 @@ export const getUnitControllerGetUnitsQueryOptions = <
 export type UnitControllerGetUnitsQueryResult = NonNullable<
     Awaited<ReturnType<typeof unitControllerGetUnits>>
 >;
-export type UnitControllerGetUnitsQueryError = ErrorType<unknown>;
+export type UnitControllerGetUnitsQueryError = ErrorType<ErrorResponseDto>;
 
 export function useUnitControllerGetUnits<
     TData = Awaited<ReturnType<typeof unitControllerGetUnits>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     options: {
         query: Partial<
@@ -110,7 +111,7 @@ export function useUnitControllerGetUnits<
 };
 export function useUnitControllerGetUnits<
     TData = Awaited<ReturnType<typeof unitControllerGetUnits>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     options?: {
         query?: Partial<
@@ -136,7 +137,7 @@ export function useUnitControllerGetUnits<
 };
 export function useUnitControllerGetUnits<
     TData = Awaited<ReturnType<typeof unitControllerGetUnits>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     options?: {
         query?: Partial<
@@ -155,7 +156,7 @@ export function useUnitControllerGetUnits<
 
 export function useUnitControllerGetUnits<
     TData = Awaited<ReturnType<typeof unitControllerGetUnits>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     options?: {
         query?: Partial<
@@ -199,7 +200,7 @@ export const unitControllerCreateUnit = (
 };
 
 export const getUnitControllerCreateUnitMutationOptions = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(options?: {
     mutation?: UseMutationOptions<
@@ -240,10 +241,10 @@ export type UnitControllerCreateUnitMutationResult = NonNullable<
     Awaited<ReturnType<typeof unitControllerCreateUnit>>
 >;
 export type UnitControllerCreateUnitMutationBody = BodyType<CreateUnitDto>;
-export type UnitControllerCreateUnitMutationError = ErrorType<unknown>;
+export type UnitControllerCreateUnitMutationError = ErrorType<ErrorResponseDto>;
 
 export const useUnitControllerCreateUnit = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(
     options?: {
@@ -284,7 +285,7 @@ export const getUnitControllerGetUnitDetailQueryKey = (id: string) => {
 
 export const getUnitControllerGetUnitDetailQueryOptions = <
     TData = Awaited<ReturnType<typeof unitControllerGetUnitDetail>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     id: string,
     options?: {
@@ -322,11 +323,11 @@ export const getUnitControllerGetUnitDetailQueryOptions = <
 export type UnitControllerGetUnitDetailQueryResult = NonNullable<
     Awaited<ReturnType<typeof unitControllerGetUnitDetail>>
 >;
-export type UnitControllerGetUnitDetailQueryError = ErrorType<unknown>;
+export type UnitControllerGetUnitDetailQueryError = ErrorType<ErrorResponseDto>;
 
 export function useUnitControllerGetUnitDetail<
     TData = Awaited<ReturnType<typeof unitControllerGetUnitDetail>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     id: string,
     options: {
@@ -353,7 +354,7 @@ export function useUnitControllerGetUnitDetail<
 };
 export function useUnitControllerGetUnitDetail<
     TData = Awaited<ReturnType<typeof unitControllerGetUnitDetail>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     id: string,
     options?: {
@@ -380,7 +381,7 @@ export function useUnitControllerGetUnitDetail<
 };
 export function useUnitControllerGetUnitDetail<
     TData = Awaited<ReturnType<typeof unitControllerGetUnitDetail>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     id: string,
     options?: {
@@ -400,7 +401,7 @@ export function useUnitControllerGetUnitDetail<
 
 export function useUnitControllerGetUnitDetail<
     TData = Awaited<ReturnType<typeof unitControllerGetUnitDetail>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     id: string,
     options?: {
@@ -449,7 +450,7 @@ export const unitControllerReplaceUnitOwnership = (
 };
 
 export const getUnitControllerReplaceUnitOwnershipMutationOptions = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(options?: {
     mutation?: UseMutationOptions<
@@ -492,10 +493,10 @@ export type UnitControllerReplaceUnitOwnershipMutationResult = NonNullable<
 export type UnitControllerReplaceUnitOwnershipMutationBody =
     BodyType<ReplaceOwnershipsDto>;
 export type UnitControllerReplaceUnitOwnershipMutationError =
-    ErrorType<unknown>;
+    ErrorType<ErrorResponseDto>;
 
 export const useUnitControllerReplaceUnitOwnership = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(
     options?: {

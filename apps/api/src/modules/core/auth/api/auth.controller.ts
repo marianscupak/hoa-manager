@@ -12,7 +12,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { ApiOkResponse } from '@nestjs/swagger';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import type { Response, Request } from 'express';
 
 import {
@@ -41,9 +41,12 @@ import {
 import { type ExchangeGoogleCodeResult } from '@/modules/core/auth/application/handlers/exchange-google-code.handler';
 import { type HandleGoogleCallbackResult } from '@/modules/core/auth/application/handlers/handle-google-callback.handler';
 import { type StartGoogleLoginResult } from '@/modules/core/auth/application/handlers/start-google-login.handler';
+import { ApiErrorResponses } from '@/shared/api/decorators/error.decorators';
 import { AccessTokenAuthGuard } from '@/shared/api/guards/access-token-auth.guard';
 import { setRefreshTokenCookie } from '@/shared/api/utils/refresh-cookie';
 
+@ApiTags('Auth')
+@ApiErrorResponses()
 @Controller('auth')
 export class AuthController {
   constructor(private readonly commandBus: CommandBus) {}

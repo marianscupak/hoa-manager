@@ -8,7 +8,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
-import { ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
+import { ApiOkResponse, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 
 import {
   CreateTenantDto,
@@ -18,9 +18,12 @@ import { TenantResponseDto } from '@/modules/core/tenancy/api/dto/tenant-respons
 import { CreateTenantCommand } from '@/modules/core/tenancy/application/commands/create-tenant.command';
 import { GetUserTenantsQuery } from '@/modules/core/tenancy/application/queries/get-user-tenants.query';
 import { CurrentAuthUser } from '@/shared/api/decorators/auth.decorators';
+import { ApiErrorResponses } from '@/shared/api/decorators/error.decorators';
 import { AccessTokenAuthGuard } from '@/shared/api/guards/access-token-auth.guard';
 import type { AuthPrincipal } from '@/shared/domain/auth-principal';
 
+@ApiTags('Tenants')
+@ApiErrorResponses()
 @Controller('tenants')
 @UseGuards(AccessTokenAuthGuard)
 export class TenancyController {

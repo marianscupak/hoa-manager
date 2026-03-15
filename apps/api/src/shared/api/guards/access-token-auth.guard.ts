@@ -4,14 +4,13 @@ import {
   Injectable,
   Inject,
 } from '@nestjs/common';
+import { QueryBus } from '@nestjs/cqrs';
 import type { Request } from 'express';
 
 import { TOKEN_VERIFIER } from '@/modules/core/auth/application/ports/auth.utils.port';
 import type { TokenVerifier } from '@/modules/core/auth/application/ports/auth.utils.port';
-import {
-  USER_REPOSITORY,
-  type UserRepository,
-} from '@/modules/core/identity/application/ports/user.repository.port';
+import { type GetUserByIdResult } from '@/modules/core/identity/application/handlers/get-user-by-id.handler';
+import { GetUserByIdQuery } from '@/modules/core/identity/application/queries/get-user-by-id.query';
 import { InvalidTokenException } from '@/shared/application/exceptions/auth.exceptions';
 import { UserInactiveException } from '@/shared/application/exceptions/user.exceptions';
 import { AuthClaims } from '@/shared/domain/auth-claims';
@@ -21,7 +20,7 @@ import { AuthPrincipal } from '@/shared/domain/auth-principal';
 export class AccessTokenAuthGuard implements CanActivate {
   constructor(
     @Inject(TOKEN_VERIFIER) private readonly tokenVerifier: TokenVerifier,
-    @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
+    private readonly queryBus: QueryBus,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -39,7 +38,11 @@ export class AccessTokenAuthGuard implements CanActivate {
     try {
       const payload = await this.tokenVerifier.verifyToken<AuthClaims>(token);
 
-      const user = await this.userRepository.findById(payload.sub);
+      const user = await this.queryBus.execute<
+        GetUserByIdQuery,
+        GetUserByIdResult
+      >(new GetUserByIdQuery(payload.sub));
+
       if (!user || !user.isActive) {
         throw new UserInactiveException();
       }

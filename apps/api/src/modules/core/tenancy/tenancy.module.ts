@@ -7,6 +7,8 @@ import { TenancyController } from '@/modules/core/tenancy/api/tenancy.controller
 import { CreateMembershipHandler } from '@/modules/core/tenancy/application/handlers/create-membership.handler';
 import { CreateTenantHandler } from '@/modules/core/tenancy/application/handlers/create-tenant.handler';
 import { GetMembershipByTenantAndUserHandler } from '@/modules/core/tenancy/application/handlers/get-membership-by-tenant-and-user.handler';
+import { GetMembershipsByUserIdHandler } from '@/modules/core/tenancy/application/handlers/get-memberships-by-user-id.handler';
+import { GetTenantByIdHandler } from '@/modules/core/tenancy/application/handlers/get-tenant-by-id.handler';
 import { GetUserTenantsHandler } from '@/modules/core/tenancy/application/handlers/get-user-tenants.handler';
 import { UpdateMembershipStatusHandler } from '@/modules/core/tenancy/application/handlers/update-membership-status.handler';
 import {
@@ -18,18 +20,27 @@ import {
   DrizzleTenantRepository,
 } from '@/modules/core/tenancy/infrastructure/persistence/drizzle-tenant.repository';
 
+const CommandHandlers = [
+  CreateTenantHandler,
+  CreateMembershipHandler,
+  UpdateMembershipStatusHandler,
+];
+const QueryHandlers = [
+  GetUserTenantsHandler,
+  GetMembershipByTenantAndUserHandler,
+  GetTenantByIdHandler,
+  GetMembershipsByUserIdHandler,
+];
+
 @Module({
   imports: [CqrsModule, IdentityModule, forwardRef(() => AuthModule)],
   controllers: [TenancyController],
   providers: [
     { provide: TENANT_REPOSITORY, useClass: DrizzleTenantRepository },
     { provide: MEMBERSHIP_REPOSITORY, useClass: DrizzleMembershipRepository },
-    GetUserTenantsHandler,
-    CreateTenantHandler,
-    CreateMembershipHandler,
-    UpdateMembershipStatusHandler,
-    GetMembershipByTenantAndUserHandler,
+    ...CommandHandlers,
+    ...QueryHandlers,
   ],
-  exports: [TENANT_REPOSITORY, MEMBERSHIP_REPOSITORY],
+  exports: [],
 })
 export class TenancyModule {}

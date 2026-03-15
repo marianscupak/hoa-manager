@@ -24,6 +24,7 @@ import type {
 import type {
     AuthControllerHandleGoogleCallbackParams,
     AuthResponseDto,
+    ErrorResponseDto,
     ExchangeCodeDto,
     LoginDto,
     SuccessResponseDto,
@@ -53,7 +54,7 @@ export const authControllerLogin = (
 };
 
 export const getAuthControllerLoginMutationOptions = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(options?: {
     mutation?: UseMutationOptions<
@@ -94,10 +95,10 @@ export type AuthControllerLoginMutationResult = NonNullable<
     Awaited<ReturnType<typeof authControllerLogin>>
 >;
 export type AuthControllerLoginMutationBody = BodyType<LoginDto>;
-export type AuthControllerLoginMutationError = ErrorType<unknown>;
+export type AuthControllerLoginMutationError = ErrorType<ErrorResponseDto>;
 
 export const useAuthControllerLogin = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(
     options?: {
@@ -137,7 +138,7 @@ export const getAuthControllerStartGoogleLoginQueryKey = () => {
 
 export const getAuthControllerStartGoogleLoginQueryOptions = <
     TData = Awaited<ReturnType<typeof authControllerStartGoogleLogin>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(options?: {
     query?: Partial<
         UseQueryOptions<
@@ -167,11 +168,12 @@ export const getAuthControllerStartGoogleLoginQueryOptions = <
 export type AuthControllerStartGoogleLoginQueryResult = NonNullable<
     Awaited<ReturnType<typeof authControllerStartGoogleLogin>>
 >;
-export type AuthControllerStartGoogleLoginQueryError = ErrorType<unknown>;
+export type AuthControllerStartGoogleLoginQueryError =
+    ErrorType<ErrorResponseDto>;
 
 export function useAuthControllerStartGoogleLogin<
     TData = Awaited<ReturnType<typeof authControllerStartGoogleLogin>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     options: {
         query: Partial<
@@ -197,7 +199,7 @@ export function useAuthControllerStartGoogleLogin<
 };
 export function useAuthControllerStartGoogleLogin<
     TData = Awaited<ReturnType<typeof authControllerStartGoogleLogin>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     options?: {
         query?: Partial<
@@ -223,7 +225,7 @@ export function useAuthControllerStartGoogleLogin<
 };
 export function useAuthControllerStartGoogleLogin<
     TData = Awaited<ReturnType<typeof authControllerStartGoogleLogin>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     options?: {
         query?: Partial<
@@ -242,7 +244,7 @@ export function useAuthControllerStartGoogleLogin<
 
 export function useAuthControllerStartGoogleLogin<
     TData = Awaited<ReturnType<typeof authControllerStartGoogleLogin>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     options?: {
         query?: Partial<
@@ -287,7 +289,7 @@ export const getAuthControllerHandleGoogleCallbackQueryKey = (
 
 export const getAuthControllerHandleGoogleCallbackQueryOptions = <
     TData = Awaited<ReturnType<typeof authControllerHandleGoogleCallback>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     params: AuthControllerHandleGoogleCallbackParams,
     options?: {
@@ -322,11 +324,12 @@ export const getAuthControllerHandleGoogleCallbackQueryOptions = <
 export type AuthControllerHandleGoogleCallbackQueryResult = NonNullable<
     Awaited<ReturnType<typeof authControllerHandleGoogleCallback>>
 >;
-export type AuthControllerHandleGoogleCallbackQueryError = ErrorType<unknown>;
+export type AuthControllerHandleGoogleCallbackQueryError =
+    ErrorType<ErrorResponseDto>;
 
 export function useAuthControllerHandleGoogleCallback<
     TData = Awaited<ReturnType<typeof authControllerHandleGoogleCallback>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     params: AuthControllerHandleGoogleCallbackParams,
     options: {
@@ -357,7 +360,7 @@ export function useAuthControllerHandleGoogleCallback<
 };
 export function useAuthControllerHandleGoogleCallback<
     TData = Awaited<ReturnType<typeof authControllerHandleGoogleCallback>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     params: AuthControllerHandleGoogleCallbackParams,
     options?: {
@@ -388,7 +391,7 @@ export function useAuthControllerHandleGoogleCallback<
 };
 export function useAuthControllerHandleGoogleCallback<
     TData = Awaited<ReturnType<typeof authControllerHandleGoogleCallback>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     params: AuthControllerHandleGoogleCallbackParams,
     options?: {
@@ -408,7 +411,7 @@ export function useAuthControllerHandleGoogleCallback<
 
 export function useAuthControllerHandleGoogleCallback<
     TData = Awaited<ReturnType<typeof authControllerHandleGoogleCallback>>,
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
 >(
     params: AuthControllerHandleGoogleCallbackParams,
     options?: {
@@ -456,7 +459,7 @@ export const authControllerExchangeGoogleCode = (
 };
 
 export const getAuthControllerExchangeGoogleCodeMutationOptions = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(options?: {
     mutation?: UseMutationOptions<
@@ -498,10 +501,11 @@ export type AuthControllerExchangeGoogleCodeMutationResult = NonNullable<
 >;
 export type AuthControllerExchangeGoogleCodeMutationBody =
     BodyType<ExchangeCodeDto>;
-export type AuthControllerExchangeGoogleCodeMutationError = ErrorType<unknown>;
+export type AuthControllerExchangeGoogleCodeMutationError =
+    ErrorType<ErrorResponseDto>;
 
 export const useAuthControllerExchangeGoogleCode = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(
     options?: {
@@ -536,7 +540,7 @@ export const authControllerRefresh = (
 };
 
 export const getAuthControllerRefreshMutationOptions = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(options?: {
     mutation?: UseMutationOptions<
@@ -575,10 +579,10 @@ export type AuthControllerRefreshMutationResult = NonNullable<
     Awaited<ReturnType<typeof authControllerRefresh>>
 >;
 
-export type AuthControllerRefreshMutationError = ErrorType<unknown>;
+export type AuthControllerRefreshMutationError = ErrorType<ErrorResponseDto>;
 
 export const useAuthControllerRefresh = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(
     options?: {
@@ -620,7 +624,7 @@ export const authControllerSwitchTenant = (
 };
 
 export const getAuthControllerSwitchTenantMutationOptions = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(options?: {
     mutation?: UseMutationOptions<
@@ -661,10 +665,11 @@ export type AuthControllerSwitchTenantMutationResult = NonNullable<
     Awaited<ReturnType<typeof authControllerSwitchTenant>>
 >;
 export type AuthControllerSwitchTenantMutationBody = BodyType<SwitchTenantDto>;
-export type AuthControllerSwitchTenantMutationError = ErrorType<unknown>;
+export type AuthControllerSwitchTenantMutationError =
+    ErrorType<ErrorResponseDto>;
 
 export const useAuthControllerSwitchTenant = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(
     options?: {
@@ -699,7 +704,7 @@ export const authControllerLogout = (
 };
 
 export const getAuthControllerLogoutMutationOptions = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(options?: {
     mutation?: UseMutationOptions<
@@ -738,10 +743,10 @@ export type AuthControllerLogoutMutationResult = NonNullable<
     Awaited<ReturnType<typeof authControllerLogout>>
 >;
 
-export type AuthControllerLogoutMutationError = ErrorType<unknown>;
+export type AuthControllerLogoutMutationError = ErrorType<ErrorResponseDto>;
 
 export const useAuthControllerLogout = <
-    TError = ErrorType<unknown>,
+    TError = ErrorType<ErrorResponseDto>,
     TContext = unknown,
 >(
     options?: {

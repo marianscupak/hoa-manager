@@ -1,13 +1,15 @@
-import { Menu } from "lucide-react";
+import { LucideIcon, Menu } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useLocation } from "react-router";
+import { NavLink } from "react-router";
 
 import { Button } from "@hoa-mngr/ui";
 
 export interface NavigationItem {
     name: string;
     href: string;
+    icon?: LucideIcon;
+    end?: boolean;
 }
 
 export interface SidebarLayoutProps {
@@ -17,28 +19,29 @@ export interface SidebarLayoutProps {
 
 export function SidebarLayout({ navigation, children }: SidebarLayoutProps) {
     const { t } = useTranslation(["common"]);
-    const location = useLocation();
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-
     const navContent = (
         <nav className="flex flex-col space-y-1">
-            {navigation.map((item) => {
-                const isActive = location.pathname.startsWith(item.href);
-                return (
-                    <Link
-                        key={item.href}
-                        to={item.href}
-                        onClick={() => setIsMobileSidebarOpen(false)}
-                        className={`group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+            {navigation.map((item) => (
+                <NavLink
+                    key={item.href}
+                    to={item.href}
+                    end={item.end}
+                    onClick={() => setIsMobileSidebarOpen(false)}
+                    className={({ isActive }) =>
+                        `group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                             isActive
                                 ? "bg-accent text-foreground"
                                 : "text-muted-foreground hover:bg-accent hover:text-foreground"
-                        }`}
-                    >
-                        {item.name}
-                    </Link>
-                );
-            })}
+                        }`
+                    }
+                >
+                    {item.icon && (
+                        <item.icon className="mr-3 h-5 w-5 shrink-0" />
+                    )}
+                    {item.name}
+                </NavLink>
+            ))}
         </nav>
     );
 

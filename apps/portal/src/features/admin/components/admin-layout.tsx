@@ -1,4 +1,5 @@
 import { useAtomValue } from "jotai";
+import { Building2, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Navigate, Outlet } from "react-router";
 
@@ -18,8 +19,16 @@ export function AdminLayout() {
     }
 
     const navigation = [
-        { name: t("nav.units"), href: "/admin/units" },
-        { name: t("nav.owners"), href: "/admin/owners" },
+        {
+            name: t("nav.units"),
+            href: "/admin/units",
+            icon: Building2,
+        },
+        {
+            name: t("nav.owners"),
+            href: "/admin/owners",
+            icon: Users,
+        },
     ];
 
     return (

@@ -2,12 +2,7 @@ import {
     DraggableAttributes,
     DraggableSyntheticListeners,
 } from "@dnd-kit/core";
-import {
-    GripVertical,
-    Pencil,
-    Settings2,
-    Trash2,
-} from "lucide-react";
+import { GripVertical, Pencil, Settings2, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@hoa-mngr/ui";

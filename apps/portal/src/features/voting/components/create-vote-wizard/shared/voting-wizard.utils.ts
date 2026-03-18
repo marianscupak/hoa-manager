@@ -73,9 +73,7 @@ export function mapQuestionToUpdateDto(params: {
             ? {}
             : {
                   options: options
-                      .filter(
-                          (o) => !o.optionKey || o.optionKey === "CUSTOM",
-                      )
+                      .filter((o) => !o.optionKey || o.optionKey === "CUSTOM")
                       .map((o) => ({
                           label: o.label,
                           sortOrder: o.sortOrder,

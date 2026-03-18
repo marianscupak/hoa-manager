@@ -134,8 +134,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
             allowAbstain: qRulesetRow.allowAbstain,
             abstainExcludedFromMajorityDenominator:
               qRulesetRow.abstainExcludedFromMajorityDenominator,
-            allowCoOwnerIndividualVote:
-              qRulesetRow.allowCoOwnerIndividualVote,
+            allowCoOwnerIndividualVote: qRulesetRow.allowCoOwnerIndividualVote,
           }
         : null;
 

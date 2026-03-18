@@ -379,8 +379,7 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
       allowAbstain: vote.ruleset.allowAbstain,
       abstainExcludedFromMajorityDenominator:
         vote.ruleset.abstainExcludedFromMajorityDenominator,
-      allowCoOwnerIndividualVote:
-        vote.ruleset.allowCoOwnerIndividualVote,
+      allowCoOwnerIndividualVote: vote.ruleset.allowCoOwnerIndividualVote,
     };
   }
 
@@ -404,8 +403,7 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
       allowAbstain: vote.ruleset.allowAbstain,
       abstainExcludedFromMajorityDenominator:
         vote.ruleset.abstainExcludedFromMajorityDenominator,
-      allowCoOwnerIndividualVote:
-        vote.ruleset.allowCoOwnerIndividualVote,
+      allowCoOwnerIndividualVote: vote.ruleset.allowCoOwnerIndividualVote,
     };
   }
 

@@ -188,6 +188,8 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
             allowAbstain: q.rulesetOverride.allowAbstain,
             abstainExcludedFromMajorityDenominator:
               q.rulesetOverride.abstainExcludedFromMajorityDenominator,
+            allowCoOwnerIndividualVote:
+              q.rulesetOverride.allowCoOwnerIndividualVote,
             updatedAt: new Date(),
           };
 
@@ -351,6 +353,7 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
       allowAbstain: row.allowAbstain,
       abstainExcludedFromMajorityDenominator:
         row.abstainExcludedFromMajorityDenominator,
+      allowCoOwnerIndividualVote: row.allowCoOwnerIndividualVote,
     };
   }
 
@@ -376,6 +379,8 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
       allowAbstain: vote.ruleset.allowAbstain,
       abstainExcludedFromMajorityDenominator:
         vote.ruleset.abstainExcludedFromMajorityDenominator,
+      allowCoOwnerIndividualVote:
+        vote.ruleset.allowCoOwnerIndividualVote,
     };
   }
 
@@ -399,6 +404,8 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
       allowAbstain: vote.ruleset.allowAbstain,
       abstainExcludedFromMajorityDenominator:
         vote.ruleset.abstainExcludedFromMajorityDenominator,
+      allowCoOwnerIndividualVote:
+        vote.ruleset.allowCoOwnerIndividualVote,
     };
   }
 
@@ -464,6 +471,7 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
       allowAbstain: override.allowAbstain,
       abstainExcludedFromMajorityDenominator:
         override.abstainExcludedFromMajorityDenominator,
+      allowCoOwnerIndividualVote: override.allowCoOwnerIndividualVote,
     };
   }
 }

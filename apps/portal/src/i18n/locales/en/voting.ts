@@ -4,6 +4,10 @@ export const voting = {
         results: "Results",
         createVote: "Create Vote",
     },
+    common: {
+        save: "Save",
+        cancel: "Cancel",
+    },
     create: {
         title: "Create Vote",
         titleEdit: "Edit Vote",
@@ -35,6 +39,10 @@ export const voting = {
                 updateSuccess: "Question updated",
                 saving: "Saving changes...",
                 autoSave: "All changes are saved automatically",
+                editQuestion: "Edit Question",
+                actions: {
+                    edit: "Edit",
+                },
                 fields: {
                     title: {
                         label: "Question Text",
@@ -98,6 +106,8 @@ export const voting = {
                 label: "Scheduled To",
                 description: "When should the vote automatically close?",
             },
+            shortVotingPeriodWarning:
+                "The voting period is shorter than 15 days. Consider extending it to give all owners enough time to vote.",
             weightBasis: {
                 label: "Weight Basis",
                 placeholder: "Select weight basis",
@@ -123,10 +133,11 @@ export const voting = {
                 },
             },
             quorumThreshold: {
-                label: "Quorum Threshold",
-                placeholder: "Enter quorum threshold value",
+                label: "Quorum Threshold (%)",
+                placeholder: "e.g. 50",
                 errors: {
                     positiveNumber: "Must be a positive number",
+                    max: "Must be at most 100 %",
                 },
             },
             majorityRuleType: {
@@ -138,10 +149,11 @@ export const voting = {
                 },
             },
             majorityThreshold: {
-                label: "Majority Threshold",
-                placeholder: "Enter majority threshold if qualified",
+                label: "Majority Threshold (%)",
+                placeholder: "e.g. 66",
                 errors: {
                     positiveNumber: "Must be a positive number",
+                    max: "Must be at most 100 %",
                 },
             },
             allowAbstain: {
@@ -154,6 +166,11 @@ export const voting = {
                 description:
                     "If true, abstain votes are omitted from the denominator when evaluating majority thresholds.",
             },
+            allowCoOwnerIndividualVote: {
+                label: "Allow Co-Owners to Vote Individually?",
+                description:
+                    "If enabled, each co-owner of a unit can cast their own ballot instead of requiring a single representative.",
+            },
             time: "Time",
         },
         actions: {
@@ -163,7 +180,7 @@ export const voting = {
             saved: "Saved",
             saveNext: "Save and Continue",
             finishLater: "Finish Later",
-            finish: "Finish",
+            finish: "Review Vote Draft",
         },
         toast: {
             createSuccess: "Vote created successfully",
@@ -217,6 +234,7 @@ export const voting = {
         timeline: {
             startDate: "START DATE",
             endDate: "END DATE",
+            notSet: "Not set",
         },
         description: {
             title: "Description",

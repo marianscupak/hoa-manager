@@ -14,11 +14,18 @@ export interface SetVoteRulesetDto {
     weightBasis: SetVoteRulesetDtoWeightBasis;
     quorumMeasure: SetVoteRulesetDtoQuorumMeasure;
     quorumElectorateBasis: SetVoteRulesetDtoQuorumElectorateBasis;
-    /** @minimum 0 */
+    /**
+     * @minimum 0
+     * @maximum 100
+     */
     quorumThreshold: number;
     majorityRuleType: SetVoteRulesetDtoMajorityRuleType;
-    /** @minimum 0 */
+    /**
+     * @minimum 0
+     * @maximum 100
+     */
     majorityThreshold?: number;
     allowAbstain: boolean;
     abstainExcludedFromMajorityDenominator: boolean;
+    allowCoOwnerIndividualVote: boolean;
 }

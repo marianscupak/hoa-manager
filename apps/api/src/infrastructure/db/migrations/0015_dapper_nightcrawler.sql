@@ -1,0 +1,1 @@
+ALTER TABLE "vote_rulesets" ADD COLUMN "allow_co_owner_individual_vote" boolean DEFAULT false NOT NULL;

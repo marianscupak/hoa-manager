@@ -14,11 +14,18 @@ export type CreateVoteQuestionDtoRulesetOverride = {
     weightBasis: CreateVoteQuestionDtoRulesetOverrideWeightBasis;
     quorumMeasure: CreateVoteQuestionDtoRulesetOverrideQuorumMeasure;
     quorumElectorateBasis: CreateVoteQuestionDtoRulesetOverrideQuorumElectorateBasis;
-    /** @minimum 0 */
+    /**
+     * @minimum 0
+     * @maximum 100
+     */
     quorumThreshold: number;
     majorityRuleType: CreateVoteQuestionDtoRulesetOverrideMajorityRuleType;
-    /** @minimum 0 */
+    /**
+     * @minimum 0
+     * @maximum 100
+     */
     majorityThreshold?: number;
     allowAbstain: boolean;
     abstainExcludedFromMajorityDenominator: boolean;
+    allowCoOwnerIndividualVote: boolean;
 };

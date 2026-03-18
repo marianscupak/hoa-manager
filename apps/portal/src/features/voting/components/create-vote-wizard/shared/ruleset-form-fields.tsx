@@ -18,7 +18,13 @@ import {
  * Expects to be rendered inside a FormProvider / react-hook-form context.
  * Field names match the SetVoteRulesetDto schema.
  */
-export function RulesetFormFields() {
+interface RulesetFormFieldsProps {
+    showCoOwnerOption?: boolean;
+}
+
+export function RulesetFormFields({
+    showCoOwnerOption = true,
+}: RulesetFormFieldsProps) {
     const { t } = useTranslation(["voting"]);
     const { watch } = useFormContext();
 
@@ -99,15 +105,22 @@ export function RulesetFormFields() {
                     ]}
                 />
 
-                <FormInput
-                    name="quorumThreshold"
-                    type="number"
-                    step="0.0001"
-                    label={t("voting:create.fields.quorumThreshold.label")}
-                    placeholder={t(
-                        "voting:create.fields.quorumThreshold.placeholder",
-                    )}
-                />
+                <div className="relative">
+                    <FormInput
+                        name="quorumThreshold"
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="1"
+                        label={t("voting:create.fields.quorumThreshold.label")}
+                        placeholder={t(
+                            "voting:create.fields.quorumThreshold.placeholder",
+                        )}
+                    />
+                    <span className="text-muted-foreground pointer-events-none absolute right-10 bottom-0 flex h-9 items-center text-sm">
+                        %
+                    </span>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -133,19 +146,30 @@ export function RulesetFormFields() {
                     ]}
                 />
 
-                <FormInput
-                    name="majorityThreshold"
-                    type="number"
-                    step="0.0001"
-                    label={t("voting:create.fields.majorityThreshold.label")}
-                    placeholder={t(
-                        "voting:create.fields.majorityThreshold.placeholder",
-                    )}
-                    disabled={isMajorityThresholdDisabled}
-                />
+                <div className="relative">
+                    <FormInput
+                        name="majorityThreshold"
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="1"
+                        label={t(
+                            "voting:create.fields.majorityThreshold.label",
+                        )}
+                        placeholder={t(
+                            "voting:create.fields.majorityThreshold.placeholder",
+                        )}
+                        disabled={isMajorityThresholdDisabled}
+                    />
+                    <span className="text-muted-foreground pointer-events-none absolute right-10 bottom-0 flex h-9 items-center text-sm">
+                        %
+                    </span>
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div
+                className={`grid grid-cols-1 gap-4 ${showCoOwnerOption ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}
+            >
                 <FormCheckbox
                     name="allowAbstain"
                     label={t("voting:create.fields.allowAbstain.label")}
@@ -161,6 +185,18 @@ export function RulesetFormFields() {
                         "voting:create.fields.abstainExcluded.description",
                     )}
                 />
+
+                {showCoOwnerOption && (
+                    <FormCheckbox
+                        name="allowCoOwnerIndividualVote"
+                        label={t(
+                            "voting:create.fields.allowCoOwnerIndividualVote.label",
+                        )}
+                        description={t(
+                            "voting:create.fields.allowCoOwnerIndividualVote.description",
+                        )}
+                    />
+                )}
             </div>
         </div>
     );

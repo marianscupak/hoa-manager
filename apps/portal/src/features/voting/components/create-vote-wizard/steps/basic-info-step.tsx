@@ -1,4 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { differenceInDays } from "date-fns";
+import { AlertTriangle } from "lucide-react";
 import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -109,12 +111,34 @@ export function CreateVoteBasicInfoStep({
         }
     };
 
+    const renderShortVotingPeriodWarning = () => {
+        const from = basicInfoForm.watch("scheduledFrom");
+        const to = basicInfoForm.watch("scheduledTo");
+        if (from && to) {
+            const days = differenceInDays(new Date(to), new Date(from));
+            if (days < 15) {
+                return (
+                    <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+                        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                        <span>
+                            {t("voting:create.fields.shortVotingPeriodWarning")}
+                        </span>
+                    </div>
+                );
+            }
+        }
+        return null;
+    };
+
     return (
         <FormProvider {...basicInfoForm}>
             <form
                 onSubmit={basicInfoForm.handleSubmit(onSubmit)}
                 className="space-y-6"
             >
+                <p className="text-muted-foreground text-sm">
+                    {t("create.steps.basicInfo.description")}
+                </p>
                 <div className="space-y-4">
                     <FormInput
                         name="title"
@@ -154,6 +178,8 @@ export function CreateVoteBasicInfoStep({
                             timeLabel={t("voting:create.fields.time")}
                         />
                     </div>
+
+                    {renderShortVotingPeriodWarning()}
                 </div>
 
                 <div className="flex justify-end pt-4">

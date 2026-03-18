@@ -1,5 +1,12 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { CheckCircle2, Circle, CircleDot, Loader2, Send } from "lucide-react";
+import {
+    CheckCircle2,
+    Circle,
+    CircleDot,
+    Loader2,
+    Send,
+    Eye,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, Link } from "react-router";
@@ -137,7 +144,7 @@ export function CreateVoteWizard({
                         hideChevron
                         className={
                             createdVoteId
-                                ? "hover:no-underline"
+                                ? "cursor-pointer hover:no-underline"
                                 : "pointer-events-none hover:no-underline"
                         }
                     >
@@ -157,10 +164,6 @@ export function CreateVoteWizard({
                     </AccordionTrigger>
 
                     <AccordionContent className="mt-2 border-t pt-4 pb-6">
-                        <p className="text-muted-foreground mb-6 text-sm">
-                            {t("create.steps.basicInfo.description")}
-                        </p>
-
                         <CreateVoteBasicInfoStep
                             onSuccess={handleBasicInfoSuccess}
                             isSaved={!!createdVoteId}
@@ -179,7 +182,7 @@ export function CreateVoteWizard({
                         hideChevron
                         className={
                             createdVoteId
-                                ? "hover:no-underline"
+                                ? "cursor-pointer hover:no-underline"
                                 : "pointer-events-none hover:no-underline"
                         }
                     >
@@ -199,10 +202,6 @@ export function CreateVoteWizard({
                     </AccordionTrigger>
 
                     <AccordionContent className="mt-2 border-t pt-4 pb-6">
-                        <p className="text-muted-foreground mb-6 text-sm">
-                            {t("create.steps.ruleset.description")}
-                        </p>
-
                         <CreateVoteRulesetStep
                             voteId={createdVoteId}
                             onSuccess={handleRulesetSuccess}
@@ -220,7 +219,7 @@ export function CreateVoteWizard({
                         hideChevron
                         className={
                             createdVoteId
-                                ? "hover:no-underline"
+                                ? "cursor-pointer hover:no-underline"
                                 : "pointer-events-none hover:no-underline"
                         }
                     >
@@ -238,66 +237,81 @@ export function CreateVoteWizard({
                     </AccordionTrigger>
 
                     <AccordionContent className="mt-2 border-t pt-4 pb-6">
-                        <p className="text-muted-foreground mb-6 text-sm">
-                            {t("create.steps.questions.description")}
-                        </p>
-
                         <CreateVoteQuestionsStep voteId={createdVoteId} />
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>
 
-            {initialVoteId && (
-                <div className="mt-8 flex justify-end gap-3 border-t pt-6">
-                    <Button variant="outline" asChild>
-                        <Link to={`/voting/${initialVoteId}`}>
-                            {t("create.actions.back")}
-                        </Link>
+            {(initialVoteId || createdVoteId) && (
+                <div className="mt-8 flex items-center justify-between gap-3 border-t pt-8">
+                    <Button variant="ghost" asChild className="h-11 px-6">
+                        <Link to="/voting">{t("create.actions.back")}</Link>
                     </Button>
-                    <Dialog
-                        open={isConfirmOpen}
-                        onOpenChange={setIsConfirmOpen}
-                    >
-                        <DialogTrigger asChild>
-                            <Button disabled={isPending}>
-                                {isPending ? (
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                ) : (
-                                    <Send className="mr-2 h-4 w-4" />
-                                )}
-                                {t("detail.actions.schedule")}
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>
-                                    {t("detail.actions.scheduleConfirmTitle")}
-                                </DialogTitle>
-                                <DialogDescription>
-                                    {t(
-                                        "detail.actions.scheduleConfirmDescription",
-                                    )}
-                                </DialogDescription>
-                            </DialogHeader>
-                            <DialogFooter>
+
+                    <div className="flex items-center gap-3">
+                        <Button
+                            variant="outline"
+                            asChild
+                            className="text-primary hover:text-primary hover:bg-primary/5 h-11 px-6"
+                        >
+                            <Link
+                                to={`/voting/${initialVoteId ?? createdVoteId}`}
+                            >
+                                <Eye className="mr-2 h-4 w-4" />
+                                {t("create.actions.finish")}
+                            </Link>
+                        </Button>
+
+                        <Dialog
+                            open={isConfirmOpen}
+                            onOpenChange={setIsConfirmOpen}
+                        >
+                            <DialogTrigger asChild>
                                 <Button
-                                    variant="outline"
-                                    onClick={() => setIsConfirmOpen(false)}
-                                >
-                                    {t("detail.actions.cancel")}
-                                </Button>
-                                <Button
-                                    onClick={handleSchedule}
                                     disabled={isPending}
+                                    className="h-11 px-6"
                                 >
                                     {isPending ? (
                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    ) : null}
-                                    {t("detail.actions.confirm")}
+                                    ) : (
+                                        <Send className="mr-2 h-4 w-4" />
+                                    )}
+                                    {t("detail.actions.schedule")}
                                 </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>
+                                        {t(
+                                            "detail.actions.scheduleConfirmTitle",
+                                        )}
+                                    </DialogTitle>
+                                    <DialogDescription>
+                                        {t(
+                                            "detail.actions.scheduleConfirmDescription",
+                                        )}
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <DialogFooter>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setIsConfirmOpen(false)}
+                                    >
+                                        {t("detail.actions.cancel")}
+                                    </Button>
+                                    <Button
+                                        onClick={handleSchedule}
+                                        disabled={isPending}
+                                    >
+                                        {isPending ? (
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        ) : null}
+                                        {t("detail.actions.confirm")}
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
+                    </div>
                 </div>
             )}
 

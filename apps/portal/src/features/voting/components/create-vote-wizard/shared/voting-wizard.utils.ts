@@ -27,6 +27,7 @@ export function mapQuestionToUpdateDto(params: {
         majorityThreshold?: number | string | null;
         allowAbstain: boolean;
         abstainExcludedFromMajorityDenominator: boolean;
+        allowCoOwnerIndividualVote: boolean;
     };
     options: VoteQuestionResponseDto["options"];
 }): UpdateVoteQuestionDto {
@@ -57,6 +58,8 @@ export function mapQuestionToUpdateDto(params: {
                   allowAbstain: rulesetValues.allowAbstain,
                   abstainExcludedFromMajorityDenominator:
                       rulesetValues.abstainExcludedFromMajorityDenominator,
+                  allowCoOwnerIndividualVote:
+                      rulesetValues.allowCoOwnerIndividualVote,
               }
             : undefined;
 
@@ -70,7 +73,9 @@ export function mapQuestionToUpdateDto(params: {
             ? {}
             : {
                   options: options
-                      .filter((o) => o.optionKey === "CUSTOM")
+                      .filter(
+                          (o) => !o.optionKey || o.optionKey === "CUSTOM",
+                      )
                       .map((o) => ({
                           label: o.label,
                           sortOrder: o.sortOrder,

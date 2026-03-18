@@ -1,8 +1,12 @@
 export const voting = {
     navigation: {
-        activeVotes: "Aktivní hlasování",
+        activeVotes: "Probíhající hlasování",
         results: "Výsledky",
         createVote: "Vytvořit hlasování",
+    },
+    common: {
+        save: "Uložit",
+        cancel: "Zrušit",
     },
     create: {
         title: "Vytvořit hlasování",
@@ -33,7 +37,11 @@ export const voting = {
                 deleteSuccess: "Otázka byla smazána",
                 updateSuccess: "Otázka byla aktualizována",
                 saving: "Ukládání změn...",
-                autoSave: "Změny jsou ukládány automaticky",
+                autoSave: "Všechny změny jsou automaticky ukládány",
+                editQuestion: "Upravit otázku",
+                actions: {
+                    edit: "Upravit",
+                },
                 fields: {
                     title: {
                         label: "Znění otázky",
@@ -97,6 +105,8 @@ export const voting = {
                 label: "Konec hlasování",
                 description: "Kdy se má hlasování automaticky uzavřít?",
             },
+            shortVotingPeriodWarning:
+                "Doba hlasování je kratší než 15 dní. Zvažte její prodloužení, aby měli všichni vlastníci dostatek času hlasovat.",
             weightBasis: {
                 label: "Váha hlasů",
                 placeholder: "Vyberte váhu hlasů",
@@ -122,10 +132,11 @@ export const voting = {
                 },
             },
             quorumThreshold: {
-                label: "Požadované kvórum",
-                placeholder: "Zadejte hodnotu kvóra",
+                label: "Požadované kvórum (%)",
+                placeholder: "např. 50",
                 errors: {
                     positiveNumber: "Musí být kladné číslo",
+                    max: "Nesmí být více než 100 %",
                 },
             },
             majorityRuleType: {
@@ -137,10 +148,11 @@ export const voting = {
                 },
             },
             majorityThreshold: {
-                label: "Požadovaná většina",
-                placeholder: "Zadejte prahovou hodnotu kvalifikované většiny",
+                label: "Požadovaná většina (%)",
+                placeholder: "např. 66",
                 errors: {
                     positiveNumber: "Musí být kladné číslo",
+                    max: "Nesmí být více než 100 %",
                 },
             },
             allowAbstain: {
@@ -153,6 +165,11 @@ export const voting = {
                 description:
                     "Pokud je zaškrtnuto, hlasy 'Zdržuji se' nebudou započítány do základu pro výpočet většiny.",
             },
+            allowCoOwnerIndividualVote: {
+                label: "Povolit spoluvlastníkům hlasovat samostatně?",
+                description:
+                    "Pokud je povoleno, každý spoluvlastník jednotky může hlasovat samostatně, místo aby museli zvolit jednoho společného zástupce.",
+            },
             time: "Čas",
         },
         actions: {
@@ -162,7 +179,7 @@ export const voting = {
             saved: "Uloženo",
             saveNext: "Uložit a pokračovat",
             finishLater: "Dokončit později",
-            finish: "Ukončit",
+            finish: "Přejít na náhled hlasování",
         },
         toast: {
             createSuccess: "Hlasování bylo úspěšně vytvořeno",
@@ -216,6 +233,7 @@ export const voting = {
         timeline: {
             startDate: "DATUM ZAHÁJENÍ",
             endDate: "DATUM UKONČENÍ",
+            notSet: "Nenastaveno",
         },
         description: {
             title: "Popis",

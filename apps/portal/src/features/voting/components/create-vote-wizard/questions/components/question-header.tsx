@@ -3,9 +3,8 @@ import {
     DraggableSyntheticListeners,
 } from "@dnd-kit/core";
 import {
-    ChevronDown,
-    ChevronUp,
     GripVertical,
+    Pencil,
     Settings2,
     Trash2,
 } from "lucide-react";
@@ -16,8 +15,7 @@ import { Button } from "@hoa-mngr/ui";
 interface QuestionHeaderProps {
     title: string;
     hasOverride: boolean;
-    isExpanded: boolean;
-    onToggleExpand: () => void;
+    onEdit: () => void;
     onDelete: () => void;
     isDeleting: boolean;
     dragAttributes: DraggableAttributes;
@@ -27,8 +25,7 @@ interface QuestionHeaderProps {
 export function QuestionHeader({
     title,
     hasOverride,
-    isExpanded,
-    onToggleExpand,
+    onEdit,
     onDelete,
     isDeleting,
     dragAttributes,
@@ -37,7 +34,7 @@ export function QuestionHeader({
     const { t } = useTranslation(["voting"]);
 
     return (
-        <div className="flex items-center gap-2 border-b p-3">
+        <div className="flex items-center gap-2 p-3">
             <button
                 {...dragAttributes}
                 {...dragListeners}
@@ -59,15 +56,13 @@ export function QuestionHeader({
                 )}
                 <Button
                     variant="ghost"
-                    size="icon"
-                    onClick={onToggleExpand}
+                    size="sm"
+                    onClick={onEdit}
                     type="button"
+                    className="h-8 gap-1 px-2 text-xs"
                 >
-                    {isExpanded ? (
-                        <ChevronUp className="h-4 w-4" />
-                    ) : (
-                        <ChevronDown className="h-4 w-4" />
-                    )}
+                    <Pencil className="h-3.5 w-3.5" />
+                    {t("voting:create.steps.questions.actions.edit")}
                 </Button>
                 <Button
                     variant="ghost"

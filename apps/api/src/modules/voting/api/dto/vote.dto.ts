@@ -67,15 +67,17 @@ export const setVoteRulesetSchema = z.object({
   weightBasis: z.nativeEnum(VoteWeightBasis),
   quorumMeasure: z.nativeEnum(QuorumMeasure),
   quorumElectorateBasis: z.nativeEnum(QuorumElectorateBasis),
-  quorumThreshold: z.number().min(0),
+  quorumThreshold: z.number().min(0).max(100),
   majorityRuleType: z.nativeEnum(MajorityRuleType),
   majorityThreshold: z
     .number()
     .min(0)
+    .max(100)
     .optional()
     .transform((v) => v ?? null),
   allowAbstain: z.boolean(),
   abstainExcludedFromMajorityDenominator: z.boolean(),
+  allowCoOwnerIndividualVote: z.boolean(),
 });
 
 export class SetVoteRulesetDto extends createZodDto(setVoteRulesetSchema) {}

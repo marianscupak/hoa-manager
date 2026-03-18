@@ -9,20 +9,14 @@ interface QuestionRulesetOverrideProps {
     hasOverride: boolean;
     isOverrideVisible: boolean;
     onToggleVisibility: () => void;
-    onApplyCustomRules: () => void;
-    onUpdateRuleset: () => void;
     onRemoveOverride: () => void;
-    isUpdating: boolean;
 }
 
 export function QuestionRulesetOverride({
     hasOverride,
     isOverrideVisible,
     onToggleVisibility,
-    onApplyCustomRules,
-    onUpdateRuleset,
     onRemoveOverride,
-    isUpdating,
 }: QuestionRulesetOverrideProps) {
     const { t } = useTranslation(["voting"]);
 
@@ -76,33 +70,7 @@ export function QuestionRulesetOverride({
                         )}
                     </div>
 
-                    <RulesetFormFields />
-
-                    <div className="mt-4 flex justify-end">
-                        {!hasOverride ? (
-                            <Button
-                                type="button"
-                                size="sm"
-                                onClick={onApplyCustomRules}
-                                disabled={isUpdating}
-                            >
-                                {t(
-                                    "voting:create.steps.questions.override.apply",
-                                )}
-                            </Button>
-                        ) : (
-                            <Button
-                                type="button"
-                                size="sm"
-                                onClick={onUpdateRuleset}
-                                disabled={isUpdating}
-                            >
-                                {t(
-                                    "voting:create.steps.questions.override.update",
-                                )}
-                            </Button>
-                        )}
-                    </div>
+                    <RulesetFormFields showCoOwnerOption={false} />
                 </div>
             )}
         </div>

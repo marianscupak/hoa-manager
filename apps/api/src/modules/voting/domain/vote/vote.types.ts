@@ -35,6 +35,7 @@ export interface VoteRuleset {
   majorityThreshold: number | null;
   allowAbstain: boolean;
   abstainExcludedFromMajorityDenominator: boolean;
+  allowCoOwnerIndividualVote: boolean;
 }
 
 export enum VoteQuestionType {

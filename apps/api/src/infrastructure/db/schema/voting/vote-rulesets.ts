@@ -48,6 +48,11 @@ export const voteRulesets = pgTable(
     abstainExcludedFromMajorityDenominator: boolean(
       'abstain_excluded_from_majority_denominator',
     ).notNull(),
+    allowCoOwnerIndividualVote: boolean(
+      'allow_co_owner_individual_vote',
+    )
+      .notNull()
+      .default(false),
     createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' })
       .defaultNow()
       .notNull(),

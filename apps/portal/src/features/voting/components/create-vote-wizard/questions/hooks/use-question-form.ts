@@ -1,6 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { showApiError } from "@/api/error-utils";
@@ -31,6 +33,16 @@ const questionSchema = z.object({
     allowAbstain: createVoteRulesetSchema.shape.allowAbstain,
     abstainExcludedFromMajorityDenominator:
         createVoteRulesetSchema.shape.abstainExcludedFromMajorityDenominator,
+    allowCoOwnerIndividualVote:
+        createVoteRulesetSchema.shape.allowCoOwnerIndividualVote,
+    options: z.array(
+        z.object({
+            id: z.string().optional(),
+            label: z.string().min(1),
+            sortOrder: z.number(),
+            optionKey: z.string().optional(),
+        }),
+    ),
 });
 
 export type QuestionFormValues = z.infer<typeof questionSchema>;
@@ -46,6 +58,7 @@ export function useQuestionForm({
     question,
     onRefresh,
 }: UseQuestionFormParams) {
+    const { t } = useTranslation(["voting"]);
     const hasOverride = !!question.rulesetOverride;
 
     const form = useForm<QuestionFormValues>({
@@ -73,14 +86,21 @@ export function useQuestionForm({
                       abstainExcludedFromMajorityDenominator:
                           question.rulesetOverride!
                               .abstainExcludedFromMajorityDenominator,
+                      allowCoOwnerIndividualVote:
+                          question.rulesetOverride!.allowCoOwnerIndividualVote,
                   }
                 : rulesetDefaultValues),
+            options: (question.options ?? []).map((o) => ({
+                id: o.id,
+                label: o.label,
+                sortOrder: o.sortOrder,
+                optionKey: (o.optionKey as string) || "CUSTOM",
+            })),
         },
     });
 
     const updateMutation = useVotesControllerUpdateVoteQuestion();
 
-    // Sync form with external updates to question (e.g., from other users or reorders)
     useEffect(() => {
         if (!form.formState.isDirty) {
             form.reset({
@@ -106,20 +126,114 @@ export function useQuestionForm({
                           abstainExcludedFromMajorityDenominator:
                               question.rulesetOverride!
                                   .abstainExcludedFromMajorityDenominator,
+                          allowCoOwnerIndividualVote:
+                              question.rulesetOverride!
+                                  .allowCoOwnerIndividualVote,
                       }
                     : rulesetDefaultValues),
+                options: (question.options ?? []).map((o) => ({
+                    id: o.id,
+                    label: o.label,
+                    sortOrder: o.sortOrder,
+                    optionKey: (o.optionKey as string) || "CUSTOM",
+                })),
             });
         }
     }, [question, form, hasOverride]);
 
+    const type = form.watch("type");
+    const allowAbstain = form.watch("allowAbstain");
+    const useCustomRuleset = form.watch("useCustomRuleset");
+
+    useEffect(() => {
+        const currentOptions = form.getValues("options") || [];
+        const customOptions = currentOptions.filter(
+            (o) => o.optionKey === "CUSTOM" || !o.optionKey,
+        );
+
+        const effectiveAllowAbstain = useCustomRuleset
+            ? allowAbstain
+            : vote.ruleset?.allowAbstain ?? false;
+
+        if (type === CreateVoteQuestionDtoType.YES_NO) {
+            const systemOptions = [
+                { label: "For", sortOrder: 1, optionKey: "YES" },
+                { label: "Against", sortOrder: 2, optionKey: "NO" },
+            ];
+
+            if (effectiveAllowAbstain) {
+                systemOptions.push({
+                    label: "Abstain",
+                    sortOrder: 3,
+                    optionKey: "ABSTAIN",
+                });
+            }
+
+            const currentSystemKeys = currentOptions
+                .filter((o) => o.optionKey && o.optionKey !== "CUSTOM")
+                .map((o) => o.optionKey);
+            const targetSystemKeys = systemOptions.map((o) => o.optionKey);
+
+            if (
+                JSON.stringify(currentSystemKeys) !==
+                JSON.stringify(targetSystemKeys)
+            ) {
+                form.setValue("options", [...systemOptions, ...customOptions]);
+            }
+        } else {
+            const systemOptions = effectiveAllowAbstain
+                ? [
+                      {
+                          label: "Abstain",
+                          sortOrder: customOptions.length + 1,
+                          optionKey: "ABSTAIN",
+                      },
+                  ]
+                : [];
+
+            const currentSystemKeys = currentOptions
+                .filter((o) => o.optionKey && o.optionKey !== "CUSTOM")
+                .map((o) => o.optionKey);
+            const targetSystemKeys = systemOptions.map((o) => o.optionKey);
+
+            if (
+                JSON.stringify(currentSystemKeys) !==
+                JSON.stringify(targetSystemKeys)
+            ) {
+                form.setValue("options", [...customOptions, ...systemOptions]);
+            }
+        }
+    }, [
+        type,
+        allowAbstain,
+        useCustomRuleset,
+        vote.ruleset?.allowAbstain,
+        form,
+    ]);
+
     const handleSave = (forcedValues?: QuestionFormValues) => {
         const values = forcedValues || form.getValues();
+
+        const currentOptions = values.options.map((o) => ({
+            label: o.label,
+            sortOrder: o.sortOrder,
+            optionKey: o.optionKey,
+        }));
+        const originalOptions = (question.options ?? []).map((o) => ({
+            label: o.label,
+            sortOrder: o.sortOrder,
+            optionKey: (o.optionKey as string) || "CUSTOM",
+        }));
+
+        const optionsChanged =
+            JSON.stringify(currentOptions) !== JSON.stringify(originalOptions);
 
         const hasChanged =
             values.title !== question.title ||
             values.description !== (question.description ?? "") ||
             values.type !== question.type ||
-            values.useCustomRuleset !== hasOverride;
+            values.useCustomRuleset !== hasOverride ||
+            optionsChanged;
 
         if (!forcedValues && !hasChanged) return;
 
@@ -130,7 +244,7 @@ export function useQuestionForm({
             sortOrder: question.sortOrder,
             useCustomRuleset: values.useCustomRuleset,
             rulesetValues: values,
-            options: question.options,
+            options: values.options as VoteQuestionResponseDto["options"],
         });
 
         updateMutation.mutate(
@@ -141,6 +255,9 @@ export function useQuestionForm({
             },
             {
                 onSuccess: () => {
+                    toast.success(
+                        t("voting:create.steps.questions.updateSuccess"),
+                    );
                     form.reset(values);
                     onRefresh();
                 },
@@ -149,12 +266,9 @@ export function useQuestionForm({
         );
     };
 
-    const handleBlurSave = () => handleSave();
-
     return {
         form,
         handleSave,
-        handleBlurSave,
         isUpdating: updateMutation.isPending,
         hasOverride,
     };

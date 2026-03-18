@@ -8,6 +8,7 @@ import {
 } from '@/modules/voting/domain/vote/vote.types';
 import {
   InvalidVoteQuestionException,
+  InvalidQuestionRulesetOverrideException,
   VoteNotDraftException,
   VoteQuestionNotFoundException,
   VoteRulesetRequiredException,
@@ -217,6 +218,8 @@ export class VoteAggregate {
       input.options,
     );
 
+    this.validateQuestionRulesetOverride(input.rulesetOverride);
+
     const question: VoteQuestion = {
       id: crypto.randomUUID(),
       title: input.title,
@@ -256,6 +259,8 @@ export class VoteAggregate {
       effectiveRuleset.allowAbstain,
       input.options,
     );
+
+    this.validateQuestionRulesetOverride(input.rulesetOverride);
 
     const updatedQuestion: VoteQuestion = {
       id: questionId,
@@ -310,6 +315,14 @@ export class VoteAggregate {
       throw new VoteRulesetRequiredException();
     }
     return this.ruleset;
+  }
+
+  private validateQuestionRulesetOverride(
+    override: VoteRuleset | undefined,
+  ): void {
+    if (override && override.allowCoOwnerIndividualVote) {
+      throw new InvalidQuestionRulesetOverrideException();
+    }
   }
 
   private buildAbstainOption(sortOrder: number): VoteOption {

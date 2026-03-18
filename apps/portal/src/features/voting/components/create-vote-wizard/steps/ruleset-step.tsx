@@ -25,7 +25,8 @@ export const createVoteRulesetSchema = z.object({
     quorumElectorateBasis: z.nativeEnum(QuorumElectorateBasis),
     quorumThreshold: z.coerce
         .number()
-        .min(0, "voting:create.fields.quorumThreshold.errors.positiveNumber"),
+        .min(0, "voting:create.fields.quorumThreshold.errors.positiveNumber")
+        .max(100, "voting:create.fields.quorumThreshold.errors.max"),
     majorityRuleType: z.nativeEnum(MajorityRuleType),
     majorityThreshold: z.coerce
         .number()
@@ -33,9 +34,13 @@ export const createVoteRulesetSchema = z.object({
         .refine((v) => v === undefined || (!isNaN(v) && v >= 0), {
             message:
                 "voting:create.fields.majorityThreshold.errors.positiveNumber",
+        })
+        .refine((v) => v === undefined || (typeof v === "number" && v <= 100), {
+            message: "voting:create.fields.majorityThreshold.errors.max",
         }),
     allowAbstain: z.boolean(),
     abstainExcludedFromMajorityDenominator: z.boolean(),
+    allowCoOwnerIndividualVote: z.boolean(),
 });
 
 export type CreateVoteRulesetValues = z.infer<typeof createVoteRulesetSchema>;
@@ -49,6 +54,7 @@ export const rulesetDefaultValues: CreateVoteRulesetValues = {
     majorityThreshold: undefined,
     allowAbstain: false,
     abstainExcludedFromMajorityDenominator: false,
+    allowCoOwnerIndividualVote: false,
 };
 
 export interface CreateVoteRulesetStepProps {
@@ -106,9 +112,14 @@ export function CreateVoteRulesetStep({
                 onSubmit={rulesetForm.handleSubmit(onSubmit)}
                 className="space-y-6"
             >
-                <p className="text-muted-foreground text-sm">
-                    {t("voting:create.steps.ruleset.defaultDescription")}
-                </p>
+                <div className="space-y-1">
+                    <p className="text-muted-foreground text-sm">
+                        {t("create.steps.ruleset.description")}
+                    </p>
+                    <p className="text-muted-foreground text-sm italic">
+                        {t("voting:create.steps.ruleset.defaultDescription")}
+                    </p>
+                </div>
 
                 <RulesetFormFields />
 

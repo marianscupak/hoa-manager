@@ -19,15 +19,20 @@ import {
 } from "@/api/generated/model";
 import { useVotesControllerUpdateVoteQuestion } from "@/api/generated/votes/votes";
 
-import { QuestionBlock } from "./question-block";
+import { QuestionModal } from "./question-modal";
 import { mapQuestionToUpdateDto } from "../shared/voting-wizard.utils";
 
 interface QuestionsListProps {
     vote: VoteDetailResponseDto;
     onRefresh: () => void;
+    autoOpenId?: string | null;
 }
 
-export function QuestionsList({ vote, onRefresh }: QuestionsListProps) {
+export function QuestionsList({
+    vote,
+    onRefresh,
+    autoOpenId,
+}: QuestionsListProps) {
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: {
@@ -87,14 +92,21 @@ export function QuestionsList({ vote, onRefresh }: QuestionsListProps) {
                 strategy={verticalListSortingStrategy}
             >
                 <div className="space-y-4">
-                    {questions.map((question) => (
-                        <QuestionBlock
-                            key={question.id}
-                            vote={vote}
-                            question={question}
-                            onRefresh={onRefresh}
-                        />
-                    ))}
+                    {questions.map((question, index) => {
+                        const isNew =
+                            autoOpenId === question.id ||
+                            (autoOpenId === "NEWLY_CREATED_FALLBACK" &&
+                                index === questions.length - 1);
+                        return (
+                            <QuestionModal
+                                key={question.id}
+                                vote={vote}
+                                question={question}
+                                onRefresh={onRefresh}
+                                autoOpen={isNew}
+                            />
+                        );
+                    })}
                 </div>
             </SortableContext>
         </DndContext>

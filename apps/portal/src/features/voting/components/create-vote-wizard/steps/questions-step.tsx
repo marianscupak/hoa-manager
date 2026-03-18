@@ -1,7 +1,6 @@
-import { useIsMutating } from "@tanstack/react-query";
-import { Loader2, Plus, CheckCircle2, Flag } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
 
 import { Button } from "@hoa-mngr/ui";
 
@@ -32,12 +31,7 @@ export function CreateVoteQuestionsStep({
 
     const createQuestionMutation = useVotesControllerCreateVoteQuestion();
 
-    const isMutating = useIsMutating({
-        predicate: (mutation) => {
-            const key = mutation.options.mutationKey?.[0];
-            return typeof key === "string" && key.startsWith("votesController");
-        },
-    });
+    const [autoOpenId, setAutoOpenId] = useState<string | null>(null);
 
     const handleAddQuestion = () => {
         if (!voteId) return;
@@ -51,7 +45,13 @@ export function CreateVoteQuestionsStep({
                 },
             },
             {
-                onSuccess: () => {
+                // TODO: check why this is not typed correctly
+                onSuccess: (data: any) => {
+                    if (data?.id) {
+                        setAutoOpenId(data.id);
+                    } else {
+                        setAutoOpenId("NEWLY_CREATED_FALLBACK");
+                    }
                     voteQuery.refetch();
                 },
                 onError: showApiError,
@@ -84,64 +84,30 @@ export function CreateVoteQuestionsStep({
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between gap-4 rounded-lg border border-blue-100/50 bg-blue-50/50 px-4 py-2">
-                <div className="flex items-center gap-2 text-sm font-medium text-blue-700">
-                    {isMutating > 0 ? (
-                        <>
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                            <span>{t("create.steps.questions.saving")}</span>
-                        </>
-                    ) : (
-                        <>
-                            <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                            <span className="text-muted-foreground font-normal">
-                                {t("create.steps.questions.autoSave")}
-                            </span>
-                        </>
-                    )}
-                </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-                <div>
-                    <h3 className="text-lg font-medium">
-                        {t("create.steps.questions.title")}
-                    </h3>
-                    <p className="text-muted-foreground text-sm">
-                        {t("create.steps.questions.description")}
-                    </p>
-                </div>
+            <div className="flex items-center justify-between gap-4">
+                <p className="text-muted-foreground text-base">
+                    {t("create.steps.questions.description")}
+                </p>
                 <Button
                     onClick={handleAddQuestion}
                     disabled={createQuestionMutation.isPending}
-                    size="sm"
                 >
                     <Plus className="mr-2 h-4 w-4" />
                     {t("create.steps.questions.addQuestion")}
                 </Button>
             </div>
 
-            <QuestionsList vote={vote} onRefresh={() => voteQuery.refetch()} />
+            <QuestionsList
+                vote={vote}
+                onRefresh={() => voteQuery.refetch()}
+                autoOpenId={autoOpenId}
+            />
 
             {questions.length === 0 && (
                 <div className="text-muted-foreground rounded-lg border-2 border-dashed p-12 text-center">
                     {t("create.steps.questions.emptyState")}
                 </div>
             )}
-
-            <div className="border-t pt-6">
-                <div className="flex justify-end">
-                    <Button
-                        className="h-11 bg-emerald-600 px-8 text-lg hover:bg-emerald-700"
-                        asChild
-                    >
-                        <Link to={`/voting/${vote.id}`}>
-                            <Flag className="mr-2 h-5 w-5" />
-                            {t("create.actions.finish")}
-                        </Link>
-                    </Button>
-                </div>
-            </div>
         </div>
     );
 }

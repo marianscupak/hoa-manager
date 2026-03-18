@@ -80,3 +80,9 @@ export class VoteQuestionMissingOptionsException extends DomainException {
     ]);
   }
 }
+
+export class InvalidQuestionRulesetOverrideException extends DomainException {
+  constructor() {
+    super(ErrorCode.INVALID_QUESTION_RULESET_OVERRIDE);
+  }
+}

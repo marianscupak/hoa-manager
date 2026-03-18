@@ -33,6 +33,7 @@ describe('VoteAggregate', () => {
     majorityThreshold: null,
     allowAbstain: false,
     abstainExcludedFromMajorityDenominator: true,
+    allowCoOwnerIndividualVote: false,
     ...opts,
   });
 

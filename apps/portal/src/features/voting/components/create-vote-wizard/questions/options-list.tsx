@@ -8,36 +8,32 @@ import {
 } from "@dnd-kit/core";
 import {
     SortableContext,
-    arrayMove,
     verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { Plus } from "lucide-react";
-import { useFormContext } from "react-hook-form";
+import { useFieldArray, useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@hoa-mngr/ui";
 
-import { showApiError } from "@/api/error-utils";
 import {
     CreateVoteQuestionDtoType,
-    VoteQuestionResponseDto,
+    VoteOptionResponseDto,
 } from "@/api/generated/model";
-import { useVotesControllerUpdateVoteQuestion } from "@/api/generated/votes/votes";
 
 import { QuestionFormValues } from "./hooks/use-question-form";
 import { OptionItem } from "./option-item";
-import { mapQuestionToUpdateDto } from "../shared/voting-wizard.utils";
 
-interface OptionsListProps {
-    voteId: string;
-    question: VoteQuestionResponseDto;
-    onRefresh: () => void;
-}
-
-export function OptionsList({ voteId, question, onRefresh }: OptionsListProps) {
+export function OptionsList() {
     const { t } = useTranslation(["voting"]);
-    const { watch, getValues } = useFormContext();
+    const { watch, control, getValues, setValue } =
+        useFormContext<QuestionFormValues>();
     const type = watch("type");
+
+    const { fields, append, remove, update } = useFieldArray({
+        control,
+        name: "options",
+    });
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -47,14 +43,12 @@ export function OptionsList({ voteId, question, onRefresh }: OptionsListProps) {
         }),
     );
 
-    const updateQuestionMutation = useVotesControllerUpdateVoteQuestion();
-
     const isSingleChoice = type === CreateVoteQuestionDtoType.SINGLE_CHOICE;
-    const allOptions = [...(question.options ?? [])].sort(
-        (a, b) => a.sortOrder - b.sortOrder,
+
+    const customOptions = fields.filter((o) => o.optionKey === "CUSTOM");
+    const systemOptions = fields.filter(
+        (o) => o.optionKey && o.optionKey !== "CUSTOM",
     );
-    const customOptions = allOptions.filter((o) => o.optionKey === "CUSTOM");
-    const systemOptions = allOptions.filter((o) => o.optionKey !== "CUSTOM");
 
     const getOptionLabel = (o: { label: string; optionKey?: string }) => {
         if (o.optionKey && o.optionKey !== "CUSTOM") {
@@ -65,92 +59,61 @@ export function OptionsList({ voteId, question, onRefresh }: OptionsListProps) {
         return o.label;
     };
 
-    const handleUpdateOptions = (
-        newOptions: { label: string; sortOrder: number; optionKey?: string }[],
-    ) => {
-        const formValues = getValues() as QuestionFormValues;
-
-        // Only send CUSTOM options to the API
-        // If an option doesn't have a key yet, it's a new custom option
-        const filteredOptions = newOptions
-            .filter((opt) => !opt.optionKey || opt.optionKey === "CUSTOM")
-            .map((opt) => ({
-                label: opt.label.trim(),
-                sortOrder: opt.sortOrder,
-                optionKey: "CUSTOM",
-            }));
-
-        updateQuestionMutation.mutate(
-            {
-                id: voteId,
-                questionId: question.id,
-                data: mapQuestionToUpdateDto({
-                    title: formValues.title,
-                    type: formValues.type,
-                    description: formValues.description,
-                    sortOrder: question.sortOrder,
-                    useCustomRuleset: formValues.useCustomRuleset,
-                    rulesetValues: formValues,
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    options: filteredOptions as any,
-                }),
-            },
-            {
-                onSuccess: onRefresh,
-                onError: (err) => showApiError(err),
-            },
-        );
-    };
-
     const handleAddOption = () => {
         const defaultLabel = t(
             "voting:create.steps.questions.options.defaultLabel",
         ) as string;
-        const newOptions = [
-            ...customOptions.map((o) => ({
-                label: o.label,
-                sortOrder: o.sortOrder,
-            })),
-            {
-                label: defaultLabel,
-                sortOrder: customOptions.length + 1,
-            },
-        ];
-        handleUpdateOptions(newOptions);
+        append({
+            label: defaultLabel,
+            sortOrder: customOptions.length + 1,
+            optionKey: "CUSTOM",
+        });
     };
 
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
 
         if (over && active.id !== over.id) {
-            const oldIndex = customOptions.findIndex((o) => o.id === active.id);
-            const newIndex = customOptions.findIndex((o) => o.id === over.id);
-            const reordered = arrayMove(customOptions, oldIndex, newIndex).map(
-                (o, idx) => ({
-                    label: o.label,
-                    sortOrder: idx + 1,
-                }),
-            );
-            handleUpdateOptions(reordered);
+            const oldIndex = fields.findIndex((o) => o.id === active.id);
+            const newIndex = fields.findIndex((o) => o.id === over.id);
+
+            if (
+                fields[oldIndex].optionKey !== "CUSTOM" ||
+                fields[newIndex].optionKey !== "CUSTOM"
+            ) {
+                return;
+            }
+
+            const currentOptions = getValues("options") || [];
+            const newOptions = [...currentOptions];
+            const [movedItem] = newOptions.splice(oldIndex, 1);
+            newOptions.splice(newIndex, 0, movedItem);
+
+            // Re-calculate sortOrder for ALL options to keep them consistent
+            const updatedOptions = newOptions.map((o, index) => ({
+                ...o,
+                sortOrder: index + 1,
+            }));
+
+            setValue("options", updatedOptions);
         }
     };
 
     const handleOptionChange = (id: string, label: string) => {
-        const newOptions = customOptions.map((o) =>
-            o.id === id
-                ? { label, sortOrder: o.sortOrder, optionKey: o.optionKey }
-                : {
-                      label: o.label,
-                      sortOrder: o.sortOrder,
-                      optionKey: o.optionKey,
-                  },
-        );
-        handleUpdateOptions(newOptions);
+        const index = fields.findIndex((o) => o.id === id);
+        if (index !== -1) {
+            update(index, {
+                ...fields[index],
+                label,
+            });
+        }
     };
 
     const handleOptionDelete = (id: string) => {
-        const newOptions = customOptions.filter((o) => o.id !== id);
-        handleUpdateOptions(newOptions);
+        const index = fields.findIndex((o) => o.id === id);
+        if (index !== -1) {
+            remove(index);
+        }
     };
 
     if (!isSingleChoice) {
@@ -160,7 +123,7 @@ export function OptionsList({ voteId, question, onRefresh }: OptionsListProps) {
                     {t("voting:create.steps.questions.options.title")}
                 </h4>
                 <div className="space-y-2 opacity-70">
-                    {allOptions.map((option) => (
+                    {fields.map((option) => (
                         <div
                             key={option.id}
                             className="bg-muted rounded px-3 py-2 text-sm"
@@ -203,7 +166,7 @@ export function OptionsList({ voteId, question, onRefresh }: OptionsListProps) {
                         {customOptions.map((option) => (
                             <OptionItem
                                 key={option.id}
-                                option={option}
+                                option={option as VoteOptionResponseDto}
                                 onLabelChange={(label) =>
                                     handleOptionChange(option.id, label)
                                 }

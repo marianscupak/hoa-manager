@@ -102,6 +102,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
           allowAbstain: ruleset.allowAbstain,
           abstainExcludedFromMajorityDenominator:
             ruleset.abstainExcludedFromMajorityDenominator,
+          allowCoOwnerIndividualVote: ruleset.allowCoOwnerIndividualVote,
         }
       : null;
 
@@ -133,6 +134,8 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
             allowAbstain: qRulesetRow.allowAbstain,
             abstainExcludedFromMajorityDenominator:
               qRulesetRow.abstainExcludedFromMajorityDenominator,
+            allowCoOwnerIndividualVote:
+              qRulesetRow.allowCoOwnerIndividualVote,
           }
         : null;
 

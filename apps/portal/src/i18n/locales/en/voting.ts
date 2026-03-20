@@ -285,7 +285,8 @@ export const voting = {
         },
         statusSidebar: {
             title: "Your Voting Status",
-            closesIn: "Voting closes in",
+            opensIn: "Voting starts in",
+            closesIn: "Voting ends in",
             owningUnits: "OWNING UNITS",
             share: "Share:",
             statusReady: "Ready",

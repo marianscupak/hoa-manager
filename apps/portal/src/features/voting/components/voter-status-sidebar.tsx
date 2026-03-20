@@ -1,3 +1,5 @@
+import { formatDistanceToNow, isPast } from "date-fns";
+import { cs } from "date-fns/locale";
 import {
     AlertTriangle,
     ArrowRight,
@@ -12,19 +14,31 @@ import { useParams } from "react-router";
 import { Button } from "@hoa-mngr/ui";
 import { cn } from "@hoa-mngr/ui/lib/utils";
 
-import { useVotesControllerGetVoterStatus } from "@/api/generated/votes/votes";
+import {
+    useVotesControllerGetVoteDetail,
+    useVotesControllerGetVoterStatus,
+} from "@/api/generated/votes/votes";
 
 export function VoterStatusSidebar() {
-    const { t } = useTranslation(["voting"]);
+    const { t, i18n } = useTranslation(["voting"]);
     const { id } = useParams<{ id: string }>();
 
-    const statusQuery = useVotesControllerGetVoterStatus(id ?? "", {
+    const voteId = id ?? "";
+    const currentLocale = i18n.language === "cs" ? cs : undefined;
+
+    const voteQuery = useVotesControllerGetVoteDetail(voteId, {
         query: {
-            enabled: !!id,
+            enabled: !!voteId,
         },
     });
 
-    if (statusQuery.isLoading) {
+    const statusQuery = useVotesControllerGetVoterStatus(voteId, {
+        query: {
+            enabled: !!voteId,
+        },
+    });
+
+    if (voteQuery.isLoading || statusQuery.isLoading) {
         return (
             <div className="flex h-64 items-center justify-center rounded-lg border bg-white shadow-sm">
                 <Loader2 className="text-primary h-8 w-8 animate-spin" />
@@ -32,33 +46,52 @@ export function VoterStatusSidebar() {
         );
     }
 
-    if (statusQuery.isError || !statusQuery.data) {
+    if (
+        voteQuery.isError ||
+        statusQuery.isError ||
+        !voteQuery.data ||
+        !statusQuery.data
+    ) {
         return (
             <div className="flex h-64 items-center justify-center rounded-lg border bg-white p-6 text-center shadow-sm">
-                <p className="text-destructive text-sm">
-                    {t("voting:list.error")}
-                </p>
+                <p className="text-destructive text-sm">{t("list.error")}</p>
             </div>
         );
     }
 
+    const vote = voteQuery.data;
     const statusData = statusQuery.data;
 
     const unitRequiringDelegation = statusData.owningUnits.find(
         (u) => u.status === "REQUIRES_DELEGATION",
     );
 
+    let timerMessage = "";
+    if (vote.status === "OPEN" && vote.scheduledTo) {
+        const endDate = new Date(vote.scheduledTo);
+        if (!isPast(endDate)) {
+            timerMessage = `${t("detail.statusSidebar.closesIn")} ${formatDistanceToNow(endDate, { locale: currentLocale })}`;
+        }
+    } else if (
+        (vote.status === "SCHEDULED" || vote.status === "DRAFT") &&
+        vote.scheduledFrom
+    ) {
+        const startDate = new Date(vote.scheduledFrom);
+        if (!isPast(startDate)) {
+            timerMessage = `${t("detail.statusSidebar.opensIn")} ${formatDistanceToNow(startDate, { locale: currentLocale })}`;
+        }
+    }
+
     return (
         <div className="flex flex-col gap-6">
             <div className="flex flex-col overflow-hidden rounded-lg border bg-white shadow-sm">
                 <div className="flex flex-col gap-1 border-b border-slate-100 bg-slate-50/50 p-6">
                     <h3 className="text-lg font-bold">
-                        {t("voting:detail.statusSidebar.title")}
+                        {t("detail.statusSidebar.title")}
                     </h3>
-                    <p className="text-sm text-slate-500">
-                        {t("voting:detail.statusSidebar.closesIn")} 1{" "}
-                        {t("voting:detail.statusSidebar.time.hour")}
-                    </p>
+                    {timerMessage && (
+                        <p className="text-sm text-slate-500">{timerMessage}</p>
+                    )}
                 </div>
 
                 <div className="p-6 pb-2">

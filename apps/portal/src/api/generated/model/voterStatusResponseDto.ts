@@ -7,8 +7,15 @@
  */
 import type { OwningUnitStatusDto } from "./owningUnitStatusDto";
 import type { TotalVotingPowerDto } from "./totalVotingPowerDto";
+import type { VoterStatusResponseDtoScheduledFrom } from "./voterStatusResponseDtoScheduledFrom";
+import type { VoterStatusResponseDtoScheduledTo } from "./voterStatusResponseDtoScheduledTo";
 
 export interface VoterStatusResponseDto {
+    status: string;
+    /** @nullable */
+    scheduledFrom?: VoterStatusResponseDtoScheduledFrom;
+    /** @nullable */
+    scheduledTo?: VoterStatusResponseDtoScheduledTo;
     canVote: boolean;
     totalVotingPower: TotalVotingPowerDto;
     owningUnits: OwningUnitStatusDto[];

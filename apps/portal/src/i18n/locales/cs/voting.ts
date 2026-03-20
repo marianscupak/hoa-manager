@@ -285,6 +285,7 @@ export const voting = {
         },
         statusSidebar: {
             title: "Váš status hlasování",
+            opensIn: "Hlasování začíná za",
             closesIn: "Hlasování končí za",
             owningUnits: "VLASTNĚNÉ JEDNOTKY",
             share: "Podíl:",

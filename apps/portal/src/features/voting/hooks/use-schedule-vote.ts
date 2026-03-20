@@ -1,15 +1,21 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { showApiError } from "@/api/error-utils";
-import { useVotesControllerScheduleVote } from "@/api/generated/votes/votes";
+import {
+    getVotesControllerGetVoteDetailQueryKey,
+    getVotesControllerGetVotesQueryKey,
+    useVotesControllerScheduleVote,
+} from "@/api/generated/votes/votes";
 
 export function useScheduleVote(
     voteId: string,
     options?: { onSuccess?: () => void },
 ) {
     const { t } = useTranslation(["voting"]);
+    const queryClient = useQueryClient();
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [isValidationOpen, setIsValidationOpen] = useState(false);
     const [validationErrors, setValidationErrors] = useState<
@@ -26,10 +32,16 @@ export function useScheduleVote(
                 onSuccess: () => {
                     toast.success(t("voting:create.toast.scheduleSuccess"));
                     setIsConfirmOpen(false);
+                    queryClient.invalidateQueries({
+                        queryKey: getVotesControllerGetVotesQueryKey(),
+                    });
+                    queryClient.invalidateQueries({
+                        queryKey:
+                            getVotesControllerGetVoteDetailQueryKey(voteId),
+                    });
                     options?.onSuccess?.();
                 },
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                onError: (error: any) => {
+                onError: (error) => {
                     const errorData = error.response?.data;
                     if (errorData?.code === "INCOMPLETE_VOTE") {
                         setValidationErrors(errorData.details || []);

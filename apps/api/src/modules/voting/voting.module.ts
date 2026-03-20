@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
 
@@ -11,11 +12,13 @@ import { CreateVoteHandler } from './application/commands/create-vote/create-vot
 import { CreateVoteConsentHandler } from './application/commands/create-vote-consent/create-vote-consent.handler';
 import { CreateVoteQuestionHandler } from './application/commands/create-vote-question/create-vote-question.handler';
 import { DeleteVoteQuestionHandler } from './application/commands/delete-vote-question/delete-vote-question.handler';
+import { OpenVoteCommandHandler } from './application/commands/open-vote/open-vote.handler';
 import { RevokeConsentHandler } from './application/commands/revoke-consent/revoke-consent.handler';
 import { ScheduleVoteHandler } from './application/commands/schedule-vote/schedule-vote.handler';
 import { SetVoteRulesetHandler } from './application/commands/set-vote-ruleset/set-vote-ruleset.handler';
 import { UpdateVoteHandler } from './application/commands/update-vote/update-vote.handler';
 import { UpdateVoteQuestionHandler } from './application/commands/update-vote-question/update-vote-question.handler';
+import { ELECTORATE_SERVICE } from './application/ports/electorate-service.port';
 import { VOTE_CONSENT_WRITE_REPOSITORY } from './application/ports/vote-consent-write.repository.port';
 import { VOTE_READ_REPOSITORY } from './application/ports/vote-read.repository.port';
 import { VOTE_WRITE_REPOSITORY } from './application/ports/vote-write.repository.port';
@@ -24,9 +27,11 @@ import { GetDelegationCandidatesHandler } from './application/queries/get-delega
 import { GetVoteDetailHandler } from './application/queries/get-vote-detail/get-vote-detail.handler';
 import { GetVoterStatusHandler } from './application/queries/get-voter-status/get-voter-status.handler';
 import { GetVotesHandler } from './application/queries/get-votes/get-votes.handler';
+import { DrizzleElectorateService } from './infrastructure/persistence/drizzle-electorate.service';
 import { DrizzleVoteConsentWriteRepository } from './infrastructure/persistence/drizzle-vote-consent-write.repository';
 import { DrizzleVoteReadRepository } from './infrastructure/persistence/drizzle-vote-read.repository';
 import { DrizzleVoteWriteRepository } from './infrastructure/persistence/drizzle-vote-write.repository';
+import { VoteSchedulerService } from './infrastructure/vote-scheduler.service';
 
 const COMMAND_HANDLERS = [
   CreateVoteHandler,
@@ -38,6 +43,7 @@ const COMMAND_HANDLERS = [
   ScheduleVoteHandler,
   CreateVoteConsentHandler,
   RevokeConsentHandler,
+  OpenVoteCommandHandler,
 ];
 const QUERY_HANDLERS = [
   GetVoteDetailHandler,
@@ -53,11 +59,19 @@ const REPOSITORIES = [
     provide: VOTE_CONSENT_WRITE_REPOSITORY,
     useClass: DrizzleVoteConsentWriteRepository,
   },
+  { provide: ELECTORATE_SERVICE, useClass: DrizzleElectorateService },
   DrizzleUnitOfWork,
+  VoteSchedulerService,
 ];
 
 @Module({
-  imports: [CqrsModule, IdentityModule, AuthModule, TenancyModule],
+  imports: [
+    CqrsModule,
+    ScheduleModule,
+    IdentityModule,
+    AuthModule,
+    TenancyModule,
+  ],
   controllers: [VotesController],
   providers: [...COMMAND_HANDLERS, ...QUERY_HANDLERS, ...REPOSITORIES],
 })

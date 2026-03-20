@@ -110,3 +110,15 @@ export class DelegationNotFoundException extends DomainException {
     super(ErrorCode.DELEGATION_NOT_FOUND);
   }
 }
+
+export class VoteNotScheduledException extends DomainException {
+  constructor() {
+    super(ErrorCode.VOTE_NOT_SCHEDULED);
+  }
+}
+
+export class VoteNotReadyToOpenException extends DomainException {
+  constructor() {
+    super(ErrorCode.VOTE_NOT_READY_TO_OPEN);
+  }
+}

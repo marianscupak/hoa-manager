@@ -6,6 +6,8 @@ import {
   VoteRulesetRequiredException,
   VoteScheduleInPastException,
   VoteScheduleInvalidRangeException,
+  VoteNotScheduledException,
+  VoteNotReadyToOpenException,
 } from '@/shared/application/exceptions/vote.exceptions';
 
 import { VoteAggregate, type CreateVoteInput } from './vote.aggregate';
@@ -613,6 +615,72 @@ describe('VoteAggregate', () => {
 
       expect(rehydrated.questions[0].rulesetOverride).toBeUndefined();
       expect(rehydrated.questions[1].rulesetOverride).toEqual(override);
+    });
+  });
+
+  describe('open()', () => {
+    let aggregate: VoteAggregate;
+
+    beforeEach(() => {
+      aggregate = createDraftAggregate();
+      aggregate.setRuleset(createValidRuleset());
+      aggregate.addQuestion({
+        title: 'Q1',
+        description: null,
+        type: VoteQuestionType.YES_NO,
+      });
+    });
+
+    it('transitions from SCHEDULED to OPEN if scheduled time has arrived', () => {
+      aggregate.schedule(defaultNow);
+
+      const openTime = addDays(defaultNow, 0.5); // ScheduledFrom is defaultNow
+      aggregate.open(defaultMembershipId, openTime);
+
+      expect(aggregate.status).toBe(VoteStatus.OPEN);
+      expect(aggregate.openedAt).toEqual(openTime);
+      expect(aggregate.openedByMembershipId).toBe(defaultMembershipId);
+    });
+
+    it('throws VoteNotScheduledException if not in SCHEDULED status', () => {
+      // It's in DRAFT here
+      expect(() => {
+        aggregate.open(defaultMembershipId, defaultNow);
+      }).toThrow(VoteNotScheduledException);
+    });
+
+    it('throws VoteNotReadyToOpenException if opening before scheduledFrom', () => {
+      const scheduledFrom = addDays(defaultNow, 1);
+      const scheduledTo = addDays(defaultNow, 2);
+
+      const futureVote = VoteAggregate.create(
+        { title: 'Test', description: 'Test', scheduledFrom, scheduledTo },
+        defaultTenantId,
+        defaultMembershipId,
+        defaultNow,
+      );
+      futureVote.setRuleset(createValidRuleset());
+      futureVote.addQuestion({
+        title: 'Q',
+        description: null,
+        type: VoteQuestionType.YES_NO,
+      });
+
+      futureVote.schedule(defaultNow);
+
+      const tooEarly = addDays(defaultNow, 0.5);
+      expect(() => {
+        futureVote.open(defaultMembershipId, tooEarly);
+      }).toThrow(VoteNotReadyToOpenException);
+    });
+
+    it('supports automated opening with undefined membershipId', () => {
+      aggregate.schedule(defaultNow);
+
+      aggregate.open(undefined, defaultNow);
+
+      expect(aggregate.status).toBe(VoteStatus.OPEN);
+      expect(aggregate.openedByMembershipId).toBeUndefined();
     });
   });
 });

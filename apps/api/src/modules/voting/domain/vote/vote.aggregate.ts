@@ -15,6 +15,8 @@ import {
   IncompleteVoteException,
   VoteScheduleInPastException,
   VoteScheduleInvalidRangeException,
+  VoteNotScheduledException,
+  VoteNotReadyToOpenException,
 } from '@/shared/application/exceptions/vote.exceptions';
 import { ErrorCode } from '@/shared/errors/error-codes';
 
@@ -138,6 +140,29 @@ export class VoteAggregate {
 
     Object.assign(this, {
       status: VoteStatus.SCHEDULED,
+      updatedAt: now,
+    });
+  }
+
+  open(openedByMembershipId: string | undefined, now: Date): void {
+    if (this.status !== VoteStatus.SCHEDULED) {
+      throw new VoteNotScheduledException();
+    }
+
+    if (!this.scheduledFrom) {
+      throw new IncompleteVoteException([
+        { code: ErrorCode.VOTE_SCHEDULE_MISSING_DATES },
+      ]);
+    }
+
+    if (now < this.scheduledFrom) {
+      throw new VoteNotReadyToOpenException();
+    }
+
+    Object.assign(this, {
+      status: VoteStatus.OPEN,
+      openedAt: now,
+      openedByMembershipId,
       updatedAt: now,
     });
   }

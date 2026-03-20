@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 
 import { Module } from '@nestjs/common';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
 import type { Request } from 'express';
 import { ClsModule } from 'nestjs-cls';
 
@@ -26,6 +27,7 @@ import { DomainExceptionFilter } from '@/shared/filters/domain-exception.filter'
           (req.headers['x-correlation-id'] as string) ?? crypto.randomUUID(),
       },
     }),
+    ScheduleModule.forRoot(),
     InfrastructureModule,
     TenancyModule,
     IdentityModule,

@@ -77,3 +77,21 @@ export enum OwningUnitStatus {
   REQUIRES_DELEGATION = 'REQUIRES_DELEGATION',
   DELEGATED = 'DELEGATED',
 }
+
+export enum ElectorateEligibilityStatus {
+  ELIGIBLE = 'ELIGIBLE',
+  INELIGIBLE = 'INELIGIBLE',
+}
+
+export enum ElectorateIneligibleReason {
+  NO_REPRESENTATIVE = 'NO_REPRESENTATIVE',
+  MISSING_OWNERSHIP = 'MISSING_OWNERSHIP',
+}
+
+export interface ElectorateUnit {
+  unitId: string;
+  representativeMembershipId: string | null;
+  eligibilityStatus: ElectorateEligibilityStatus;
+  ineligibleReason: ElectorateIneligibleReason | null;
+  votingWeight: number;
+}

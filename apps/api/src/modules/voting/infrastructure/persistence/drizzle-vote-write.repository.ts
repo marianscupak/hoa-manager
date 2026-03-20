@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { and, eq, inArray, isNull, isNotNull } from 'drizzle-orm';
+import { and, eq, inArray, isNull, isNotNull, lte } from 'drizzle-orm';
 
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
 import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
@@ -8,6 +8,7 @@ import {
   votes,
   voteQuestions,
   voteOptions,
+  voteElectorateUnits,
 } from '@/infrastructure/db/schema';
 
 import { VoteWriteRepository } from '../../application/ports/vote-write.repository.port';
@@ -23,6 +24,7 @@ import {
   type VoteWeightBasis,
   type VoteQuestion,
   type VoteOption,
+  ElectorateUnit,
 } from '../../domain/vote/vote.types';
 
 @Injectable()
@@ -471,5 +473,46 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
         override.abstainExcludedFromMajorityDenominator,
       allowCoOwnerIndividualVote: override.allowCoOwnerIndividualVote,
     };
+  }
+
+  async saveElectorateUnits(
+    tenantId: string,
+    voteId: string,
+    units: ElectorateUnit[],
+  ): Promise<void> {
+    if (units.length === 0) return;
+
+    await this.db.insert(voteElectorateUnits).values(
+      units.map((u) => ({
+        tenantId,
+        voteId,
+        unitId: u.unitId,
+        representativeMembershipId: u.representativeMembershipId,
+        eligibilityStatus: u.eligibilityStatus,
+        ineligibleReason: u.ineligibleReason,
+        votingWeight: u.votingWeight.toString(),
+        snapshottedAt: new Date(),
+      })),
+    );
+  }
+
+  async findScheduledToOpen(now: Date): Promise<VoteAggregate[]> {
+    // Cross-tenant query to find all votes that should be opened
+    const voteRows = await this.drizzle.db
+      .select({ id: votes.id, tenantId: votes.tenantId })
+      .from(votes)
+      .where(
+        and(
+          eq(votes.status, VoteStatus.SCHEDULED),
+          lte(votes.scheduledFrom, now),
+        ),
+      );
+
+    const aggregates: VoteAggregate[] = [];
+    for (const row of voteRows) {
+      const agg = await this.findById(row.tenantId, row.id);
+      if (agg) aggregates.push(agg);
+    }
+    return aggregates;
   }
 }

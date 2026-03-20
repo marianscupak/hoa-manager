@@ -46,6 +46,8 @@ export const ErrorCode = {
   MUTUAL_DELEGATION_NOT_ALLOWED: 'MUTUAL_DELEGATION_NOT_ALLOWED',
   FORBIDDEN: 'FORBIDDEN',
   DELEGATION_NOT_FOUND: 'DELEGATION_NOT_FOUND',
+  VOTE_NOT_SCHEDULED: 'VOTE_NOT_SCHEDULED',
+  VOTE_NOT_READY_TO_OPEN: 'VOTE_NOT_READY_TO_OPEN',
 } as const;
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
@@ -96,4 +98,6 @@ export const ERROR_HTTP_STATUS: Record<ErrorCode, HttpStatus> = {
   [ErrorCode.MUTUAL_DELEGATION_NOT_ALLOWED]: HttpStatus.FORBIDDEN,
   [ErrorCode.FORBIDDEN]: HttpStatus.FORBIDDEN,
   [ErrorCode.DELEGATION_NOT_FOUND]: HttpStatus.NOT_FOUND,
+  [ErrorCode.VOTE_NOT_SCHEDULED]: HttpStatus.BAD_REQUEST,
+  [ErrorCode.VOTE_NOT_READY_TO_OPEN]: HttpStatus.BAD_REQUEST,
 };

@@ -4,5 +4,6 @@ export class GetVotesQuery {
   constructor(
     public readonly tenantId: string,
     public readonly roles: TenantMembershipRole[],
+    public readonly membershipId: string,
   ) {}
 }

@@ -2452,6 +2452,18 @@
         },
         "required": ["accessToken", "tenantId"]
       },
+      "VoterSummaryDto": {
+        "type": "object",
+        "properties": {
+          "canVote": {
+            "type": "boolean"
+          },
+          "requiresDelegation": {
+            "type": "boolean"
+          }
+        },
+        "required": ["canVote", "requiresDelegation"]
+      },
       "VoteListItemResponseDto": {
         "type": "object",
         "properties": {
@@ -2477,6 +2489,14 @@
           },
           "status": {
             "type": "string"
+          },
+          "voterSummary": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VoterSummaryDto"
+              }
+            ]
           }
         },
         "required": ["id", "title", "status"]
@@ -2665,9 +2685,6 @@
           "status": {
             "type": "string",
             "enum": ["READY", "REQUIRES_DELEGATION", "VOTED"]
-          },
-          "statusMessage": {
-            "type": "string"
           }
         },
         "required": ["id", "name", "share", "status"]

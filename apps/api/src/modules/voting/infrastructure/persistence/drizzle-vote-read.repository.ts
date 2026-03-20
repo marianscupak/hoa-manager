@@ -1,5 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { and, desc, eq, inArray, isNull, isNotNull } from 'drizzle-orm';
+import {
+  and,
+  desc,
+  eq,
+  inArray,
+  isNull,
+  isNotNull,
+  count,
+  sum,
+} from 'drizzle-orm';
 
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
 import {
@@ -7,11 +16,18 @@ import {
   votes,
   voteQuestions,
   voteOptions,
+  voteUnitConsents,
+  owners,
+  units,
+  unitOwnerships,
+  tenantMemberships,
 } from '@/infrastructure/db/schema';
 import {
   type VoteDetailResponseDto,
   type VoteListItemResponseDto,
   type VoteQuestionResponseDto,
+  type VoterStatusResponseDto,
+  type VoterSummaryDto,
 } from '@/modules/voting/api/dto/vote.dto';
 import { type VoteReadRepository } from '@/modules/voting/application/ports/vote-read.repository.port';
 import {
@@ -193,5 +209,323 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       scheduledFrom: row.scheduledFrom ?? null,
       scheduledTo: row.scheduledTo ?? null,
     }));
+  }
+
+  /**
+   * Resolves a membershipId to the single ownerId in a tenant.
+   * Returns `null` if the membership or owner does not exist.
+   */
+  private async resolveOwnerId(
+    tenantId: string,
+    membershipId: string,
+  ): Promise<string | null> {
+    const membershipRows = await this.drizzle.db
+      .select({ userId: tenantMemberships.userId })
+      .from(tenantMemberships)
+      .where(
+        and(
+          eq(tenantMemberships.tenantId, tenantId),
+          eq(tenantMemberships.id, membershipId),
+        ),
+      )
+      .limit(1);
+
+    if (membershipRows.length === 0) return null;
+
+    const ownerRows = await this.drizzle.db
+      .select({ id: owners.id })
+      .from(owners)
+      .where(
+        and(
+          eq(owners.tenantId, tenantId),
+          eq(owners.userId, membershipRows[0].userId),
+        ),
+      )
+      .limit(1);
+
+    return ownerRows.length > 0 ? ownerRows[0].id : null;
+  }
+
+  /**
+   * Returns unique unit IDs actively owned by an owner.
+   */
+  private async findOwnedUnitIds(
+    tenantId: string,
+    ownerId: string,
+  ): Promise<string[]> {
+    const rows = await this.drizzle.db
+      .select({ unitId: unitOwnerships.unitId })
+      .from(unitOwnerships)
+      .where(
+        and(
+          eq(unitOwnerships.tenantId, tenantId),
+          eq(unitOwnerships.ownerId, ownerId),
+          isNull(unitOwnerships.validTo),
+        ),
+      );
+
+    return [...new Set(rows.map((r) => r.unitId))];
+  }
+
+  /**
+   * Counts the total number of active owners per unit.
+   */
+  private async getCoOwnerCounts(
+    tenantId: string,
+    unitIds: string[],
+  ): Promise<Map<string, number>> {
+    if (unitIds.length === 0) return new Map();
+
+    const rows = await this.drizzle.db
+      .select({
+        unitId: unitOwnerships.unitId,
+        ownerCount: count(unitOwnerships.id),
+      })
+      .from(unitOwnerships)
+      .where(
+        and(
+          eq(unitOwnerships.tenantId, tenantId),
+          inArray(unitOwnerships.unitId, unitIds),
+          isNull(unitOwnerships.validTo),
+        ),
+      )
+      .groupBy(unitOwnerships.unitId);
+
+    return new Map(rows.map((r) => [r.unitId, Number(r.ownerCount)]));
+  }
+
+  /**
+   * Returns the `allowCoOwnerIndividualVote` flag from the vote-level ruleset.
+   */
+  private async getAllowCoOwnerIndividualVote(
+    tenantId: string,
+    voteId: string,
+  ): Promise<boolean> {
+    const rows = await this.drizzle.db
+      .select({
+        allowCoOwnerIndividualVote: voteRulesets.allowCoOwnerIndividualVote,
+      })
+      .from(voteRulesets)
+      .where(
+        and(
+          eq(voteRulesets.tenantId, tenantId),
+          eq(voteRulesets.voteId, voteId),
+          isNull(voteRulesets.questionId),
+        ),
+      )
+      .limit(1);
+
+    return rows.length > 0 ? rows[0].allowCoOwnerIndividualVote : false;
+  }
+
+  /**
+   * Counts valid consents per unit pointing to a specific membership.
+   */
+  private async getConsentCounts(
+    tenantId: string,
+    voteId: string,
+    unitIds: string[],
+    membershipId: string,
+  ): Promise<Map<string, number>> {
+    if (unitIds.length === 0) return new Map();
+
+    const rows = await this.drizzle.db
+      .select({
+        unitId: voteUnitConsents.unitId,
+        consentCount: count(voteUnitConsents.id),
+      })
+      .from(voteUnitConsents)
+      .where(
+        and(
+          eq(voteUnitConsents.tenantId, tenantId),
+          eq(voteUnitConsents.voteId, voteId),
+          inArray(voteUnitConsents.unitId, unitIds),
+          eq(voteUnitConsents.toMembershipId, membershipId),
+          eq(voteUnitConsents.status, 'VALID'),
+        ),
+      )
+      .groupBy(voteUnitConsents.unitId);
+
+    return new Map(rows.map((r) => [r.unitId, Number(r.consentCount)]));
+  }
+
+  /**
+   * Determines per-unit delegation status given co-owner counts, consents,
+   * and the `allowCoOwnerIndividualVote` flag.
+   *
+   * Returns `{ hasReady, hasRequiresDelegation }`.
+   */
+  private computeUnitDelegationStatus(
+    unitIds: string[],
+    ownerCountMap: Map<string, number>,
+    consentCountMap: Map<string, number>,
+    allowIndividualVote: boolean,
+  ): { hasReady: boolean; hasRequiresDelegation: boolean } {
+    let hasReady = false;
+    let hasRequiresDelegation = false;
+
+    for (const unitId of unitIds) {
+      const ownerCount = ownerCountMap.get(unitId) ?? 1;
+      const isSoleOwner = ownerCount === 1;
+
+      if (isSoleOwner || allowIndividualVote) {
+        hasReady = true;
+      } else {
+        const consents = consentCountMap.get(unitId) ?? 0;
+        if (consents >= ownerCount) {
+          hasReady = true;
+        } else {
+          hasRequiresDelegation = true;
+        }
+      }
+    }
+
+    return { hasReady, hasRequiresDelegation };
+  }
+
+  // ── Public methods ────────────────────────────────────────────────
+
+  async findVoterStatus(
+    tenantId: string,
+    voteId: string,
+    membershipId: string,
+  ): Promise<VoterStatusResponseDto> {
+    const emptyResult: VoterStatusResponseDto = {
+      canVote: false,
+      totalVotingPower: { value: 0, maximum: 0 },
+      owningUnits: [],
+    };
+
+    const ownerId = await this.resolveOwnerId(tenantId, membershipId);
+    if (!ownerId) return emptyResult;
+
+    // Fetch ownerships with unit details (needed for building the response)
+    const ownershipRows = await this.drizzle.db
+      .select({
+        unitId: unitOwnerships.unitId,
+        unitNo: units.unitNo,
+        buildingShare: units.buildingShare,
+      })
+      .from(unitOwnerships)
+      .innerJoin(units, eq(unitOwnerships.unitId, units.id))
+      .where(
+        and(
+          eq(unitOwnerships.tenantId, tenantId),
+          eq(unitOwnerships.ownerId, ownerId),
+          isNull(unitOwnerships.validTo),
+        ),
+      );
+
+    if (ownershipRows.length === 0) return emptyResult;
+
+    const uniqueUnitIds = [...new Set(ownershipRows.map((o) => o.unitId))];
+
+    const [allowIndividualVote, ownerCountMap, consentCountMap] =
+      await Promise.all([
+        this.getAllowCoOwnerIndividualVote(tenantId, voteId),
+        this.getCoOwnerCounts(tenantId, uniqueUnitIds),
+        this.getConsentCounts(tenantId, voteId, uniqueUnitIds, membershipId),
+      ]);
+
+    // Compute total voting power (sum of all building shares in the tenant)
+    const totalShareRows = await this.drizzle.db
+      .select({ total: sum(units.buildingShare) })
+      .from(units)
+      .where(eq(units.tenantId, tenantId));
+
+    const totalMaximum = totalShareRows[0]?.total
+      ? Number(totalShareRows[0].total)
+      : 0;
+
+    // Build unit statuses
+    let totalValue = 0;
+    let hasReady = false;
+
+    const owningUnits = uniqueUnitIds.map((unitId) => {
+      const ownership = ownershipRows.find((o) => o.unitId === unitId)!;
+      const ownerCount = ownerCountMap.get(unitId) ?? 1;
+      const isSoleOwner = ownerCount === 1;
+      const share = Number(ownership.buildingShare);
+
+      let status: 'READY' | 'REQUIRES_DELEGATION' | 'VOTED';
+
+      if (isSoleOwner || allowIndividualVote) {
+        status = 'READY';
+        totalValue += share;
+        hasReady = true;
+      } else {
+        const consents = consentCountMap.get(unitId) ?? 0;
+        if (consents >= ownerCount) {
+          status = 'READY';
+          totalValue += share;
+          hasReady = true;
+        } else {
+          status = 'REQUIRES_DELEGATION';
+        }
+      }
+
+      return {
+        id: unitId,
+        name: ownership.unitNo,
+        share: `${share}/${totalMaximum}`,
+        status,
+      };
+    });
+
+    return {
+      canVote: hasReady,
+      totalVotingPower: { value: totalValue, maximum: totalMaximum },
+      owningUnits,
+    };
+  }
+
+  async findVoterSummariesForVotes(
+    tenantId: string,
+    voteIds: string[],
+    membershipId: string,
+  ): Promise<Map<string, VoterSummaryDto>> {
+    const result = new Map<string, VoterSummaryDto>();
+    if (voteIds.length === 0) return result;
+
+    const noVoteSummary: VoterSummaryDto = {
+      canVote: false,
+      requiresDelegation: false,
+    };
+
+    const ownerId = await this.resolveOwnerId(tenantId, membershipId);
+    if (!ownerId) {
+      for (const id of voteIds) result.set(id, noVoteSummary);
+      return result;
+    }
+
+    const unitIds = await this.findOwnedUnitIds(tenantId, ownerId);
+    if (unitIds.length === 0) {
+      for (const id of voteIds) result.set(id, noVoteSummary);
+      return result;
+    }
+
+    const ownerCountMap = await this.getCoOwnerCounts(tenantId, unitIds);
+
+    for (const voteId of voteIds) {
+      const [allowIndividualVote, consentCountMap] = await Promise.all([
+        this.getAllowCoOwnerIndividualVote(tenantId, voteId),
+        this.getConsentCounts(tenantId, voteId, unitIds, membershipId),
+      ]);
+
+      const { hasReady, hasRequiresDelegation } =
+        this.computeUnitDelegationStatus(
+          unitIds,
+          ownerCountMap,
+          consentCountMap,
+          allowIndividualVote,
+        );
+
+      result.set(voteId, {
+        canVote: hasReady,
+        requiresDelegation: hasRequiresDelegation,
+      });
+    }
+
+    return result;
   }
 }

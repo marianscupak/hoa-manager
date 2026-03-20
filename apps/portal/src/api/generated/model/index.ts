@@ -88,3 +88,4 @@ export * from "./voteOptionResponseDtoOptionKey";
 export * from "./voteQuestionResponseDto";
 export * from "./voteQuestionResponseDtoType";
 export * from "./voterStatusResponseDto";
+export * from "./voterSummaryDto";

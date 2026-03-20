@@ -5,6 +5,7 @@
  * The HOA Manager API description
  * OpenAPI spec version: 1.0
  */
+import type { VoterSummaryDto } from "./voterSummaryDto";
 
 export interface VoteListItemResponseDto {
     id: string;
@@ -16,4 +17,5 @@ export interface VoteListItemResponseDto {
     /** @nullable */
     scheduledTo?: string | null;
     status: string;
+    voterSummary?: VoterSummaryDto | null;
 }

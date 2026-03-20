@@ -12,5 +12,4 @@ export interface OwningUnitStatusDto {
     name: string;
     share: string;
     status: OwningUnitStatusDtoStatus;
-    statusMessage?: string;
 }

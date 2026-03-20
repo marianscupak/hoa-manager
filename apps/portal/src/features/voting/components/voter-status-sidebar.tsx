@@ -131,14 +131,13 @@ export function VoterStatusSidebar() {
                             <AlertTriangle className="h-5 w-5 shrink-0 text-orange-600" />
                             <div className="flex flex-col gap-2">
                                 <p className="text-sm font-medium text-orange-800">
-                                    {unitRequiringDelegation.statusMessage ||
-                                        t(
-                                            "voting:detail.statusSidebar.delegationWarning",
-                                            {
-                                                unitName:
-                                                    unitRequiringDelegation.name,
-                                            },
-                                        )}
+                                    {t(
+                                        "voting:detail.statusSidebar.delegationWarning",
+                                        {
+                                            unitName:
+                                                unitRequiringDelegation.name,
+                                        },
+                                    )}
                                 </p>
                                 <a
                                     href="#"

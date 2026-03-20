@@ -20,7 +20,7 @@ export class GetVotesHandler
   ) {}
 
   async execute(query: GetVotesQuery): Promise<VoteListItemResponseDto[]> {
-    const { tenantId, roles } = query;
+    const { tenantId, roles, membershipId } = query;
 
     const isAdminOrBoard =
       roles.includes(TenantMembershipRole.ADMIN) ||
@@ -37,6 +37,28 @@ export class GetVotesHandler
           VoteStatus.CANCELLED,
         ];
 
-    return this.voteReadRepository.findVotes(tenantId, statuses);
+    const votes = await this.voteReadRepository.findVotes(tenantId, statuses);
+
+    // Compute voter summaries for scheduled votes
+    const scheduledVoteIds = votes
+      .filter((v) => v.status === VoteStatus.SCHEDULED)
+      .map((v) => v.id);
+
+    if (scheduledVoteIds.length > 0) {
+      const summaries =
+        await this.voteReadRepository.findVoterSummariesForVotes(
+          tenantId,
+          scheduledVoteIds,
+          membershipId,
+        );
+
+      for (const vote of votes) {
+        if (vote.status === VoteStatus.SCHEDULED) {
+          vote.voterSummary = summaries.get(vote.id) ?? null;
+        }
+      }
+    }
+
+    return votes;
   }
 }

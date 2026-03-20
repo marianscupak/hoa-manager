@@ -66,7 +66,11 @@ export class VotesController {
   @UseGuards(AccessTokenAuthGuard, TenantContextGuard)
   getVotes(@Tenant() tenantCtx: TenantContext) {
     return this.queryBus.execute(
-      new GetVotesQuery(tenantCtx.tenantId, tenantCtx.roles),
+      new GetVotesQuery(
+        tenantCtx.tenantId,
+        tenantCtx.roles,
+        tenantCtx.membershipId,
+      ),
     );
   }
 

@@ -100,20 +100,56 @@ export function VoteCard({ vote }: VoteCardProps) {
                     ) : isScheduled ? (
                         <>
                             <div className="mb-4 flex flex-col items-center text-center">
-                                <Users className="mb-2 h-8 w-8 text-orange-500" />
-                                <span className="font-semibold text-orange-800">
-                                    {t("list.card.delegationNeeded")}
-                                </span>
-                                <span className="text-sm text-orange-600">
-                                    {t("list.card.fromCoOwners")}
-                                </span>
+                                {vote.voterSummary?.requiresDelegation ? (
+                                    <>
+                                        <Users className="mb-2 h-8 w-8 text-orange-500" />
+                                        <span className="font-semibold text-orange-800">
+                                            {t("list.card.delegationNeeded")}
+                                        </span>
+                                        <span className="text-sm text-orange-600">
+                                            {t("list.card.fromCoOwners")}
+                                        </span>
+                                    </>
+                                ) : vote.voterSummary?.canVote ? (
+                                    <>
+                                        <CheckCircle2 className="mb-2 h-8 w-8 text-emerald-500" />
+                                        <span className="font-semibold text-emerald-700">
+                                            {t("list.card.readyToVote")}
+                                        </span>
+                                        <span className="text-sm text-emerald-600">
+                                            {t("list.card.readyToVoteSubtitle")}
+                                        </span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Calendar className="mb-2 h-8 w-8 text-blue-500" />
+                                        <span className="font-semibold text-slate-700">
+                                            {t("list.card.scheduledStatus")}
+                                        </span>
+                                        <span className="text-sm text-slate-500">
+                                            {t("list.card.scheduledSubtitle")}
+                                        </span>
+                                    </>
+                                )}
                             </div>
-                            <Button
-                                variant="outline"
-                                className="w-full border-slate-200"
-                            >
-                                {t("list.card.manageDelegation")}
-                            </Button>
+                            {vote.voterSummary?.requiresDelegation ? (
+                                <Button
+                                    variant="outline"
+                                    className="w-full border-slate-200"
+                                >
+                                    {t("list.card.manageDelegation")}
+                                </Button>
+                            ) : (
+                                <Button
+                                    variant="outline"
+                                    className="w-full border-slate-200"
+                                    asChild
+                                >
+                                    <Link to={`/voting/${vote.id}`}>
+                                        {t("list.card.viewDetails")}
+                                    </Link>
+                                </Button>
+                            )}
                         </>
                     ) : isDraft ? (
                         <>

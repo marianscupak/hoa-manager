@@ -1,4 +1,10 @@
+import { Inject } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+
+import {
+  VOTE_READ_REPOSITORY,
+  type VoteReadRepository,
+} from '@/modules/voting/application/ports/vote-read.repository.port';
 
 import { GetVoterStatusQuery } from './get-voter-status.query';
 import { VoterStatusResponseDto } from '../../../api/dto/vote.dto';
@@ -7,34 +13,16 @@ import { VoterStatusResponseDto } from '../../../api/dto/vote.dto';
 export class GetVoterStatusHandler
   implements IQueryHandler<GetVoterStatusQuery, VoterStatusResponseDto>
 {
-  async execute(_query: GetVoterStatusQuery): Promise<VoterStatusResponseDto> {
-    // TODO: This is currently mocked for membershipId: ${_query.membershipId}.
-    // In a real implementation, we would query the read models to determine
-    // the true units owned by `query.membershipId`, calculate their shares,
-    // and ascertain if delegation is required for any co-owned units.
+  constructor(
+    @Inject(VOTE_READ_REPOSITORY)
+    private readonly voteReadRepository: VoteReadRepository,
+  ) {}
 
-    return {
-      canVote: true,
-      totalVotingPower: {
-        value: 50,
-        maximum: 1000,
-      },
-      owningUnits: [
-        {
-          id: '1',
-          name: 'Unit A12',
-          share: '50/1000',
-          status: 'READY',
-        },
-        {
-          id: '2',
-          name: 'Garage G04',
-          share: '20/1000',
-          status: 'REQUIRES_DELEGATION',
-          statusMessage:
-            'Garage G04 is co-owned. A delegation form is required.',
-        },
-      ],
-    };
+  async execute(query: GetVoterStatusQuery): Promise<VoterStatusResponseDto> {
+    return this.voteReadRepository.findVoterStatus(
+      query.tenantId,
+      query.voteId,
+      query.membershipId,
+    );
   }
 }

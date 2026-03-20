@@ -3,16 +3,15 @@ import { eq, and } from 'drizzle-orm';
 
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
 import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
+import { voteUnitConsents } from '@/infrastructure/db/schema/voting/vote-unit-consents';
 import {
   SaveVoteUnitConsentInput,
   VoteConsentWriteRepository,
 } from '@/modules/voting/application/ports/vote-consent-write.repository.port';
-import { voteUnitConsents } from '@/infrastructure/db/schema/voting/vote-unit-consents';
+import { VoteUnitConsentStatus } from '@/modules/voting/domain/vote/vote.types';
 
 @Injectable()
-export class DrizzleVoteConsentWriteRepository
-  implements VoteConsentWriteRepository
-{
+export class DrizzleVoteConsentWriteRepository implements VoteConsentWriteRepository {
   constructor(private readonly drizzle: DrizzleService) {}
 
   private get db() {
@@ -51,5 +50,35 @@ export class DrizzleVoteConsentWriteRepository
         status: data.status,
       });
     }
+  }
+
+  async findById(
+    tenantId: string,
+    consentId: string,
+  ): Promise<typeof voteUnitConsents.$inferSelect | null> {
+    const records = await this.db
+      .select()
+      .from(voteUnitConsents)
+      .where(
+        and(
+          eq(voteUnitConsents.id, consentId),
+          eq(voteUnitConsents.tenantId, tenantId),
+        ),
+      )
+      .limit(1);
+    return records.length > 0 ? records[0] : null;
+  }
+
+  async updateStatus(
+    consentId: string,
+    status: VoteUnitConsentStatus,
+  ): Promise<void> {
+    await this.db
+      .update(voteUnitConsents)
+      .set({
+        status,
+        updatedAt: new Date(),
+      })
+      .where(eq(voteUnitConsents.id, consentId));
   }
 }

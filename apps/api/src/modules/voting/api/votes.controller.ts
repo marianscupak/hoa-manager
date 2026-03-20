@@ -18,6 +18,7 @@ import {
   ApiCreatedResponse,
   ApiNoContentResponse,
   ApiOkResponse,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 
@@ -34,6 +35,7 @@ import {
   UpdateVoteDto,
   DelegationCandidateDto,
   CreateVoteConsentDto,
+  VoteConsentResponseDto,
 } from './dto/vote.dto';
 import { Roles, Tenant } from '../../../shared/api/decorators/auth.decorators';
 import { AccessTokenAuthGuard } from '../../../shared/api/guards/access-token-auth.guard';
@@ -45,10 +47,12 @@ import { CreateVoteCommand } from '../application/commands/create-vote/create-vo
 import { CreateVoteConsentCommand } from '../application/commands/create-vote-consent/create-vote-consent.command';
 import { CreateVoteQuestionCommand } from '../application/commands/create-vote-question/create-vote-question.command';
 import { DeleteVoteQuestionCommand } from '../application/commands/delete-vote-question/delete-vote-question.command';
+import { RevokeConsentCommand } from '../application/commands/revoke-consent/revoke-consent.command';
 import { ScheduleVoteCommand } from '../application/commands/schedule-vote/schedule-vote.command';
 import { SetVoteRulesetCommand } from '../application/commands/set-vote-ruleset/set-vote-ruleset.command';
 import { UpdateVoteCommand } from '../application/commands/update-vote/update-vote.command';
 import { UpdateVoteQuestionCommand } from '../application/commands/update-vote-question/update-vote-question.command';
+import { GetConsentsQuery } from '../application/queries/get-consents/get-consents.query';
 import { GetDelegationCandidatesQuery } from '../application/queries/get-delegation-candidates/get-delegation-candidates.query';
 import { GetVoteDetailQuery } from '../application/queries/get-vote-detail/get-vote-detail.query';
 import { GetVoterStatusQuery } from '../application/queries/get-voter-status/get-voter-status.query';
@@ -73,6 +77,41 @@ export class VotesController {
     return this.queryBus.execute(
       new GetVotesQuery(
         tenantCtx.tenantId,
+        tenantCtx.roles,
+        tenantCtx.membershipId,
+      ),
+    );
+  }
+
+  @Get('consents')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Returns a list of delegation consents',
+    type: [VoteConsentResponseDto],
+  })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard)
+  getConsents(@Tenant() tenantCtx: TenantContext) {
+    return this.queryBus.execute(
+      new GetConsentsQuery(
+        tenantCtx.tenantId,
+        tenantCtx.roles,
+        tenantCtx.membershipId,
+      ),
+    );
+  }
+
+  @Patch('consents/:id/revoke')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ description: 'Consent revoked' })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard)
+  revokeConsent(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Tenant() tenantCtx: TenantContext,
+  ) {
+    return this.commandBus.execute(
+      new RevokeConsentCommand(
+        tenantCtx.tenantId,
+        id,
         tenantCtx.roles,
         tenantCtx.membershipId,
       ),
@@ -232,13 +271,17 @@ export class VotesController {
   @Get(':id/delegation-candidates')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
-    description: 'Returns a list of memberships eligible for delegation for this unit',
+    description:
+      'Returns a list of memberships eligible for delegation for this unit',
     type: [DelegationCandidateDto],
   })
+  @ApiQuery({ name: 'forMembershipId', required: false, type: String })
   @UseGuards(AccessTokenAuthGuard, TenantContextGuard)
   getDelegationCandidates(
     @Param('id', ParseUUIDPipe) id: string,
     @Query('unitId', ParseUUIDPipe) unitId: string,
+    @Query('forMembershipId', new ParseUUIDPipe({ optional: true }))
+    forMembershipId: string | undefined,
     @Tenant() tenantCtx: TenantContext,
   ) {
     return this.queryBus.execute(
@@ -247,6 +290,7 @@ export class VotesController {
         id,
         unitId,
         tenantCtx.membershipId,
+        forMembershipId,
       ),
     );
   }
@@ -269,6 +313,8 @@ export class VotesController {
         body.unitId,
         tenantCtx.membershipId,
         body.delegateMembershipId,
+        tenantCtx.roles,
+        body.ownerMembershipId,
       ),
     );
   }

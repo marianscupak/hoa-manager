@@ -1,11 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { and, eq } from 'drizzle-orm';
 
-import { DrizzleService } from '@/infrastructure/db/drizzle.service';
-import { owners } from '@/infrastructure/db/schema/core/owners';
-import { tenantMemberships } from '@/infrastructure/db/schema/core/tenant-memberships';
-import { voteUnitConsents } from '@/infrastructure/db/schema/voting/vote-unit-consents';
 import {
   VOTE_CONSENT_WRITE_REPOSITORY,
   type VoteConsentWriteRepository,
@@ -22,6 +17,7 @@ import {
   VoteStatus,
   VoteUnitConsentStatus,
 } from '@/modules/voting/domain/vote/vote.types';
+import { ForbiddenException } from '@/shared/application/exceptions/auth.exceptions';
 import {
   InvalidVoteStatusForDelegationException,
   MembershipHasNoAssociatedOwnerException,
@@ -41,7 +37,6 @@ export class CreateVoteConsentHandler implements ICommandHandler<CreateVoteConse
     private readonly consentWriteRepo: VoteConsentWriteRepository,
     @Inject(VOTE_READ_REPOSITORY)
     private readonly voteReadRepo: VoteReadRepository,
-    private readonly drizzle: DrizzleService,
   ) {}
 
   async execute(command: CreateVoteConsentCommand): Promise<void> {
@@ -58,11 +53,24 @@ export class CreateVoteConsentHandler implements ICommandHandler<CreateVoteConse
       throw new InvalidVoteStatusForDelegationException();
     }
 
+    let effectiveMembershipId = command.membershipId;
+
+    if (command.ownerMembershipId) {
+      const isAdminOrBoard =
+        command.roles.includes('ADMIN') ||
+        command.roles.includes('BOARD_MEMBER');
+
+      if (!isAdminOrBoard) {
+        throw new ForbiddenException();
+      }
+      effectiveMembershipId = command.ownerMembershipId;
+    }
+
     // Verify the user is an owner of the unit
     const statuses = await this.voteReadRepo.findVoterStatus(
       command.tenantId,
       command.voteId,
-      command.membershipId,
+      effectiveMembershipId,
     );
 
     const isOwner = statuses.owningUnits.some((u) => u.id === command.unitId);
@@ -71,42 +79,25 @@ export class CreateVoteConsentHandler implements ICommandHandler<CreateVoteConse
     }
 
     // Resolve exactly which owner this membership maps to for this unit.
-    const results = await this.drizzle.db
-      .select({ ownerId: owners.id })
-      .from(tenantMemberships)
-      .innerJoin(owners, eq(owners.userId, tenantMemberships.userId))
-      .where(and(eq(tenantMemberships.id, command.membershipId)))
-      .limit(1);
+    const ownerId = await this.voteReadRepo.getOwnerIdByMembership(
+      command.tenantId,
+      effectiveMembershipId,
+    );
 
-    if (results.length === 0) {
+    if (!ownerId) {
       throw new MembershipHasNoAssociatedOwnerException();
     }
-    const ownerId = results[0].ownerId;
 
     // Prevent mutual delegation: Check if the delegate has already delegated to THIS owner
-    const mutualConsent = await this.drizzle.db
-      .select({ id: voteUnitConsents.id })
-      .from(voteUnitConsents)
-      .where(
-        and(
-          eq(voteUnitConsents.unitId, command.unitId),
-          eq(voteUnitConsents.voteId, command.voteId),
-          eq(voteUnitConsents.toMembershipId, command.membershipId),
-          // We need to resolve the delegateMembershipId's ownerId,
-          // but actually we can just check if they have a consent where TO is us.
-          eq(
-            voteUnitConsents.fromOwnerId,
-            this.drizzle.db
-              .select({ id: owners.id })
-              .from(tenantMemberships)
-              .innerJoin(owners, eq(owners.userId, tenantMemberships.userId))
-              .where(eq(tenantMemberships.id, command.delegateMembershipId)),
-          ),
-        ),
-      )
-      .limit(1);
+    const hasMutual = await this.voteReadRepo.hasMutualDelegation(
+      command.tenantId,
+      command.unitId,
+      command.voteId,
+      effectiveMembershipId,
+      command.delegateMembershipId,
+    );
 
-    if (mutualConsent.length > 0) {
+    if (hasMutual) {
       throw new MutualDelegationNotAllowedException();
     }
 

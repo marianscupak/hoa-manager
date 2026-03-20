@@ -11,4 +11,5 @@ export interface DelegationCandidateDto {
     name: string;
     hasDelegatedToRequester: boolean;
     isEligible: boolean;
+    isUnitOwner: boolean;
 }

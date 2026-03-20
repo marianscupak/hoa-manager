@@ -5,5 +5,7 @@ export class CreateVoteConsentCommand {
     public readonly unitId: string,
     public readonly membershipId: string,
     public readonly delegateMembershipId: string,
+    public readonly roles: string[],
+    public readonly ownerMembershipId?: string,
   ) {}
 }

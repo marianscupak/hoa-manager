@@ -3,6 +3,7 @@ export const voting = {
         activeVotes: "Probíhající hlasování",
         results: "Výsledky",
         createVote: "Vytvořit hlasování",
+        delegations: "Delegace",
     },
     common: {
         save: "Uložit",
@@ -351,13 +352,6 @@ export const voting = {
             toast: {
                 success: "Delegace byla úspěšně vytvořena",
                 error: "Nepodařilo se vytvořit delegaci",
-                INVALID_VOTE_STATUS_FOR_DELEGATION:
-                    "Delegování je povoleno pouze pro naplánovaná hlasování.",
-                NOT_A_UNIT_OWNER: "Nejste vlastníkem této jednotky.",
-                MEMBERSHIP_HAS_NO_ASSOCIATED_OWNER:
-                    "Vaše členství není propojeno s vlastníkem.",
-                MUTUAL_DELEGATION_NOT_ALLOWED:
-                    "Vzájemné delegování není povoleno. Tato osoba na vás již delegovala.",
             },
             delegateLabel: "ZÁSTUPCE",
             delegateSubtext: "Oprávněná osoba",
@@ -370,6 +364,55 @@ export const voting = {
                 "Tuto delegaci můžete kdykoli před začátkem hlasování zrušit ve svém přehledu.",
             terms: "Pokračováním potvrzujete, že tato delegace je v souladu se stanovami SVJ. Tato akce uděluje plnou hlasovací moc pro tento konkrétní bod programu určenému zástupci uvedenému výše.",
             allowAction: "Povolit osobě hlasovat mým jménem",
+        },
+    },
+    delegations: {
+        title: "Delegace",
+        description: "Spravujte, kdo může hlasovat vaším jménem.",
+        help: {
+            title: "Jak funguje delegování",
+            description:
+                "Delegování umožňuje jiné osobě hlasovat vaším jménem pro konkrétní jednotky v naplánovaném hlasování.",
+            rules: [
+                "Za jednotku může vždy hlasovat pouze jedna osoba.",
+                "Vzájemné delegování není povoleno (pokud x deleguje na y, y nemůže delegovat na x).",
+                "Delegaci můžete kdykoli před začátkem hlasování zrušit.",
+            ],
+        },
+        tabs: {
+            myDelegations: "Moje delegace",
+            recordProxy: "Evidence plné moci (Admin)",
+        },
+        table: {
+            unit: "Jednotka",
+            vote: "Hlasování",
+            from: "Zmocnitel",
+            to: "Zmocněnec",
+            date: "Evidováno dne",
+            actions: "Akce",
+            revoke: "Zrušit",
+            revokeSuccess: "Delegace byla úspěšně zrušena",
+        },
+        empty: {
+            title: "Žádné delegace nebyly nalezeny",
+            description:
+                "Zatím jste nikomu svůj hlas nedelegovali a nikdo nedelegoval hlas vám.",
+            all: "Nebyly nalezeny žádné aktivní delegace.",
+            filtered: "Pro vybrané hlasování nebyly nalezeny žádné delegace.",
+        },
+        filter: {
+            vote: "Filtrovat podle hlasování",
+            allVotes: "Všechna naplánovaná hlasování",
+        },
+        admin: {
+            title: "Evidovat plnou moc",
+            description:
+                "Jako administrátor můžete zaevidovat plnou moc na základě fyzického dokumentu doloženého vlastníkem.",
+            selectVote: "Vyberte hlasování",
+            selectUnit: "Vyberte jednotku",
+            selectOwner: "Zmocnitel",
+            selectDelegate: "Zmocněnec",
+            success: "Plná moc byla úspěšně zaevidována",
         },
     },
 };

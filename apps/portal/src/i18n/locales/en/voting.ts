@@ -3,6 +3,7 @@ export const voting = {
         activeVotes: "Active Votes",
         results: "Results",
         createVote: "Create Vote",
+        delegations: "Delegations",
     },
     common: {
         save: "Save",
@@ -351,13 +352,6 @@ export const voting = {
             toast: {
                 success: "Delegation created successfully",
                 error: "Failed to create delegation",
-                INVALID_VOTE_STATUS_FOR_DELEGATION:
-                    "Delegation is only allowed for scheduled votes.",
-                NOT_A_UNIT_OWNER: "You are not an owner of this unit.",
-                MEMBERSHIP_HAS_NO_ASSOCIATED_OWNER:
-                    "Your membership is not linked to an owner.",
-                MUTUAL_DELEGATION_NOT_ALLOWED:
-                    "Mutual delegation is not allowed. This person already delegated to you.",
             },
             delegateLabel: "DELEGATE",
             delegateSubtext: "Authorized Person",
@@ -370,6 +364,55 @@ export const voting = {
                 "You can cancel this delegation via your dashboard at any time before the vote begins.",
             terms: "By proceeding, you acknowledge that this delegation complies with the statutes of the HOA. This action grants full voting power for this specific agenda item to the designated delegate listed above.",
             allowAction: "Allow person to vote on my behalf",
+        },
+    },
+    delegations: {
+        title: "Delegations",
+        description: "Manage who can vote on your behalf.",
+        help: {
+            title: "How Delegation Works",
+            description:
+                "A delegation allows another person to vote on your behalf for specific units in a scheduled voting event.",
+            rules: [
+                "Only one person can vote for a unit.",
+                "Mutual delegation is not allowed (x delegates to y, y cannot delegate to x).",
+                "You can revoke your delegation at any time before the vote starts.",
+            ],
+        },
+        tabs: {
+            myDelegations: "My Delegations",
+            recordProxy: "Record Proxy (Admin)",
+        },
+        table: {
+            unit: "Unit",
+            vote: "Vote",
+            from: "Principal",
+            to: "Proxy",
+            date: "Recorded On",
+            actions: "Actions",
+            revoke: "Revoke",
+            revokeSuccess: "Delegation revoked successfully",
+        },
+        empty: {
+            title: "No delegations found",
+            description:
+                "You haven't delegated your vote to anyone yet, and no one has delegated their vote to you.",
+            all: "No active delegations found.",
+            filtered: "No delegations for the selected vote.",
+        },
+        filter: {
+            vote: "Filter by Vote",
+            allVotes: "All Scheduled Votes",
+        },
+        admin: {
+            title: "Record Proxy Delegation",
+            description:
+                "As an administrator, you can record a delegation on behalf of an owner who provided you with a physical consent form.",
+            selectVote: "Select Vote",
+            selectUnit: "Select Unit",
+            selectOwner: "Principal",
+            selectDelegate: "Proxy",
+            success: "Proxy delegation recorded successfully",
         },
     },
 };

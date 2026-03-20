@@ -10,9 +10,7 @@ import {
 import { GetDelegationCandidatesQuery } from './get-delegation-candidates.query';
 
 @QueryHandler(GetDelegationCandidatesQuery)
-export class GetDelegationCandidatesHandler
-  implements IQueryHandler<GetDelegationCandidatesQuery>
-{
+export class GetDelegationCandidatesHandler implements IQueryHandler<GetDelegationCandidatesQuery> {
   constructor(
     @Inject(VOTE_READ_REPOSITORY)
     private readonly voteReadRepo: VoteReadRepository,
@@ -25,6 +23,7 @@ export class GetDelegationCandidatesHandler
       query.tenantId,
       query.voteId,
       query.unitId,
+      query.forMembershipId,
       query.requesterMembershipId,
     );
   }

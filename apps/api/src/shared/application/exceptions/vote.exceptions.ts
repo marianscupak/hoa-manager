@@ -110,3 +110,9 @@ export class MutualDelegationNotAllowedException extends DomainException {
     super(ErrorCode.MUTUAL_DELEGATION_NOT_ALLOWED);
   }
 }
+
+export class DelegationNotFoundException extends DomainException {
+  constructor() {
+    super(ErrorCode.DELEGATION_NOT_FOUND);
+  }
+}

@@ -1,5 +1,5 @@
 import { useAtomValue } from "jotai";
-import { BarChart3, PlusCircle, Vote } from "lucide-react";
+import { BarChart3, PlusCircle, Vote, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Outlet } from "react-router";
 
@@ -34,6 +34,11 @@ export function VotingLayout() {
             name: t("voting:navigation.results"),
             href: "/voting/results",
             icon: BarChart3,
+        },
+        {
+            name: t("voting:navigation.delegations"),
+            href: "/voting/delegations",
+            icon: Users,
         },
     ];
 

@@ -4,10 +4,32 @@ import {
   type VoterStatusResponseDto,
   type VoterSummaryDto,
   type DelegationCandidateDto,
+  type VoteConsentResponseDto,
 } from '@/modules/voting/api/dto/vote.dto';
-import { type VoteStatus } from '@/modules/voting/domain/vote/vote.types';
+import { VoteStatus } from '@/modules/voting/domain/vote/vote.types';
 
 export interface VoteReadRepository {
+  findConsents(
+    tenantId: string,
+    membershipId: string,
+    isAdmin: boolean,
+  ): Promise<VoteConsentResponseDto[]>;
+  getOwnerIdByMembership(
+    tenantId: string,
+    membershipId: string,
+  ): Promise<string | null>;
+  hasMutualDelegation(
+    tenantId: string,
+    unitId: string,
+    voteId: string,
+    delegatorMembershipId: string,
+    delegateMembershipId: string,
+  ): Promise<boolean>;
+  isOwnerOfConsent(
+    tenantId: string,
+    consentId: string,
+    membershipId: string,
+  ): Promise<boolean>;
   findDetailById(
     tenantId: string,
     id: string,
@@ -30,6 +52,7 @@ export interface VoteReadRepository {
     tenantId: string,
     voteId: string,
     unitId: string,
+    forMembershipId: string | undefined,
     requesterMembershipId: string,
   ): Promise<DelegationCandidateDto[]>;
 }

@@ -1,4 +1,4 @@
-import { CheckCircle2, Home, Warehouse } from "lucide-react";
+import { CheckCircle2, Home } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Card } from "@hoa-mngr/ui";

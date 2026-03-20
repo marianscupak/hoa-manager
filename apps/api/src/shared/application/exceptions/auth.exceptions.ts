@@ -24,3 +24,9 @@ export class ReplayAttackException extends DomainException {
     super(ErrorCode.REPLAY_ATTACK);
   }
 }
+
+export class ForbiddenException extends DomainException {
+  constructor() {
+    super(ErrorCode.FORBIDDEN);
+  }
+}

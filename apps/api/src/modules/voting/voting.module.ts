@@ -11,6 +11,7 @@ import { CreateVoteHandler } from './application/commands/create-vote/create-vot
 import { CreateVoteConsentHandler } from './application/commands/create-vote-consent/create-vote-consent.handler';
 import { CreateVoteQuestionHandler } from './application/commands/create-vote-question/create-vote-question.handler';
 import { DeleteVoteQuestionHandler } from './application/commands/delete-vote-question/delete-vote-question.handler';
+import { RevokeConsentHandler } from './application/commands/revoke-consent/revoke-consent.handler';
 import { ScheduleVoteHandler } from './application/commands/schedule-vote/schedule-vote.handler';
 import { SetVoteRulesetHandler } from './application/commands/set-vote-ruleset/set-vote-ruleset.handler';
 import { UpdateVoteHandler } from './application/commands/update-vote/update-vote.handler';
@@ -18,6 +19,7 @@ import { UpdateVoteQuestionHandler } from './application/commands/update-vote-qu
 import { VOTE_CONSENT_WRITE_REPOSITORY } from './application/ports/vote-consent-write.repository.port';
 import { VOTE_READ_REPOSITORY } from './application/ports/vote-read.repository.port';
 import { VOTE_WRITE_REPOSITORY } from './application/ports/vote-write.repository.port';
+import { GetConsentsHandler } from './application/queries/get-consents/get-consents.handler';
 import { GetDelegationCandidatesHandler } from './application/queries/get-delegation-candidates/get-delegation-candidates.handler';
 import { GetVoteDetailHandler } from './application/queries/get-vote-detail/get-vote-detail.handler';
 import { GetVoterStatusHandler } from './application/queries/get-voter-status/get-voter-status.handler';
@@ -35,12 +37,14 @@ const COMMAND_HANDLERS = [
   UpdateVoteHandler,
   ScheduleVoteHandler,
   CreateVoteConsentHandler,
+  RevokeConsentHandler,
 ];
 const QUERY_HANDLERS = [
   GetVoteDetailHandler,
   GetVotesHandler,
   GetVoterStatusHandler,
   GetDelegationCandidatesHandler,
+  GetConsentsHandler,
 ];
 const REPOSITORIES = [
   { provide: VOTE_WRITE_REPOSITORY, useClass: DrizzleVoteWriteRepository },

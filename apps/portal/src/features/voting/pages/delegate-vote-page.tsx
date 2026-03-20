@@ -1,4 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { useAtomValue } from "jotai";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router";
@@ -14,6 +15,7 @@ import {
     getVotesControllerGetVoterStatusQueryKey,
     getVotesControllerGetVotesQueryKey,
 } from "@/api/generated/votes/votes";
+import { tenantContextAtom } from "@/auth/atoms";
 
 import { ConfirmDelegationModal } from "../components/confirm-delegation-modal";
 import { DelegateSelection } from "../components/delegation/delegate-selection";
@@ -35,12 +37,14 @@ export const DelegateVotePage = () => {
     );
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
+    const tenantCtx = useAtomValue(tenantContextAtom);
     const { data: vote } = useVotesControllerGetVoteDetail(id);
     const { data: voterStatus } = useVotesControllerGetVoterStatus(id);
     const { data: candidates } = useVotesControllerGetDelegationCandidates(
         id,
         {
             unitId: selectedUnitId || "",
+            forMembershipId: tenantCtx?.membershipId,
         },
         {
             query: {
@@ -58,58 +62,60 @@ export const DelegateVotePage = () => {
         (c) => c.membershipId === selectedDelegateId,
     );
 
-    const handleConfirm = async () => {
+    const handleConfirm = () => {
         if (!selectedUnitId || !selectedDelegateId) return;
 
-        try {
-            await createConsent.mutateAsync({
+        createConsent.mutate(
+            {
                 id,
                 data: {
                     unitId: selectedUnitId,
                     delegateMembershipId: selectedDelegateId,
                 },
-            });
+            },
+            {
+                onSuccess: () => {
+                    toast.success(t("delegate.modal.toast.success"));
+                    queryClient.invalidateQueries({
+                        queryKey: getVotesControllerGetVoterStatusQueryKey(id),
+                    });
+                    queryClient.invalidateQueries({
+                        queryKey: getVotesControllerGetVotesQueryKey(),
+                    });
+                    queryClient.invalidateQueries({
+                        queryKey: ["/api/votes/consents"],
+                    });
 
-            toast.success(t("delegate.modal.toast.success"));
-
-            // Invalidate relevant queries to ensure UI updates
-            queryClient.invalidateQueries({
-                queryKey: getVotesControllerGetVoterStatusQueryKey(id),
-            });
-            queryClient.invalidateQueries({
-                queryKey: getVotesControllerGetVotesQueryKey(),
-            });
-
-            setIsConfirmModalOpen(false);
-            navigate(`/voting/${id}`);
-        } catch (error) {
-            showApiError(error);
-        }
+                    setIsConfirmModalOpen(false);
+                    navigate(`/voting/${id}`);
+                },
+                onError: showApiError,
+            },
+        );
     };
 
     const filteredCandidates = candidates?.filter((c) =>
         c.name.toLowerCase().includes(searchQuery.toLowerCase()),
     );
 
-    // Filter units that are not already delegated or voted
-    const selectableUnits = voterStatus?.owningUnits.filter(
-        (u) => u.status === "REQUIRES_DELEGATION" || u.status === "READY",
-    ) || [];
+    const selectableUnits =
+        voterStatus?.owningUnits.filter(
+            (u) => u.status === "REQUIRES_DELEGATION" || u.status === "READY",
+        ) || [];
 
     if (!vote || !voterStatus) return null;
 
     return (
         <div className="container max-w-5xl py-4">
-            <DelegationHeader 
+            <DelegationHeader
                 voteTitle={vote.title}
                 scheduledFrom={vote.scheduledFrom}
                 onBack={() => navigate(`/voting/${id}`)}
             />
 
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-                {/* Left Column: Steps */}
                 <div className="space-y-8 lg:col-span-2">
-                    <UnitSelection 
+                    <UnitSelection
                         units={selectableUnits}
                         selectedUnitId={selectedUnitId}
                         onSelect={(id) => {
@@ -118,7 +124,7 @@ export const DelegateVotePage = () => {
                         }}
                     />
 
-                    <DelegateSelection 
+                    <DelegateSelection
                         candidates={filteredCandidates || []}
                         selectedDelegateId={selectedDelegateId}
                         onSelect={setSelectedDelegateId}
@@ -128,11 +134,10 @@ export const DelegateVotePage = () => {
                     />
                 </div>
 
-                {/* Right Column: Summary */}
                 <div className="space-y-6">
                     <DelegationNotice />
-                    
-                    <DelegationSummary 
+
+                    <DelegationSummary
                         selectedUnit={selectedUnit}
                         selectedDelegate={selectedDelegate}
                         isPending={createConsent.isPending}

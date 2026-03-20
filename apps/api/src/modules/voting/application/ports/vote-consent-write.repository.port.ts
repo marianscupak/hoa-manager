@@ -1,3 +1,4 @@
+import { voteUnitConsents } from '@/infrastructure/db/schema';
 import { VoteUnitConsentStatus } from '@/modules/voting/domain/vote/vote.types';
 
 export type SaveVoteUnitConsentInput = {
@@ -16,6 +17,19 @@ export interface VoteConsentWriteRepository {
    * Identifies the record by tenantId, voteId, unitId, and fromOwnerId.
    */
   save(data: SaveVoteUnitConsentInput): Promise<void>;
+
+  /**
+   * Finds a consent record by its exact ID and Tenant ID.
+   */
+  findById(
+    tenantId: string,
+    consentId: string,
+  ): Promise<typeof voteUnitConsents.$inferSelect | null>;
+
+  /**
+   * Updates the status of an existing consent.
+   */
+  updateStatus(consentId: string, status: VoteUnitConsentStatus): Promise<void>;
 }
 
 export const VOTE_CONSENT_WRITE_REPOSITORY = Symbol(

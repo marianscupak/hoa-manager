@@ -198,6 +198,9 @@ export class VoterSummaryDto {
 export class VoteListItemResponseDto extends CreateVoteResponseDto {
   @ApiProperty({ type: VoterSummaryDto, required: false, nullable: true })
   voterSummary?: VoterSummaryDto | null;
+
+  @ApiProperty()
+  allowCoOwnerIndividualVote!: boolean;
 }
 
 export class OwningUnitStatusDto {
@@ -245,11 +248,64 @@ export class DelegationCandidateDto {
 
   @ApiProperty()
   isEligible!: boolean;
+
+  @ApiProperty()
+  isUnitOwner!: boolean;
 }
 
 export const createVoteConsentSchema = z.object({
   unitId: z.string().uuid(),
   delegateMembershipId: z.string().uuid(),
+  ownerMembershipId: z.string().uuid().optional(),
 });
 
 export class CreateVoteConsentDto extends createZodDto(createVoteConsentSchema) {}
+
+export class VoteConsentResponseDto {
+  @ApiProperty()
+  id!: string;
+
+  @ApiProperty()
+  voteId!: string;
+
+  @ApiProperty()
+  voteTitle!: string;
+
+  @ApiProperty()
+  voteStatus!: VoteStatus;
+
+  @ApiProperty({
+    type: 'string',
+    format: 'date-time',
+    required: false,
+    nullable: true,
+  })
+  voteScheduledFrom!: Date | null;
+
+  @ApiProperty()
+  unitId!: string;
+
+  @ApiProperty()
+  unitName!: string;
+
+  @ApiProperty()
+  fromOwnerId!: string;
+
+  @ApiProperty()
+  fromOwnerName!: string;
+
+  @ApiProperty()
+  toMembershipId!: string;
+
+  @ApiProperty()
+  toDelegateName!: string;
+
+  @ApiProperty()
+  recordedByMembershipId!: string | null;
+
+  @ApiProperty({
+    type: 'string',
+    format: 'date-time',
+  })
+  createdAt!: Date;
+}

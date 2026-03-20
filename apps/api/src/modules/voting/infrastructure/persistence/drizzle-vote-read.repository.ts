@@ -6,10 +6,12 @@ import {
   inArray,
   isNull,
   isNotNull,
+  ne,
   count,
   sum,
-  ne,
+  or,
 } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/pg-core';
 
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
 import {
@@ -30,6 +32,7 @@ import {
   type VoterStatusResponseDto,
   type VoterSummaryDto,
   type DelegationCandidateDto,
+  type VoteConsentResponseDto,
 } from '@/modules/voting/api/dto/vote.dto';
 import { type VoteReadRepository } from '@/modules/voting/application/ports/vote-read.repository.port';
 import {
@@ -41,6 +44,7 @@ import {
   type VoteStatus,
   type VoteWeightBasis,
   OwningUnitStatus,
+  VoteUnitConsentStatus,
 } from '@/modules/voting/domain/vote/vote.types';
 
 @Injectable()
@@ -199,8 +203,13 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
         scheduledFrom: votes.scheduledFrom,
         scheduledTo: votes.scheduledTo,
         createdAt: votes.createdAt,
+        allowCoOwnerIndividualVote: voteRulesets.allowCoOwnerIndividualVote,
       })
       .from(votes)
+      .leftJoin(
+        voteRulesets,
+        and(eq(votes.id, voteRulesets.voteId), isNull(voteRulesets.questionId)),
+      )
       .where(whereClause)
       .orderBy((votes) => [desc(votes.createdAt)]);
 
@@ -211,6 +220,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       status: row.status as VoteStatus,
       scheduledFrom: row.scheduledFrom ?? null,
       scheduledTo: row.scheduledTo ?? null,
+      allowCoOwnerIndividualVote: row.allowCoOwnerIndividualVote ?? false,
     }));
   }
 
@@ -587,6 +597,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
     tenantId: string,
     voteId: string,
     unitId: string,
+    forMembershipId: string | undefined,
     requesterMembershipId: string,
   ): Promise<DelegationCandidateDto[]> {
     const records = await this.drizzle.db
@@ -595,6 +606,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
         name: owners.displayName,
         delegateMembershipId: voteUnitConsents.toMembershipId,
         hasConsent: isNotNull(voteUnitConsents.id),
+        isUnitOwner: isNotNull(unitOwnerships.id),
       })
       .from(tenantMemberships)
       .innerJoin(owners, eq(owners.userId, tenantMemberships.userId))
@@ -618,15 +630,165 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       .where(
         and(
           eq(tenantMemberships.tenantId, tenantId),
-          ne(tenantMemberships.id, requesterMembershipId),
+          eq(tenantMemberships.status, 'ACTIVE'),
+          forMembershipId ? ne(tenantMemberships.id, forMembershipId) : undefined,
         ),
-      );
+      )
+      .orderBy(owners.displayName);
 
     return records.map((r) => ({
       membershipId: r.membershipId,
       name: r.name,
       hasDelegatedToRequester: r.delegateMembershipId === requesterMembershipId,
       isEligible: !r.hasConsent,
+      isUnitOwner: !!r.isUnitOwner,
     }));
+  }
+
+  async findConsents(
+    tenantId: string,
+    membershipId: string,
+    isAdmin: boolean,
+  ): Promise<VoteConsentResponseDto[]> {
+    let whereClause = and(
+      eq(voteUnitConsents.tenantId, tenantId),
+      eq(voteUnitConsents.status, VoteUnitConsentStatus.VALID),
+    );
+
+    if (!isAdmin) {
+      const ownerId = await this.resolveOwnerId(tenantId, membershipId);
+
+      if (!ownerId) {
+        whereClause = and(
+          whereClause,
+          eq(voteUnitConsents.toMembershipId, membershipId),
+        );
+      } else {
+        whereClause = and(
+          whereClause,
+          or(
+            eq(voteUnitConsents.fromOwnerId, ownerId),
+            eq(voteUnitConsents.toMembershipId, membershipId),
+          ),
+        );
+      }
+    }
+
+    const delegateOwners = alias(owners, 'delegate_owners');
+    const delegateMemberships = alias(
+      tenantMemberships,
+      'delegate_memberships',
+    );
+
+    const rows = await this.drizzle.db
+      .select({
+        id: voteUnitConsents.id,
+        voteId: voteUnitConsents.voteId,
+        voteTitle: votes.title,
+        voteStatus: votes.status,
+        voteScheduledFrom: votes.scheduledFrom,
+        unitId: voteUnitConsents.unitId,
+        unitName: units.unitNo,
+        fromOwnerId: voteUnitConsents.fromOwnerId,
+        fromOwnerName: owners.displayName,
+        toMembershipId: voteUnitConsents.toMembershipId,
+        toDelegateName: delegateOwners.displayName,
+        recordedByMembershipId: voteUnitConsents.recordedByMembershipId,
+        createdAt: voteUnitConsents.createdAt,
+      })
+      .from(voteUnitConsents)
+      .innerJoin(votes, eq(voteUnitConsents.voteId, votes.id))
+      .innerJoin(units, eq(voteUnitConsents.unitId, units.id))
+      .innerJoin(owners, eq(voteUnitConsents.fromOwnerId, owners.id))
+      .innerJoin(
+        delegateMemberships,
+        eq(voteUnitConsents.toMembershipId, delegateMemberships.id),
+      )
+      .innerJoin(
+        delegateOwners,
+        and(
+          eq(delegateMemberships.userId, delegateOwners.userId),
+          eq(delegateOwners.tenantId, tenantId),
+        ),
+      )
+      .where(whereClause);
+
+    return rows.map((r) => ({
+      id: r.id,
+      voteId: r.voteId,
+      voteTitle: r.voteTitle,
+      voteStatus: r.voteStatus as VoteStatus,
+      voteScheduledFrom: r.voteScheduledFrom,
+      unitId: r.unitId,
+      unitName: r.unitName,
+      fromOwnerId: r.fromOwnerId,
+      fromOwnerName: r.fromOwnerName,
+      toMembershipId: r.toMembershipId,
+      toDelegateName: r.toDelegateName,
+      recordedByMembershipId: r.recordedByMembershipId,
+      createdAt: r.createdAt,
+    }));
+  }
+
+  async getOwnerIdByMembership(
+    tenantId: string,
+    membershipId: string,
+  ): Promise<string | null> {
+    return this.resolveOwnerId(tenantId, membershipId);
+  }
+
+  async hasMutualDelegation(
+    tenantId: string,
+    unitId: string,
+    voteId: string,
+    delegatorMembershipId: string,
+    delegateMembershipId: string,
+  ): Promise<boolean> {
+    const mutualConsent = await this.drizzle.db
+      .select({ id: voteUnitConsents.id })
+      .from(voteUnitConsents)
+      .where(
+        and(
+          eq(voteUnitConsents.unitId, unitId),
+          eq(voteUnitConsents.voteId, voteId),
+          eq(voteUnitConsents.status, VoteUnitConsentStatus.VALID),
+          eq(voteUnitConsents.tenantId, tenantId),
+          eq(voteUnitConsents.toMembershipId, delegatorMembershipId),
+          eq(
+            voteUnitConsents.fromOwnerId,
+            this.drizzle.db
+              .select({ id: owners.id })
+              .from(tenantMemberships)
+              .innerJoin(owners, eq(owners.userId, tenantMemberships.userId))
+              .where(eq(tenantMemberships.id, delegateMembershipId)),
+          ),
+        ),
+      )
+      .limit(1);
+
+    return mutualConsent.length > 0;
+  }
+
+  async isOwnerOfConsent(
+    tenantId: string,
+    consentId: string,
+    membershipId: string,
+  ): Promise<boolean> {
+    const ownerId = await this.resolveOwnerId(tenantId, membershipId);
+    if (!ownerId) return false;
+
+    const consentRows = await this.drizzle.db
+      .select({ id: voteUnitConsents.id })
+      .from(voteUnitConsents)
+      .where(
+        and(
+          eq(voteUnitConsents.id, consentId),
+          eq(voteUnitConsents.tenantId, tenantId),
+          eq(voteUnitConsents.fromOwnerId, ownerId),
+        ),
+      )
+      .limit(1);
+
+    return consentRows.length > 0;
   }
 }

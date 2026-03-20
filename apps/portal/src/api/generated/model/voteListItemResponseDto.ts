@@ -18,4 +18,5 @@ export interface VoteListItemResponseDto {
     scheduledTo?: string | null;
     status: string;
     voterSummary?: VoterSummaryDto | null;
+    allowCoOwnerIndividualVote: boolean;
 }

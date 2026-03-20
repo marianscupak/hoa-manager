@@ -10,6 +10,7 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -31,6 +32,8 @@ import {
   VoteListItemResponseDto,
   VoterStatusResponseDto,
   UpdateVoteDto,
+  DelegationCandidateDto,
+  CreateVoteConsentDto,
 } from './dto/vote.dto';
 import { Roles, Tenant } from '../../../shared/api/decorators/auth.decorators';
 import { AccessTokenAuthGuard } from '../../../shared/api/guards/access-token-auth.guard';
@@ -39,12 +42,14 @@ import { TenantContextGuard } from '../../../shared/api/guards/tenant-context.gu
 import { type TenantContext } from '../../../shared/domain/tenant-context';
 import { TenantMembershipRole } from '../../core/tenancy/domain/tenant.entity';
 import { CreateVoteCommand } from '../application/commands/create-vote/create-vote.command';
+import { CreateVoteConsentCommand } from '../application/commands/create-vote-consent/create-vote-consent.command';
 import { CreateVoteQuestionCommand } from '../application/commands/create-vote-question/create-vote-question.command';
 import { DeleteVoteQuestionCommand } from '../application/commands/delete-vote-question/delete-vote-question.command';
 import { ScheduleVoteCommand } from '../application/commands/schedule-vote/schedule-vote.command';
 import { SetVoteRulesetCommand } from '../application/commands/set-vote-ruleset/set-vote-ruleset.command';
 import { UpdateVoteCommand } from '../application/commands/update-vote/update-vote.command';
 import { UpdateVoteQuestionCommand } from '../application/commands/update-vote-question/update-vote-question.command';
+import { GetDelegationCandidatesQuery } from '../application/queries/get-delegation-candidates/get-delegation-candidates.query';
 import { GetVoteDetailQuery } from '../application/queries/get-vote-detail/get-vote-detail.query';
 import { GetVoterStatusQuery } from '../application/queries/get-voter-status/get-voter-status.query';
 import { GetVotesQuery } from '../application/queries/get-votes/get-votes.query';
@@ -221,6 +226,50 @@ export class VotesController {
   ) {
     return this.commandBus.execute(
       new ScheduleVoteCommand(tenantCtx.tenantId, id),
+    );
+  }
+
+  @Get(':id/delegation-candidates')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Returns a list of memberships eligible for delegation for this unit',
+    type: [DelegationCandidateDto],
+  })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard)
+  getDelegationCandidates(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Query('unitId', ParseUUIDPipe) unitId: string,
+    @Tenant() tenantCtx: TenantContext,
+  ) {
+    return this.queryBus.execute(
+      new GetDelegationCandidatesQuery(
+        tenantCtx.tenantId,
+        id,
+        unitId,
+        tenantCtx.membershipId,
+      ),
+    );
+  }
+
+  @Post(':id/consents')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Records a delegation consent for a specific unit',
+  })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard)
+  createVoteConsent(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() body: CreateVoteConsentDto,
+    @Tenant() tenantCtx: TenantContext,
+  ) {
+    return this.commandBus.execute(
+      new CreateVoteConsentCommand(
+        tenantCtx.tenantId,
+        id,
+        body.unitId,
+        tenantCtx.membershipId,
+        body.delegateMembershipId,
+      ),
     );
   }
 }

@@ -2049,6 +2049,80 @@
           "Votes"
         ]
       }
+    },
+    "/api/votes/{id}/delegation-candidates": {
+      "get": {
+        "operationId": "VotesController_getDelegationCandidates",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "unitId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns a list of memberships eligible for delegation for this unit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DelegationCandidateDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Votes"
+        ]
+      }
+    },
+    "/api/votes/{id}/consents": {
+      "post": {
+        "operationId": "VotesController_createVoteConsent",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVoteConsentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Records a delegation consent for a specific unit"
+          }
+        },
+        "tags": [
+          "Votes"
+        ]
+      }
     }
   },
   "info": {
@@ -2617,11 +2691,15 @@
           },
           "requiresDelegation": {
             "type": "boolean"
+          },
+          "isDelegated": {
+            "type": "boolean"
           }
         },
         "required": [
           "canVote",
-          "requiresDelegation"
+          "requiresDelegation",
+          "isDelegated"
         ]
       },
       "VoteListItemResponseDto": {
@@ -2890,7 +2968,8 @@
             "enum": [
               "READY",
               "REQUIRES_DELEGATION",
-              "VOTED"
+              "VOTED",
+              "DELEGATED"
             ]
           }
         },
@@ -2904,17 +2983,6 @@
       "VoterStatusResponseDto": {
         "type": "object",
         "properties": {
-          "status": {
-            "type": "string"
-          },
-          "scheduledFrom": {
-            "type": "object",
-            "nullable": true
-          },
-          "scheduledTo": {
-            "type": "object",
-            "nullable": true
-          },
           "canVote": {
             "type": "boolean"
           },
@@ -2929,7 +2997,6 @@
           }
         },
         "required": [
-          "status",
           "canVote",
           "totalVotingPower",
           "owningUnits"
@@ -3298,6 +3365,48 @@
         },
         "required": [
           "title"
+        ]
+      },
+      "DelegationCandidateDto": {
+        "type": "object",
+        "properties": {
+          "membershipId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "hasDelegatedToRequester": {
+            "type": "boolean"
+          },
+          "isEligible": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "membershipId",
+          "name",
+          "hasDelegatedToRequester",
+          "isEligible"
+        ]
+      },
+      "CreateVoteConsentDto": {
+        "type": "object",
+        "properties": {
+          "unitId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "delegateMembershipId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          }
+        },
+        "required": [
+          "unitId",
+          "delegateMembershipId"
         ]
       }
     }

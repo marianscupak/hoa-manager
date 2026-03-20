@@ -223,6 +223,8 @@ export const voting = {
             manageDelegation: "Spravovat delegaci",
             readyToVote: "Připraveni k hlasování",
             readyToVoteSubtitle: "Jste oprávněni, jakmile hlasování začne.",
+            alreadyDelegated: "Delegováno",
+            alreadyDelegatedSubtitle: "Zvolili jste společného zástupce.",
             scheduledStatus: "Naplánováno",
             scheduledSubtitle: "Toto hlasování ještě nezačalo.",
             viewDetails: "Zobrazit detail",
@@ -285,13 +287,14 @@ export const voting = {
         },
         statusSidebar: {
             title: "Váš status hlasování",
-            opensIn: "Hlasování začíná za",
-            closesIn: "Hlasování končí za",
+            opensIn: "Hlasování začíná",
+            closesIn: "Hlasování končí",
             owningUnits: "VLASTNĚNÉ JEDNOTKY",
             share: "Podíl:",
             statusReady: "Připraveno",
             statusDelegation: "Vyžaduje delegaci",
             statusVoted: "Odhlasováno",
+            statusDelegated: "Delegováno",
             delegationWarning:
                 "{{unitName}} je v podílovém spoluvlastnictví. Musí být zvolen společný zástupce.",
             manageDelegation: "Spravovat delegaci",
@@ -309,6 +312,64 @@ export const voting = {
                 hour: "hodina",
                 hours: "hodin",
             },
+        },
+    },
+    delegate: {
+        title: "Delegovat hlas",
+        backToVote: "Zpět na detail hlasování",
+        votingEvent: "Hlasování",
+        cancelExisting: "Zrušit delegaci",
+        selectUnit: "Vyberte jednotku",
+        whoWillRepresent: "Kdo vás bude zastupovat?",
+        searchByCoOwner: "Hledat spoluvlastníky podle jména",
+        noCandidatesFound: "Nebyli nalezeni žádní způsobilí spoluvlastníci.",
+        noSelectableUnits:
+            "Všechny vaše jednotky jsou již v tomto hlasování delegovány.",
+        assignedToYou: "Pověřil(a) vás",
+        alreadyDelegated: "Již delegoval(a)",
+        confirmButton: "Potvrdit delegaci",
+        confirming: "Potvrzování...",
+        terms: 'Kliknutím na "Potvrdit delegaci" souhlasíte s podmínkami digitálního hlasování portálu SVJ.',
+        notice: {
+            title: "Důležité upozornění",
+            description:
+                "Jakmile delegujete svůj hlas pro tuto jednotku, nemůžete v tomto konkrétním hlasování hlasovat osobně, dokud delegaci nezrušíte před začátkem hlasování.",
+        },
+        summary: {
+            title: "Přehled delegace",
+            unit: "Jednotka",
+            voteShare: "Hlasovací podíl",
+            delegate: "Zástupce",
+            notSelected: "Nevybráno",
+        },
+        modal: {
+            title: "Potvrdit delegaci",
+            description:
+                "Zkontrolujte prosím údaje o delegaci před potvrzením.",
+            warning:
+                "Potvrzením zmocňujete vybraného zástupce, aby hlasoval vaším jménem pro tuto jednotku. Toto můžete vzít zpět před začátkem hlasování.",
+            toast: {
+                success: "Delegace byla úspěšně vytvořena",
+                error: "Nepodařilo se vytvořit delegaci",
+                INVALID_VOTE_STATUS_FOR_DELEGATION:
+                    "Delegování je povoleno pouze pro naplánovaná hlasování.",
+                NOT_A_UNIT_OWNER: "Nejste vlastníkem této jednotky.",
+                MEMBERSHIP_HAS_NO_ASSOCIATED_OWNER:
+                    "Vaše členství není propojeno s vlastníkem.",
+                MUTUAL_DELEGATION_NOT_ALLOWED:
+                    "Vzájemné delegování není povoleno. Tato osoba na vás již delegovala.",
+            },
+            delegateLabel: "ZÁSTUPCE",
+            delegateSubtext: "Oprávněná osoba",
+            unitLabel: "JEDNOTKA",
+            unitSubtext: "Nemovitost",
+            eventLabel: "HLASOVÁNÍ",
+            eventSubtext: "Bod programu",
+            revocableTitle: "Akce je odvolatelná",
+            revocableDescription:
+                "Tuto delegaci můžete kdykoli před začátkem hlasování zrušit ve svém přehledu.",
+            terms: "Pokračováním potvrzujete, že tato delegace je v souladu se stanovami SVJ. Tato akce uděluje plnou hlasovací moc pro tento konkrétní bod programu určenému zástupci uvedenému výše.",
+            allowAction: "Povolit osobě hlasovat mým jménem",
         },
     },
 };

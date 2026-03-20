@@ -6,9 +6,6 @@
  * OpenAPI spec version: 1.0
  */
 
-/**
- * @nullable
- */
-export type VoterStatusResponseDtoScheduledTo = {
-    [key: string]: unknown;
-} | null;
+export type VotesControllerGetDelegationCandidatesParams = {
+    unitId: string;
+};

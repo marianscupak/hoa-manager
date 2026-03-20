@@ -41,4 +41,8 @@ export default {
         "Voting ruleset cannot be changed anymore as the vote has started or already contains questions.",
     VOTE_SCHEDULE_IN_PAST: "Scheduled dates cannot be in the past.",
     VOTE_SCHEDULE_INVALID_RANGE: "Invalid vote schedule range.",
+    INVALID_VOTE_STATUS_FOR_DELEGATION: "Delegation is only allowed when the vote is in scheduled status.",
+    NOT_A_UNIT_OWNER: "You are not an owner of this unit.",
+    MEMBERSHIP_HAS_NO_ASSOCIATED_OWNER: "Your membership is not correctly linked to an owner profile.",
+    MUTUAL_DELEGATION_NOT_ALLOWED: "Mutual delegation is not allowed. This person has already delegated their vote to you.",
 } as const;

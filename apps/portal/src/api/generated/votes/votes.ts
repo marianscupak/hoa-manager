@@ -22,9 +22,11 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+    CreateVoteConsentDto,
     CreateVoteDto,
     CreateVoteQuestionDto,
     CreateVoteResponseDto,
+    DelegationCandidateDto,
     SetVoteRulesetDto,
     SetVoteRulesetResponseDto,
     UpdateVoteDto,
@@ -32,6 +34,7 @@ import type {
     VoteDetailResponseDto,
     VoteListItemResponseDto,
     VoterStatusResponseDto,
+    VotesControllerGetDelegationCandidatesParams,
 } from ".././model";
 
 import { customInstance } from "../../axios";
@@ -1135,6 +1138,309 @@ export const useVotesControllerScheduleVote = <
 > => {
     return useMutation(
         getVotesControllerScheduleVoteMutationOptions(options),
+        queryClient,
+    );
+};
+export const votesControllerGetDelegationCandidates = (
+    id: string,
+    params: VotesControllerGetDelegationCandidatesParams,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<DelegationCandidateDto[]>(
+        {
+            url: `/api/votes/${id}/delegation-candidates`,
+            method: "GET",
+            params,
+            signal,
+        },
+        options,
+    );
+};
+
+export const getVotesControllerGetDelegationCandidatesQueryKey = (
+    id: string,
+    params?: VotesControllerGetDelegationCandidatesParams,
+) => {
+    return [
+        `/api/votes/${id}/delegation-candidates`,
+        ...(params ? [params] : []),
+    ] as const;
+};
+
+export const getVotesControllerGetDelegationCandidatesQueryOptions = <
+    TData = Awaited<ReturnType<typeof votesControllerGetDelegationCandidates>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    params: VotesControllerGetDelegationCandidatesParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof votesControllerGetDelegationCandidates>
+                >,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getVotesControllerGetDelegationCandidatesQueryKey(id, params);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof votesControllerGetDelegationCandidates>>
+    > = ({ signal }) =>
+        votesControllerGetDelegationCandidates(
+            id,
+            params,
+            requestOptions,
+            signal,
+        );
+
+    return {
+        queryKey,
+        queryFn,
+        enabled: !!id,
+        ...queryOptions,
+    } as UseQueryOptions<
+        Awaited<ReturnType<typeof votesControllerGetDelegationCandidates>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type VotesControllerGetDelegationCandidatesQueryResult = NonNullable<
+    Awaited<ReturnType<typeof votesControllerGetDelegationCandidates>>
+>;
+export type VotesControllerGetDelegationCandidatesQueryError =
+    ErrorType<unknown>;
+
+export function useVotesControllerGetDelegationCandidates<
+    TData = Awaited<ReturnType<typeof votesControllerGetDelegationCandidates>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    params: VotesControllerGetDelegationCandidatesParams,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof votesControllerGetDelegationCandidates>
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<
+                            typeof votesControllerGetDelegationCandidates
+                        >
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<
+                            typeof votesControllerGetDelegationCandidates
+                        >
+                    >
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useVotesControllerGetDelegationCandidates<
+    TData = Awaited<ReturnType<typeof votesControllerGetDelegationCandidates>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    params: VotesControllerGetDelegationCandidatesParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof votesControllerGetDelegationCandidates>
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<
+                            typeof votesControllerGetDelegationCandidates
+                        >
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<
+                            typeof votesControllerGetDelegationCandidates
+                        >
+                    >
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useVotesControllerGetDelegationCandidates<
+    TData = Awaited<ReturnType<typeof votesControllerGetDelegationCandidates>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    params: VotesControllerGetDelegationCandidatesParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof votesControllerGetDelegationCandidates>
+                >,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useVotesControllerGetDelegationCandidates<
+    TData = Awaited<ReturnType<typeof votesControllerGetDelegationCandidates>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    params: VotesControllerGetDelegationCandidatesParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof votesControllerGetDelegationCandidates>
+                >,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
+    const queryOptions = getVotesControllerGetDelegationCandidatesQueryOptions(
+        id,
+        params,
+        options,
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+        TData,
+        TError
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+    return { ...query, queryKey: queryOptions.queryKey };
+}
+
+export const votesControllerCreateVoteConsent = (
+    id: string,
+    createVoteConsentDto: BodyType<CreateVoteConsentDto>,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<void>(
+        {
+            url: `/api/votes/${id}/consents`,
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            data: createVoteConsentDto,
+            signal,
+        },
+        options,
+    );
+};
+
+export const getVotesControllerCreateVoteConsentMutationOptions = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof votesControllerCreateVoteConsent>>,
+        TError,
+        { id: string; data: BodyType<CreateVoteConsentDto> },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof votesControllerCreateVoteConsent>>,
+    TError,
+    { id: string; data: BodyType<CreateVoteConsentDto> },
+    TContext
+> => {
+    const mutationKey = ["votesControllerCreateVoteConsent"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof votesControllerCreateVoteConsent>>,
+        { id: string; data: BodyType<CreateVoteConsentDto> }
+    > = (props) => {
+        const { id, data } = props ?? {};
+
+        return votesControllerCreateVoteConsent(id, data, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type VotesControllerCreateVoteConsentMutationResult = NonNullable<
+    Awaited<ReturnType<typeof votesControllerCreateVoteConsent>>
+>;
+export type VotesControllerCreateVoteConsentMutationBody =
+    BodyType<CreateVoteConsentDto>;
+export type VotesControllerCreateVoteConsentMutationError = ErrorType<unknown>;
+
+export const useVotesControllerCreateVoteConsent = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof votesControllerCreateVoteConsent>>,
+            TError,
+            { id: string; data: BodyType<CreateVoteConsentDto> },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof votesControllerCreateVoteConsent>>,
+    TError,
+    { id: string; data: BodyType<CreateVoteConsentDto> },
+    TContext
+> => {
+    return useMutation(
+        getVotesControllerCreateVoteConsentMutationOptions(options),
         queryClient,
     );
 };

@@ -3,6 +3,7 @@ import {
   type VoteListItemResponseDto,
   type VoterStatusResponseDto,
   type VoterSummaryDto,
+  type DelegationCandidateDto,
 } from '@/modules/voting/api/dto/vote.dto';
 import { type VoteStatus } from '@/modules/voting/domain/vote/vote.types';
 
@@ -25,6 +26,12 @@ export interface VoteReadRepository {
     voteIds: string[],
     membershipId: string,
   ): Promise<Map<string, VoterSummaryDto>>;
+  findDelegationCandidates(
+    tenantId: string,
+    voteId: string,
+    unitId: string,
+    requesterMembershipId: string,
+  ): Promise<DelegationCandidateDto[]>;
 }
 
 export const VOTE_READ_REPOSITORY = Symbol('VOTE_READ_REPOSITORY');

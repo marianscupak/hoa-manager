@@ -45,4 +45,8 @@ export default {
         "Pravidla hlasování již nelze měnit, protože hlasování bylo zahájeno nebo již obsahuje otázky.",
     VOTE_SCHEDULE_IN_PAST: "Naplánovaná data nemohou být v minulosti.",
     VOTE_SCHEDULE_INVALID_RANGE: "Harmonogram hlasování je neplatný.",
+    INVALID_VOTE_STATUS_FOR_DELEGATION: "Delegování je povoleno pouze pokud je hlasování v naplánovaném stavu.",
+    NOT_A_UNIT_OWNER: "Nejste vlastníkem této jednotky.",
+    MEMBERSHIP_HAS_NO_ASSOCIATED_OWNER: "Vaše členství není správně propojeno s profilem vlastníka.",
+    MUTUAL_DELEGATION_NOT_ALLOWED: "Vzájemné delegování není povoleno. Tato osoba na vás již svůj hlas delegovala.",
 } as const;

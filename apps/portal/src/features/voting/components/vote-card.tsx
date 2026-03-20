@@ -120,6 +120,16 @@ export function VoteCard({ vote }: VoteCardProps) {
                                             {t("list.card.readyToVoteSubtitle")}
                                         </span>
                                     </>
+                                ) : vote.voterSummary?.isDelegated ? (
+                                    <>
+                                        <Users className="mb-2 h-8 w-8 text-slate-500" />
+                                        <span className="font-semibold text-slate-700">
+                                            {t("list.card.alreadyDelegated")}
+                                        </span>
+                                        <span className="text-sm text-slate-500">
+                                            {t("list.card.alreadyDelegatedSubtitle")}
+                                        </span>
+                                    </>
                                 ) : (
                                     <>
                                         <Calendar className="mb-2 h-8 w-8 text-blue-500" />
@@ -136,8 +146,11 @@ export function VoteCard({ vote }: VoteCardProps) {
                                 <Button
                                     variant="outline"
                                     className="w-full border-slate-200"
+                                    asChild
                                 >
-                                    {t("list.card.manageDelegation")}
+                                    <Link to={`/voting/${vote.id}/delegate`}>
+                                        {t("list.card.manageDelegation")}
+                                    </Link>
                                 </Button>
                             ) : (
                                 <Button

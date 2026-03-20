@@ -9,7 +9,7 @@ import {
     Loader2,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 
 import { Button } from "@hoa-mngr/ui";
 import { cn } from "@hoa-mngr/ui/lib/utils";
@@ -70,7 +70,7 @@ export function VoterStatusSidebar() {
     if (vote.status === "OPEN" && vote.scheduledTo) {
         const endDate = new Date(vote.scheduledTo);
         if (!isPast(endDate)) {
-            timerMessage = `${t("detail.statusSidebar.closesIn")} ${formatDistanceToNow(endDate, { locale: currentLocale })}`;
+            timerMessage = `${t("detail.statusSidebar.closesIn")} ${formatDistanceToNow(endDate, { locale: currentLocale, addSuffix: true })}`;
         }
     } else if (
         (vote.status === "SCHEDULED" || vote.status === "DRAFT") &&
@@ -78,7 +78,7 @@ export function VoterStatusSidebar() {
     ) {
         const startDate = new Date(vote.scheduledFrom);
         if (!isPast(startDate)) {
-            timerMessage = `${t("detail.statusSidebar.opensIn")} ${formatDistanceToNow(startDate, { locale: currentLocale })}`;
+            timerMessage = `${t("detail.statusSidebar.opensIn")} ${formatDistanceToNow(startDate, { locale: currentLocale, addSuffix: true })}`;
         }
     }
 
@@ -142,6 +142,12 @@ export function VoterStatusSidebar() {
                                                     "voting:detail.statusSidebar.statusDelegation",
                                                 )}
                                             </span>
+                                        ) : unit.status === "DELEGATED" ? (
+                                            <span className="shrink-0 rounded border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-600">
+                                                {t(
+                                                    "voting:detail.statusSidebar.statusDelegated",
+                                                )}
+                                            </span>
                                         ) : (
                                             <span className="shrink-0 rounded border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-800">
                                                 {t(
@@ -172,14 +178,14 @@ export function VoterStatusSidebar() {
                                         },
                                     )}
                                 </p>
-                                <a
-                                    href="#"
+                                <Link
+                                    to={`/voting/${voteId}/delegate`}
                                     className="text-sm font-bold text-orange-900 underline underline-offset-2 hover:no-underline"
                                 >
                                     {t(
                                         "voting:detail.statusSidebar.manageDelegation",
                                     )}
-                                </a>
+                                </Link>
                             </div>
                         </div>
                     )}

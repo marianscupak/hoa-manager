@@ -9,4 +9,5 @@
 export interface VoterSummaryDto {
     canVote: boolean;
     requiresDelegation: boolean;
+    isDelegated: boolean;
 }

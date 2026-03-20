@@ -10,6 +10,7 @@ import {
   VoteQuestionType,
   VoteStatus,
   VoteWeightBasis,
+  OwningUnitStatus,
 } from '@/modules/voting/domain/vote/vote.types';
 
 export const createVoteSchema = z.object({
@@ -189,6 +190,9 @@ export class VoterSummaryDto {
 
   @ApiProperty()
   requiresDelegation!: boolean;
+
+  @ApiProperty()
+  isDelegated!: boolean;
 }
 
 export class VoteListItemResponseDto extends CreateVoteResponseDto {
@@ -206,8 +210,8 @@ export class OwningUnitStatusDto {
   @ApiProperty()
   share!: string;
 
-  @ApiProperty({ enum: ['READY', 'REQUIRES_DELEGATION', 'VOTED'] })
-  status!: 'READY' | 'REQUIRES_DELEGATION' | 'VOTED';
+  @ApiProperty()
+  status!: OwningUnitStatus;
 }
 
 export class TotalVotingPowerDto {
@@ -228,3 +232,24 @@ export class VoterStatusResponseDto {
   @ApiProperty({ type: [OwningUnitStatusDto] })
   owningUnits!: OwningUnitStatusDto[];
 }
+
+export class DelegationCandidateDto {
+  @ApiProperty()
+  membershipId!: string;
+
+  @ApiProperty()
+  name!: string;
+
+  @ApiProperty()
+  hasDelegatedToRequester!: boolean;
+
+  @ApiProperty()
+  isEligible!: boolean;
+}
+
+export const createVoteConsentSchema = z.object({
+  unitId: z.string().uuid(),
+  delegateMembershipId: z.string().uuid(),
+});
+
+export class CreateVoteConsentDto extends createZodDto(createVoteConsentSchema) {}

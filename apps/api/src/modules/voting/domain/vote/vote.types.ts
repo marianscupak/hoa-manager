@@ -66,3 +66,14 @@ export interface VoteQuestion {
   options: VoteOption[];
   rulesetOverride?: VoteRuleset;
 }
+
+export enum VoteUnitConsentStatus {
+  VALID = 'VALID',
+  REVOKED = 'REVOKED',
+}
+
+export enum OwningUnitStatus {
+  READY = 'READY',
+  REQUIRES_DELEGATION = 'REQUIRES_DELEGATION',
+  DELEGATED = 'DELEGATED',
+}

@@ -8,6 +8,7 @@ import {
   isNotNull,
   count,
   sum,
+  ne,
 } from 'drizzle-orm';
 
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
@@ -28,6 +29,7 @@ import {
   type VoteQuestionResponseDto,
   type VoterStatusResponseDto,
   type VoterSummaryDto,
+  type DelegationCandidateDto,
 } from '@/modules/voting/api/dto/vote.dto';
 import { type VoteReadRepository } from '@/modules/voting/application/ports/vote-read.repository.port';
 import {
@@ -38,6 +40,7 @@ import {
   type VoteQuestionType,
   type VoteStatus,
   type VoteWeightBasis,
+  OwningUnitStatus,
 } from '@/modules/voting/domain/vote/vote.types';
 
 @Injectable()
@@ -350,21 +353,59 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
   }
 
   /**
+   * Returns unit IDs for which the current membership (via their owner) has given consent.
+   */
+  private async getGivenConsentUnits(
+    tenantId: string,
+    voteId: string,
+    ownerId: string,
+    unitIds: string[],
+  ): Promise<Set<string>> {
+    if (unitIds.length === 0) return new Set();
+
+    const rows = await this.drizzle.db
+      .select({ unitId: voteUnitConsents.unitId })
+      .from(voteUnitConsents)
+      .where(
+        and(
+          eq(voteUnitConsents.tenantId, tenantId),
+          eq(voteUnitConsents.voteId, voteId),
+          inArray(voteUnitConsents.unitId, unitIds),
+          eq(voteUnitConsents.fromOwnerId, ownerId),
+          eq(voteUnitConsents.status, 'VALID'),
+        ),
+      );
+
+    return new Set(rows.map((r) => r.unitId));
+  }
+
+  /**
    * Determines per-unit delegation status given co-owner counts, consents,
    * and the `allowCoOwnerIndividualVote` flag.
    *
-   * Returns `{ hasReady, hasRequiresDelegation }`.
+   * Returns `{ hasReady, hasRequiresDelegation, hasDelegated }`.
    */
   private computeUnitDelegationStatus(
     unitIds: string[],
     ownerCountMap: Map<string, number>,
     consentCountMap: Map<string, number>,
+    givenConsentUnits: Set<string>,
     allowIndividualVote: boolean,
-  ): { hasReady: boolean; hasRequiresDelegation: boolean } {
+  ): {
+    hasReady: boolean;
+    hasRequiresDelegation: boolean;
+    hasDelegated: boolean;
+  } {
     let hasReady = false;
     let hasRequiresDelegation = false;
+    let hasDelegated = false;
 
     for (const unitId of unitIds) {
+      if (givenConsentUnits.has(unitId)) {
+        hasDelegated = true;
+        continue;
+      }
+
       const ownerCount = ownerCountMap.get(unitId) ?? 1;
       const isSoleOwner = ownerCount === 1;
 
@@ -372,7 +413,8 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
         hasReady = true;
       } else {
         const consents = consentCountMap.get(unitId) ?? 0;
-        if (consents >= ownerCount) {
+        // A representative is ready if they have consents from all OTHER co-owners.
+        if (consents >= ownerCount - 1) {
           hasReady = true;
         } else {
           hasRequiresDelegation = true;
@@ -380,7 +422,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       }
     }
 
-    return { hasReady, hasRequiresDelegation };
+    return { hasReady, hasRequiresDelegation, hasDelegated };
   }
 
   // ── Public methods ────────────────────────────────────────────────
@@ -420,12 +462,17 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
 
     const uniqueUnitIds = [...new Set(ownershipRows.map((o) => o.unitId))];
 
-    const [allowIndividualVote, ownerCountMap, consentCountMap] =
-      await Promise.all([
-        this.getAllowCoOwnerIndividualVote(tenantId, voteId),
-        this.getCoOwnerCounts(tenantId, uniqueUnitIds),
-        this.getConsentCounts(tenantId, voteId, uniqueUnitIds, membershipId),
-      ]);
+    const [
+      allowIndividualVote,
+      ownerCountMap,
+      receivedConsentCountMap,
+      givenConsentUnits,
+    ] = await Promise.all([
+      this.getAllowCoOwnerIndividualVote(tenantId, voteId),
+      this.getCoOwnerCounts(tenantId, uniqueUnitIds),
+      this.getConsentCounts(tenantId, voteId, uniqueUnitIds, membershipId),
+      this.getGivenConsentUnits(tenantId, voteId, ownerId, uniqueUnitIds),
+    ]);
 
     // Compute total voting power (sum of all building shares in the tenant)
     const totalShareRows = await this.drizzle.db
@@ -447,21 +494,23 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       const isSoleOwner = ownerCount === 1;
       const share = Number(ownership.buildingShare);
 
-      let status: 'READY' | 'REQUIRES_DELEGATION' | 'VOTED';
+      let status: OwningUnitStatus;
 
-      if (isSoleOwner || allowIndividualVote) {
-        status = 'READY';
+      const receivedConsents = receivedConsentCountMap.get(unitId) ?? 0;
+      const isGiven = givenConsentUnits.has(unitId);
+
+      if (isGiven) {
+        status = OwningUnitStatus.DELEGATED;
+      } else if (
+        isSoleOwner ||
+        allowIndividualVote ||
+        receivedConsents >= ownerCount - 1
+      ) {
+        status = OwningUnitStatus.READY;
         totalValue += share;
         hasReady = true;
       } else {
-        const consents = consentCountMap.get(unitId) ?? 0;
-        if (consents >= ownerCount) {
-          status = 'READY';
-          totalValue += share;
-          hasReady = true;
-        } else {
-          status = 'REQUIRES_DELEGATION';
-        }
+        status = OwningUnitStatus.REQUIRES_DELEGATION;
       }
 
       return {
@@ -490,6 +539,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
     const noVoteSummary: VoterSummaryDto = {
       canVote: false,
       requiresDelegation: false,
+      isDelegated: false,
     };
 
     const ownerId = await this.resolveOwnerId(tenantId, membershipId);
@@ -507,25 +557,76 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
     const ownerCountMap = await this.getCoOwnerCounts(tenantId, unitIds);
 
     for (const voteId of voteIds) {
-      const [allowIndividualVote, consentCountMap] = await Promise.all([
-        this.getAllowCoOwnerIndividualVote(tenantId, voteId),
-        this.getConsentCounts(tenantId, voteId, unitIds, membershipId),
-      ]);
+      const [allowIndividualVote, consentCountMap, givenConsentUnits] =
+        await Promise.all([
+          this.getAllowCoOwnerIndividualVote(tenantId, voteId),
+          this.getConsentCounts(tenantId, voteId, unitIds, membershipId),
+          this.getGivenConsentUnits(tenantId, voteId, ownerId, unitIds),
+        ]);
 
-      const { hasReady, hasRequiresDelegation } =
+      const { hasReady, hasRequiresDelegation, hasDelegated } =
         this.computeUnitDelegationStatus(
           unitIds,
           ownerCountMap,
           consentCountMap,
+          givenConsentUnits,
           allowIndividualVote,
         );
 
       result.set(voteId, {
         canVote: hasReady,
         requiresDelegation: hasRequiresDelegation,
+        isDelegated: hasDelegated,
       });
     }
 
     return result;
+  }
+
+  async findDelegationCandidates(
+    tenantId: string,
+    voteId: string,
+    unitId: string,
+    requesterMembershipId: string,
+  ): Promise<DelegationCandidateDto[]> {
+    const records = await this.drizzle.db
+      .select({
+        membershipId: tenantMemberships.id,
+        name: owners.displayName,
+        delegateMembershipId: voteUnitConsents.toMembershipId,
+        hasConsent: isNotNull(voteUnitConsents.id),
+      })
+      .from(tenantMemberships)
+      .innerJoin(owners, eq(owners.userId, tenantMemberships.userId))
+      .innerJoin(
+        unitOwnerships,
+        and(
+          eq(unitOwnerships.ownerId, owners.id),
+          eq(unitOwnerships.unitId, unitId),
+          isNull(unitOwnerships.validTo),
+        ),
+      )
+      .leftJoin(
+        voteUnitConsents,
+        and(
+          eq(voteUnitConsents.unitId, unitId),
+          eq(voteUnitConsents.voteId, voteId),
+          eq(voteUnitConsents.fromOwnerId, owners.id),
+          eq(voteUnitConsents.status, 'VALID'),
+        ),
+      )
+      .where(
+        and(
+          eq(tenantMemberships.tenantId, tenantId),
+          ne(tenantMemberships.id, requesterMembershipId),
+        ),
+      );
+
+    return records.map((r) => ({
+      membershipId: r.membershipId,
+      name: r.name,
+      hasDelegatedToRequester: r.delegateMembershipId === requesterMembershipId,
+      isEligible: !r.hasConsent,
+    }));
   }
 }

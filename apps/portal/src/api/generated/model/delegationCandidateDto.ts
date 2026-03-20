@@ -6,9 +6,9 @@
  * OpenAPI spec version: 1.0
  */
 
-/**
- * @nullable
- */
-export type VoterStatusResponseDtoScheduledFrom = {
-    [key: string]: unknown;
-} | null;
+export interface DelegationCandidateDto {
+    membershipId: string;
+    name: string;
+    hasDelegatedToRequester: boolean;
+    isEligible: boolean;
+}

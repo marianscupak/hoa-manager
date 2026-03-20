@@ -224,6 +224,8 @@ export const voting = {
             manageDelegation: "Manage Delegation",
             readyToVote: "Ready to vote",
             readyToVoteSubtitle: "You are eligible when voting opens.",
+            alreadyDelegated: "Delegated",
+            alreadyDelegatedSubtitle: "You have assigned a representative.",
             scheduledStatus: "Scheduled",
             scheduledSubtitle: "This vote has not started yet.",
             viewDetails: "View Details",
@@ -285,13 +287,14 @@ export const voting = {
         },
         statusSidebar: {
             title: "Your Voting Status",
-            opensIn: "Voting starts in",
-            closesIn: "Voting ends in",
+            opensIn: "Voting starts",
+            closesIn: "Voting ends",
             owningUnits: "OWNING UNITS",
             share: "Share:",
             statusReady: "Ready",
             statusDelegation: "Requires delegation",
             statusVoted: "Voted",
+            statusDelegated: "Delegated",
             delegationWarning:
                 "{{unitName}} is co-owned. A common representative must be chosen.",
             manageDelegation: "Manage Delegation",
@@ -309,6 +312,64 @@ export const voting = {
                 hour: "hour",
                 hours: "hours",
             },
+        },
+    },
+    delegate: {
+        title: "Delegate Your Vote",
+        backToVote: "Back to vote detail",
+        votingEvent: "Voting Event",
+        cancelExisting: "Cancel delegation",
+        selectUnit: "Select Unit",
+        whoWillRepresent: "Who will represent you?",
+        searchByCoOwner: "Search co-owners by name",
+        noCandidatesFound: "No eligible co-owners found.",
+        noSelectableUnits:
+            "All your units have already been delegated in this event.",
+        assignedToYou: "Assigned to you",
+        alreadyDelegated: "Already delegated",
+        confirmButton: "Confirm Delegation",
+        confirming: "Confirming...",
+        terms: 'By clicking "Confirm Delegation", you agree to the HOA Portal digital voting terms and conditions.',
+        notice: {
+            title: "Important Notice",
+            description:
+                "Once you delegate your vote for this unit, you cannot vote personally in this specific event unless you revoke the delegation before the vote starts.",
+        },
+        summary: {
+            title: "Delegation Summary",
+            unit: "Unit",
+            voteShare: "Vote Share",
+            delegate: "Delegate",
+            notSelected: "Not selected",
+        },
+        modal: {
+            title: "Confirm Delegation",
+            description:
+                "Please review the delegation details before confirming.",
+            warning:
+                "By confirming, you authorize the selected representative to vote on your behalf for this unit. You can revoke this before the voting starts.",
+            toast: {
+                success: "Delegation created successfully",
+                error: "Failed to create delegation",
+                INVALID_VOTE_STATUS_FOR_DELEGATION:
+                    "Delegation is only allowed for scheduled votes.",
+                NOT_A_UNIT_OWNER: "You are not an owner of this unit.",
+                MEMBERSHIP_HAS_NO_ASSOCIATED_OWNER:
+                    "Your membership is not linked to an owner.",
+                MUTUAL_DELEGATION_NOT_ALLOWED:
+                    "Mutual delegation is not allowed. This person already delegated to you.",
+            },
+            delegateLabel: "DELEGATE",
+            delegateSubtext: "Authorized Person",
+            unitLabel: "UNIT",
+            unitSubtext: "Property Asset",
+            eventLabel: "VOTING EVENT",
+            eventSubtext: "Agenda Item",
+            revocableTitle: "Revocable action",
+            revocableDescription:
+                "You can cancel this delegation via your dashboard at any time before the vote begins.",
+            terms: "By proceeding, you acknowledge that this delegation complies with the statutes of the HOA. This action grants full voting power for this specific agenda item to the designated delegate listed above.",
+            allowAction: "Allow person to vote on my behalf",
         },
     },
 };

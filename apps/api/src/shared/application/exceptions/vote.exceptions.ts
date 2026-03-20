@@ -86,3 +86,27 @@ export class InvalidQuestionRulesetOverrideException extends DomainException {
     super(ErrorCode.INVALID_QUESTION_RULESET_OVERRIDE);
   }
 }
+
+export class InvalidVoteStatusForDelegationException extends DomainException {
+  constructor() {
+    super(ErrorCode.INVALID_VOTE_STATUS_FOR_DELEGATION);
+  }
+}
+
+export class NotAUnitOwnerException extends DomainException {
+  constructor() {
+    super(ErrorCode.NOT_A_UNIT_OWNER);
+  }
+}
+
+export class MembershipHasNoAssociatedOwnerException extends DomainException {
+  constructor() {
+    super(ErrorCode.MEMBERSHIP_HAS_NO_ASSOCIATED_OWNER);
+  }
+}
+
+export class MutualDelegationNotAllowedException extends DomainException {
+  constructor() {
+    super(ErrorCode.MUTUAL_DELEGATION_NOT_ALLOWED);
+  }
+}

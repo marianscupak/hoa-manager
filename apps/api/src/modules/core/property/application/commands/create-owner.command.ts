@@ -4,5 +4,6 @@ export class CreateOwnerCommand {
     public readonly displayName: string,
     public readonly userId: string | null = null,
     public readonly email: string | null = null,
+    public readonly executorId: string | null = null,
   ) {}
 }

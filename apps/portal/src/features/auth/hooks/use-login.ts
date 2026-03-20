@@ -42,14 +42,14 @@ export function useLogin() {
                     const storedRedirect = StorageService.getString(
                         STORAGE_KEYS.POST_LOGIN_REDIRECT,
                     );
+                    StorageService.remove(STORAGE_KEYS.POST_LOGIN_REDIRECT);
 
-                    // if there is a stored redirect, leave the redirect up to the public layout
-                    if (!storedRedirect) {
-                        if (hasTenant) {
-                            navigate("/", { replace: true });
-                        } else {
-                            navigate("/tenant", { replace: true });
-                        }
+                    if (storedRedirect) {
+                        navigate(storedRedirect, { replace: true });
+                    } else if (hasTenant) {
+                        navigate("/", { replace: true });
+                    } else {
+                        navigate("/tenant", { replace: true });
                     }
                 },
                 onError: showApiError,

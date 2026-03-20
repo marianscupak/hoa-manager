@@ -13,6 +13,7 @@ export type GetUserByIdResult = {
   email: string;
   fullName: string;
   isActive: boolean;
+  isEmailVerified: boolean;
   preferredLanguage: string;
 };
 
@@ -36,6 +37,7 @@ export class GetUserByIdHandler
       email: user.email,
       fullName: user.fullName,
       isActive: user.isActive,
+      isEmailVerified: user.isEmailVerified,
       preferredLanguage: user.preferredLanguage,
     };
   }

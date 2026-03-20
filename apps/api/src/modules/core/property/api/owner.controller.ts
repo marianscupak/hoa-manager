@@ -68,6 +68,7 @@ export class OwnerController {
   })
   async createOwner(
     @Tenant() tenantCtx: TenantContext,
+    @CurrentAuthUser() user: AuthPrincipal,
     @Body() dto: CreateOwnerDto,
   ): Promise<CreateOwnerResponseDto> {
     return this.commandBus.execute<CreateOwnerCommand, { ownerId: string }>(
@@ -76,6 +77,7 @@ export class OwnerController {
         dto.displayName,
         dto.userId ?? null,
         dto.email ?? null,
+        user.userId,
       ),
     );
   }

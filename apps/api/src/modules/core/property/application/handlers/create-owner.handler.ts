@@ -1,6 +1,7 @@
 import { Inject } from '@nestjs/common';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 
+import { GetUserByIdQuery } from '@/modules/core/identity/application/queries/get-user-by-id.query';
 import { CreateOwnerCommand } from '@/modules/core/property/application/commands/create-owner.command';
 import {
   OWNER_REPOSITORY,
@@ -16,6 +17,7 @@ export class CreateOwnerHandler
   constructor(
     @Inject(OWNER_REPOSITORY)
     private readonly ownerRepo: OwnerRepository,
+    private readonly queryBus: QueryBus,
   ) {}
 
   async execute(command: CreateOwnerCommand): Promise<{ ownerId: string }> {
@@ -31,10 +33,25 @@ export class CreateOwnerHandler
       }
     }
 
+    let resolvedUserId = command.userId;
+
+    if (email && !resolvedUserId && command.executorId) {
+      const executor = await this.queryBus.execute(
+        new GetUserByIdQuery(command.executorId),
+      );
+      if (
+        executor &&
+        executor.email &&
+        email.toLowerCase() === executor.email.toLowerCase()
+      ) {
+        resolvedUserId = executor.id;
+      }
+    }
+
     const newOwner = await this.ownerRepo.create(
       command.tenantId,
       command.displayName,
-      command.userId,
+      resolvedUserId,
       email,
     );
 

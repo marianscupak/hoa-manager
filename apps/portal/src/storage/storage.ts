@@ -40,5 +40,6 @@ export const StorageService = {
 
     clearAuthHints(): void {
         this.remove(STORAGE_KEYS.LAST_TENANT_ID);
+        this.remove(STORAGE_KEYS.POST_LOGIN_REDIRECT);
     },
 };

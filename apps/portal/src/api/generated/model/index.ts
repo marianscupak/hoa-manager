@@ -48,6 +48,8 @@ export * from "./loginDto";
 export * from "./ownerResponseDto";
 export * from "./ownerResponseDtoInviteStatus";
 export * from "./owningUnitStatusDto";
+export * from "./owningUnitStatusDtoIneligibleReason";
+export * from "./owningUnitStatusDtoStatus";
 export * from "./registerFromInviteDto";
 export * from "./registerFromInviteResponseDto";
 export * from "./replaceOwnershipsDto";

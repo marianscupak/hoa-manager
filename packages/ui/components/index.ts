@@ -19,3 +19,4 @@ export * from "./popover";
 export * from "./accordion";
 export * from "./checkbox";
 export * from "./tabs";
+export * from "./tooltip";

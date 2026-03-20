@@ -230,6 +230,12 @@ export const voting = {
             scheduledStatus: "Scheduled",
             scheduledSubtitle: "This vote has not started yet.",
             viewDetails: "View Details",
+            alreadyDelegatedOpen: "Delegated",
+            alreadyDelegatedOpenSubtitle:
+                "Other co-owners have chosen a representative for your units.",
+            cannotVoteOpen: "Cannot Vote",
+            cannotVoteOpenSubtitle:
+                "None of your units are eligible in this vote.",
             completed: "Voting Completed",
             viewOutcomes: "View final outcomes",
             viewResults: "View Results",
@@ -296,6 +302,12 @@ export const voting = {
             statusDelegation: "Requires delegation",
             statusVoted: "Voted",
             statusDelegated: "Delegated",
+            statusIneligible: "Ineligible",
+            ineligibleReasons: {
+                NO_REPRESENTATIVE: "No common representative was chosen.",
+                MISSING_OWNERSHIP:
+                    "Ownership information missing at start time.",
+            },
             delegationWarning:
                 "{{unitName}} is co-owned. A common representative must be chosen.",
             manageDelegation: "Manage Delegation",

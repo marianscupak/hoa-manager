@@ -24,6 +24,7 @@ import {
   units,
   unitOwnerships,
   tenantMemberships,
+  voteElectorateUnits,
 } from '@/infrastructure/db/schema';
 import {
   type VoteDetailResponseDto,
@@ -45,6 +46,8 @@ import {
   type VoteWeightBasis,
   OwningUnitStatus,
   VoteUnitConsentStatus,
+  ElectorateEligibilityStatus,
+  ElectorateIneligibleReason,
 } from '@/modules/voting/domain/vote/vote.types';
 
 @Injectable()
@@ -472,6 +475,95 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
 
     const uniqueUnitIds = [...new Set(ownershipRows.map((o) => o.unitId))];
 
+    const voteRow = await this.drizzle.db
+      .select({ status: votes.status })
+      .from(votes)
+      .where(and(eq(votes.tenantId, tenantId), eq(votes.id, voteId)))
+      .limit(1);
+
+    const isSnapshotStatus =
+      voteRow.length > 0 &&
+      (voteRow[0].status === 'OPEN' || voteRow[0].status === 'CLOSED');
+
+    if (isSnapshotStatus) {
+      const snapshotRows = await this.drizzle.db
+        .select({
+          unitId: voteElectorateUnits.unitId,
+          representativeMembershipId:
+            voteElectorateUnits.representativeMembershipId,
+          eligibilityStatus: voteElectorateUnits.eligibilityStatus,
+          ineligibleReason: voteElectorateUnits.ineligibleReason,
+          votingWeight: voteElectorateUnits.votingWeight,
+          unitNo: units.unitNo,
+          buildingShare: units.buildingShare,
+        })
+        .from(voteElectorateUnits)
+        .innerJoin(units, eq(voteElectorateUnits.unitId, units.id))
+        .where(
+          and(
+            eq(voteElectorateUnits.tenantId, tenantId),
+            eq(voteElectorateUnits.voteId, voteId),
+            inArray(voteElectorateUnits.unitId, uniqueUnitIds),
+          ),
+        );
+
+      const totalShareRows = await this.drizzle.db
+        .select({ total: sum(units.buildingShare) })
+        .from(units)
+        .where(eq(units.tenantId, tenantId));
+
+      const totalMaximum = totalShareRows[0]?.total
+        ? Number(totalShareRows[0].total)
+        : 0;
+
+      let totalValue = 0;
+      let hasReady = false;
+
+      const owningUnits = uniqueUnitIds.map((unitId) => {
+        const snapshot = snapshotRows.find((s) => s.unitId === unitId);
+        const ownership = ownershipRows.find((o) => o.unitId === unitId)!;
+        const share = Number(ownership.buildingShare);
+
+        if (!snapshot) {
+          // This should not happen if the snapshot is complete, but fallback
+          return {
+            id: unitId,
+            name: ownership.unitNo,
+            share: `${share}/${totalMaximum}`,
+            status: OwningUnitStatus.INELIGIBLE,
+          };
+        }
+
+        let status: OwningUnitStatus;
+        if (
+          snapshot.eligibilityStatus === ElectorateEligibilityStatus.INELIGIBLE
+        ) {
+          status = OwningUnitStatus.INELIGIBLE;
+        } else if (snapshot.representativeMembershipId === membershipId) {
+          status = OwningUnitStatus.READY;
+          totalValue += Number(snapshot.votingWeight);
+          hasReady = true;
+        } else {
+          status = OwningUnitStatus.DELEGATED;
+        }
+
+        return {
+          id: unitId,
+          name: ownership.unitNo,
+          share: `${Number(snapshot.votingWeight)}/${totalMaximum}`,
+          status,
+          ineligibleReason:
+            snapshot.ineligibleReason as ElectorateIneligibleReason | null,
+        };
+      });
+
+      return {
+        canVote: hasReady,
+        totalVotingPower: { value: totalValue, maximum: totalMaximum },
+        owningUnits,
+      };
+    }
+
     const [
       allowIndividualVote,
       ownerCountMap,
@@ -566,7 +658,52 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
 
     const ownerCountMap = await this.getCoOwnerCounts(tenantId, unitIds);
 
+    const voteStatuses = await this.drizzle.db
+      .select({ id: votes.id, status: votes.status })
+      .from(votes)
+      .where(inArray(votes.id, voteIds));
+
+    const voteStatusMap = new Map(voteStatuses.map((v) => [v.id, v.status]));
+
     for (const voteId of voteIds) {
+      const status = voteStatusMap.get(voteId);
+      if (status === 'OPEN' || status === 'CLOSED') {
+        const snapshotRows = await this.drizzle.db
+          .select({
+            representativeMembershipId:
+              voteElectorateUnits.representativeMembershipId,
+            eligibilityStatus: voteElectorateUnits.eligibilityStatus,
+          })
+          .from(voteElectorateUnits)
+          .where(
+            and(
+              eq(voteElectorateUnits.tenantId, tenantId),
+              eq(voteElectorateUnits.voteId, voteId),
+              inArray(voteElectorateUnits.unitId, unitIds),
+            ),
+          );
+
+        let canVote = false;
+        let isDelegated = false;
+
+        for (const row of snapshotRows) {
+          if (row.eligibilityStatus === ElectorateEligibilityStatus.ELIGIBLE) {
+            if (row.representativeMembershipId === membershipId) {
+              canVote = true;
+            } else {
+              isDelegated = true;
+            }
+          }
+        }
+
+        result.set(voteId, {
+          canVote,
+          requiresDelegation: false,
+          isDelegated: !canVote && isDelegated,
+        });
+        continue;
+      }
+
       const [allowIndividualVote, consentCountMap, givenConsentUnits] =
         await Promise.all([
           this.getAllowCoOwnerIndividualVote(tenantId, voteId),

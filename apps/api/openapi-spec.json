@@ -2871,7 +2871,13 @@
             "type": "string"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "enum": ["READY", "REQUIRES_DELEGATION", "DELEGATED", "INELIGIBLE"]
+          },
+          "ineligibleReason": {
+            "type": "string",
+            "enum": ["NO_REPRESENTATIVE", "MISSING_OWNERSHIP"],
+            "nullable": true
           }
         },
         "required": ["id", "name", "share", "status"]

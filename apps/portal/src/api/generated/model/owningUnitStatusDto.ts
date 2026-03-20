@@ -5,10 +5,14 @@
  * The HOA Manager API description
  * OpenAPI spec version: 1.0
  */
+import type { OwningUnitStatusDtoIneligibleReason } from "./owningUnitStatusDtoIneligibleReason";
+import type { OwningUnitStatusDtoStatus } from "./owningUnitStatusDtoStatus";
 
 export interface OwningUnitStatusDto {
     id: string;
     name: string;
     share: string;
-    status: string;
+    status: OwningUnitStatusDtoStatus;
+    /** @nullable */
+    ineligibleReason?: OwningUnitStatusDtoIneligibleReason;
 }

@@ -76,6 +76,7 @@ export enum OwningUnitStatus {
   READY = 'READY',
   REQUIRES_DELEGATION = 'REQUIRES_DELEGATION',
   DELEGATED = 'DELEGATED',
+  INELIGIBLE = 'INELIGIBLE',
 }
 
 export enum ElectorateEligibilityStatus {

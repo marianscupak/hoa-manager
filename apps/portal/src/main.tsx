@@ -3,7 +3,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router";
 
-import { Toaster } from "@hoa-mngr/ui";
+import { Toaster, TooltipProvider } from "@hoa-mngr/ui";
 
 import "@/api/axios";
 import "@/i18n";
@@ -24,10 +24,12 @@ const queryClient = new QueryClient({
 createRoot(document.getElementById("app")!).render(
     <StrictMode>
         <QueryClientProvider client={queryClient}>
-            <AppBootLoader>
-                <RouterProvider router={router} />
-                <Toaster />
-            </AppBootLoader>
+            <TooltipProvider>
+                <AppBootLoader>
+                    <RouterProvider router={router} />
+                    <Toaster />
+                </AppBootLoader>
+            </TooltipProvider>
         </QueryClientProvider>
     </StrictMode>,
 );

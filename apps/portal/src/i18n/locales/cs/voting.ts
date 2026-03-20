@@ -224,11 +224,17 @@ export const voting = {
             manageDelegation: "Spravovat delegaci",
             readyToVote: "Připraveni k hlasování",
             readyToVoteSubtitle: "Jste oprávněni, jakmile hlasování začne.",
+            viewDetails: "Zobrazit detail",
             alreadyDelegated: "Delegováno",
             alreadyDelegatedSubtitle: "Zvolili jste společného zástupce.",
             scheduledStatus: "Naplánováno",
             scheduledSubtitle: "Toto hlasování ještě nezačalo.",
-            viewDetails: "Zobrazit detail",
+            alreadyDelegatedOpen: "Delegováno",
+            alreadyDelegatedOpenSubtitle:
+                "Jiní spoluvlastníci zvolili zástupce pro vaše jednotky.",
+            cannotVoteOpen: "Nemůžete hlasovat",
+            cannotVoteOpenSubtitle:
+                "Žádná z vašich jednotek není v tomto hlasování oprávněna.",
             completed: "Hlasování dokončeno",
             viewOutcomes: "Zobrazit konečné výsledky",
             viewResults: "Zobrazit výsledky",
@@ -296,6 +302,12 @@ export const voting = {
             statusDelegation: "Vyžaduje delegaci",
             statusVoted: "Odhlasováno",
             statusDelegated: "Delegováno",
+            statusIneligible: "Nepovolaný",
+            ineligibleReasons: {
+                NO_REPRESENTATIVE: "Nebyl zvolen společný zástupce.",
+                MISSING_OWNERSHIP:
+                    "Chybí informace o vlastnictví v době zahájení.",
+            },
             delegationWarning:
                 "{{unitName}} je v podílovém spoluvlastnictví. Musí být zvolen společný zástupce.",
             manageDelegation: "Spravovat delegaci",

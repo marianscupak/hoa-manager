@@ -11,6 +11,7 @@ import {
   VoteStatus,
   VoteWeightBasis,
   OwningUnitStatus,
+  ElectorateIneligibleReason,
 } from '@/modules/voting/domain/vote/vote.types';
 
 export const createVoteSchema = z.object({
@@ -213,8 +214,15 @@ export class OwningUnitStatusDto {
   @ApiProperty()
   share!: string;
 
-  @ApiProperty()
+  @ApiProperty({ enum: OwningUnitStatus })
   status!: OwningUnitStatus;
+
+  @ApiProperty({
+    enum: ElectorateIneligibleReason,
+    required: false,
+    nullable: true,
+  })
+  ineligibleReason?: ElectorateIneligibleReason | null;
 }
 
 export class TotalVotingPowerDto {

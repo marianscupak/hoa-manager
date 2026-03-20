@@ -1,26 +1,15 @@
 import { format } from "date-fns";
-import {
-    ArrowRight,
-    Calendar,
-    CheckCircle2,
-    Pencil,
-    Users,
-} from "lucide-react";
+import { Calendar } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
-import {
-    Button,
-    Card,
-    CardContent,
-    CardDescription,
-    CardTitle,
-} from "@hoa-mngr/ui";
+import { Card, CardContent, CardDescription, CardTitle } from "@hoa-mngr/ui";
 import { cn } from "@hoa-mngr/ui/lib/utils";
 
 import { VoteListItemResponseDto } from "@/api/generated/model";
 
 import { StatusBadge } from "./status-badge";
+import { VoteStatusSection } from "./vote-status-section";
 
 interface VoteCardProps {
     vote: VoteListItemResponseDto;
@@ -31,7 +20,6 @@ export function VoteCard({ vote }: VoteCardProps) {
 
     const isVotingOpen = vote.status === "OPEN";
     const isScheduled = vote.status === "SCHEDULED";
-    const isDraft = vote.status === "DRAFT";
 
     const borderColor = isVotingOpen
         ? "border-l-emerald-500"
@@ -76,135 +64,7 @@ export function VoteCard({ vote }: VoteCardProps) {
                 </CardContent>
 
                 <div className="flex flex-col items-center justify-center border-t border-slate-100 bg-slate-50/50 p-6 md:w-72 md:border-t-0 md:border-l">
-                    {isVotingOpen ? (
-                        <>
-                            <div className="mb-4 flex flex-col items-center text-center">
-                                <CheckCircle2 className="mb-2 h-8 w-8 text-emerald-500" />
-                                <span className="font-semibold text-emerald-700">
-                                    {t("list.card.canVote")}
-                                </span>
-                                <span className="text-sm text-emerald-600">
-                                    {t("list.card.voteRequired")}
-                                </span>
-                            </div>
-                            <Button
-                                className="w-full bg-blue-600 text-white hover:bg-blue-700"
-                                asChild
-                            >
-                                <Link to={`/voting/${vote.id}`}>
-                                    {t("list.card.voteAction")}{" "}
-                                    <ArrowRight className="ml-2 h-4 w-4" />
-                                </Link>
-                            </Button>
-                        </>
-                    ) : isScheduled ? (
-                        <>
-                            <div className="mb-4 flex flex-col items-center text-center">
-                                {vote.voterSummary?.requiresDelegation ? (
-                                    <>
-                                        <Users className="mb-2 h-8 w-8 text-orange-500" />
-                                        <span className="font-semibold text-orange-800">
-                                            {t("list.card.delegationNeeded")}
-                                        </span>
-                                        <span className="text-sm text-orange-600">
-                                            {t("list.card.fromCoOwners")}
-                                        </span>
-                                    </>
-                                ) : vote.voterSummary?.canVote ? (
-                                    <>
-                                        <CheckCircle2 className="mb-2 h-8 w-8 text-emerald-500" />
-                                        <span className="font-semibold text-emerald-700">
-                                            {t("list.card.readyToVote")}
-                                        </span>
-                                        <span className="text-sm text-emerald-600">
-                                            {t("list.card.readyToVoteSubtitle")}
-                                        </span>
-                                    </>
-                                ) : vote.voterSummary?.isDelegated ? (
-                                    <>
-                                        <Users className="mb-2 h-8 w-8 text-slate-500" />
-                                        <span className="font-semibold text-slate-700">
-                                            {t("list.card.alreadyDelegated")}
-                                        </span>
-                                        <span className="text-sm text-slate-500">
-                                            {t(
-                                                "list.card.alreadyDelegatedSubtitle",
-                                            )}
-                                        </span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Calendar className="mb-2 h-8 w-8 text-blue-500" />
-                                        <span className="font-semibold text-slate-700">
-                                            {t("list.card.scheduledStatus")}
-                                        </span>
-                                        <span className="text-sm text-slate-500">
-                                            {t("list.card.scheduledSubtitle")}
-                                        </span>
-                                    </>
-                                )}
-                            </div>
-                            {vote.voterSummary?.requiresDelegation ? (
-                                <Button
-                                    variant="outline"
-                                    className="w-full border-slate-200"
-                                    asChild
-                                >
-                                    <Link to={`/voting/${vote.id}/delegate`}>
-                                        {t("list.card.manageDelegation")}
-                                    </Link>
-                                </Button>
-                            ) : (
-                                <Button
-                                    variant="outline"
-                                    className="w-full border-slate-200"
-                                    asChild
-                                >
-                                    <Link to={`/voting/${vote.id}`}>
-                                        {t("list.card.viewDetails")}
-                                    </Link>
-                                </Button>
-                            )}
-                        </>
-                    ) : isDraft ? (
-                        <>
-                            <div className="mb-4 flex flex-col items-center text-center">
-                                <Pencil className="mb-2 h-8 w-8 text-slate-500" />
-                                <span className="font-semibold text-slate-700">
-                                    {t("list.card.draftStatus")}
-                                </span>
-                                <span className="text-sm text-slate-500">
-                                    {t("list.card.editDraft")}
-                                </span>
-                            </div>
-                            <Button
-                                variant="outline"
-                                className="w-full"
-                                asChild
-                            >
-                                <Link to={`/voting/${vote.id}/edit`}>
-                                    {t("list.card.editAction")}
-                                </Link>
-                            </Button>
-                        </>
-                    ) : (
-                        <>
-                            <div className="mb-4 flex flex-col items-center text-center">
-                                <span className="font-semibold text-slate-700">
-                                    {t("list.card.completed")}
-                                </span>
-                                <span className="text-sm text-slate-500">
-                                    {t("list.card.viewOutcomes")}
-                                </span>
-                            </div>
-                            <Button
-                                variant="outline"
-                                className="w-full border-slate-200"
-                            >
-                                {t("list.card.viewResults")}
-                            </Button>
-                        </>
-                    )}
+                    <VoteStatusSection vote={vote} />
                 </div>
             </div>
         </Card>

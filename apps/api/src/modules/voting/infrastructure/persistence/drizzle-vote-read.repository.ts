@@ -631,7 +631,9 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
         and(
           eq(tenantMemberships.tenantId, tenantId),
           eq(tenantMemberships.status, 'ACTIVE'),
-          forMembershipId ? ne(tenantMemberships.id, forMembershipId) : undefined,
+          forMembershipId
+            ? ne(tenantMemberships.id, forMembershipId)
+            : undefined,
         ),
       )
       .orderBy(owners.displayName);

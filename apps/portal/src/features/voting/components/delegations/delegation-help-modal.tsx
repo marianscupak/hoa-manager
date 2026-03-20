@@ -23,7 +23,9 @@ export function DelegationHelpModal() {
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>{t("voting:delegations.help.title")}</DialogTitle>
+                    <DialogTitle>
+                        {t("voting:delegations.help.title")}
+                    </DialogTitle>
                     <DialogDescription>
                         {t("voting:delegations.help.description")}
                     </DialogDescription>

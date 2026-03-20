@@ -90,7 +90,9 @@ export function UserDelegationList() {
                 onSuccess: () => {
                     toast.success(t("voting:delegations.table.revokeSuccess"));
                     queryClient.invalidateQueries({ queryKey: ["/api/votes"] });
-                    queryClient.invalidateQueries({ queryKey: ["/api/votes/consents"] });
+                    queryClient.invalidateQueries({
+                        queryKey: ["/api/votes/consents"],
+                    });
                 },
                 onError: (error) => {
                     showApiError(error);

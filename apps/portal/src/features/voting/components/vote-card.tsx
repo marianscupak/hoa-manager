@@ -127,7 +127,9 @@ export function VoteCard({ vote }: VoteCardProps) {
                                             {t("list.card.alreadyDelegated")}
                                         </span>
                                         <span className="text-sm text-slate-500">
-                                            {t("list.card.alreadyDelegatedSubtitle")}
+                                            {t(
+                                                "list.card.alreadyDelegatedSubtitle",
+                                            )}
                                         </span>
                                     </>
                                 ) : (

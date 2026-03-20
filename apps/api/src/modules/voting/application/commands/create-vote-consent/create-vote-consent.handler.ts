@@ -29,7 +29,9 @@ import {
 import { CreateVoteConsentCommand } from './create-vote-consent.command';
 
 @CommandHandler(CreateVoteConsentCommand)
-export class CreateVoteConsentHandler implements ICommandHandler<CreateVoteConsentCommand> {
+export class CreateVoteConsentHandler
+  implements ICommandHandler<CreateVoteConsentCommand>
+{
   constructor(
     @Inject(VOTE_WRITE_REPOSITORY)
     private readonly voteWriteRepo: VoteWriteRepository,

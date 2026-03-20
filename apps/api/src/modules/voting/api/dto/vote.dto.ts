@@ -259,7 +259,9 @@ export const createVoteConsentSchema = z.object({
   ownerMembershipId: z.string().uuid().optional(),
 });
 
-export class CreateVoteConsentDto extends createZodDto(createVoteConsentSchema) {}
+export class CreateVoteConsentDto extends createZodDto(
+  createVoteConsentSchema,
+) {}
 
 export class VoteConsentResponseDto {
   @ApiProperty()

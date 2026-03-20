@@ -16,7 +16,9 @@ import { DelegationNotFoundException } from '@/shared/application/exceptions/vot
 import { RevokeConsentCommand } from './revoke-consent.command';
 
 @CommandHandler(RevokeConsentCommand)
-export class RevokeConsentHandler implements ICommandHandler<RevokeConsentCommand> {
+export class RevokeConsentHandler
+  implements ICommandHandler<RevokeConsentCommand>
+{
   constructor(
     @Inject(VOTE_CONSENT_WRITE_REPOSITORY)
     private readonly consentWriteRepo: VoteConsentWriteRepository,

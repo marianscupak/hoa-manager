@@ -3,7 +3,10 @@ import { useTranslation } from "react-i18next";
 import { Button, Card } from "@hoa-mngr/ui";
 import { cn } from "@hoa-mngr/ui/lib/utils";
 
-import { DelegationCandidateDto, OwningUnitStatusDto } from "@/api/generated/model";
+import {
+    DelegationCandidateDto,
+    OwningUnitStatusDto,
+} from "@/api/generated/model";
 
 interface DelegationSummaryProps {
     selectedUnit: OwningUnitStatusDto | null | undefined;
@@ -57,9 +60,7 @@ export const DelegationSummary = ({
                                     "text-muted-foreground text-sm italic",
                             )}
                         >
-                            {selectedUnit?.share
-                                ? selectedUnit.share
-                                : "-"}
+                            {selectedUnit?.share ? selectedUnit.share : "-"}
                         </span>
                     </div>
                     <div className="border-muted flex items-center justify-between border-b border-dashed py-1 pb-3">

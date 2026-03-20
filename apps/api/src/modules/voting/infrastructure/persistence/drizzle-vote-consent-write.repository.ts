@@ -11,7 +11,9 @@ import {
 import { VoteUnitConsentStatus } from '@/modules/voting/domain/vote/vote.types';
 
 @Injectable()
-export class DrizzleVoteConsentWriteRepository implements VoteConsentWriteRepository {
+export class DrizzleVoteConsentWriteRepository
+  implements VoteConsentWriteRepository
+{
   constructor(private readonly drizzle: DrizzleService) {}
 
   private get db() {

@@ -27,8 +27,6 @@ export default {
     INVALID_OWNERSHIP_SUM:
         "Total ownership shares must sum exactly to 1.0 (100%).",
     UNKNOWN: "An unexpected error occurred. Please try again later.",
-    INVALID_VOTE_SCHEDULE:
-        "The vote schedule is invalid. Make sure the end date is after the start date and the dates are not in the past.",
     VOTE_NOT_FOUND: "Vote not found.",
     VOTE_NOT_DRAFT:
         "The vote is no longer in draft mode and cannot be modified.",

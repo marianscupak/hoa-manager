@@ -2,9 +2,10 @@ import { addDays, addMilliseconds } from 'date-fns';
 
 import {
   InvalidVoteQuestionException,
-  InvalidVoteScheduleException,
   VoteNotDraftException,
   VoteRulesetRequiredException,
+  VoteScheduleInPastException,
+  VoteScheduleInvalidRangeException,
 } from '@/shared/application/exceptions/vote.exceptions';
 
 import { VoteAggregate, type CreateVoteInput } from './vote.aggregate';
@@ -77,7 +78,7 @@ describe('VoteAggregate', () => {
       expect(aggregate.questions).toEqual([]);
     });
 
-    it('throws InvalidVoteScheduleException if scheduledFrom is in the past', () => {
+    it('throws VoteScheduleInPastException if scheduledFrom is in the past', () => {
       const data: CreateVoteInput = {
         title: 'Test Vote',
         description: 'Desc',
@@ -92,10 +93,10 @@ describe('VoteAggregate', () => {
           defaultMembershipId,
           defaultNow,
         );
-      }).toThrow(InvalidVoteScheduleException);
+      }).toThrow(VoteScheduleInPastException);
     });
 
-    it('throws InvalidVoteScheduleException if scheduledTo is before scheduledFrom', () => {
+    it('throws VoteScheduleInvalidRangeException if scheduledTo is before scheduledFrom', () => {
       const data: CreateVoteInput = {
         title: 'Test Vote',
         description: 'Desc',
@@ -110,7 +111,7 @@ describe('VoteAggregate', () => {
           defaultMembershipId,
           defaultNow,
         );
-      }).toThrow(InvalidVoteScheduleException);
+      }).toThrow(VoteScheduleInvalidRangeException);
     });
   });
 

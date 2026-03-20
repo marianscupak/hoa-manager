@@ -6,7 +6,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@hoa-mngr/ui";
 import { tenantContextAtom } from "@/auth/atoms";
 
 import { AdminRecordDelegation } from "../components/delegations/admin-record-delegation";
-import { DelegationHelpModal } from "../components/delegations/delegation-help-modal";
 import { UserDelegationList } from "../components/delegations/user-delegation-list";
 
 export function DelegationsPage() {
@@ -28,7 +27,6 @@ export function DelegationsPage() {
                         {t("voting:delegations.description")}
                     </p>
                 </div>
-                <DelegationHelpModal />
             </div>
 
             {isAdmin ? (

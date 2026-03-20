@@ -381,16 +381,6 @@ export const voting = {
     delegations: {
         title: "Delegations",
         description: "Manage who can vote on your behalf.",
-        help: {
-            title: "How Delegation Works",
-            description:
-                "A delegation allows another person to vote on your behalf for specific units in a scheduled voting event.",
-            rules: [
-                "Only one person can vote for a unit.",
-                "Mutual delegation is not allowed (x delegates to y, y cannot delegate to x).",
-                "You can revoke your delegation at any time before the vote starts.",
-            ],
-        },
         tabs: {
             myDelegations: "My Delegations",
             recordProxy: "Record Proxy (Admin)",

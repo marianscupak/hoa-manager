@@ -381,16 +381,6 @@ export const voting = {
     delegations: {
         title: "Delegace",
         description: "Spravujte, kdo může hlasovat vaším jménem.",
-        help: {
-            title: "Jak funguje delegování",
-            description:
-                "Delegování umožňuje jiné osobě hlasovat vaším jménem pro konkrétní jednotky v naplánovaném hlasování.",
-            rules: [
-                "Za jednotku může vždy hlasovat pouze jedna osoba.",
-                "Vzájemné delegování není povoleno (pokud x deleguje na y, y nemůže delegovat na x).",
-                "Delegaci můžete kdykoli před začátkem hlasování zrušit.",
-            ],
-        },
         tabs: {
             myDelegations: "Moje delegace",
             recordProxy: "Evidence plné moci (Admin)",

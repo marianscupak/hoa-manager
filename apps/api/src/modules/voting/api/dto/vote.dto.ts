@@ -189,11 +189,14 @@ export class VoterSummaryDto {
   @ApiProperty()
   canVote!: boolean;
 
-  @ApiProperty()
-  requiresDelegation!: boolean;
+  @ApiProperty({ required: false })
+  requiresDelegation?: boolean;
 
   @ApiProperty()
   isDelegated!: boolean;
+
+  @ApiProperty()
+  hasVoted!: boolean;
 }
 
 export class VoteListItemResponseDto extends CreateVoteResponseDto {
@@ -318,4 +321,30 @@ export class VoteConsentResponseDto {
     format: 'date-time',
   })
   createdAt!: Date;
+}
+
+// ── Ballot Submission ──────────────────────────────────────
+
+export const submitBallotAnswerSchema = z.object({
+  questionId: z.string().uuid(),
+  optionId: z.string().uuid(),
+});
+
+export const submitBallotUnitSchema = z.object({
+  unitId: z.string().uuid(),
+  answers: z.array(submitBallotAnswerSchema).min(1),
+});
+
+export const submitBallotSchema = z.object({
+  ballots: z.array(submitBallotUnitSchema).min(1),
+});
+
+export class SubmitBallotDto extends createZodDto(submitBallotSchema) {}
+
+export class SubmitBallotResponseDto {
+  @ApiProperty({
+    type: 'string',
+    format: 'date-time',
+  })
+  submittedAt!: Date;
 }

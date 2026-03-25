@@ -29,6 +29,8 @@ import type {
     DelegationCandidateDto,
     SetVoteRulesetDto,
     SetVoteRulesetResponseDto,
+    SubmitBallotDto,
+    SubmitBallotResponseDto,
     UpdateVoteDto,
     UpdateVoteQuestionDto,
     VoteConsentResponseDto,
@@ -1669,6 +1671,93 @@ export const useVotesControllerCreateVoteConsent = <
 > => {
     return useMutation(
         getVotesControllerCreateVoteConsentMutationOptions(options),
+        queryClient,
+    );
+};
+export const votesControllerSubmitBallot = (
+    id: string,
+    submitBallotDto: BodyType<SubmitBallotDto>,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<SubmitBallotResponseDto>(
+        {
+            url: `/api/votes/${id}/ballots`,
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            data: submitBallotDto,
+            signal,
+        },
+        options,
+    );
+};
+
+export const getVotesControllerSubmitBallotMutationOptions = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof votesControllerSubmitBallot>>,
+        TError,
+        { id: string; data: BodyType<SubmitBallotDto> },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof votesControllerSubmitBallot>>,
+    TError,
+    { id: string; data: BodyType<SubmitBallotDto> },
+    TContext
+> => {
+    const mutationKey = ["votesControllerSubmitBallot"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof votesControllerSubmitBallot>>,
+        { id: string; data: BodyType<SubmitBallotDto> }
+    > = (props) => {
+        const { id, data } = props ?? {};
+
+        return votesControllerSubmitBallot(id, data, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type VotesControllerSubmitBallotMutationResult = NonNullable<
+    Awaited<ReturnType<typeof votesControllerSubmitBallot>>
+>;
+export type VotesControllerSubmitBallotMutationBody = BodyType<SubmitBallotDto>;
+export type VotesControllerSubmitBallotMutationError = ErrorType<unknown>;
+
+export const useVotesControllerSubmitBallot = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof votesControllerSubmitBallot>>,
+            TError,
+            { id: string; data: BodyType<SubmitBallotDto> },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof votesControllerSubmitBallot>>,
+    TError,
+    { id: string; data: BodyType<SubmitBallotDto> },
+    TContext
+> => {
+    return useMutation(
+        getVotesControllerSubmitBallotMutationOptions(options),
         queryClient,
     );
 };

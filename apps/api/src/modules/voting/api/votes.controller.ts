@@ -36,6 +36,8 @@ import {
   DelegationCandidateDto,
   CreateVoteConsentDto,
   VoteConsentResponseDto,
+  SubmitBallotDto,
+  SubmitBallotResponseDto,
 } from './dto/vote.dto';
 import { Roles, Tenant } from '../../../shared/api/decorators/auth.decorators';
 import { AccessTokenAuthGuard } from '../../../shared/api/guards/access-token-auth.guard';
@@ -50,6 +52,7 @@ import { DeleteVoteQuestionCommand } from '../application/commands/delete-vote-q
 import { RevokeConsentCommand } from '../application/commands/revoke-consent/revoke-consent.command';
 import { ScheduleVoteCommand } from '../application/commands/schedule-vote/schedule-vote.command';
 import { SetVoteRulesetCommand } from '../application/commands/set-vote-ruleset/set-vote-ruleset.command';
+import { SubmitBallotCommand } from '../application/commands/submit-ballot/submit-ballot.command';
 import { UpdateVoteCommand } from '../application/commands/update-vote/update-vote.command';
 import { UpdateVoteQuestionCommand } from '../application/commands/update-vote-question/update-vote-question.command';
 import { GetConsentsQuery } from '../application/queries/get-consents/get-consents.query';
@@ -315,6 +318,28 @@ export class VotesController {
         body.delegateMembershipId,
         tenantCtx.roles,
         body.ownerMembershipId,
+      ),
+    );
+  }
+
+  @Post(':id/ballots')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Submits ballots for the authenticated user',
+    type: SubmitBallotResponseDto,
+  })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard)
+  submitBallot(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() body: SubmitBallotDto,
+    @Tenant() tenantCtx: TenantContext,
+  ) {
+    return this.commandBus.execute(
+      new SubmitBallotCommand(
+        tenantCtx.tenantId,
+        id,
+        tenantCtx.membershipId,
+        body.ballots,
       ),
     );
   }

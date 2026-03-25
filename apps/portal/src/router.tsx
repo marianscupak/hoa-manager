@@ -17,6 +17,7 @@ import { ProfilePage } from "@/features/profile/pages/profile-page";
 import { CreateTenantPage } from "@/features/tenants/pages/create-tenant-page";
 import { VotingAdminGuard } from "@/features/voting/guards/voting-admin-guard";
 import { VotingLayout } from "@/features/voting/layouts/voting-layout";
+import { CastVotePage } from "@/features/voting/pages/cast-vote-page";
 import { CreateVotePage } from "@/features/voting/pages/create-vote-page";
 import { DelegateVotePage } from "@/features/voting/pages/delegate-vote-page";
 import { DelegationsPage } from "@/features/voting/pages/delegations-page";
@@ -72,6 +73,10 @@ export const router = createBrowserRouter([
                     {
                         path: ":id/delegate",
                         element: <DelegateVotePage />,
+                    },
+                    {
+                        path: ":id/cast",
+                        element: <CastVotePage />,
                     },
                     {
                         path: "delegations",

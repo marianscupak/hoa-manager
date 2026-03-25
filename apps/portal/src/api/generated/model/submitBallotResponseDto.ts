@@ -6,9 +6,6 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface VoterSummaryDto {
-    canVote: boolean;
-    requiresDelegation?: boolean;
-    isDelegated: boolean;
-    hasVoted: boolean;
+export interface SubmitBallotResponseDto {
+    submittedAt: string;
 }

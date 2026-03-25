@@ -238,6 +238,9 @@ export const voting = {
             completed: "Hlasování dokončeno",
             viewOutcomes: "Zobrazit konečné výsledky",
             viewResults: "Zobrazit výsledky",
+            voted: "Odhlasováno",
+            votedSubtitle: "Váš hlas byl již zaznamenán.",
+            alreadyVotedAction: "Již odhlasováno",
             draftStatus: "Koncept hlasování",
             editDraft: "Konfigurace není kompletní",
             editAction: "Upravit hlasování",
@@ -313,6 +316,7 @@ export const voting = {
             manageDelegation: "Spravovat delegaci",
             totalPower: "Celková síla hlasu:",
             voteButton: "Hlasovat",
+            alreadyVotedButton: "Již odhlasováno",
             secureBoothHint:
                 "Kliknutím na „Hlasovat“ vstoupíte do zabezpečené hlasovací místnosti.",
             help: {
@@ -415,6 +419,40 @@ export const voting = {
             selectOwner: "Zmocnitel",
             selectDelegate: "Zmocněnec",
             success: "Plná moc byla úspěšně zaevidována",
+        },
+    },
+    castVote: {
+        error: "Nepodařilo se načíst hlasování. Zkuste to prosím znovu.",
+        votingFor: "HLASOVÁNÍ ZA",
+        voteShare: "Podíl na hlasování",
+        voteShareLabel: "Podíl na hlasování",
+        progress: {
+            question: "Otázka {{current}} z {{total}}",
+            completed: "Dokončeno",
+        },
+        options: {
+            yes: "Pro",
+            no: "Proti",
+            abstain: "Zdržuji se",
+        },
+        navigation: {
+            previous: "Předchozí otázka",
+            next: "Další otázka",
+            review: "Zkontrolovat odpovědi",
+        },
+        review: {
+            title: "Kontrola vašeho hlasu",
+            subtitle:
+                "Před odesláním zkontrolujte své volby. Po odeslání tuto akci nelze vrátit zpět.",
+            selectedChoices: "Vybrané možnosti",
+            editAnswers: "Upravit odpovědi",
+            submitVote: "Odeslat hlas",
+        },
+        success: {
+            title: "Hlas byl zaznamenán!",
+            subtitle: "Váš hlas byl úspěšně zaznamenán v systému.",
+            timestamp: "Čas zaznamenání",
+            backToDashboard: "Zpět na přehled",
         },
     },
 };

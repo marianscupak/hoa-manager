@@ -239,6 +239,9 @@ export const voting = {
             completed: "Voting Completed",
             viewOutcomes: "View final outcomes",
             viewResults: "View Results",
+            voted: "Voted",
+            votedSubtitle: "You have already cast your ballot.",
+            alreadyVotedAction: "Already Voted",
             draftStatus: "Draft Vote",
             editDraft: "Configuration is incomplete",
             editAction: "Edit Vote",
@@ -313,6 +316,7 @@ export const voting = {
             manageDelegation: "Manage Delegation",
             totalPower: "Total Voting Power:",
             voteButton: "Vote",
+            alreadyVotedButton: "Already Voted",
             secureBoothHint:
                 'By clicking "Vote", you will enter the secure voting booth.',
             help: {
@@ -415,6 +419,40 @@ export const voting = {
             selectOwner: "Principal",
             selectDelegate: "Proxy",
             success: "Proxy delegation recorded successfully",
+        },
+    },
+    castVote: {
+        error: "Unable to load vote. Please try again.",
+        votingFor: "VOTING FOR",
+        voteShare: "Vote Share",
+        voteShareLabel: "Vote Share",
+        progress: {
+            question: "Question {{current}} of {{total}}",
+            completed: "Completed",
+        },
+        options: {
+            yes: "In Favor",
+            no: "Against",
+            abstain: "Abstain",
+        },
+        navigation: {
+            previous: "Previous Question",
+            next: "Next Question",
+            review: "Review Answers",
+        },
+        review: {
+            title: "Review Your Vote",
+            subtitle:
+                "Please verify your choices before submitting. Once submitted, this action cannot be undone.",
+            selectedChoices: "Selected Choices",
+            editAnswers: "Edit Answers",
+            submitVote: "Submit Vote",
+        },
+        success: {
+            title: "Vote Recorded!",
+            subtitle: "Your vote has been successfully recorded.",
+            timestamp: "Timestamp",
+            backToDashboard: "Back to dashboard",
         },
     },
 };

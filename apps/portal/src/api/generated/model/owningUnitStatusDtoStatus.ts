@@ -14,4 +14,5 @@ export const OwningUnitStatusDtoStatus = {
     REQUIRES_DELEGATION: "REQUIRES_DELEGATION",
     DELEGATED: "DELEGATED",
     INELIGIBLE: "INELIGIBLE",
+    VOTED: "VOTED",
 } as const;

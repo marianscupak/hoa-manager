@@ -25,6 +25,7 @@ import {
   unitOwnerships,
   tenantMemberships,
   voteElectorateUnits,
+  ballots,
 } from '@/infrastructure/db/schema';
 import {
   type VoteDetailResponseDto,
@@ -438,6 +439,33 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
     return { hasReady, hasRequiresDelegation, hasDelegated };
   }
 
+  private async getVotedUnits(
+    tenantId: string,
+    voteId: string,
+    unitIds: string[],
+    membershipId: string,
+    allowIndividualVote: boolean,
+  ): Promise<Set<string>> {
+    if (unitIds.length === 0) return new Set();
+
+    const conditions = [
+      eq(ballots.tenantId, tenantId),
+      eq(ballots.voteId, voteId),
+      inArray(ballots.unitId, unitIds),
+    ];
+
+    if (allowIndividualVote) {
+      conditions.push(eq(ballots.castByMembershipId, membershipId));
+    }
+
+    const rows = await this.drizzle.db
+      .select({ unitId: ballots.unitId })
+      .from(ballots)
+      .where(and(...conditions));
+
+    return new Set(rows.map((r) => r.unitId));
+  }
+
   // ── Public methods ────────────────────────────────────────────────
 
   async findVoterStatus(
@@ -507,6 +535,18 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
           ),
         );
 
+      const allowIndividualVote = await this.getAllowCoOwnerIndividualVote(
+        tenantId,
+        voteId,
+      );
+      const votedUnits = await this.getVotedUnits(
+        tenantId,
+        voteId,
+        uniqueUnitIds,
+        membershipId,
+        allowIndividualVote,
+      );
+
       const totalShareRows = await this.drizzle.db
         .select({ total: sum(units.buildingShare) })
         .from(units)
@@ -539,6 +579,8 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
           snapshot.eligibilityStatus === ElectorateEligibilityStatus.INELIGIBLE
         ) {
           status = OwningUnitStatus.INELIGIBLE;
+        } else if (votedUnits.has(unitId)) {
+          status = OwningUnitStatus.VOTED;
         } else if (snapshot.representativeMembershipId === membershipId) {
           status = OwningUnitStatus.READY;
           totalValue += Number(snapshot.votingWeight);
@@ -564,16 +606,27 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       };
     }
 
+    const allowIndividualVote = await this.getAllowCoOwnerIndividualVote(
+      tenantId,
+      voteId,
+    );
+
     const [
-      allowIndividualVote,
       ownerCountMap,
       receivedConsentCountMap,
       givenConsentUnits,
+      votedUnits,
     ] = await Promise.all([
-      this.getAllowCoOwnerIndividualVote(tenantId, voteId),
       this.getCoOwnerCounts(tenantId, uniqueUnitIds),
       this.getConsentCounts(tenantId, voteId, uniqueUnitIds, membershipId),
       this.getGivenConsentUnits(tenantId, voteId, ownerId, uniqueUnitIds),
+      this.getVotedUnits(
+        tenantId,
+        voteId,
+        uniqueUnitIds,
+        membershipId,
+        allowIndividualVote,
+      ),
     ]);
 
     // Compute total voting power (sum of all building shares in the tenant)
@@ -603,6 +656,8 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
 
       if (isGiven) {
         status = OwningUnitStatus.DELEGATED;
+      } else if (votedUnits.has(unitId)) {
+        status = OwningUnitStatus.VOTED;
       } else if (
         isSoleOwner ||
         allowIndividualVote ||
@@ -642,6 +697,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       canVote: false,
       requiresDelegation: false,
       isDelegated: false,
+      hasVoted: false,
     };
 
     const ownerId = await this.resolveOwnerId(tenantId, membershipId);
@@ -696,19 +752,42 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
           }
         }
 
+        const allowIndividualVote = await this.getAllowCoOwnerIndividualVote(
+          tenantId,
+          voteId,
+        );
+        const votedUnits = await this.getVotedUnits(
+          tenantId,
+          voteId,
+          unitIds,
+          membershipId,
+          allowIndividualVote,
+        );
+
         result.set(voteId, {
           canVote,
-          requiresDelegation: false,
           isDelegated: !canVote && isDelegated,
+          hasVoted: votedUnits.size > 0,
         });
         continue;
       }
 
-      const [allowIndividualVote, consentCountMap, givenConsentUnits] =
+      const allowIndividualVote = await this.getAllowCoOwnerIndividualVote(
+        tenantId,
+        voteId,
+      );
+
+      const [consentCountMap, givenConsentUnits, votedUnits] =
         await Promise.all([
-          this.getAllowCoOwnerIndividualVote(tenantId, voteId),
           this.getConsentCounts(tenantId, voteId, unitIds, membershipId),
           this.getGivenConsentUnits(tenantId, voteId, ownerId, unitIds),
+          this.getVotedUnits(
+            tenantId,
+            voteId,
+            unitIds,
+            membershipId,
+            allowIndividualVote,
+          ),
         ]);
 
       const { hasReady, hasRequiresDelegation, hasDelegated } =
@@ -724,6 +803,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
         canVote: hasReady,
         requiresDelegation: hasRequiresDelegation,
         isDelegated: hasDelegated,
+        hasVoted: votedUnits.size > 0,
       });
     }
 

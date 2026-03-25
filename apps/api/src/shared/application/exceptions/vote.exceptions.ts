@@ -122,3 +122,27 @@ export class VoteNotReadyToOpenException extends DomainException {
     super(ErrorCode.VOTE_NOT_READY_TO_OPEN);
   }
 }
+
+export class VoteNotOpenException extends DomainException {
+  constructor() {
+    super(ErrorCode.VOTE_NOT_OPEN);
+  }
+}
+
+export class BallotAlreadyCastException extends DomainException {
+  constructor() {
+    super(ErrorCode.BALLOT_ALREADY_CAST);
+  }
+}
+
+export class InvalidBallotAnswersException extends DomainException {
+  constructor() {
+    super(ErrorCode.INVALID_BALLOT_ANSWERS);
+  }
+}
+
+export class NotUnitRepresentativeException extends DomainException {
+  constructor() {
+    super(ErrorCode.NOT_UNIT_REPRESENTATIVE);
+  }
+}

@@ -16,6 +16,7 @@ import { OpenVoteCommandHandler } from './application/commands/open-vote/open-vo
 import { RevokeConsentHandler } from './application/commands/revoke-consent/revoke-consent.handler';
 import { ScheduleVoteHandler } from './application/commands/schedule-vote/schedule-vote.handler';
 import { SetVoteRulesetHandler } from './application/commands/set-vote-ruleset/set-vote-ruleset.handler';
+import { SubmitBallotHandler } from './application/commands/submit-ballot/submit-ballot.handler';
 import { UpdateVoteHandler } from './application/commands/update-vote/update-vote.handler';
 import { UpdateVoteQuestionHandler } from './application/commands/update-vote-question/update-vote-question.handler';
 import { ELECTORATE_SERVICE } from './application/ports/electorate-service.port';
@@ -44,6 +45,7 @@ const COMMAND_HANDLERS = [
   CreateVoteConsentHandler,
   RevokeConsentHandler,
   OpenVoteCommandHandler,
+  SubmitBallotHandler,
 ];
 const QUERY_HANDLERS = [
   GetVoteDetailHandler,

@@ -2088,6 +2088,44 @@
         },
         "tags": ["Votes"]
       }
+    },
+    "/api/votes/{id}/ballots": {
+      "post": {
+        "operationId": "VotesController_submitBallot",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitBallotDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Submits ballots for the authenticated user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubmitBallotResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Votes"]
+      }
     }
   },
   "info": {
@@ -2584,9 +2622,12 @@
           },
           "isDelegated": {
             "type": "boolean"
+          },
+          "hasVoted": {
+            "type": "boolean"
           }
         },
-        "required": ["canVote", "requiresDelegation", "isDelegated"]
+        "required": ["canVote", "isDelegated", "hasVoted"]
       },
       "VoteListItemResponseDto": {
         "type": "object",
@@ -2872,7 +2913,13 @@
           },
           "status": {
             "type": "string",
-            "enum": ["READY", "REQUIRES_DELEGATION", "DELEGATED", "INELIGIBLE"]
+            "enum": [
+              "READY",
+              "REQUIRES_DELEGATION",
+              "DELEGATED",
+              "INELIGIBLE",
+              "VOTED"
+            ]
           },
           "ineligibleReason": {
             "type": "string",
@@ -3252,6 +3299,57 @@
           }
         },
         "required": ["unitId", "delegateMembershipId"]
+      },
+      "SubmitBallotDto": {
+        "type": "object",
+        "properties": {
+          "ballots": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "unitId": {
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                },
+                "answers": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "questionId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      },
+                      "optionId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      }
+                    },
+                    "required": ["questionId", "optionId"]
+                  }
+                }
+              },
+              "required": ["unitId", "answers"]
+            }
+          }
+        },
+        "required": ["ballots"]
+      },
+      "SubmitBallotResponseDto": {
+        "type": "object",
+        "properties": {
+          "submittedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["submittedAt"]
       }
     }
   }

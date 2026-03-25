@@ -109,7 +109,8 @@ export function VoterStatusSidebar() {
                                 <div
                                     className={cn(
                                         "mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg",
-                                        unit.status === "READY"
+                                        unit.status === "READY" ||
+                                            unit.status === "VOTED"
                                             ? "bg-emerald-100 text-emerald-600"
                                             : unit.status ===
                                                 "REQUIRES_DELEGATION"
@@ -167,10 +168,16 @@ export function VoterStatusSidebar() {
                                                     </TooltipContent>
                                                 )}
                                             </Tooltip>
+                                        ) : unit.status === "VOTED" ? (
+                                            <span className="shrink-0 rounded border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-800">
+                                                {t(
+                                                    "voting:detail.statusSidebar.statusVoted",
+                                                )}
+                                            </span>
                                         ) : (
                                             <span className="shrink-0 rounded border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-800">
                                                 {t(
-                                                    "voting:detail.statusSidebar.statusVoted",
+                                                    "voting:detail.statusSidebar.statusDelegated",
                                                 )}
                                             </span>
                                         )}
@@ -226,6 +233,7 @@ export function VoterStatusSidebar() {
                             <Button
                                 size="lg"
                                 disabled={!statusData.canVote}
+                                asChild={statusData.canVote}
                                 className={cn(
                                     "w-full font-semibold",
                                     statusData.canVote
@@ -233,8 +241,27 @@ export function VoterStatusSidebar() {
                                         : "",
                                 )}
                             >
-                                {t("voting:detail.statusSidebar.voteButton")}{" "}
-                                <ArrowRight className="ml-2 h-4 w-4" />
+                                {statusData.canVote ? (
+                                    <Link to={`/voting/${voteId}/cast`}>
+                                        {t(
+                                            "voting:detail.statusSidebar.voteButton",
+                                        )}{" "}
+                                        <ArrowRight className="ml-2 h-4 w-4" />
+                                    </Link>
+                                ) : (
+                                    <>
+                                        {statusData.owningUnits.some(
+                                            (u) => u.status === "VOTED",
+                                        )
+                                            ? t(
+                                                  "voting:detail.statusSidebar.alreadyVotedButton",
+                                              )
+                                            : t(
+                                                  "voting:detail.statusSidebar.voteButton",
+                                              )}{" "}
+                                        <ArrowRight className="ml-2 h-4 w-4" />
+                                    </>
+                                )}
                             </Button>
 
                             <p className="px-4 text-center text-xs text-slate-500">

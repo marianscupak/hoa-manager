@@ -39,21 +39,27 @@ export class GetVotesHandler
 
     const votes = await this.voteReadRepository.findVotes(tenantId, statuses);
 
-    // Compute voter summaries for scheduled votes
-    const scheduledVoteIds = votes
-      .filter((v) => v.status === VoteStatus.SCHEDULED)
+    // Compute voter summaries for scheduled and open votes
+    const voteIdsForSummary = votes
+      .filter(
+        (v) =>
+          v.status === VoteStatus.SCHEDULED || v.status === VoteStatus.OPEN,
+      )
       .map((v) => v.id);
 
-    if (scheduledVoteIds.length > 0) {
+    if (voteIdsForSummary.length > 0) {
       const summaries =
         await this.voteReadRepository.findVoterSummariesForVotes(
           tenantId,
-          scheduledVoteIds,
+          voteIdsForSummary,
           membershipId,
         );
 
       for (const vote of votes) {
-        if (vote.status === VoteStatus.SCHEDULED) {
+        if (
+          vote.status === VoteStatus.SCHEDULED ||
+          vote.status === VoteStatus.OPEN
+        ) {
           vote.voterSummary = summaries.get(vote.id) ?? null;
         }
       }

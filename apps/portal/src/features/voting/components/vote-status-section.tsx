@@ -1,6 +1,7 @@
 import {
     AlertTriangle,
     ArrowRight,
+    BadgeCheck,
     Calendar,
     CheckCircle2,
     Pencil,
@@ -26,7 +27,14 @@ export function VoteStatusSection({ vote }: VoteStatusSectionProps) {
         return (
             <div className="flex flex-col items-center">
                 <div className="mb-4 flex flex-col items-center text-center">
-                    {summary?.canVote ? (
+                    {summary?.hasVoted ? (
+                        <StatusDisplay
+                            icon={BadgeCheck}
+                            iconColor="text-emerald-500"
+                            title={t("list.card.voted")}
+                            subtitle={t("list.card.votedSubtitle")}
+                        />
+                    ) : summary?.canVote ? (
                         <StatusDisplay
                             icon={CheckCircle2}
                             iconColor="text-emerald-500"
@@ -54,9 +62,11 @@ export function VoteStatusSection({ vote }: VoteStatusSectionProps) {
                 <ActionButton
                     to={`/voting/${vote.id}`}
                     label={
-                        summary?.canVote
-                            ? t("list.card.voteAction")
-                            : t("list.card.viewDetails")
+                        summary?.hasVoted
+                            ? t("list.card.alreadyVotedAction")
+                            : summary?.canVote
+                              ? t("list.card.voteAction")
+                              : t("list.card.viewDetails")
                     }
                 />
             </div>

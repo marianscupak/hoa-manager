@@ -9,9 +9,14 @@ import {
   voteQuestions,
   voteOptions,
   voteElectorateUnits,
+  ballots,
+  ballotAnswers,
 } from '@/infrastructure/db/schema';
 
-import { VoteWriteRepository } from '../../application/ports/vote-write.repository.port';
+import {
+  VoteWriteRepository,
+  type BallotInput,
+} from '../../application/ports/vote-write.repository.port';
 import { VoteAggregate } from '../../domain/vote/vote.aggregate';
 import {
   type MajorityRuleType,
@@ -514,5 +519,90 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
       if (agg) aggregates.push(agg);
     }
     return aggregates;
+  }
+
+  // ── Ballot Operations ──────────────────────────────────────
+
+  async saveBallots(
+    tenantId: string,
+    voteId: string,
+    ballotInputs: BallotInput[],
+  ): Promise<void> {
+    if (ballotInputs.length === 0) return;
+
+    for (const input of ballotInputs) {
+      const [inserted] = await this.db
+        .insert(ballots)
+        .values({
+          tenantId,
+          voteId,
+          unitId: input.unitId,
+          castByMembershipId: input.castByMembershipId,
+          castMethod: input.castMethod,
+          castAt: new Date(),
+        })
+        .returning({ id: ballots.id });
+
+      if (input.answers.length > 0) {
+        await this.db.insert(ballotAnswers).values(
+          input.answers.map((a) => ({
+            ballotId: inserted.id,
+            questionId: a.questionId,
+            optionId: a.optionId,
+          })),
+        );
+      }
+    }
+  }
+
+  async findElectorateUnitsForMembership(
+    tenantId: string,
+    voteId: string,
+    membershipId: string,
+    unitIds: string[],
+  ): Promise<{ unitId: string; representativeMembershipId: string | null }[]> {
+    if (unitIds.length === 0) return [];
+
+    return this.db
+      .select({
+        unitId: voteElectorateUnits.unitId,
+        representativeMembershipId:
+          voteElectorateUnits.representativeMembershipId,
+      })
+      .from(voteElectorateUnits)
+      .where(
+        and(
+          eq(voteElectorateUnits.tenantId, tenantId),
+          eq(voteElectorateUnits.voteId, voteId),
+          inArray(voteElectorateUnits.unitId, unitIds),
+          eq(voteElectorateUnits.representativeMembershipId, membershipId),
+        ),
+      );
+  }
+
+  async hasExistingBallots(
+    tenantId: string,
+    voteId: string,
+    unitIds: string[],
+    castByMembershipId?: string,
+  ): Promise<Set<string>> {
+    if (unitIds.length === 0) return new Set();
+
+    const conditions = [
+      eq(ballots.tenantId, tenantId),
+      eq(ballots.voteId, voteId),
+      inArray(ballots.unitId, unitIds),
+    ];
+
+    if (castByMembershipId) {
+      conditions.push(eq(ballots.castByMembershipId, castByMembershipId));
+    }
+
+    const rows = await this.db
+      .select({ unitId: ballots.unitId })
+      .from(ballots)
+      .where(and(...conditions));
+
+    return new Set(rows.map((r) => r.unitId));
   }
 }

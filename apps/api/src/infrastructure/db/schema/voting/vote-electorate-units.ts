@@ -39,8 +39,8 @@ export const voteElectorateUnits = pgTable(
     }).notNull(),
   },
   (table) => ({
-    unqVoteElectorateUnitsVoteIdUnitId: unique(
-      'unq_vote_electorate_units_vote_id_unit_id',
-    ).on(table.voteId, table.unitId),
+    unqVoteElectorateUnitsVoteIdUnitIdRepId: unique(
+      'unq_vote_electorate_units_vote_id_unit_id_rep_id',
+    ).on(table.voteId, table.unitId, table.representativeMembershipId),
   }),
 );

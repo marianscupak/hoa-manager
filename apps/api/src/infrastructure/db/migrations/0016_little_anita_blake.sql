@@ -1,0 +1,2 @@
+ALTER TABLE "vote_electorate_units" DROP CONSTRAINT "unq_vote_electorate_units_vote_id_unit_id";--> statement-breakpoint
+ALTER TABLE "vote_electorate_units" ADD CONSTRAINT "unq_vote_electorate_units_vote_id_unit_id_rep_id" UNIQUE("vote_id","unit_id","representative_membership_id");

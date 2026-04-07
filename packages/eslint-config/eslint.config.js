@@ -18,6 +18,7 @@ export const baseConfig = tseslint.config({
         "import-x/resolver": {
             typescript: {
                 alwaysTryTypes: true,
+                project: ["./tsconfig.json", "./apps/*/tsconfig.json", "./packages/*/tsconfig.json"],
             },
             node: true,
         },

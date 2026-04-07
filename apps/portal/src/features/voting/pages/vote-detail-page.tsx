@@ -1,5 +1,5 @@
 import { useAtomValue } from "jotai";
-import { Edit2, Loader2, Send } from "lucide-react";
+import { BarChart2, Edit2, Loader2, Send } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
 
@@ -138,6 +138,16 @@ export function VoteDetailPage() {
                             </DialogContent>
                         </Dialog>
                     </div>
+                )}
+
+                {vote.status === "CLOSED" && (
+                    <Button
+                        size="sm"
+                        onClick={() => navigate(`/voting/${id}/results`)}
+                    >
+                        <BarChart2 className="mr-2 h-4 w-4" />
+                        {t("voting:results.viewResults")}
+                    </Button>
                 )}
             </div>
 

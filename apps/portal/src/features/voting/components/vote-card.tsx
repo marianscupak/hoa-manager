@@ -38,7 +38,7 @@ export function VoteCard({ vote }: VoteCardProps) {
                 <CardContent className="flex-1 p-6">
                     <div className="mb-4 flex items-center gap-4">
                         <StatusBadge status={vote.status} />
-                        {vote.scheduledFrom && (
+                        {(vote.scheduledFrom || vote.scheduledTo) && (
                             <div className="flex items-center gap-1.5 text-sm text-slate-500">
                                 <Calendar className="h-4 w-4" />
                                 <span>
@@ -46,14 +46,24 @@ export function VoteCard({ vote }: VoteCardProps) {
                                         ? t("list.card.endsOn")
                                         : t("list.card.startsOn")}
                                     {format(
-                                        new Date(vote.scheduledFrom),
+                                        new Date(
+                                            isVotingOpen && vote.scheduledTo
+                                                ? vote.scheduledTo
+                                                : vote.scheduledFrom!,
+                                        ),
                                         "d. M. yyyy HH:mm",
                                     )}
                                 </span>
                             </div>
                         )}
                     </div>
-                    <Link to={`/voting/${vote.id}`}>
+                    <Link
+                        to={
+                            vote.status === "CLOSED"
+                                ? `/voting/${vote.id}/results`
+                                : `/voting/${vote.id}`
+                        }
+                    >
                         <CardTitle className="mb-2 cursor-pointer text-xl hover:underline">
                             {vote.title}
                         </CardTitle>

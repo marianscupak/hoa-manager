@@ -14,7 +14,7 @@ export function VotingPage() {
 
     const filteredVotes = useMemo(() => {
         if (!votes) return [];
-        if (filter === "ALL") return votes;
+        if (filter === "ALL") return votes.filter((v) => v.status !== "CLOSED");
         return votes.filter((v) => v.status === filter);
     }, [votes, filter]);
 

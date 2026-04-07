@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 
 import { cn } from "@hoa-mngr/ui/lib/utils";
 
-export type FilterType = "ALL" | "OPEN" | "SCHEDULED" | "CLOSED";
+export type FilterType = "ALL" | "OPEN" | "SCHEDULED" | "DRAFT";
 
 interface VotingFilterProps {
     filter: FilterType;
@@ -16,7 +16,6 @@ export function VotingFilter({ filter, onFilterChange }: VotingFilterProps) {
         { key: "ALL", label: t("list.filters.all") },
         { key: "OPEN", label: t("list.filters.open") },
         { key: "SCHEDULED", label: t("list.filters.scheduled") },
-        { key: "CLOSED", label: t("list.filters.closed") },
     ];
 
     return (

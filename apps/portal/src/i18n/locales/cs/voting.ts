@@ -246,6 +246,12 @@ export const voting = {
             editAction: "Upravit hlasování",
         },
     },
+    resultsOverview: {
+        title: "Výsledky hlasování",
+        description: "Přehled výsledků a záznamů ukončených hlasování.",
+        empty: "Nebyly nalezeny žádné ukončené hlasování.",
+        error: "Nepodařilo se načíst výsledky hlasování.",
+    },
     detail: {
         timeline: {
             startDate: "DATUM ZAHÁJENÍ",
@@ -454,5 +460,27 @@ export const voting = {
             timestamp: "Čas zaznamenání",
             backToDashboard: "Zpět na přehled",
         },
+    },
+    results: {
+        pageTitle: "Výsledky",
+        breadcrumbVoting: "Hlasování",
+        finalizedAt: "Uzavřeno",
+        approved: "Schváleno",
+        rejected: "Zamítnuto",
+        quorum: "Kvorum",
+        inFavor: "Pro",
+        finalResolution: "Výsledek hlasování",
+        majorityThresholdNote:
+            "Kvalifikovaná většina vyžaduje: {{threshold}}% oprávněných hlasů.",
+        quorumValidation: "Ověření kvora",
+        quorumMet:
+            "Práh účasti byl dosažen. Požadované kvorum bylo překročeno.",
+        quorumNotMet:
+            "Práh účasti nebyl dosažen. Požadované kvorum nebylo splněno.",
+        totalEligibleUnits: "Celkem oprávněných jednotek",
+        votesCast: "Odevzdané hlasy",
+        participationWeight: "Váha účasti",
+        resolutionDetails: "Usnesení {{index}} – {{title}}",
+        viewResults: "Zobrazit výsledky",
     },
 };

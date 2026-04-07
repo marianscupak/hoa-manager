@@ -23,7 +23,9 @@ import { DelegateVotePage } from "@/features/voting/pages/delegate-vote-page";
 import { DelegationsPage } from "@/features/voting/pages/delegations-page";
 import { EditVotePage } from "@/features/voting/pages/edit-vote-page";
 import { VoteDetailPage } from "@/features/voting/pages/vote-detail-page";
+import { VoteResultsPage } from "@/features/voting/pages/vote-results-page";
 import { VotingPage } from "@/features/voting/pages/voting-page";
+import { VotingResultsOverviewPage } from "@/features/voting/pages/voting-results-overview-page";
 import { NotFoundPage } from "@/pages/not-found";
 
 import { UnitDetailPage } from "./features/admin/pages/unit-detail-page";
@@ -67,8 +69,16 @@ export const router = createBrowserRouter([
                         ],
                     },
                     {
+                        path: "results",
+                        element: <VotingResultsOverviewPage />,
+                    },
+                    {
                         path: ":id",
                         element: <VoteDetailPage />,
+                    },
+                    {
+                        path: ":id/results",
+                        element: <VoteResultsPage />,
                     },
                     {
                         path: ":id/delegate",

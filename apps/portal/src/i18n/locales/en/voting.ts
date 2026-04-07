@@ -247,6 +247,12 @@ export const voting = {
             editAction: "Edit Vote",
         },
     },
+    resultsOverview: {
+        title: "Voting Results",
+        description: "Review outcomes and records of completed votings.",
+        empty: "No closed votings found.",
+        error: "Failed to load voting results.",
+    },
     detail: {
         timeline: {
             startDate: "START DATE",
@@ -454,5 +460,27 @@ export const voting = {
             timestamp: "Timestamp",
             backToDashboard: "Back to dashboard",
         },
+    },
+    results: {
+        pageTitle: "Results",
+        breadcrumbVoting: "Voting",
+        finalizedAt: "Finalized",
+        approved: "Approved",
+        rejected: "Rejected",
+        quorum: "Quorum",
+        inFavor: "In Favor",
+        finalResolution: "Final Resolution",
+        majorityThresholdNote:
+            "Qualified majority required: {{threshold}}% of eligible votes.",
+        quorumValidation: "Quorum Validation",
+        quorumMet:
+            "Participation threshold met. The required quorum was exceeded.",
+        quorumNotMet:
+            "Participation threshold not met. The required quorum was not reached.",
+        totalEligibleUnits: "Total Eligible Units",
+        votesCast: "Votes Cast",
+        participationWeight: "Participation Weight",
+        resolutionDetails: "Resolution {{index}} Details: {{title}}",
+        viewResults: "View Results",
     },
 };

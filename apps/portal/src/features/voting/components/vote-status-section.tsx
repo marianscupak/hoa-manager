@@ -153,7 +153,7 @@ export function VoteStatusSection({ vote }: VoteStatusSectionProps) {
                 className="w-full border-slate-200"
                 asChild
             >
-                <Link to={`/voting/${vote.id}`}>
+                <Link to={`/voting/${vote.id}/results`}>
                     {t("list.card.viewResults")}{" "}
                     <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>

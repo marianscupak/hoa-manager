@@ -348,3 +348,62 @@ export class SubmitBallotResponseDto {
   })
   submittedAt!: Date;
 }
+
+// ── Vote Results ──────────────────────────────────────
+
+export class VoteOptionResultDto {
+  @ApiProperty()
+  optionId!: string;
+
+  @ApiProperty()
+  voteWeight!: number;
+
+  @ApiProperty()
+  voteUnitCount!: number;
+}
+
+export class VoteQuestionResultDto {
+  @ApiProperty()
+  questionId!: string;
+
+  @ApiProperty()
+  majorityMet!: boolean;
+
+  @ApiProperty({ type: 'string', nullable: true })
+  winningOptionId!: string | null;
+
+  @ApiProperty({ type: 'number', nullable: true })
+  majorityThresholdValue!: number | null;
+
+  @ApiProperty()
+  majorityDenominatorValue!: number;
+
+  @ApiProperty({ type: [VoteOptionResultDto] })
+  optionResults!: VoteOptionResultDto[];
+}
+
+export class VoteResultsResponseDto {
+  @ApiProperty({ enum: ['COMPUTED', 'FAILED'] })
+  resultStatus!: 'COMPUTED' | 'FAILED';
+
+  @ApiProperty()
+  quorumMet!: boolean;
+
+  @ApiProperty()
+  participationWeight!: number;
+
+  @ApiProperty()
+  participationUnitCount!: number;
+
+  @ApiProperty()
+  denominatorWeight!: number;
+
+  @ApiProperty()
+  denominatorUnitCount!: number;
+
+  @ApiProperty({ type: 'string', format: 'date-time' })
+  computedAt!: Date;
+
+  @ApiProperty({ type: [VoteQuestionResultDto] })
+  questionResults!: VoteQuestionResultDto[];
+}

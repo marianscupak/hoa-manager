@@ -2126,6 +2126,55 @@
         },
         "tags": ["Votes"]
       }
+    },
+    "/api/votes/{id}/results": {
+      "get": {
+        "operationId": "VotesController_getVoteResults",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns the computed results for a closed vote",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoteResultsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Votes"]
+      }
+    },
+    "/api/votes/{id}/close": {
+      "post": {
+        "operationId": "VotesController_closeVote",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vote closed manually"
+          }
+        },
+        "tags": ["Votes"]
+      }
     }
   },
   "info": {
@@ -3350,6 +3399,101 @@
           }
         },
         "required": ["submittedAt"]
+      },
+      "VoteOptionResultDto": {
+        "type": "object",
+        "properties": {
+          "optionId": {
+            "type": "string"
+          },
+          "voteWeight": {
+            "type": "number"
+          },
+          "voteUnitCount": {
+            "type": "number"
+          }
+        },
+        "required": ["optionId", "voteWeight", "voteUnitCount"]
+      },
+      "VoteQuestionResultDto": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string"
+          },
+          "majorityMet": {
+            "type": "boolean"
+          },
+          "winningOptionId": {
+            "type": "string",
+            "nullable": true
+          },
+          "majorityThresholdValue": {
+            "type": "number",
+            "nullable": true
+          },
+          "majorityDenominatorValue": {
+            "type": "number"
+          },
+          "optionResults": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VoteOptionResultDto"
+            }
+          }
+        },
+        "required": [
+          "questionId",
+          "majorityMet",
+          "winningOptionId",
+          "majorityThresholdValue",
+          "majorityDenominatorValue",
+          "optionResults"
+        ]
+      },
+      "VoteResultsResponseDto": {
+        "type": "object",
+        "properties": {
+          "resultStatus": {
+            "type": "string",
+            "enum": ["COMPUTED", "FAILED"]
+          },
+          "quorumMet": {
+            "type": "boolean"
+          },
+          "participationWeight": {
+            "type": "number"
+          },
+          "participationUnitCount": {
+            "type": "number"
+          },
+          "denominatorWeight": {
+            "type": "number"
+          },
+          "denominatorUnitCount": {
+            "type": "number"
+          },
+          "computedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "questionResults": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VoteQuestionResultDto"
+            }
+          }
+        },
+        "required": [
+          "resultStatus",
+          "quorumMet",
+          "participationWeight",
+          "participationUnitCount",
+          "denominatorWeight",
+          "denominatorUnitCount",
+          "computedAt",
+          "questionResults"
+        ]
       }
     }
   }

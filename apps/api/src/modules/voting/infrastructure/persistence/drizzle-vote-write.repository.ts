@@ -11,12 +11,16 @@ import {
   voteElectorateUnits,
   ballots,
   ballotAnswers,
+  voteResults,
+  voteQuestionResults,
+  voteOptionResults,
 } from '@/infrastructure/db/schema';
 
 import {
   VoteWriteRepository,
   type BallotInput,
 } from '../../application/ports/vote-write.repository.port';
+import { VoteResultSnapshot } from '../../domain/vote/vote-result.types';
 import { VoteAggregate } from '../../domain/vote/vote.aggregate';
 import {
   type MajorityRuleType,
@@ -604,5 +608,73 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
       .where(and(...conditions));
 
     return new Set(rows.map((r) => r.unitId));
+  }
+
+  async findScheduledToClose(now: Date): Promise<VoteAggregate[]> {
+    // Cross-tenant query to find all OPEN votes whose scheduledTo has passed
+    const voteRows = await this.drizzle.db
+      .select({ id: votes.id, tenantId: votes.tenantId })
+      .from(votes)
+      .where(
+        and(eq(votes.status, VoteStatus.OPEN), lte(votes.scheduledTo, now)),
+      );
+
+    const aggregates: VoteAggregate[] = [];
+    for (const row of voteRows) {
+      const agg = await this.findById(row.tenantId, row.id);
+      if (agg) aggregates.push(agg);
+    }
+    return aggregates;
+  }
+
+  async saveResults(
+    tenantId: string,
+    voteId: string,
+    snapshot: VoteResultSnapshot,
+  ): Promise<void> {
+    const [insertedResult] = await this.db
+      .insert(voteResults)
+      .values({
+        tenantId,
+        voteId,
+        resultStatus: 'COMPUTED',
+        quorumMet: snapshot.quorumMet,
+        participationWeight: snapshot.participationWeight.toString(),
+        participationUnitCount: snapshot.participationUnitCount,
+        denominatorWeight: snapshot.denominatorWeight.toString(),
+        denominatorUnitCount: snapshot.denominatorUnitCount,
+        computedAt: new Date(),
+      })
+      .returning({ id: voteResults.id });
+
+    for (const qr of snapshot.questionResults) {
+      const [insertedQr] = await this.db
+        .insert(voteQuestionResults)
+        .values({
+          tenantId,
+          voteResultId: insertedResult.id,
+          questionId: qr.questionId,
+          majorityMet: qr.majorityMet,
+          winningOptionId: qr.winningOptionId,
+          majorityThresholdValue:
+            qr.majorityThresholdValue !== null
+              ? qr.majorityThresholdValue.toString()
+              : null,
+          majorityDenominatorValue: qr.majorityDenominatorValue.toString(),
+        })
+        .returning({ id: voteQuestionResults.id });
+
+      if (qr.optionResults.length > 0) {
+        await this.db.insert(voteOptionResults).values(
+          qr.optionResults.map((or) => ({
+            tenantId,
+            questionResultId: insertedQr.id,
+            optionId: or.optionId,
+            voteWeight: or.voteWeight.toString(),
+            voteUnitCount: or.voteUnitCount,
+          })),
+        );
+      }
+    }
   }
 }

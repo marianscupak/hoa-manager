@@ -17,6 +17,7 @@ import {
   VoteScheduleInvalidRangeException,
   VoteNotScheduledException,
   VoteNotReadyToOpenException,
+  VoteNotOpenException,
 } from '@/shared/application/exceptions/vote.exceptions';
 import { ErrorCode } from '@/shared/errors/error-codes';
 
@@ -163,6 +164,19 @@ export class VoteAggregate {
       status: VoteStatus.OPEN,
       openedAt: now,
       openedByMembershipId,
+      updatedAt: now,
+    });
+  }
+
+  close(closedByMembershipId: string | undefined, now: Date): void {
+    if (this.status !== VoteStatus.OPEN) {
+      throw new VoteNotOpenException();
+    }
+
+    Object.assign(this, {
+      status: VoteStatus.CLOSED,
+      closedAt: now,
+      closedByMembershipId,
       updatedAt: now,
     });
   }

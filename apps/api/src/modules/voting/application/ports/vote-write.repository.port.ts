@@ -1,3 +1,4 @@
+import { VoteResultSnapshot } from '@/modules/voting/domain/vote/vote-result.types';
 import { VoteAggregate } from '@/modules/voting/domain/vote/vote.aggregate';
 import { ElectorateUnit } from '@/modules/voting/domain/vote/vote.types';
 
@@ -34,6 +35,12 @@ export interface VoteWriteRepository {
     unitIds: string[],
     castByMembershipId?: string,
   ): Promise<Set<string>>;
+  findScheduledToClose(now: Date): Promise<VoteAggregate[]>;
+  saveResults(
+    tenantId: string,
+    voteId: string,
+    snapshot: VoteResultSnapshot,
+  ): Promise<void>;
 }
 
 export const VOTE_WRITE_REPOSITORY = Symbol('VOTE_WRITE_REPOSITORY');

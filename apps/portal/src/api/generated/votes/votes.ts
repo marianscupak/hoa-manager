@@ -36,6 +36,7 @@ import type {
     VoteConsentResponseDto,
     VoteDetailResponseDto,
     VoteListItemResponseDto,
+    VoteResultsResponseDto,
     VoterStatusResponseDto,
     VotesControllerGetDelegationCandidatesParams,
 } from ".././model";
@@ -1758,6 +1759,250 @@ export const useVotesControllerSubmitBallot = <
 > => {
     return useMutation(
         getVotesControllerSubmitBallotMutationOptions(options),
+        queryClient,
+    );
+};
+export const votesControllerGetVoteResults = (
+    id: string,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<VoteResultsResponseDto>(
+        { url: `/api/votes/${id}/results`, method: "GET", signal },
+        options,
+    );
+};
+
+export const getVotesControllerGetVoteResultsQueryKey = (id: string) => {
+    return [`/api/votes/${id}/results`] as const;
+};
+
+export const getVotesControllerGetVoteResultsQueryOptions = <
+    TData = Awaited<ReturnType<typeof votesControllerGetVoteResults>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof votesControllerGetVoteResults>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ?? getVotesControllerGetVoteResultsQueryKey(id);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof votesControllerGetVoteResults>>
+    > = ({ signal }) =>
+        votesControllerGetVoteResults(id, requestOptions, signal);
+
+    return {
+        queryKey,
+        queryFn,
+        enabled: !!id,
+        ...queryOptions,
+    } as UseQueryOptions<
+        Awaited<ReturnType<typeof votesControllerGetVoteResults>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type VotesControllerGetVoteResultsQueryResult = NonNullable<
+    Awaited<ReturnType<typeof votesControllerGetVoteResults>>
+>;
+export type VotesControllerGetVoteResultsQueryError = ErrorType<unknown>;
+
+export function useVotesControllerGetVoteResults<
+    TData = Awaited<ReturnType<typeof votesControllerGetVoteResults>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof votesControllerGetVoteResults>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof votesControllerGetVoteResults>>,
+                    TError,
+                    Awaited<ReturnType<typeof votesControllerGetVoteResults>>
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useVotesControllerGetVoteResults<
+    TData = Awaited<ReturnType<typeof votesControllerGetVoteResults>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof votesControllerGetVoteResults>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof votesControllerGetVoteResults>>,
+                    TError,
+                    Awaited<ReturnType<typeof votesControllerGetVoteResults>>
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useVotesControllerGetVoteResults<
+    TData = Awaited<ReturnType<typeof votesControllerGetVoteResults>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof votesControllerGetVoteResults>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useVotesControllerGetVoteResults<
+    TData = Awaited<ReturnType<typeof votesControllerGetVoteResults>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof votesControllerGetVoteResults>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
+    const queryOptions = getVotesControllerGetVoteResultsQueryOptions(
+        id,
+        options,
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+        TData,
+        TError
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+    return { ...query, queryKey: queryOptions.queryKey };
+}
+
+export const votesControllerCloseVote = (
+    id: string,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<void>(
+        { url: `/api/votes/${id}/close`, method: "POST", signal },
+        options,
+    );
+};
+
+export const getVotesControllerCloseVoteMutationOptions = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof votesControllerCloseVote>>,
+        TError,
+        { id: string },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof votesControllerCloseVote>>,
+    TError,
+    { id: string },
+    TContext
+> => {
+    const mutationKey = ["votesControllerCloseVote"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof votesControllerCloseVote>>,
+        { id: string }
+    > = (props) => {
+        const { id } = props ?? {};
+
+        return votesControllerCloseVote(id, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type VotesControllerCloseVoteMutationResult = NonNullable<
+    Awaited<ReturnType<typeof votesControllerCloseVote>>
+>;
+
+export type VotesControllerCloseVoteMutationError = ErrorType<unknown>;
+
+export const useVotesControllerCloseVote = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof votesControllerCloseVote>>,
+            TError,
+            { id: string },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof votesControllerCloseVote>>,
+    TError,
+    { id: string },
+    TContext
+> => {
+    return useMutation(
+        getVotesControllerCloseVoteMutationOptions(options),
         queryClient,
     );
 };

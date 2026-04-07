@@ -38,6 +38,7 @@ import {
   VoteConsentResponseDto,
   SubmitBallotDto,
   SubmitBallotResponseDto,
+  VoteResultsResponseDto,
 } from './dto/vote.dto';
 import { Roles, Tenant } from '../../../shared/api/decorators/auth.decorators';
 import { AccessTokenAuthGuard } from '../../../shared/api/guards/access-token-auth.guard';
@@ -45,6 +46,7 @@ import { RolesGuard } from '../../../shared/api/guards/roles.guard';
 import { TenantContextGuard } from '../../../shared/api/guards/tenant-context.guard';
 import { type TenantContext } from '../../../shared/domain/tenant-context';
 import { TenantMembershipRole } from '../../core/tenancy/domain/tenant.entity';
+import { CloseVoteCommand } from '../application/commands/close-vote/close-vote.command';
 import { CreateVoteCommand } from '../application/commands/create-vote/create-vote.command';
 import { CreateVoteConsentCommand } from '../application/commands/create-vote-consent/create-vote-consent.command';
 import { CreateVoteQuestionCommand } from '../application/commands/create-vote-question/create-vote-question.command';
@@ -58,6 +60,7 @@ import { UpdateVoteQuestionCommand } from '../application/commands/update-vote-q
 import { GetConsentsQuery } from '../application/queries/get-consents/get-consents.query';
 import { GetDelegationCandidatesQuery } from '../application/queries/get-delegation-candidates/get-delegation-candidates.query';
 import { GetVoteDetailQuery } from '../application/queries/get-vote-detail/get-vote-detail.query';
+import { GetVoteResultsQuery } from '../application/queries/get-vote-results/get-vote-results.query';
 import { GetVoterStatusQuery } from '../application/queries/get-voter-status/get-voter-status.query';
 import { GetVotesQuery } from '../application/queries/get-votes/get-votes.query';
 
@@ -341,6 +344,36 @@ export class VotesController {
         tenantCtx.membershipId,
         body.ballots,
       ),
+    );
+  }
+
+  @Get(':id/results')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Returns the computed results for a closed vote',
+    type: VoteResultsResponseDto,
+  })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard)
+  getVoteResults(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Tenant() tenantCtx: TenantContext,
+  ) {
+    return this.queryBus.execute(
+      new GetVoteResultsQuery(tenantCtx.tenantId, id),
+    );
+  }
+
+  @Post(':id/close')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ description: 'Vote closed manually' })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  closeVote(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Tenant() tenantCtx: TenantContext,
+  ) {
+    return this.commandBus.execute(
+      new CloseVoteCommand(tenantCtx.tenantId, id, tenantCtx.membershipId),
     );
   }
 }

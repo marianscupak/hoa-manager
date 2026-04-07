@@ -26,6 +26,9 @@ import {
   tenantMemberships,
   voteElectorateUnits,
   ballots,
+  voteResults,
+  voteQuestionResults,
+  voteOptionResults,
 } from '@/infrastructure/db/schema';
 import {
   type VoteDetailResponseDto,
@@ -35,6 +38,7 @@ import {
   type VoterSummaryDto,
   type DelegationCandidateDto,
   type VoteConsentResponseDto,
+  type VoteResultsResponseDto,
 } from '@/modules/voting/api/dto/vote.dto';
 import { type VoteReadRepository } from '@/modules/voting/application/ports/vote-read.repository.port';
 import {
@@ -1009,5 +1013,67 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       .limit(1);
 
     return consentRows.length > 0;
+  }
+
+  async findResultsByVoteId(
+    tenantId: string,
+    voteId: string,
+  ): Promise<VoteResultsResponseDto | null> {
+    const resultRows = await this.drizzle.db
+      .select()
+      .from(voteResults)
+      .where(
+        and(eq(voteResults.tenantId, tenantId), eq(voteResults.voteId, voteId)),
+      )
+      .limit(1);
+
+    if (resultRows.length === 0) return null;
+
+    const result = resultRows[0];
+
+    const questionResultRows = await this.drizzle.db
+      .select()
+      .from(voteQuestionResults)
+      .where(eq(voteQuestionResults.voteResultId, result.id));
+
+    const questionResultIds = questionResultRows.map((qr) => qr.id);
+    const optionResultRows =
+      questionResultIds.length > 0
+        ? await this.drizzle.db
+            .select()
+            .from(voteOptionResults)
+            .where(
+              inArray(voteOptionResults.questionResultId, questionResultIds),
+            )
+        : [];
+
+    const questionResults = questionResultRows.map((qr) => ({
+      questionId: qr.questionId,
+      majorityMet: qr.majorityMet,
+      winningOptionId: qr.winningOptionId ?? null,
+      majorityThresholdValue:
+        qr.majorityThresholdValue !== null
+          ? Number(qr.majorityThresholdValue)
+          : null,
+      majorityDenominatorValue: Number(qr.majorityDenominatorValue),
+      optionResults: optionResultRows
+        .filter((or) => or.questionResultId === qr.id)
+        .map((or) => ({
+          optionId: or.optionId,
+          voteWeight: Number(or.voteWeight),
+          voteUnitCount: or.voteUnitCount,
+        })),
+    }));
+
+    return {
+      resultStatus: result.resultStatus as 'COMPUTED' | 'FAILED',
+      quorumMet: result.quorumMet,
+      participationWeight: Number(result.participationWeight),
+      participationUnitCount: result.participationUnitCount,
+      denominatorWeight: Number(result.denominatorWeight ?? 0),
+      denominatorUnitCount: result.denominatorUnitCount ?? 0,
+      computedAt: result.computedAt,
+      questionResults,
+    };
   }
 }

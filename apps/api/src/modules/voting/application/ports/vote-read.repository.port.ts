@@ -5,6 +5,7 @@ import {
   type VoterSummaryDto,
   type DelegationCandidateDto,
   type VoteConsentResponseDto,
+  type VoteResultsResponseDto,
 } from '@/modules/voting/api/dto/vote.dto';
 import { VoteStatus } from '@/modules/voting/domain/vote/vote.types';
 
@@ -55,6 +56,10 @@ export interface VoteReadRepository {
     forMembershipId: string | undefined,
     requesterMembershipId: string,
   ): Promise<DelegationCandidateDto[]>;
+  findResultsByVoteId(
+    tenantId: string,
+    voteId: string,
+  ): Promise<VoteResultsResponseDto | null>;
 }
 
 export const VOTE_READ_REPOSITORY = Symbol('VOTE_READ_REPOSITORY');

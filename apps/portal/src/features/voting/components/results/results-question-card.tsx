@@ -1,7 +1,12 @@
 import { CheckCircle2, XCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { type VoteResultsResponseDto } from "@/api/generated/model";
+import {
+    SetVoteRulesetResponseDtoQuorumMeasure,
+    VoteOptionResponseDtoOptionKey,
+    VoteQuestionResponseDtoType,
+    type VoteResultsResponseDto,
+} from "@/api/generated/model";
 
 interface ResultsQuestionCardProps {
     index: number;
@@ -12,6 +17,10 @@ interface ResultsQuestionCardProps {
     onClick: () => void;
     participationWeight: number;
     denominatorWeight: number;
+    optionLabels: Record<string, { label: string; optionKey: string }>;
+    quorumMeasure: string | undefined;
+    denominatorUnitCount: number;
+    participationUnitCount: number;
 }
 
 export function ResultsQuestionCard({
@@ -21,13 +30,24 @@ export function ResultsQuestionCard({
     onClick,
     participationWeight,
     denominatorWeight,
+    optionLabels,
+    quorumMeasure,
+    denominatorUnitCount,
+    participationUnitCount,
 }: ResultsQuestionCardProps) {
     const { t } = useTranslation(["voting"]);
 
     const quorumPct =
-        denominatorWeight > 0
-            ? ((participationWeight / denominatorWeight) * 100).toFixed(1)
-            : "0.0";
+        quorumMeasure === SetVoteRulesetResponseDtoQuorumMeasure.UNIT_COUNT
+            ? denominatorUnitCount > 0
+                ? (
+                      (participationUnitCount / denominatorUnitCount) *
+                      100
+                  ).toFixed(1)
+                : "0.0"
+            : denominatorWeight > 0
+              ? ((participationWeight / denominatorWeight) * 100).toFixed(1)
+              : "0.0";
 
     const winningOpt = question.winningOptionId
         ? question.optionResults.find(
@@ -35,13 +55,40 @@ export function ResultsQuestionCard({
           )
         : null;
 
+    let inFavorOpt = null;
+    if (question.type === VoteQuestionResponseDtoType.YES_NO) {
+        const yesOptionId = Object.keys(optionLabels).find(
+            (id) =>
+                optionLabels[id].optionKey ===
+                VoteOptionResponseDtoOptionKey.YES,
+        );
+        inFavorOpt = question.optionResults.find(
+            (o) => o.optionId === yesOptionId,
+        );
+    } else {
+        inFavorOpt = winningOpt;
+    }
+
     const inFavorPct =
-        winningOpt && question.majorityDenominatorValue > 0
+        inFavorOpt && question.majorityDenominatorValue > 0
             ? (
-                  (winningOpt.voteWeight / question.majorityDenominatorValue) *
+                  (inFavorOpt.voteWeight / question.majorityDenominatorValue) *
                   100
               ).toFixed(1)
             : "—";
+
+    let isApproved = false;
+    if (question.majorityMet) {
+        if (question.type === VoteQuestionResponseDtoType.YES_NO) {
+            const winningMeta = question.winningOptionId
+                ? optionLabels[question.winningOptionId]
+                : null;
+            isApproved =
+                winningMeta?.optionKey === VoteOptionResponseDtoOptionKey.YES;
+        } else {
+            isApproved = true;
+        }
+    }
 
     return (
         <button
@@ -53,7 +100,7 @@ export function ResultsQuestionCard({
             }`}
         >
             <div className="mb-3 flex items-start justify-between gap-2">
-                {question.majorityMet ? (
+                {isApproved ? (
                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold tracking-wide text-emerald-700 uppercase">
                         <CheckCircle2 className="h-3 w-3" />
                         {t("voting:results.approved")}
@@ -89,7 +136,7 @@ export function ResultsQuestionCard({
                         {t("voting:results.inFavor")}
                     </p>
                     <p
-                        className={`text-base font-bold ${question.majorityMet ? "text-emerald-600" : "text-red-600"}`}
+                        className={`text-base font-bold ${isApproved ? "text-emerald-600" : "text-red-600"}`}
                     >
                         {inFavorPct} %
                     </p>

@@ -1,13 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { and, eq, inArray } from 'drizzle-orm';
+import { Inject, Injectable } from '@nestjs/common';
 
-import { DrizzleService } from '@/infrastructure/db/drizzle.service';
-import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
-import {
-  ballotAnswers,
-  ballots,
-  voteElectorateUnits,
-} from '@/infrastructure/db/schema';
 import {
   VoteOptionResultSnapshot,
   VoteQuestionResultSnapshot,
@@ -24,18 +16,19 @@ import {
   VoteRuleset,
 } from '@/modules/voting/domain/vote/vote.types';
 
-import { ResultCalculationService } from '../../application/ports/result-calculation.service.port';
+import {
+  RESULT_CALCULATION_DATA_REPOSITORY,
+  ResultCalculationAnswerData,
+  type ResultCalculationDataRepository,
+} from '../ports/result-calculation-data.repository.port';
+import { ResultCalculationService } from '../ports/result-calculation.service.port';
 
 @Injectable()
-export class DrizzleResultCalculationService
-  implements ResultCalculationService
-{
-  constructor(private readonly drizzle: DrizzleService) {}
-
-  private get db() {
-    return (DRIZZLE_TX_STORAGE.getStore() ??
-      this.drizzle.db) as typeof this.drizzle.db;
-  }
+export class ResultCalculationDomainService implements ResultCalculationService {
+  constructor(
+    @Inject(RESULT_CALCULATION_DATA_REPOSITORY)
+    private readonly dataRepository: ResultCalculationDataRepository,
+  ) {}
 
   async calculate(
     tenantId: string,
@@ -48,59 +41,29 @@ export class DrizzleResultCalculationService
       );
     }
 
-    // ── 1. Load electorate snapshot ────────────────────────────────
-    const electorateRows = await this.db
-      .select()
-      .from(voteElectorateUnits)
-      .where(
-        and(
-          eq(voteElectorateUnits.tenantId, tenantId),
-          eq(voteElectorateUnits.voteId, voteId),
-        ),
-      );
-
-    // ── 2. Load all ballots + answers for this vote ─────────────────
-    const ballotRows = await this.db
-      .select({
-        ballotId: ballots.id,
-        unitId: ballots.unitId,
-      })
-      .from(ballots)
-      .where(and(eq(ballots.tenantId, tenantId), eq(ballots.voteId, voteId)));
+    const electorateRows = await this.dataRepository.findElectorateSnapshot(
+      tenantId,
+      voteId,
+    );
+    const ballotRows = await this.dataRepository.findBallots(tenantId, voteId);
 
     const ballotIds = ballotRows.map((b) => b.ballotId);
-    const answerRows =
-      ballotIds.length > 0
-        ? await this.db
-            .select({
-              ballotId: ballotAnswers.ballotId,
-              questionId: ballotAnswers.questionId,
-              optionId: ballotAnswers.optionId,
-            })
-            .from(ballotAnswers)
-            .where(inArray(ballotAnswers.ballotId, ballotIds))
-        : [];
+    const answerRows = await this.dataRepository.findBallotAnswers(ballotIds);
 
-    // ── 3. Build lookup maps ────────────────────────────────────────
-    // unitId -> votingWeight (from snapshot, not live data)
     const weightByUnit = new Map<string, number>(
       electorateRows.map((e) => [e.unitId, Number(e.votingWeight)]),
     );
 
-    // unitId -> eligibilityStatus
     const eligibilityByUnit = new Map<string, string>(
       electorateRows.map((e) => [e.unitId, e.eligibilityStatus]),
     );
 
-    // ballotId -> unitId
     const unitByBallot = new Map<string, string>(
       ballotRows.map((b) => [b.ballotId, b.unitId]),
     );
 
-    // Set of unitIds that submitted a ballot
     const participatingUnitIds = new Set(ballotRows.map((b) => b.unitId));
 
-    // ── 4. Quorum calculation (vote-level ruleset) ──────────────────
     const ruleset = vote.ruleset;
 
     const { denominatorWeight, denominatorUnitCount } = this.computeDenominator(
@@ -122,13 +85,11 @@ export class DrizzleResultCalculationService
       denominatorUnitCount,
     );
 
-    // ── 5. Per-question results ─────────────────────────────────────
     const questionResults: VoteQuestionResultSnapshot[] = [];
 
     for (const question of vote.questions) {
       const effectiveRuleset = question.rulesetOverride ?? ruleset;
 
-      // answers for this question: ballotId -> optionId
       const answersForQuestion = answerRows.filter(
         (a) => a.questionId === question.id,
       );
@@ -154,8 +115,6 @@ export class DrizzleResultCalculationService
       questionResults,
     };
   }
-
-  // ── Helpers ──────────────────────────────────────────────────────
 
   private computeDenominator(
     electorateRows: {
@@ -197,7 +156,6 @@ export class DrizzleResultCalculationService
       if (denominatorWeight === 0) return false;
       return participationWeight / denominatorWeight >= threshold;
     } else {
-      // UNIT_COUNT
       if (denominatorUnitCount === 0) return false;
       return participationUnitCount / denominatorUnitCount >= threshold;
     }
@@ -206,12 +164,11 @@ export class DrizzleResultCalculationService
   private computeQuestionResult(
     question: VoteQuestion,
     effectiveRuleset: VoteRuleset,
-    answers: { ballotId: string; questionId: string; optionId: string }[],
+    answers: ResultCalculationAnswerData[],
     unitByBallot: Map<string, string>,
     weightByUnit: Map<string, number>,
     _eligibilityByUnit: Map<string, string>,
   ): VoteQuestionResultSnapshot {
-    // Aggregate weight per option
     const weightByOption = new Map<string, number>();
     const countByOption = new Map<string, number>();
 
@@ -235,7 +192,6 @@ export class DrizzleResultCalculationService
       );
     }
 
-    // Build per-option snapshots
     const optionResults: VoteOptionResultSnapshot[] = question.options.map(
       (opt) => ({
         optionId: opt.id,
@@ -244,7 +200,6 @@ export class DrizzleResultCalculationService
       }),
     );
 
-    // Majority denominator: exclude abstain weight if configured
     const abstainOptionId = question.options.find(
       (o) => o.optionKey === VoteOptionSemantic.ABSTAIN,
     )?.id;
@@ -261,7 +216,6 @@ export class DrizzleResultCalculationService
       majorityDenominatorValue += w;
     }
 
-    // Find winning option (highest weight, excluding abstain from contention)
     const nonAbstainOptions = question.options.filter(
       (o) => o.id !== abstainOptionId,
     );
@@ -285,7 +239,6 @@ export class DrizzleResultCalculationService
       winningOptionId = null;
     }
 
-    // Check majority
     let majorityMet = false;
     let majorityThresholdValue: number | null = null;
 
@@ -296,10 +249,8 @@ export class DrizzleResultCalculationService
         effectiveRuleset.majorityRuleType === MajorityRuleType.SIMPLE_MAJORITY
       ) {
         majorityMet = winningWeight / majorityDenominatorValue > 0.5;
-        // Simple majority always uses >50%; no configurable threshold to snapshot
         majorityThresholdValue = null;
       } else {
-        // QUALIFIED_MAJORITY
         const threshold = (effectiveRuleset.majorityThreshold ?? 50) / 100;
         majorityThresholdValue = threshold;
         majorityMet = winningWeight / majorityDenominatorValue >= threshold;

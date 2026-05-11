@@ -1,14 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { and, eq, isNull } from 'drizzle-orm';
+import { Inject, Injectable } from '@nestjs/common';
 
-import { DrizzleService } from '@/infrastructure/db/drizzle.service';
-import {
-  owners,
-  tenantMemberships,
-  unitOwnerships,
-  units,
-  voteUnitConsents,
-} from '@/infrastructure/db/schema';
 import { VoteAggregate } from '@/modules/voting/domain/vote/vote.aggregate';
 import {
   ElectorateEligibilityStatus,
@@ -17,61 +8,29 @@ import {
   VoteWeightBasis,
 } from '@/modules/voting/domain/vote/vote.types';
 
-import { ElectorateService } from '../../application/ports/electorate-service.port';
+import {
+  ELECTORATE_DATA_REPOSITORY,
+  type ElectorateDataRepository,
+} from '../ports/electorate-data.repository.port';
+import { ElectorateService } from '../ports/electorate-service.port';
 
 @Injectable()
-export class DrizzleElectorateService implements ElectorateService {
-  constructor(private readonly drizzle: DrizzleService) {}
+export class ElectorateDomainService implements ElectorateService {
+  constructor(
+    @Inject(ELECTORATE_DATA_REPOSITORY)
+    private readonly electorateDataRepository: ElectorateDataRepository,
+  ) {}
 
   async resolveElectorate(vote: VoteAggregate): Promise<ElectorateUnit[]> {
     const tenantId = vote.tenantId;
 
-    // 1. Get all units in the tenant
-    const allUnits = await this.drizzle.db
-      .select()
-      .from(units)
-      .where(eq(units.tenantId, tenantId));
+    const [allUnits, ownershipRecords, consentRecords] = await Promise.all([
+      this.electorateDataRepository.findAllUnits(tenantId),
+      this.electorateDataRepository.findOwnershipRecords(tenantId),
+      this.electorateDataRepository.findValidConsents(tenantId, vote.id),
+    ]);
 
     if (allUnits.length === 0) return [];
-
-    // 2. Get all ownerships + their linked memberships
-    const ownershipRecords = await this.drizzle.db
-      .select({
-        unitId: unitOwnerships.unitId,
-        ownerId: unitOwnerships.ownerId,
-        membershipId: tenantMemberships.id,
-      })
-      .from(unitOwnerships)
-      .innerJoin(owners, eq(unitOwnerships.ownerId, owners.id))
-      .leftJoin(
-        tenantMemberships,
-        and(
-          eq(owners.userId, tenantMemberships.userId),
-          eq(owners.tenantId, tenantMemberships.tenantId),
-        ),
-      )
-      .where(
-        and(
-          eq(unitOwnerships.tenantId, tenantId),
-          isNull(unitOwnerships.validTo),
-        ),
-      );
-
-    // 3. Get all valid consents for this vote
-    const consentRecords = await this.drizzle.db
-      .select({
-        unitId: voteUnitConsents.unitId,
-        fromOwnerId: voteUnitConsents.fromOwnerId,
-        toMembershipId: voteUnitConsents.toMembershipId,
-      })
-      .from(voteUnitConsents)
-      .where(
-        and(
-          eq(voteUnitConsents.tenantId, tenantId),
-          eq(voteUnitConsents.voteId, vote.id),
-          eq(voteUnitConsents.status, 'VALID'),
-        ),
-      );
 
     const allowIndividualVote =
       vote.ruleset?.allowCoOwnerIndividualVote ?? false;
@@ -96,13 +55,12 @@ export class DrizzleElectorateService implements ElectorateService {
           representativeMembershipId: null,
           eligibilityStatus: ElectorateEligibilityStatus.INELIGIBLE,
           ineligibleReason: ElectorateIneligibleReason.MISSING_OWNERSHIP,
-          votingWeight: 0,
+          votingWeight: totalWeight,
         });
         continue;
       }
 
       if (allowIndividualVote) {
-        // Each co-owner with a membership gets a separate entry with full unit weight
         const eligibleMemberships = unitOwnerships
           .map((o) => o.membershipId)
           .filter((id): id is string => id !== null);
@@ -113,7 +71,7 @@ export class DrizzleElectorateService implements ElectorateService {
             representativeMembershipId: null,
             eligibilityStatus: ElectorateEligibilityStatus.INELIGIBLE,
             ineligibleReason: ElectorateIneligibleReason.NO_REPRESENTATIVE,
-            votingWeight: 0,
+            votingWeight: totalWeight,
           });
         } else {
           for (const mid of eligibleMemberships) {
@@ -127,7 +85,6 @@ export class DrizzleElectorateService implements ElectorateService {
           }
         }
       } else {
-        // Standard representative logic
         if (unitOwnerships.length === 1) {
           const soleOwnerMid = unitOwnerships[0].membershipId;
           if (soleOwnerMid) {
@@ -144,11 +101,10 @@ export class DrizzleElectorateService implements ElectorateService {
               representativeMembershipId: null,
               eligibilityStatus: ElectorateEligibilityStatus.INELIGIBLE,
               ineligibleReason: ElectorateIneligibleReason.NO_REPRESENTATIVE,
-              votingWeight: 0,
+              votingWeight: totalWeight,
             });
           }
         } else {
-          // Co-ownership: need consents from ALL owners pointing to the SAME membership
           const consensusMembershipId = this.resolveConsensus(
             unitOwnerships,
             unitConsents,
@@ -168,7 +124,7 @@ export class DrizzleElectorateService implements ElectorateService {
               representativeMembershipId: null,
               eligibilityStatus: ElectorateEligibilityStatus.INELIGIBLE,
               ineligibleReason: ElectorateIneligibleReason.NO_REPRESENTATIVE,
-              votingWeight: 0,
+              votingWeight: totalWeight,
             });
           }
         }
@@ -182,11 +138,7 @@ export class DrizzleElectorateService implements ElectorateService {
     ownerships: { ownerId: string; membershipId: string | null }[],
     consents: { fromOwnerId: string; toMembershipId: string }[],
   ): string | null {
-    // A representative is ready if they have consents from all OTHER co-owners.
-    // So we need to find a membership that EVERY owner has consented to.
-
     const candidates = new Set<string>();
-    // Potential candidates are all memberships linked to owners or pointed to by consents
     ownerships.forEach((o) => {
       if (o.membershipId) candidates.add(o.membershipId);
     });
@@ -195,10 +147,6 @@ export class DrizzleElectorateService implements ElectorateService {
     for (const candidateMid of candidates) {
       let allConsented = true;
       for (const owner of ownerships) {
-        // Does this owner agree on candidateMid?
-        // They agree if:
-        // 1. Their own membership is candidateMid
-        // OR 2. They have a consent pointing to candidateMid
         const isSelf = owner.membershipId === candidateMid;
         const hasConsent = consents.some(
           (c) =>

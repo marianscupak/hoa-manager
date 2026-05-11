@@ -20,7 +20,9 @@ import { SetVoteRulesetHandler } from './application/commands/set-vote-ruleset/s
 import { SubmitBallotHandler } from './application/commands/submit-ballot/submit-ballot.handler';
 import { UpdateVoteHandler } from './application/commands/update-vote/update-vote.handler';
 import { UpdateVoteQuestionHandler } from './application/commands/update-vote-question/update-vote-question.handler';
+import { ELECTORATE_DATA_REPOSITORY } from './application/ports/electorate-data.repository.port';
 import { ELECTORATE_SERVICE } from './application/ports/electorate-service.port';
+import { RESULT_CALCULATION_DATA_REPOSITORY } from './application/ports/result-calculation-data.repository.port';
 import { RESULT_CALCULATION_SERVICE } from './application/ports/result-calculation.service.port';
 import { VOTE_CONSENT_WRITE_REPOSITORY } from './application/ports/vote-consent-write.repository.port';
 import { VOTE_READ_REPOSITORY } from './application/ports/vote-read.repository.port';
@@ -31,8 +33,10 @@ import { GetVoteDetailHandler } from './application/queries/get-vote-detail/get-
 import { GetVoteResultsHandler } from './application/queries/get-vote-results/get-vote-results.handler';
 import { GetVoterStatusHandler } from './application/queries/get-voter-status/get-voter-status.handler';
 import { GetVotesHandler } from './application/queries/get-votes/get-votes.handler';
-import { DrizzleElectorateService } from './infrastructure/persistence/drizzle-electorate.service';
-import { DrizzleResultCalculationService } from './infrastructure/persistence/drizzle-result-calculation.service';
+import { ElectorateDomainService } from './application/services/electorate.service';
+import { ResultCalculationDomainService } from './application/services/result-calculation.service';
+import { DrizzleElectorateDataRepository } from './infrastructure/persistence/drizzle-electorate-data.repository';
+import { DrizzleResultCalculationDataRepository } from './infrastructure/persistence/drizzle-result-calculation-data.repository';
 import { DrizzleVoteConsentWriteRepository } from './infrastructure/persistence/drizzle-vote-consent-write.repository';
 import { DrizzleVoteReadRepository } from './infrastructure/persistence/drizzle-vote-read.repository';
 import { DrizzleVoteWriteRepository } from './infrastructure/persistence/drizzle-vote-write.repository';
@@ -67,10 +71,18 @@ const REPOSITORIES = [
     provide: VOTE_CONSENT_WRITE_REPOSITORY,
     useClass: DrizzleVoteConsentWriteRepository,
   },
-  { provide: ELECTORATE_SERVICE, useClass: DrizzleElectorateService },
+  {
+    provide: ELECTORATE_DATA_REPOSITORY,
+    useClass: DrizzleElectorateDataRepository,
+  },
+  { provide: ELECTORATE_SERVICE, useClass: ElectorateDomainService },
+  {
+    provide: RESULT_CALCULATION_DATA_REPOSITORY,
+    useClass: DrizzleResultCalculationDataRepository,
+  },
   {
     provide: RESULT_CALCULATION_SERVICE,
-    useClass: DrizzleResultCalculationService,
+    useClass: ResultCalculationDomainService,
   },
   DrizzleUnitOfWork,
   VoteSchedulerService,

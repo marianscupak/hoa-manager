@@ -19,6 +19,7 @@ import { StatusBadge } from "../components/status-badge";
 
 type EnrichedQuestion = VoteResultsResponseDto["questionResults"][number] & {
     title: string;
+    type?: string;
 };
 
 function buildOptionLabelMap(
@@ -42,6 +43,7 @@ function buildEnrichedQuestions(
         return {
             ...qr,
             title: question?.title ?? qr.questionId,
+            type: question?.type,
         };
     });
 }
@@ -129,6 +131,10 @@ export function VoteResultsPage() {
                             onClick={() => setSelectedIndex(i)}
                             participationWeight={results.participationWeight}
                             denominatorWeight={results.denominatorWeight}
+                            optionLabels={optionLabelMap}
+                            quorumMeasure={vote.ruleset?.quorumMeasure}
+                            denominatorUnitCount={results.denominatorUnitCount}
+                            participationUnitCount={results.participationUnitCount}
                         />
                     ))}
                 </div>
@@ -151,7 +157,7 @@ export function VoteResultsPage() {
                             />
                         </div>
                         <div>
-                            <ResultsQuorumPanel results={results} />
+                            <ResultsQuorumPanel results={results} quorumMeasure={vote.ruleset?.quorumMeasure} />
                         </div>
                     </div>
                 </>

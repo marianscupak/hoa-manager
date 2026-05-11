@@ -1,21 +1,28 @@
 import { CheckCircle2, XCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { type VoteResultsResponseDto } from "@/api/generated/model";
+import {
+    SetVoteRulesetResponseDtoQuorumMeasure,
+    type VoteResultsResponseDto,
+} from "@/api/generated/model";
 
 interface ResultsQuorumPanelProps {
     results: VoteResultsResponseDto;
+    quorumMeasure: string | undefined;
 }
 
-export function ResultsQuorumPanel({ results }: ResultsQuorumPanelProps) {
+export function ResultsQuorumPanel({ results, quorumMeasure }: ResultsQuorumPanelProps) {
     const { t } = useTranslation(["voting"]);
 
-    const participationPct =
-        results.denominatorWeight > 0
-            ? (
-                  (results.participationWeight / results.denominatorWeight) *
-                  100
-              ).toFixed(1)
+    const isUnitCount =
+        quorumMeasure === SetVoteRulesetResponseDtoQuorumMeasure.UNIT_COUNT;
+
+    const participationPct = isUnitCount
+        ? results.denominatorUnitCount > 0
+            ? ((results.participationUnitCount / results.denominatorUnitCount) * 100).toFixed(1)
+            : "0.0"
+        : results.denominatorWeight > 0
+            ? ((results.participationWeight / results.denominatorWeight) * 100).toFixed(1)
             : "0.0";
 
     return (

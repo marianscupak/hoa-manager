@@ -1,14 +1,18 @@
 import { useTranslation } from "react-i18next";
 
-import { type VoteResultsResponseDto } from "@/api/generated/model";
+import {
+    VoteOptionResponseDtoOptionKey,
+    VoteQuestionResponseDtoType,
+    type VoteResultsResponseDto,
+} from "@/api/generated/model";
 
 type QuestionResult = VoteResultsResponseDto["questionResults"][number];
 
 function useOptionDisplayLabel(optionKey: string, fallback: string): string {
     const { t } = useTranslation(["voting"]);
-    if (optionKey === "YES") return t("create.optionLabels.YES");
-    if (optionKey === "NO") return t("create.optionLabels.NO");
-    if (optionKey === "ABSTAIN") return t("create.optionLabels.ABSTAIN");
+    if (optionKey === VoteOptionResponseDtoOptionKey.YES) return t("create.optionLabels.YES");
+    if (optionKey === VoteOptionResponseDtoOptionKey.NO) return t("create.optionLabels.NO");
+    if (optionKey === VoteOptionResponseDtoOptionKey.ABSTAIN) return t("create.optionLabels.ABSTAIN");
     return fallback;
 }
 
@@ -35,8 +39,8 @@ function ResultsOptionBar({
     const pct =
         majorityDenominator > 0 ? (voteWeight / majorityDenominator) * 100 : 0;
 
-    const isAbstain = optionKey === "ABSTAIN";
-    const isAgainst = optionKey === "NO";
+    const isAbstain = optionKey === VoteOptionResponseDtoOptionKey.ABSTAIN;
+    const isAgainst = optionKey === VoteOptionResponseDtoOptionKey.NO;
 
     const barColor = isAbstain
         ? "bg-slate-300"
@@ -70,7 +74,7 @@ function ResultsOptionBar({
 }
 
 interface ResultsQuestionDetailProps {
-    question: QuestionResult & { title: string };
+    question: QuestionResult & { title: string; type?: string };
     optionLabels: Record<string, { label: string; optionKey: string }>;
 }
 
@@ -80,13 +84,26 @@ export function ResultsQuestionDetail({
 }: ResultsQuestionDetailProps) {
     const { t } = useTranslation(["voting"]);
 
+    let isApproved = false;
+    if (question.majorityMet) {
+        if (question.type === VoteQuestionResponseDtoType.YES_NO) {
+            const winningMeta = question.winningOptionId
+                ? optionLabels[question.winningOptionId]
+                : null;
+            isApproved =
+                winningMeta?.optionKey === VoteOptionResponseDtoOptionKey.YES;
+        } else {
+            isApproved = true;
+        }
+    }
+
     return (
         <div>
             <div className="text-primary mb-1 text-xs font-semibold tracking-wider uppercase">
                 {t("voting:results.finalResolution")}
             </div>
             <h2 className="mb-6 text-4xl font-black tracking-tight text-slate-900">
-                {question.majorityMet
+                {isApproved
                     ? t("voting:results.approved").toUpperCase()
                     : t("voting:results.rejected").toUpperCase()}
             </h2>

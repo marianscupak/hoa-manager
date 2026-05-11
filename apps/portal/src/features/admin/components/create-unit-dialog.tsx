@@ -1,6 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { TFunction } from "i18next";
-import { useForm } from "react-hook-form";
+import { Resolver, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
@@ -25,24 +24,25 @@ import {
 import { showApiError } from "@/api/error-utils";
 import { useUnitControllerCreateUnit } from "@/api/generated/property-units/property-units";
 
-const createUnitSchema = (t: TFunction<"admin">) =>
-    z.object({
-        unitNo: z.string().min(1, t("units.create.unitNoRequired")).max(50),
-        buildingShareNumerator: z.coerce
-            .number({
-                invalid_type_error: t("units.create.shareMustBePositive"),
-            })
-            .int(t("units.create.shareMustBePositive"))
-            .positive(t("units.create.shareMustBePositive")),
-        buildingShareDenominator: z.coerce
-            .number({
-                invalid_type_error: t("units.create.shareMustBePositive"),
-            })
-            .int(t("units.create.shareMustBePositive"))
-            .positive(t("units.create.shareMustBePositive")),
-    });
+const createUnitSchema = z.object({
+    unitNo: z.string().min(1, "units.create.unitNoRequired").max(50),
+    buildingShareNumerator: z.preprocess(
+        (v) => (v === "" ? undefined : Number(v)),
+        z
+            .number()
+            .int("units.create.shareMustBePositive")
+            .positive("units.create.shareMustBePositive"),
+    ),
+    buildingShareDenominator: z.preprocess(
+        (v) => (v === "" ? undefined : Number(v)),
+        z
+            .number()
+            .int("units.create.shareMustBePositive")
+            .positive("units.create.shareMustBePositive"),
+    ),
+});
 
-type CreateUnitValues = z.infer<ReturnType<typeof createUnitSchema>>;
+type CreateUnitValues = z.infer<typeof createUnitSchema>;
 
 interface CreateUnitDialogProps {
     open: boolean;
@@ -56,7 +56,6 @@ export function CreateUnitDialog({
     onSuccess,
 }: CreateUnitDialogProps) {
     const { t } = useTranslation(["admin"]);
-    const schema = createUnitSchema(t);
 
     const createUnit = useUnitControllerCreateUnit({
         mutation: {
@@ -71,11 +70,14 @@ export function CreateUnitDialog({
     });
 
     const form = useForm<CreateUnitValues>({
-        resolver: zodResolver(schema),
+        resolver: zodResolver(createUnitSchema) as unknown as Resolver<
+            CreateUnitValues,
+            unknown
+        >,
         defaultValues: {
             unitNo: "",
-            buildingShareNumerator: undefined as unknown as number,
-            buildingShareDenominator: undefined as unknown as number,
+            buildingShareNumerator: 1,
+            buildingShareDenominator: 1,
         },
     });
 
@@ -104,7 +106,7 @@ export function CreateUnitDialog({
                         onSubmit={form.handleSubmit(onSubmit)}
                         className="space-y-4"
                     >
-                        <FormField
+                        <FormField<CreateUnitValues>
                             control={form.control}
                             name="unitNo"
                             render={({ field }) => (
@@ -129,7 +131,7 @@ export function CreateUnitDialog({
                                 {t("units.create.buildingShareLabel")}
                             </FormLabel>
                             <div className="mt-2 flex items-center gap-2">
-                                <FormField
+                                <FormField<CreateUnitValues>
                                     control={form.control}
                                     name="buildingShareNumerator"
                                     render={({ field }) => (
@@ -152,7 +154,7 @@ export function CreateUnitDialog({
                                 <span className="text-muted-foreground text-lg font-semibold">
                                     /
                                 </span>
-                                <FormField
+                                <FormField<CreateUnitValues>
                                     control={form.control}
                                     name="buildingShareDenominator"
                                     render={({ field }) => (

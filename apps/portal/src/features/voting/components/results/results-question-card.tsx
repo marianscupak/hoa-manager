@@ -12,6 +12,7 @@ interface ResultsQuestionCardProps {
     index: number;
     question: VoteResultsResponseDto["questionResults"][number] & {
         title: string;
+        type?: string;
     };
     isSelected: boolean;
     onClick: () => void;

@@ -18,7 +18,9 @@ import {
 } from '../../application/ports/electorate-data.repository.port';
 
 @Injectable()
-export class DrizzleElectorateDataRepository implements ElectorateDataRepository {
+export class DrizzleElectorateDataRepository
+  implements ElectorateDataRepository
+{
   constructor(private readonly drizzle: DrizzleService) {}
 
   async findAllUnits(tenantId: string): Promise<ElectorateUnitData[]> {

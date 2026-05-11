@@ -12,10 +12,9 @@ import {
 } from '@/shared/application/exceptions/property.exceptions';
 
 @CommandHandler(CreateUnitCommand)
-export class CreateUnitHandler implements ICommandHandler<
-  CreateUnitCommand,
-  { unitId: string }
-> {
+export class CreateUnitHandler
+  implements ICommandHandler<CreateUnitCommand, { unitId: string }>
+{
   constructor(
     @Inject(UNIT_REPOSITORY)
     private readonly unitRepo: UnitRepository,

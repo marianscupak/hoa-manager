@@ -1,9 +1,9 @@
 import {
+  integer,
   pgTable,
   text,
   timestamp,
   uuid,
-  numeric,
   unique,
 } from 'drizzle-orm/pg-core';
 
@@ -17,10 +17,8 @@ export const units = pgTable(
       .notNull()
       .references(() => tenants.id, { onDelete: 'cascade' }),
     unitNo: text('unit_no').notNull(),
-    buildingShare: numeric('building_share', {
-      precision: 12,
-      scale: 8,
-    }).notNull(),
+    buildingShareNumerator: integer('building_share_numerator').notNull(),
+    buildingShareDenominator: integer('building_share_denominator').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' })
       .defaultNow()
       .notNull(),

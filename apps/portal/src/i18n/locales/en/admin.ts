@@ -51,17 +51,19 @@ export default {
         create: {
             title: "Add Unit",
             description:
-                "Create a new property unit and assign its building share (voting weight).",
+                "Create a new property unit and assign its building share as a fraction (e.g. 225/1332).",
             unitNoLabel: "Unit Number / Label",
             unitNoPlaceholder: "E.g. A-101 or Garage 1",
             buildingShareLabel: "Building Share",
-            buildingSharePlaceholder: "E.g. 0.05 (for 5%)",
+            numeratorPlaceholder: "Numerator",
+            denominatorPlaceholder: "Denominator",
             submit: "Create Unit",
             submitting: "Creating...",
             success: "Unit created successfully",
             error: "Failed to create unit",
             unitNoRequired: "Unit number is required",
-            buildingShareRequired: "Must be a valid positive decimal number",
+            shareRequired: "Both numerator and denominator are required",
+            shareMustBePositive: "Must be a positive integer",
         },
         details: {
             title: "Unit Details",

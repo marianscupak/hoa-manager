@@ -51,17 +51,19 @@ export default {
         create: {
             title: "Přidat jednotku",
             description:
-                "Vytvořte novou jednotku a přiřaďte jí podíl na budově (hlasovací váhu).",
+                "Vytvořte novou jednotku a přiřaďte jí podíl na budově jako zlomek (např. 225/1332).",
             unitNoLabel: "Číslo / Označení jednotky",
             unitNoPlaceholder: "Např. A-101 nebo Garáž 1",
             buildingShareLabel: "Podíl na budově",
-            buildingSharePlaceholder: "Např. 0.05 (pro 5%)",
+            numeratorPlaceholder: "Čitatel",
+            denominatorPlaceholder: "Jmenovatel",
             submit: "Vytvořit jednotku",
             submitting: "Vytváření...",
             success: "Jednotka byla úspěšně vytvořena",
             error: "Nepodařilo se vytvořit jednotku",
             unitNoRequired: "Číslo jednotky je povinné",
-            buildingShareRequired: "Musí být platné desetinné číslo",
+            shareRequired: "Čitatel i jmenovatel jsou povinné",
+            shareMustBePositive: "Musí být kladné celé číslo",
         },
         details: {
             title: "Detail jednotky",

@@ -25,9 +25,9 @@ export function UnitsPage() {
         },
         {
             header: t("units.table.buildingShare"),
-            accessorKey: "buildingShare",
+            accessorKey: "buildingShareNumerator",
             cell: ({ row }) =>
-                `${Number.parseFloat(row.buildingShare) * 100} %`,
+                `${row.buildingShareNumerator}/${row.buildingShareDenominator}`,
         },
         {
             header: tCommon("actions"),

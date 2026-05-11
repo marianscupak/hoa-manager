@@ -8,13 +8,39 @@ export const createUnitSchema = z.object({
     .min(1, 'Unit number is required')
     .max(50)
     .describe('The unit number or label'),
-  buildingShare: z
-    .string()
-    .regex(/^\d+(\.\d+)?$/, 'Must be a valid decimal number')
-    .describe('The building share as a decimal string'),
+  buildingShareNumerator: z
+    .number()
+    .int('Must be an integer')
+    .min(1, 'Must be at least 1')
+    .describe('The numerator of the building share fraction'),
+  buildingShareDenominator: z
+    .number()
+    .int('Must be an integer')
+    .min(1, 'Must be at least 1')
+    .describe('The denominator of the building share fraction'),
 });
 
 export class CreateUnitDto extends createZodDto(createUnitSchema) {}
+
+export const updateUnitSchema = z.object({
+  unitNo: z
+    .string()
+    .min(1, 'Unit number is required')
+    .max(50)
+    .describe('The unit number or label'),
+  buildingShareNumerator: z
+    .number()
+    .int('Must be an integer')
+    .min(1, 'Must be at least 1')
+    .describe('The numerator of the building share fraction'),
+  buildingShareDenominator: z
+    .number()
+    .int('Must be an integer')
+    .min(1, 'Must be at least 1')
+    .describe('The denominator of the building share fraction'),
+});
+
+export class UpdateUnitDto extends createZodDto(updateUnitSchema) {}
 
 export class CreateUnitResponseDto {
   @ApiProperty({
@@ -52,8 +78,11 @@ export class UnitResponseDto {
   @ApiProperty()
   unitNo!: string;
 
-  @ApiProperty()
-  buildingShare!: string;
+  @ApiProperty({ description: 'Numerator of the building share fraction' })
+  buildingShareNumerator!: number;
+
+  @ApiProperty({ description: 'Denominator of the building share fraction' })
+  buildingShareDenominator!: number;
 
   @ApiProperty()
   createdAt!: Date;

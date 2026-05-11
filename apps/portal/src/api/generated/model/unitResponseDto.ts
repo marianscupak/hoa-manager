@@ -10,7 +10,10 @@ export interface UnitResponseDto {
     id: string;
     tenantId: string;
     unitNo: string;
-    buildingShare: string;
+    /** Numerator of the building share fraction */
+    buildingShareNumerator: number;
+    /** Denominator of the building share fraction */
+    buildingShareDenominator: number;
     createdAt: string;
     updatedAt: string;
 }

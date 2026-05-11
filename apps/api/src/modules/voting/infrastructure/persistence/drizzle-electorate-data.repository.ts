@@ -18,16 +18,15 @@ import {
 } from '../../application/ports/electorate-data.repository.port';
 
 @Injectable()
-export class DrizzleElectorateDataRepository
-  implements ElectorateDataRepository
-{
+export class DrizzleElectorateDataRepository implements ElectorateDataRepository {
   constructor(private readonly drizzle: DrizzleService) {}
 
   async findAllUnits(tenantId: string): Promise<ElectorateUnitData[]> {
     return await this.drizzle.db
       .select({
         id: units.id,
-        buildingShare: units.buildingShare,
+        buildingShareNumerator: units.buildingShareNumerator,
+        buildingShareDenominator: units.buildingShareDenominator,
       })
       .from(units)
       .where(eq(units.tenantId, tenantId));

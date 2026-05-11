@@ -163,6 +163,11 @@ export function CastVotePage() {
         });
     }, [readyUnits, questions, answers, submitMutation]);
 
+    const hasAlreadyVoted = useMemo(() => {
+        if (!statusQuery.data) return false;
+        return statusQuery.data.owningUnits.some((u) => u.status === "VOTED");
+    }, [statusQuery.data]);
+
     // ── Loading / Error ──────────────────────────────────
     if (voteQuery.isLoading || statusQuery.isLoading) {
         return (
@@ -172,12 +177,39 @@ export function CastVotePage() {
         );
     }
 
-    if (!voteQuery.data || !statusQuery.data || readyUnits.length === 0) {
+    if (!voteQuery.data || !statusQuery.data) {
         return (
             <div className="flex h-96 items-center justify-center">
                 <p className="text-destructive text-sm">
                     {t("castVote.error")}
                 </p>
+            </div>
+        );
+    }
+
+    if (readyUnits.length === 0) {
+        return (
+            <div className="mx-auto flex max-w-lg flex-col items-center justify-center py-20 text-center">
+                <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100">
+                    <ShieldCheck className="h-10 w-10 text-emerald-600" />
+                </div>
+                <h2 className="mb-2 text-2xl font-bold text-slate-900">
+                    {hasAlreadyVoted
+                        ? t("castVote.alreadyVoted.title")
+                        : t("castVote.noUnits.title")}
+                </h2>
+                <p className="mb-8 text-slate-500">
+                    {hasAlreadyVoted
+                        ? t("castVote.alreadyVoted.description")
+                        : t("castVote.noUnits.description")}
+                </p>
+                <Button
+                    onClick={() => navigate(`/voting/${voteId}`)}
+                    className="bg-blue-600 text-white hover:bg-blue-700"
+                >
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    {t("castVote.backToDetail")}
+                </Button>
             </div>
         );
     }
@@ -433,7 +465,7 @@ export function CastVotePage() {
                 <Button
                     disabled={!allCurrentAnswered}
                     onClick={handleNext}
-                    className="gap-2 bg-slate-900 text-white hover:bg-slate-800"
+                    className="gap-2 bg-blue-600 text-white hover:bg-blue-700"
                 >
                     {currentQuestionIndex < totalQuestions - 1
                         ? t("castVote.navigation.next")

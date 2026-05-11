@@ -2,7 +2,8 @@ export interface Unit {
   id: string;
   tenantId: string;
   unitNo: string;
-  buildingShare: string;
+  buildingShareNumerator: number;
+  buildingShareDenominator: number;
   createdAt: Date;
   updatedAt: Date;
 }

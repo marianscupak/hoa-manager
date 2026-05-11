@@ -26,17 +26,38 @@ export class DrizzleUnitRepository implements UnitRepository {
   async create(
     tenantId: string,
     unitNo: string,
-    buildingShare: string,
+    buildingShareNumerator: number,
+    buildingShareDenominator: number,
   ): Promise<Unit> {
     const [inserted] = await this.db
       .insert(units)
       .values({
         tenantId,
         unitNo,
-        buildingShare,
+        buildingShareNumerator,
+        buildingShareDenominator,
       })
       .returning();
     return inserted;
+  }
+
+  async update(
+    tenantId: string,
+    unitId: string,
+    unitNo: string,
+    buildingShareNumerator: number,
+    buildingShareDenominator: number,
+  ): Promise<Unit> {
+    const [updated] = await this.db
+      .update(units)
+      .set({
+        unitNo,
+        buildingShareNumerator,
+        buildingShareDenominator,
+      })
+      .where(and(eq(units.tenantId, tenantId), eq(units.id, unitId)))
+      .returning();
+    return updated;
   }
 
   async findById(tenantId: string, unitId: string): Promise<Unit | null> {

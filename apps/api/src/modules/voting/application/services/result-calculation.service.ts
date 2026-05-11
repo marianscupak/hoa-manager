@@ -24,7 +24,9 @@ import {
 import { ResultCalculationService } from '../ports/result-calculation.service.port';
 
 @Injectable()
-export class ResultCalculationDomainService implements ResultCalculationService {
+export class ResultCalculationDomainService
+  implements ResultCalculationService
+{
   constructor(
     @Inject(RESULT_CALCULATION_DATA_REPOSITORY)
     private readonly dataRepository: ResultCalculationDataRepository,

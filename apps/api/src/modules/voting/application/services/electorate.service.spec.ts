@@ -61,7 +61,7 @@ describe('ElectorateDomainService', () => {
 
     it('assigns INELIGIBLE MISSING_OWNERSHIP if unit has no ownerships', async () => {
       dataRepo.findAllUnits.mockResolvedValue([
-        { id: 'u1', buildingShare: '0.10' },
+        { id: 'u1', buildingShareNumerator: 1, buildingShareDenominator: 10 },
       ]);
       dataRepo.findOwnershipRecords.mockResolvedValue([]);
       dataRepo.findValidConsents.mockResolvedValue([]);
@@ -79,7 +79,7 @@ describe('ElectorateDomainService', () => {
 
     it('assigns ELIGIBLE if single owner has a membership', async () => {
       dataRepo.findAllUnits.mockResolvedValue([
-        { id: 'u1', buildingShare: '0.10' },
+        { id: 'u1', buildingShareNumerator: 1, buildingShareDenominator: 10 },
       ]);
       dataRepo.findOwnershipRecords.mockResolvedValue([
         { unitId: 'u1', ownerId: 'o1', membershipId: 'm1' },
@@ -99,7 +99,7 @@ describe('ElectorateDomainService', () => {
 
     it('assigns INELIGIBLE NO_REPRESENTATIVE if single owner has NO membership', async () => {
       dataRepo.findAllUnits.mockResolvedValue([
-        { id: 'u1', buildingShare: '0.10' },
+        { id: 'u1', buildingShareNumerator: 1, buildingShareDenominator: 10 },
       ]);
       dataRepo.findOwnershipRecords.mockResolvedValue([
         { unitId: 'u1', ownerId: 'o1', membershipId: null },
@@ -119,7 +119,7 @@ describe('ElectorateDomainService', () => {
 
     it('uses 1.0 weight if ruleset is ONE_UNIT_ONE_VOTE', async () => {
       dataRepo.findAllUnits.mockResolvedValue([
-        { id: 'u1', buildingShare: '0.10' },
+        { id: 'u1', buildingShareNumerator: 1, buildingShareDenominator: 10 },
       ]);
       dataRepo.findOwnershipRecords.mockResolvedValue([
         { unitId: 'u1', ownerId: 'o1', membershipId: 'm1' },
@@ -138,10 +138,27 @@ describe('ElectorateDomainService', () => {
       expect(result[0].votingWeight).toBe(1.0);
     });
 
+    it('correctly computes weight from arbitrary fractions', async () => {
+      dataRepo.findAllUnits.mockResolvedValue([
+        {
+          id: 'u1',
+          buildingShareNumerator: 225,
+          buildingShareDenominator: 1332,
+        },
+      ]);
+      dataRepo.findOwnershipRecords.mockResolvedValue([
+        { unitId: 'u1', ownerId: 'o1', membershipId: 'm1' },
+      ]);
+      dataRepo.findValidConsents.mockResolvedValue([]);
+
+      const result = await service.resolveElectorate(mockVote);
+      expect(result[0].votingWeight).toBeCloseTo(225 / 1332, 10);
+    });
+
     describe('Co-ownership (allowCoOwnerIndividualVote = false)', () => {
       it('assigns ELIGIBLE if all co-owners reach consensus on one membership via consents', async () => {
         dataRepo.findAllUnits.mockResolvedValue([
-          { id: 'u1', buildingShare: '0.20' },
+          { id: 'u1', buildingShareNumerator: 1, buildingShareDenominator: 5 },
         ]);
         dataRepo.findOwnershipRecords.mockResolvedValue([
           { unitId: 'u1', ownerId: 'o1', membershipId: 'm1' }, // Has membership
@@ -164,7 +181,7 @@ describe('ElectorateDomainService', () => {
 
       it('assigns INELIGIBLE if co-owners lack consensus', async () => {
         dataRepo.findAllUnits.mockResolvedValue([
-          { id: 'u1', buildingShare: '0.20' },
+          { id: 'u1', buildingShareNumerator: 1, buildingShareDenominator: 5 },
         ]);
         dataRepo.findOwnershipRecords.mockResolvedValue([
           { unitId: 'u1', ownerId: 'o1', membershipId: 'm1' },
@@ -195,7 +212,11 @@ describe('ElectorateDomainService', () => {
 
       it('creates multiple ELIGIBLE electorate entries, one for each membership', async () => {
         dataRepo.findAllUnits.mockResolvedValue([
-          { id: 'u1', buildingShare: '0.30' },
+          {
+            id: 'u1',
+            buildingShareNumerator: 3,
+            buildingShareDenominator: 10,
+          },
         ]);
         dataRepo.findOwnershipRecords.mockResolvedValue([
           { unitId: 'u1', ownerId: 'o1', membershipId: 'm1' },
@@ -228,7 +249,11 @@ describe('ElectorateDomainService', () => {
 
       it('assigns INELIGIBLE if NO co-owner has a membership', async () => {
         dataRepo.findAllUnits.mockResolvedValue([
-          { id: 'u1', buildingShare: '0.30' },
+          {
+            id: 'u1',
+            buildingShareNumerator: 3,
+            buildingShareDenominator: 10,
+          },
         ]);
         dataRepo.findOwnershipRecords.mockResolvedValue([
           { unitId: 'u1', ownerId: 'o1', membershipId: null },

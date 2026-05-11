@@ -47,7 +47,7 @@ export class ElectorateDomainService implements ElectorateService {
       const totalWeight =
         weightBasis === VoteWeightBasis.ONE_UNIT_ONE_VOTE
           ? 1.0
-          : Number(unit.buildingShare);
+          : unit.buildingShareNumerator / unit.buildingShareDenominator;
 
       if (unitOwnerships.length === 0) {
         electorate.push({

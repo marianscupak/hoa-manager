@@ -15,6 +15,7 @@ import { ListOwnersHandler } from '@/modules/core/property/application/handlers/
 import { ListUnitsHandler } from '@/modules/core/property/application/handlers/list-units.handler';
 import { ReplaceUnitOwnershipHandler } from '@/modules/core/property/application/handlers/replace-unit-ownership.handler';
 import { SetOwnerUserIdHandler } from '@/modules/core/property/application/handlers/set-owner-user-id.handler';
+import { UpdateUnitHandler } from '@/modules/core/property/application/handlers/update-unit.handler';
 import {
   OWNER_REPOSITORY,
   UNIT_OWNERSHIP_REPOSITORY,
@@ -32,6 +33,7 @@ const CommandHandlers = [
   CreateUnitHandler,
   ReplaceUnitOwnershipHandler,
   SetOwnerUserIdHandler,
+  UpdateUnitHandler,
 ];
 
 const QueryHandlers = [

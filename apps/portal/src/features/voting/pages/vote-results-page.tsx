@@ -134,7 +134,10 @@ export function VoteResultsPage() {
                             optionLabels={optionLabelMap}
                             quorumMeasure={vote.ruleset?.quorumMeasure}
                             denominatorUnitCount={results.denominatorUnitCount}
-                            participationUnitCount={results.participationUnitCount}
+                            participationUnitCount={
+                                results.participationUnitCount
+                            }
+                            quorumMet={results.quorumMet}
                         />
                     ))}
                 </div>
@@ -154,10 +157,14 @@ export function VoteResultsPage() {
                             <ResultsQuestionDetail
                                 question={selectedQuestion}
                                 optionLabels={optionLabelMap}
+                                quorumMet={results.quorumMet}
                             />
                         </div>
                         <div>
-                            <ResultsQuorumPanel results={results} quorumMeasure={vote.ruleset?.quorumMeasure} />
+                            <ResultsQuorumPanel
+                                results={results}
+                                quorumMeasure={vote.ruleset?.quorumMeasure}
+                            />
                         </div>
                     </div>
                 </>

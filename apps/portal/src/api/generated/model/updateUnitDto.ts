@@ -6,7 +6,7 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface CreateUnitDto {
+export interface UpdateUnitDto {
     /**
      * The unit number or label
      * @minLength 1

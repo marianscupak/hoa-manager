@@ -77,6 +77,7 @@ export * from "./totalVotingPowerDto";
 export * from "./unitDetailResponseDto";
 export * from "./unitOwnershipResponseDto";
 export * from "./unitResponseDto";
+export * from "./updateUnitDto";
 export * from "./updateUserLanguageDto";
 export * from "./updateVoteDto";
 export * from "./updateVoteQuestionDto";

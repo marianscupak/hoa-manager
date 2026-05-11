@@ -17,7 +17,9 @@ import {
 } from '../../application/ports/result-calculation-data.repository.port';
 
 @Injectable()
-export class DrizzleResultCalculationDataRepository implements ResultCalculationDataRepository {
+export class DrizzleResultCalculationDataRepository
+  implements ResultCalculationDataRepository
+{
   constructor(private readonly drizzle: DrizzleService) {}
 
   private get db() {

@@ -460,6 +460,17 @@ export const voting = {
             timestamp: "Čas zaznamenání",
             backToDashboard: "Zpět na přehled",
         },
+        alreadyVoted: {
+            title: "Hlas byl úspěšně zaznamenán",
+            description:
+                "Váš hlas pro toto hlasování byl již v systému uložen. Průběh můžete sledovat v detailu hlasování.",
+        },
+        noUnits: {
+            title: "Žádné jednotky k hlasování",
+            description:
+                "V tomto hlasování nemáte žádné další jednotky, za které by bylo možné odevzdat hlas.",
+        },
+        backToDetail: "Zpět na detail hlasování",
     },
     results: {
         pageTitle: "Výsledky",
@@ -482,5 +493,11 @@ export const voting = {
         participationWeight: "Váha účasti",
         resolutionDetails: "Usnesení {{index}} – {{title}}",
         viewResults: "Zobrazit výsledky",
+        unitCount_one: "{{count}} jednotka",
+        unitCount_few: "{{count}} jednotky",
+        unitCount_other: "{{count}} jednotek",
+        weightLabel: "podílu",
+        invalid: "Neplatné",
+        invalidQuorum: "Chybí kvórum",
     },
 };

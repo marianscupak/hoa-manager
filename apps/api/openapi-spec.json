@@ -1385,6 +1385,75 @@
           }
         },
         "tags": ["Property Units"]
+      },
+      "patch": {
+        "operationId": "UnitController_updateUnit",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUnitDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Unit updated successfully"
+          },
+          "400": {
+            "description": "Bad Request - Validation or Domain logic error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Property Units"]
       }
     },
     "/api/units/{id}/ownership": {
@@ -2443,8 +2512,13 @@
           "unitNo": {
             "type": "string"
           },
-          "buildingShare": {
-            "type": "string"
+          "buildingShareNumerator": {
+            "type": "number",
+            "description": "Numerator of the building share fraction"
+          },
+          "buildingShareDenominator": {
+            "type": "number",
+            "description": "Denominator of the building share fraction"
           },
           "createdAt": {
             "format": "date-time",
@@ -2459,7 +2533,8 @@
           "id",
           "tenantId",
           "unitNo",
-          "buildingShare",
+          "buildingShareNumerator",
+          "buildingShareDenominator",
           "createdAt",
           "updatedAt"
         ]
@@ -2473,13 +2548,24 @@
             "maxLength": 50,
             "description": "The unit number or label"
           },
-          "buildingShare": {
-            "type": "string",
-            "pattern": "^\\d+(\\.\\d+)?$",
-            "description": "The building share as a decimal string"
+          "buildingShareNumerator": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991,
+            "description": "The numerator of the building share fraction"
+          },
+          "buildingShareDenominator": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991,
+            "description": "The denominator of the building share fraction"
           }
         },
-        "required": ["unitNo", "buildingShare"]
+        "required": [
+          "unitNo",
+          "buildingShareNumerator",
+          "buildingShareDenominator"
+        ]
       },
       "CreateUnitResponseDto": {
         "type": "object",
@@ -2542,8 +2628,13 @@
           "unitNo": {
             "type": "string"
           },
-          "buildingShare": {
-            "type": "string"
+          "buildingShareNumerator": {
+            "type": "number",
+            "description": "Numerator of the building share fraction"
+          },
+          "buildingShareDenominator": {
+            "type": "number",
+            "description": "Denominator of the building share fraction"
           },
           "createdAt": {
             "format": "date-time",
@@ -2564,10 +2655,39 @@
           "id",
           "tenantId",
           "unitNo",
-          "buildingShare",
+          "buildingShareNumerator",
+          "buildingShareDenominator",
           "createdAt",
           "updatedAt",
           "ownerships"
+        ]
+      },
+      "UpdateUnitDto": {
+        "type": "object",
+        "properties": {
+          "unitNo": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50,
+            "description": "The unit number or label"
+          },
+          "buildingShareNumerator": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991,
+            "description": "The numerator of the building share fraction"
+          },
+          "buildingShareDenominator": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991,
+            "description": "The denominator of the building share fraction"
+          }
+        },
+        "required": [
+          "unitNo",
+          "buildingShareNumerator",
+          "buildingShareDenominator"
         ]
       },
       "ReplaceOwnershipsDto": {

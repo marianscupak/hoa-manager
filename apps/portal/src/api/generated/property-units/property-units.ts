@@ -28,6 +28,7 @@ import type {
     ReplaceOwnershipsDto,
     UnitDetailResponseDto,
     UnitResponseDto,
+    UpdateUnitDto,
 } from ".././model";
 
 import { customInstance } from "../../axios";
@@ -431,6 +432,93 @@ export function useUnitControllerGetUnitDetail<
     return { ...query, queryKey: queryOptions.queryKey };
 }
 
+export const unitControllerUpdateUnit = (
+    id: string,
+    updateUnitDto: BodyType<UpdateUnitDto>,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<void>(
+        {
+            url: `/api/units/${id}`,
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            data: updateUnitDto,
+            signal,
+        },
+        options,
+    );
+};
+
+export const getUnitControllerUpdateUnitMutationOptions = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof unitControllerUpdateUnit>>,
+        TError,
+        { id: string; data: BodyType<UpdateUnitDto> },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof unitControllerUpdateUnit>>,
+    TError,
+    { id: string; data: BodyType<UpdateUnitDto> },
+    TContext
+> => {
+    const mutationKey = ["unitControllerUpdateUnit"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof unitControllerUpdateUnit>>,
+        { id: string; data: BodyType<UpdateUnitDto> }
+    > = (props) => {
+        const { id, data } = props ?? {};
+
+        return unitControllerUpdateUnit(id, data, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type UnitControllerUpdateUnitMutationResult = NonNullable<
+    Awaited<ReturnType<typeof unitControllerUpdateUnit>>
+>;
+export type UnitControllerUpdateUnitMutationBody = BodyType<UpdateUnitDto>;
+export type UnitControllerUpdateUnitMutationError = ErrorType<ErrorResponseDto>;
+
+export const useUnitControllerUpdateUnit = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof unitControllerUpdateUnit>>,
+            TError,
+            { id: string; data: BodyType<UpdateUnitDto> },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof unitControllerUpdateUnit>>,
+    TError,
+    { id: string; data: BodyType<UpdateUnitDto> },
+    TContext
+> => {
+    return useMutation(
+        getUnitControllerUpdateUnitMutationOptions(options),
+        queryClient,
+    );
+};
 export const unitControllerReplaceUnitOwnership = (
     id: string,
     replaceOwnershipsDto: BodyType<ReplaceOwnershipsDto>,

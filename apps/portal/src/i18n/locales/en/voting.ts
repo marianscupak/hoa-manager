@@ -460,6 +460,17 @@ export const voting = {
             timestamp: "Timestamp",
             backToDashboard: "Back to dashboard",
         },
+        alreadyVoted: {
+            title: "Vote Successfully Recorded",
+            description:
+                "Your ballot has been successfully stored in our system. You can follow the progress in the vote detail.",
+        },
+        noUnits: {
+            title: "No Units to Vote",
+            description:
+                "You don't have any additional units eligible to cast a vote in this specific event.",
+        },
+        backToDetail: "Back to Vote Detail",
     },
     results: {
         pageTitle: "Results",
@@ -482,5 +493,10 @@ export const voting = {
         participationWeight: "Participation Weight",
         resolutionDetails: "Resolution {{index}} Details: {{title}}",
         viewResults: "View Results",
+        unitCount_one: "{{count}} unit",
+        unitCount_other: "{{count}} units",
+        weightLabel: "weight",
+        invalid: "Invalid",
+        invalidQuorum: "Quorum not met",
     },
 };

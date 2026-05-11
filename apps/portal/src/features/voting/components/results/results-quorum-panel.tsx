@@ -11,7 +11,10 @@ interface ResultsQuorumPanelProps {
     quorumMeasure: string | undefined;
 }
 
-export function ResultsQuorumPanel({ results, quorumMeasure }: ResultsQuorumPanelProps) {
+export function ResultsQuorumPanel({
+    results,
+    quorumMeasure,
+}: ResultsQuorumPanelProps) {
     const { t } = useTranslation(["voting"]);
 
     const isUnitCount =
@@ -19,11 +22,18 @@ export function ResultsQuorumPanel({ results, quorumMeasure }: ResultsQuorumPane
 
     const participationPct = isUnitCount
         ? results.denominatorUnitCount > 0
-            ? ((results.participationUnitCount / results.denominatorUnitCount) * 100).toFixed(1)
+            ? (
+                  (results.participationUnitCount /
+                      results.denominatorUnitCount) *
+                  100
+              ).toFixed(1)
             : "0.0"
         : results.denominatorWeight > 0
-            ? ((results.participationWeight / results.denominatorWeight) * 100).toFixed(1)
-            : "0.0";
+          ? (
+                (results.participationWeight / results.denominatorWeight) *
+                100
+            ).toFixed(1)
+          : "0.0";
 
     return (
         <div className="rounded-xl bg-slate-900 p-6 text-white">
@@ -69,7 +79,14 @@ export function ResultsQuorumPanel({ results, quorumMeasure }: ResultsQuorumPane
                         {t("voting:results.participationWeight")}
                     </span>
                     <span className="text-lg font-bold">
-                        {results.participationWeight.toFixed(2)}
+                        {results.denominatorWeight > 0
+                            ? (
+                                  (results.participationWeight /
+                                      results.denominatorWeight) *
+                                  100
+                              ).toFixed(1)
+                            : "0.0"}{" "}
+                        %
                     </span>
                 </div>
             </div>

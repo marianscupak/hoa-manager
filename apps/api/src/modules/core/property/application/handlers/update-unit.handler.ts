@@ -1,7 +1,7 @@
 import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { CreateUnitCommand } from '@/modules/core/property/application/commands/create-unit.command';
+import { UpdateUnitCommand } from '@/modules/core/property/application/commands/update-unit.command';
 import {
   UNIT_REPOSITORY,
   type UnitRepository,
@@ -9,19 +9,19 @@ import {
 import {
   DuplicateUnitNumberException,
   InvalidOwnershipShareException,
+  UnitNotFoundException,
 } from '@/shared/application/exceptions/property.exceptions';
 
-@CommandHandler(CreateUnitCommand)
-export class CreateUnitHandler implements ICommandHandler<
-  CreateUnitCommand,
-  { unitId: string }
-> {
+@CommandHandler(UpdateUnitCommand)
+export class UpdateUnitHandler
+  implements ICommandHandler<UpdateUnitCommand, void>
+{
   constructor(
     @Inject(UNIT_REPOSITORY)
     private readonly unitRepo: UnitRepository,
   ) {}
 
-  async execute(command: CreateUnitCommand): Promise<{ unitId: string }> {
+  async execute(command: UpdateUnitCommand): Promise<void> {
     if (
       !Number.isInteger(command.buildingShareNumerator) ||
       !Number.isInteger(command.buildingShareDenominator) ||
@@ -31,18 +31,24 @@ export class CreateUnitHandler implements ICommandHandler<
       throw new InvalidOwnershipShareException();
     }
 
+    const existing = await this.unitRepo.findById(
+      command.tenantId,
+      command.unitId,
+    );
+    if (!existing) {
+      throw new UnitNotFoundException();
+    }
+
     try {
-      const newUnit = await this.unitRepo.create(
+      await this.unitRepo.update(
         command.tenantId,
+        command.unitId,
         command.unitNo,
         command.buildingShareNumerator,
         command.buildingShareDenominator,
       );
-
-      return { unitId: newUnit.id };
     } catch (error: any) {
       if (error.code === '23505') {
-        // Postgres unique constraint violation
         throw new DuplicateUnitNumberException();
       }
       throw error;

@@ -21,6 +21,7 @@ interface ResultsQuestionCardProps {
     quorumMeasure: string | undefined;
     denominatorUnitCount: number;
     participationUnitCount: number;
+    quorumMet: boolean;
 }
 
 export function ResultsQuestionCard({
@@ -34,6 +35,7 @@ export function ResultsQuestionCard({
     quorumMeasure,
     denominatorUnitCount,
     participationUnitCount,
+    quorumMet,
 }: ResultsQuestionCardProps) {
     const { t } = useTranslation(["voting"]);
 
@@ -55,7 +57,7 @@ export function ResultsQuestionCard({
           )
         : null;
 
-    let inFavorOpt = null;
+    let inFavorOpt;
     if (question.type === VoteQuestionResponseDtoType.YES_NO) {
         const yesOptionId = Object.keys(optionLabels).find(
             (id) =>
@@ -78,7 +80,9 @@ export function ResultsQuestionCard({
             : "—";
 
     let isApproved = false;
-    if (question.majorityMet) {
+    const isQuorumInvalid = !quorumMet;
+
+    if (quorumMet && question.majorityMet) {
         if (question.type === VoteQuestionResponseDtoType.YES_NO) {
             const winningMeta = question.winningOptionId
                 ? optionLabels[question.winningOptionId]
@@ -100,7 +104,12 @@ export function ResultsQuestionCard({
             }`}
         >
             <div className="mb-3 flex items-start justify-between gap-2">
-                {isApproved ? (
+                {isQuorumInvalid ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold tracking-wide text-amber-700 uppercase">
+                        <XCircle className="h-3 w-3" />
+                        {t("voting:results.invalidQuorum")}
+                    </span>
+                ) : isApproved ? (
                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold tracking-wide text-emerald-700 uppercase">
                         <CheckCircle2 className="h-3 w-3" />
                         {t("voting:results.approved")}

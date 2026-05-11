@@ -8,7 +8,6 @@ import {
   isNotNull,
   ne,
   count,
-  sum,
   or,
 } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
@@ -491,7 +490,8 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       .select({
         unitId: unitOwnerships.unitId,
         unitNo: units.unitNo,
-        buildingShare: units.buildingShare,
+        buildingShareNumerator: units.buildingShareNumerator,
+        buildingShareDenominator: units.buildingShareDenominator,
       })
       .from(unitOwnerships)
       .innerJoin(units, eq(unitOwnerships.unitId, units.id))
@@ -527,7 +527,8 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
           ineligibleReason: voteElectorateUnits.ineligibleReason,
           votingWeight: voteElectorateUnits.votingWeight,
           unitNo: units.unitNo,
-          buildingShare: units.buildingShare,
+          buildingShareNumerator: units.buildingShareNumerator,
+          buildingShareDenominator: units.buildingShareDenominator,
         })
         .from(voteElectorateUnits)
         .innerJoin(units, eq(voteElectorateUnits.unitId, units.id))
@@ -551,14 +552,19 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
         allowIndividualVote,
       );
 
-      const totalShareRows = await this.drizzle.db
-        .select({ total: sum(units.buildingShare) })
+      // Compute total voting power from fractions
+      const allUnits = await this.drizzle.db
+        .select({
+          buildingShareNumerator: units.buildingShareNumerator,
+          buildingShareDenominator: units.buildingShareDenominator,
+        })
         .from(units)
         .where(eq(units.tenantId, tenantId));
 
-      const totalMaximum = totalShareRows[0]?.total
-        ? Number(totalShareRows[0].total)
-        : 0;
+      const totalMaximum = allUnits.reduce(
+        (sum, u) => sum + u.buildingShareNumerator / u.buildingShareDenominator,
+        0,
+      );
 
       let totalValue = 0;
       let hasReady = false;
@@ -566,14 +572,13 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       const owningUnits = uniqueUnitIds.map((unitId) => {
         const snapshot = snapshotRows.find((s) => s.unitId === unitId);
         const ownership = ownershipRows.find((o) => o.unitId === unitId)!;
-        const share = Number(ownership.buildingShare);
 
         if (!snapshot) {
           // This should not happen if the snapshot is complete, but fallback
           return {
             id: unitId,
             name: ownership.unitNo,
-            share: `${share}/${totalMaximum}`,
+            share: `${ownership.buildingShareNumerator}/${ownership.buildingShareDenominator}`,
             status: OwningUnitStatus.INELIGIBLE,
           };
         }
@@ -596,7 +601,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
         return {
           id: unitId,
           name: ownership.unitNo,
-          share: `${Number(snapshot.votingWeight)}/${totalMaximum}`,
+          share: `${ownership.buildingShareNumerator}/${ownership.buildingShareDenominator}`,
           status,
           ineligibleReason:
             snapshot.ineligibleReason as ElectorateIneligibleReason | null,
@@ -633,15 +638,19 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       ),
     ]);
 
-    // Compute total voting power (sum of all building shares in the tenant)
-    const totalShareRows = await this.drizzle.db
-      .select({ total: sum(units.buildingShare) })
+    // Compute total voting power from fractions
+    const allUnits = await this.drizzle.db
+      .select({
+        buildingShareNumerator: units.buildingShareNumerator,
+        buildingShareDenominator: units.buildingShareDenominator,
+      })
       .from(units)
       .where(eq(units.tenantId, tenantId));
 
-    const totalMaximum = totalShareRows[0]?.total
-      ? Number(totalShareRows[0].total)
-      : 0;
+    const totalMaximum = allUnits.reduce(
+      (sum, u) => sum + u.buildingShareNumerator / u.buildingShareDenominator,
+      0,
+    );
 
     // Build unit statuses
     let totalValue = 0;
@@ -651,7 +660,8 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       const ownership = ownershipRows.find((o) => o.unitId === unitId)!;
       const ownerCount = ownerCountMap.get(unitId) ?? 1;
       const isSoleOwner = ownerCount === 1;
-      const share = Number(ownership.buildingShare);
+      const share =
+        ownership.buildingShareNumerator / ownership.buildingShareDenominator;
 
       let status: OwningUnitStatus;
 
@@ -677,7 +687,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       return {
         id: unitId,
         name: ownership.unitNo,
-        share: `${share}/${totalMaximum}`,
+        share: `${ownership.buildingShareNumerator}/${ownership.buildingShareDenominator}`,
         status,
       };
     });

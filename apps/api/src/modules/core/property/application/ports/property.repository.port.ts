@@ -8,7 +8,15 @@ export interface UnitRepository {
   create(
     tenantId: string,
     unitNo: string,
-    buildingShare: string,
+    buildingShareNumerator: number,
+    buildingShareDenominator: number,
+  ): Promise<Unit>;
+  update(
+    tenantId: string,
+    unitId: string,
+    unitNo: string,
+    buildingShareNumerator: number,
+    buildingShareDenominator: number,
   ): Promise<Unit>;
   findById(tenantId: string, unitId: string): Promise<Unit | null>;
   listByTenant(tenantId: string): Promise<Unit[]>;

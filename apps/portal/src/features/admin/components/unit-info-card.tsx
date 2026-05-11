@@ -28,10 +28,8 @@ export function UnitInfoCard({ unit }: UnitInfoCardProps) {
                         {t("admin:units.details.buildingShare")}
                     </dt>
                     <dd className="text-foreground text-lg font-medium">
-                        {(parseFloat(unit?.buildingShare ?? "0") * 100).toFixed(
-                            2,
-                        )}
-                        %
+                        {unit?.buildingShareNumerator}/
+                        {unit?.buildingShareDenominator}
                     </dd>
                 </div>
             </dl>

@@ -28,9 +28,18 @@ import { useUnitControllerCreateUnit } from "@/api/generated/property-units/prop
 const createUnitSchema = (t: TFunction<"admin">) =>
     z.object({
         unitNo: z.string().min(1, t("units.create.unitNoRequired")).max(50),
-        buildingShare: z
-            .string()
-            .regex(/^\d+(\.\d+)?$/, t("units.create.buildingShareRequired")),
+        buildingShareNumerator: z.coerce
+            .number({
+                invalid_type_error: t("units.create.shareMustBePositive"),
+            })
+            .int(t("units.create.shareMustBePositive"))
+            .positive(t("units.create.shareMustBePositive")),
+        buildingShareDenominator: z.coerce
+            .number({
+                invalid_type_error: t("units.create.shareMustBePositive"),
+            })
+            .int(t("units.create.shareMustBePositive"))
+            .positive(t("units.create.shareMustBePositive")),
     });
 
 type CreateUnitValues = z.infer<ReturnType<typeof createUnitSchema>>;
@@ -65,12 +74,19 @@ export function CreateUnitDialog({
         resolver: zodResolver(schema),
         defaultValues: {
             unitNo: "",
-            buildingShare: "",
+            buildingShareNumerator: undefined as unknown as number,
+            buildingShareDenominator: undefined as unknown as number,
         },
     });
 
     const onSubmit = (values: CreateUnitValues) => {
-        createUnit.mutate({ data: values });
+        createUnit.mutate({
+            data: {
+                unitNo: values.unitNo,
+                buildingShareNumerator: values.buildingShareNumerator,
+                buildingShareDenominator: values.buildingShareDenominator,
+            },
+        });
     };
 
     return (
@@ -108,26 +124,56 @@ export function CreateUnitDialog({
                                 </FormItem>
                             )}
                         />
-                        <FormField
-                            control={form.control}
-                            name="buildingShare"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>
-                                        {t("units.create.buildingShareLabel")}
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            placeholder={t(
-                                                "units.create.buildingSharePlaceholder",
-                                            )}
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                        <div>
+                            <FormLabel>
+                                {t("units.create.buildingShareLabel")}
+                            </FormLabel>
+                            <div className="mt-2 flex items-center gap-2">
+                                <FormField
+                                    control={form.control}
+                                    name="buildingShareNumerator"
+                                    render={({ field }) => (
+                                        <FormItem className="flex-1">
+                                            <FormControl>
+                                                <Input
+                                                    type="number"
+                                                    min={1}
+                                                    step={1}
+                                                    placeholder={t(
+                                                        "units.create.numeratorPlaceholder",
+                                                    )}
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <span className="text-muted-foreground text-lg font-semibold">
+                                    /
+                                </span>
+                                <FormField
+                                    control={form.control}
+                                    name="buildingShareDenominator"
+                                    render={({ field }) => (
+                                        <FormItem className="flex-1">
+                                            <FormControl>
+                                                <Input
+                                                    type="number"
+                                                    min={1}
+                                                    step={1}
+                                                    placeholder={t(
+                                                        "units.create.denominatorPlaceholder",
+                                                    )}
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                        </div>
                         <DialogFooter>
                             <Button
                                 type="submit"

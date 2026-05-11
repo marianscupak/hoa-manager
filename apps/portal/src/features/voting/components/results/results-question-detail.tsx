@@ -10,9 +10,12 @@ type QuestionResult = VoteResultsResponseDto["questionResults"][number];
 
 function useOptionDisplayLabel(optionKey: string, fallback: string): string {
     const { t } = useTranslation(["voting"]);
-    if (optionKey === VoteOptionResponseDtoOptionKey.YES) return t("create.optionLabels.YES");
-    if (optionKey === VoteOptionResponseDtoOptionKey.NO) return t("create.optionLabels.NO");
-    if (optionKey === VoteOptionResponseDtoOptionKey.ABSTAIN) return t("create.optionLabels.ABSTAIN");
+    if (optionKey === VoteOptionResponseDtoOptionKey.YES)
+        return t("create.optionLabels.YES");
+    if (optionKey === VoteOptionResponseDtoOptionKey.NO)
+        return t("create.optionLabels.NO");
+    if (optionKey === VoteOptionResponseDtoOptionKey.ABSTAIN)
+        return t("create.optionLabels.ABSTAIN");
     return fallback;
 }
 
@@ -34,6 +37,7 @@ function ResultsOptionBar({
     majorityDenominator,
     isWinner,
 }: ResultsOptionBarProps) {
+    const { t } = useTranslation(["voting"]);
     const displayLabel = useOptionDisplayLabel(optionKey, label);
 
     const pct =
@@ -67,7 +71,9 @@ function ResultsOptionBar({
                 />
             </div>
             <p className="mt-1 text-xs text-slate-500">
-                {voteUnitCount} units · {voteWeight.toFixed(2)} weight
+                {t("voting:results.unitCount", { count: voteUnitCount })} ·{" "}
+                {(voteWeight * 100).toFixed(1)} %{" "}
+                {t("voting:results.weightLabel")}
             </p>
         </div>
     );
@@ -76,16 +82,20 @@ function ResultsOptionBar({
 interface ResultsQuestionDetailProps {
     question: QuestionResult & { title: string; type?: string };
     optionLabels: Record<string, { label: string; optionKey: string }>;
+    quorumMet: boolean;
 }
 
 export function ResultsQuestionDetail({
     question,
     optionLabels,
+    quorumMet,
 }: ResultsQuestionDetailProps) {
     const { t } = useTranslation(["voting"]);
 
     let isApproved = false;
-    if (question.majorityMet) {
+    const isQuorumInvalid = !quorumMet;
+
+    if (quorumMet && question.majorityMet) {
         if (question.type === VoteQuestionResponseDtoType.YES_NO) {
             const winningMeta = question.winningOptionId
                 ? optionLabels[question.winningOptionId]
@@ -103,9 +113,11 @@ export function ResultsQuestionDetail({
                 {t("voting:results.finalResolution")}
             </div>
             <h2 className="mb-6 text-4xl font-black tracking-tight text-slate-900">
-                {isApproved
-                    ? t("voting:results.approved").toUpperCase()
-                    : t("voting:results.rejected").toUpperCase()}
+                {isQuorumInvalid
+                    ? t("voting:results.invalid").toUpperCase()
+                    : isApproved
+                      ? t("voting:results.approved").toUpperCase()
+                      : t("voting:results.rejected").toUpperCase()}
             </h2>
 
             <div className="space-y-1">

@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Put,
+  Patch,
   Body,
   Param,
   UseGuards,
@@ -15,12 +16,14 @@ import { ApiOkResponse, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import {
   CreateUnitDto,
   CreateUnitResponseDto,
+  UpdateUnitDto,
   ReplaceOwnershipsDto,
   UnitResponseDto,
   UnitDetailResponseDto,
 } from '@/modules/core/property/api/dto/unit.dto';
 import { CreateUnitCommand } from '@/modules/core/property/application/commands/create-unit.command';
 import { ReplaceUnitOwnershipCommand } from '@/modules/core/property/application/commands/replace-unit-ownership.command';
+import { UpdateUnitCommand } from '@/modules/core/property/application/commands/update-unit.command';
 import { GetUnitDetailQuery } from '@/modules/core/property/application/queries/get-unit-detail.query';
 import { ListUnitsQuery } from '@/modules/core/property/application/queries/list-units.query';
 import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
@@ -66,7 +69,12 @@ export class UnitController {
     @Body() dto: CreateUnitDto,
   ): Promise<CreateUnitResponseDto> {
     return this.commandBus.execute<CreateUnitCommand, { unitId: string }>(
-      new CreateUnitCommand(tenantCtx.tenantId, dto.unitNo, dto.buildingShare),
+      new CreateUnitCommand(
+        tenantCtx.tenantId,
+        dto.unitNo,
+        dto.buildingShareNumerator,
+        dto.buildingShareDenominator,
+      ),
     );
   }
 
@@ -83,6 +91,28 @@ export class UnitController {
   ): Promise<UnitDetailResponseDto> {
     return this.queryBus.execute(
       new GetUnitDetailQuery(tenantCtx.tenantId, unitId),
+    );
+  }
+
+  @Patch(':id')
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOkResponse({
+    description: 'Unit updated successfully',
+  })
+  async updateUnit(
+    @Tenant() tenantCtx: TenantContext,
+    @Param('id') unitId: string,
+    @Body() dto: UpdateUnitDto,
+  ): Promise<void> {
+    await this.commandBus.execute(
+      new UpdateUnitCommand(
+        tenantCtx.tenantId,
+        unitId,
+        dto.unitNo,
+        dto.buildingShareNumerator,
+        dto.buildingShareDenominator,
+      ),
     );
   }
 

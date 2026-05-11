@@ -1,6 +1,7 @@
 export interface ElectorateUnitData {
   id: string;
-  buildingShare: string;
+  buildingShareNumerator: number;
+  buildingShareDenominator: number;
 }
 
 export interface ElectorateOwnershipData {

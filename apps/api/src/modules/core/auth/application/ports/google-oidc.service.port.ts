@@ -12,10 +12,17 @@ export interface CodeExchangeResult {
   refreshToken?: string;
 }
 
+export interface GoogleCallbackParams {
+  code?: string;
+  state?: string;
+  error?: string;
+  error_description?: string;
+}
+
 export interface GoogleOidcService {
   getAuthorizationUrl(state: string, nonce: string): Promise<string>;
   exchangeCode(
-    params: Record<string, string>,
+    params: GoogleCallbackParams,
     expectedNonce: string,
     expectedState?: string,
   ): Promise<CodeExchangeResult>;

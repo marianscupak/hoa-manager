@@ -11,6 +11,7 @@ import {
 import { addDays, addMinutes } from 'date-fns';
 
 import { HandleGoogleCallbackCommand } from '@/modules/core/auth/application/commands/handle-google-callback.command';
+import { AccountExistsException } from '@/shared/application/exceptions/invite.exceptions';
 import {
   AUTH_IDENTITY_REPOSITORY,
   AUTH_SESSION_REPOSITORY,
@@ -106,18 +107,15 @@ export class HandleGoogleCallbackHandler implements ICommandHandler<HandleGoogle
         ? await this.queryBus.execute(new GetUserByIdQuery(identity.userId))
         : null;
 
-      if (!identity && !user) {
-        user = await this.queryBus.execute(
+      if (!identity) {
+        // Refuse to silently link Google to an existing email-based
+        // account. The user must sign in via their existing provider
+        // and explicitly link Google from settings.
+        const existingByEmail = await this.queryBus.execute(
           new GetUserByEmailQuery(idToken.email!.toLowerCase()),
         );
-
-        if (user) {
-          identity = await this.authIdentityRepository.create({
-            userId: user.id,
-            provider: 'OIDC_GOOGLE',
-            providerSubject: idToken.sub,
-            passwordHash: null,
-          });
+        if (existingByEmail) {
+          throw new AccountExistsException();
         }
       }
 

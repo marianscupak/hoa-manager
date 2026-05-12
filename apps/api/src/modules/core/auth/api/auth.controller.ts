@@ -20,6 +20,7 @@ import {
   SuccessResponseDto,
 } from '@/modules/core/auth/api/dto/auth-response.dto';
 import { ExchangeCodeDto } from '@/modules/core/auth/api/dto/exchange-code.dto';
+import { GoogleCallbackQueryDto } from '@/modules/core/auth/api/dto/google-callback-query.dto';
 import { LoginDto } from '@/modules/core/auth/api/dto/login.dto';
 import { SwitchTenantDto } from '@/modules/core/auth/api/dto/switch-tenant.dto';
 import { ExchangeGoogleCodeCommand } from '@/modules/core/auth/application/commands/exchange-google-code.command';
@@ -82,7 +83,10 @@ export class AuthController {
   }
 
   @Get('google/callback')
-  async handleGoogleCallback(@Query() query: any, @Res() res: Response) {
+  async handleGoogleCallback(
+    @Query() query: GoogleCallbackQueryDto,
+    @Res() res: Response,
+  ) {
     const result = await this.commandBus.execute<
       HandleGoogleCallbackCommand,
       HandleGoogleCallbackResult

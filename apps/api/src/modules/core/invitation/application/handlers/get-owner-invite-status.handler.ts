@@ -44,18 +44,12 @@ export class GetOwnerInviteStatusHandler
     }
 
     if (invite.acceptedAt) {
-      return {
-        status: 'accepted',
-        emailMasked: maskEmail(invite.emailNormalized),
-      };
+      // Strip details on stale invites to avoid enumeration via leaked links
+      return { status: 'accepted' };
     }
 
     if (invite.expiresAt < this.clock.now()) {
-      return {
-        status: 'expired',
-        emailMasked: maskEmail(invite.emailNormalized),
-        expiresAt: invite.expiresAt,
-      };
+      return { status: 'expired' };
     }
 
     return {

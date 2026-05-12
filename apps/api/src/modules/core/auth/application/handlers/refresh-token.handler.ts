@@ -67,6 +67,10 @@ export class RefreshTokenHandler
 
       const userId = session.userId;
 
+      // Enforce expiry and revocation-replay detection. Outside the
+      // grace period, a reused revoked token triggers revokeAllForUser.
+      await this.validateSessionStatus(session, userId);
+
       const user = await this.queryBus.execute<
         GetUserByIdQuery,
         GetUserByIdResult

@@ -42,7 +42,10 @@ import { type HandleGoogleCallbackResult } from '@/modules/core/auth/application
 import { type StartGoogleLoginResult } from '@/modules/core/auth/application/handlers/start-google-login.handler';
 import { ApiErrorResponses } from '@/shared/api/decorators/error.decorators';
 import { AccessTokenAuthGuard } from '@/shared/api/guards/access-token-auth.guard';
-import { setRefreshTokenCookie } from '@/shared/api/utils/refresh-cookie';
+import {
+  clearRefreshTokenCookie,
+  setRefreshTokenCookie,
+} from '@/shared/api/utils/refresh-cookie';
 import { UnauthorizedException } from '@/shared/application/exceptions/auth.exceptions';
 
 @ApiTags('Auth')
@@ -157,7 +160,7 @@ export class AuthController {
       await this.commandBus.execute(new LogoutCommand(refreshToken));
     }
 
-    res.clearCookie('refresh_token');
+    clearRefreshTokenCookie(res);
     return { success: true };
   }
 

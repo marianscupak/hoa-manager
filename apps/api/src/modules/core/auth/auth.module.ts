@@ -51,10 +51,9 @@ import { TenancyModule } from '@/modules/core/tenancy/tenancy.module';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>(
-          'JWT_SECRET',
-          'fallback_secret_for_development',
-        ),
+        secret: configService.getOrThrow<string>('JWT_SECRET'),
+        signOptions: { algorithm: 'HS256' },
+        verifyOptions: { algorithms: ['HS256'] },
       }),
     }),
   ],

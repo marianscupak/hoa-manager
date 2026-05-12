@@ -53,6 +53,9 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
         new GetUserByEmailQuery(command.email),
       );
       if (!user) {
+        // Equalise timing with the bcrypt-compare path to prevent
+        // user enumeration via login response time.
+        await this.passwordHasher.compareDummy(command.password ?? '');
         throw new InvalidCredentialsException();
       }
 
@@ -68,11 +71,15 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
       );
 
       if (!identity || identity.userId !== user.id) {
+        if (command.provider === 'LOCAL') {
+          await this.passwordHasher.compareDummy(command.password ?? '');
+        }
         throw new InvalidCredentialsException();
       }
 
       if (command.provider === 'LOCAL') {
         if (!command.password || !identity.passwordHash) {
+          await this.passwordHasher.compareDummy(command.password ?? '');
           throw new InvalidCredentialsException();
         }
         const isValid = await this.passwordHasher.compare(

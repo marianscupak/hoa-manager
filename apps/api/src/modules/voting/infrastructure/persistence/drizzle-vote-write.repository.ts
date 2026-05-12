@@ -3,6 +3,7 @@ import { and, eq, inArray, isNull, isNotNull, lte } from 'drizzle-orm';
 
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
 import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
+import { BallotAlreadyCastException } from '@/shared/application/exceptions/vote.exceptions';
 import {
   voteRulesets,
   votes,
@@ -534,28 +535,38 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
   ): Promise<void> {
     if (ballotInputs.length === 0) return;
 
-    for (const input of ballotInputs) {
-      const [inserted] = await this.db
-        .insert(ballots)
-        .values({
-          tenantId,
-          voteId,
-          unitId: input.unitId,
-          castByMembershipId: input.castByMembershipId,
-          castMethod: input.castMethod,
-          castAt: new Date(),
-        })
-        .returning({ id: ballots.id });
+    try {
+      for (const input of ballotInputs) {
+        const [inserted] = await this.db
+          .insert(ballots)
+          .values({
+            tenantId,
+            voteId,
+            unitId: input.unitId,
+            castByMembershipId: input.castByMembershipId,
+            castMethod: input.castMethod,
+            castAt: new Date(),
+          })
+          .returning({ id: ballots.id });
 
-      if (input.answers.length > 0) {
-        await this.db.insert(ballotAnswers).values(
-          input.answers.map((a) => ({
-            ballotId: inserted.id,
-            questionId: a.questionId,
-            optionId: a.optionId,
-          })),
-        );
+        if (input.answers.length > 0) {
+          await this.db.insert(ballotAnswers).values(
+            input.answers.map((a) => ({
+              ballotId: inserted.id,
+              questionId: a.questionId,
+              optionId: a.optionId,
+            })),
+          );
+        }
       }
+    } catch (error: any) {
+      // Concurrent ballot submissions can both pass the prior
+      // hasExistingBallots check under READ COMMITTED. Translate the
+      // resulting unique-constraint violation into a clean domain error.
+      if (error?.code === '23505') {
+        throw new BallotAlreadyCastException();
+      }
+      throw error;
     }
   }
 

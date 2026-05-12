@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
 
 import {
@@ -42,6 +43,7 @@ export class InviteController {
   ) {}
 
   @Get('invites/owner/status')
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
     description: 'Returns the current status of an owner invitation',
@@ -73,6 +75,7 @@ export class InviteController {
   }
 
   @Post('auth/register-from-invite')
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
     description:

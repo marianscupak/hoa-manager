@@ -16,6 +16,12 @@ import { ObservabilityModule } from '@/infrastructure/observability/observabilit
     ObservabilityModule,
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 20 }]),
   ],
-  exports: [ConfigModule, DbModule, ObservabilityModule, ClockModule],
+  exports: [
+    ConfigModule,
+    DbModule,
+    ObservabilityModule,
+    ClockModule,
+    ThrottlerModule,
+  ],
 })
 export class InfrastructureModule {}

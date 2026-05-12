@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import type { Response, Request } from 'express';
 
 import {
@@ -55,6 +56,7 @@ export class AuthController {
   constructor(private readonly commandBus: CommandBus) {}
 
   @Post('login')
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: AuthResponseDto })
   async login(
@@ -92,6 +94,7 @@ export class AuthController {
   }
 
   @Post('google/exchange')
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: AuthResponseDto })
   async exchangeGoogleCode(
@@ -106,6 +109,7 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: AuthResponseDto })
   async refresh(

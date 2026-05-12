@@ -1,4 +1,4 @@
-import { Inject, NotFoundException } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { CommandHandler, type ICommandHandler } from '@nestjs/cqrs';
 
 import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
@@ -7,6 +7,8 @@ import {
   type VoteWriteRepository,
 } from '@/modules/voting/application/ports/vote-write.repository.port';
 import { type Clock, CLOCK } from '@/shared/application/ports/clock.port';
+import { DomainException } from '@/shared/errors/domain.exception';
+import { ErrorCode } from '@/shared/errors/error-codes';
 
 import {
   UpdateVoteCommand,
@@ -30,7 +32,7 @@ export class UpdateVoteHandler implements ICommandHandler<UpdateVoteCommand> {
     );
 
     if (!vote) {
-      throw new NotFoundException('Vote not found');
+      throw new DomainException(ErrorCode.VOTE_NOT_FOUND);
     }
 
     vote.update(command.data, this.clock.now());

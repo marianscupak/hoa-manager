@@ -50,4 +50,23 @@ export default {
         "Vaše členství není správně propojeno s profilem vlastníka.",
     MUTUAL_DELEGATION_NOT_ALLOWED:
         "Vzájemné delegování není povoleno. Tato osoba na vás již svůj hlas delegovala.",
+    LAST_ADMIN_CANNOT_BE_REMOVED:
+        "Posledního administrátora nelze odstranit ani mu změnit roli.",
+    BALLOT_ALREADY_CAST: "V tomto hlasování jste již odevzdali svůj hlas.",
+    DELEGATION_NOT_FOUND: "Požadované delegování nebylo nalezeno.",
+    FORBIDDEN: "K provedení této akce nemáte dostatečná oprávnění.",
+    INCOMPLETE_VOTE: "Konfigurace hlasování není úplná.",
+    INVALID_BALLOT_ANSWERS: "Odevzdané odpovědi v hlasování jsou neplatné.",
+    INVALID_QUESTION_RULESET_OVERRIDE: "Přepsání pravidel otázky je neplatné.",
+    MEMBERSHIP_NOT_FOUND:
+        "Členství uživatele v tomto společenství nebylo nalezeno.",
+    NOT_UNIT_REPRESENTATIVE: "Nejste určeným zástupcem pro tuto jednotku.",
+    VOTE_MISSING_QUESTIONS: "Hlasování musí obsahovat alespoň jednu otázku.",
+    VOTE_NOT_OPEN: "Toto hlasování momentálně není otevřeno.",
+    VOTE_NOT_READY_TO_OPEN: "Hlasování není připraveno k otevření.",
+    VOTE_NOT_SCHEDULED:
+        "Hlasování musí být naplánováno, než může být otevřeno.",
+    VOTE_QUESTION_MISSING_OPTIONS: "Některé otázky nemají vyplněné možnosti.",
+    VOTE_SCHEDULE_MISSING_DATES:
+        "V harmonogramu hlasování chybí datum zahájení nebo ukončení.",
 } as const;

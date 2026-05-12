@@ -1,4 +1,4 @@
-import { Inject, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { UpdateMemberRoleCommand } from '@/modules/core/tenancy/application/commands/update-member-role.command';
@@ -7,6 +7,8 @@ import {
   type MembershipRepository,
 } from '@/modules/core/tenancy/application/ports/tenant.repository.port';
 import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
+import { DomainException } from '@/shared/errors/domain.exception';
+import { ErrorCode } from '@/shared/errors/error-codes';
 
 @CommandHandler(UpdateMemberRoleCommand)
 export class UpdateMemberRoleHandler
@@ -23,7 +25,7 @@ export class UpdateMemberRoleHandler
     );
 
     if (!membership || membership.tenantId !== command.tenantId) {
-      throw new NotFoundException('Membership not found');
+      throw new DomainException(ErrorCode.MEMBERSHIP_NOT_FOUND);
     }
 
     if (
@@ -38,7 +40,7 @@ export class UpdateMemberRoleHandler
       );
 
       if (admins.length <= 1) {
-        throw new BadRequestException('Cannot remove the last administrator');
+        throw new DomainException(ErrorCode.LAST_ADMIN_CANNOT_BE_REMOVED);
       }
     }
 

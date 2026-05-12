@@ -1,12 +1,8 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  ForbiddenException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
 import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
+import { ForbiddenException } from '@/shared/application/exceptions/auth.exceptions';
 import { TenantContext } from '@/shared/domain/tenant-context';
 
 export const ROLES_KEY = 'roles';
@@ -28,15 +24,13 @@ export class RolesGuard implements CanActivate {
     const tenant: TenantContext | undefined = request['tenant'];
 
     if (!tenant) {
-      throw new ForbiddenException(
-        'Tenant context not found. Role verification requires tenant scope.',
-      );
+      throw new ForbiddenException();
     }
 
     const hasRole = tenant.roles.some((role) => requiredRoles.includes(role));
 
     if (!hasRole) {
-      throw new ForbiddenException('Insufficient permissions');
+      throw new ForbiddenException();
     }
 
     return true;

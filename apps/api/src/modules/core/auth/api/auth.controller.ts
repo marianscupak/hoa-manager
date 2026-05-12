@@ -9,7 +9,6 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
@@ -44,6 +43,7 @@ import { type StartGoogleLoginResult } from '@/modules/core/auth/application/han
 import { ApiErrorResponses } from '@/shared/api/decorators/error.decorators';
 import { AccessTokenAuthGuard } from '@/shared/api/guards/access-token-auth.guard';
 import { setRefreshTokenCookie } from '@/shared/api/utils/refresh-cookie';
+import { UnauthorizedException } from '@/shared/application/exceptions/auth.exceptions';
 
 @ApiTags('Auth')
 @ApiErrorResponses()

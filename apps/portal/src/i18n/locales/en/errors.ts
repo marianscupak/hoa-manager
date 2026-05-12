@@ -46,4 +46,23 @@ export default {
         "Your membership is not correctly linked to an owner profile.",
     MUTUAL_DELEGATION_NOT_ALLOWED:
         "Mutual delegation is not allowed. This person has already delegated their vote to you.",
+    LAST_ADMIN_CANNOT_BE_REMOVED:
+        "The last administrator cannot be removed or assigned a different role.",
+    BALLOT_ALREADY_CAST: "You have already cast a ballot for this vote.",
+    DELEGATION_NOT_FOUND: "The requested delegation was not found.",
+    FORBIDDEN: "You do not have permission to perform this action.",
+    INCOMPLETE_VOTE: "The vote configuration is incomplete.",
+    INVALID_BALLOT_ANSWERS: "The submitted ballot answers are invalid.",
+    INVALID_QUESTION_RULESET_OVERRIDE:
+        "The question ruleset override is invalid.",
+    MEMBERSHIP_NOT_FOUND: "User membership not found in this association.",
+    NOT_UNIT_REPRESENTATIVE:
+        "You are not the designated representative for this unit.",
+    VOTE_MISSING_QUESTIONS: "The vote must contain at least one question.",
+    VOTE_NOT_OPEN: "This vote is not currently open for voting.",
+    VOTE_NOT_READY_TO_OPEN: "The vote is not ready to be opened.",
+    VOTE_NOT_SCHEDULED: "The vote must be scheduled before it can be opened.",
+    VOTE_QUESTION_MISSING_OPTIONS: "Some questions are missing options.",
+    VOTE_SCHEDULE_MISSING_DATES:
+        "The vote schedule is missing start or end dates.",
 } as const;

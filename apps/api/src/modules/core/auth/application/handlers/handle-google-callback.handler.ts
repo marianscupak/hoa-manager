@@ -43,9 +43,7 @@ export interface HandleGoogleCallbackResult {
 }
 
 @CommandHandler(HandleGoogleCallbackCommand)
-export class HandleGoogleCallbackHandler
-  implements ICommandHandler<HandleGoogleCallbackCommand>
-{
+export class HandleGoogleCallbackHandler implements ICommandHandler<HandleGoogleCallbackCommand> {
   constructor(
     @Inject(UNIT_OF_WORK) private readonly uow: UnitOfWork,
     @Inject(AUTH_IDENTITY_REPOSITORY)
@@ -67,7 +65,13 @@ export class HandleGoogleCallbackHandler
   async execute(
     command: HandleGoogleCallbackCommand,
   ): Promise<HandleGoogleCallbackResult> {
-    const stateHash = createHash('sha256').update(command.state).digest('hex');
+    const { code, state } = command.query;
+
+    if (!code || !state) {
+      throw new UnauthorizedException();
+    }
+
+    const stateHash = createHash('sha256').update(state).digest('hex');
     const attempt = await this.attemptRepository.findByStateHash(stateHash);
 
     if (!attempt) {
@@ -82,9 +86,11 @@ export class HandleGoogleCallbackHandler
     await this.attemptRepository.delete(attempt.id);
 
     const tokenPayload = await this.googleOidcService.exchangeCode(
-      command.code,
+      command.query,
       attempt.nonce,
+      state,
     );
+
     const idToken = tokenPayload.idTokenPayload;
 
     if (!idToken.email || !idToken.email_verified) {

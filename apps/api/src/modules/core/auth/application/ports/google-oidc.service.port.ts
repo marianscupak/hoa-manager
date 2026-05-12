@@ -15,8 +15,9 @@ export interface CodeExchangeResult {
 export interface GoogleOidcService {
   getAuthorizationUrl(state: string, nonce: string): Promise<string>;
   exchangeCode(
-    code: string,
+    params: Record<string, string>,
     expectedNonce: string,
+    expectedState?: string,
   ): Promise<CodeExchangeResult>;
 }
 

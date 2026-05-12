@@ -77,19 +77,11 @@ export class AuthController {
   }
 
   @Get('google/callback')
-  async handleGoogleCallback(
-    @Query('code') code: string,
-    @Query('state') state: string,
-    @Res() res: Response,
-  ) {
-    if (!code || !state) {
-      throw new UnauthorizedException();
-    }
-
+  async handleGoogleCallback(@Query() query: any, @Res() res: Response) {
     const result = await this.commandBus.execute<
       HandleGoogleCallbackCommand,
       HandleGoogleCallbackResult
-    >(new HandleGoogleCallbackCommand(code, state));
+    >(new HandleGoogleCallbackCommand(query));
 
     setRefreshTokenCookie(res, result.refreshToken);
 

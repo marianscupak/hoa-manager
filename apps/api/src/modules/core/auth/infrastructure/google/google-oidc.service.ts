@@ -41,16 +41,17 @@ export class GoogleOidcServiceImpl implements GoogleOidcService, OnModuleInit {
   }
 
   async exchangeCode(
-    code: string,
+    params: Record<string, string>,
     expectedNonce: string,
+    expectedState?: string,
   ): Promise<CodeExchangeResult> {
     const redirectUri = this.configService.get<string>('GOOGLE_REDIRECT_URI');
 
-    const tokenSet = await this.client.callback(
-      redirectUri,
-      { code },
-      { nonce: expectedNonce },
-    );
+    const tokenSet = await this.client.callback(redirectUri, params, {
+      nonce: expectedNonce,
+      state: expectedState,
+    });
+
     const claims = tokenSet.claims();
 
     return {

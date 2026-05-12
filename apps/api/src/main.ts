@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { ZodValidationPipe, cleanupOpenApiDoc } from 'nestjs-zod';
 
@@ -17,6 +18,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   app.setGlobalPrefix('api');
+  app.use(helmet());
   app.enableCors({
     origin: configService.get('CORS_ORIGINS'),
     credentials: true,

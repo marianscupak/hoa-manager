@@ -29,6 +29,7 @@ import {
 import { VoteDetailResponseDto } from "@/api/generated/model";
 import {
     getVotesControllerGetVoteDetailQueryKey,
+    getVotesControllerGetVotesQueryKey,
     useVotesControllerGetVoteDetail,
 } from "@/api/generated/votes/votes";
 
@@ -77,6 +78,9 @@ export function CreateVoteWizard({
                 queryKey: getVotesControllerGetVoteDetailQueryKey(
                     initialVoteId ?? createdVoteId ?? "",
                 ),
+            });
+            queryClient.invalidateQueries({
+                queryKey: getVotesControllerGetVotesQueryKey(),
             });
             navigate(`/voting/${initialVoteId ?? createdVoteId}`, {
                 replace: true,

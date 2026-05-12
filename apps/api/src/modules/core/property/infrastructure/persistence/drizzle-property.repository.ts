@@ -73,6 +73,12 @@ export class DrizzleUnitRepository implements UnitRepository {
       orderBy: (t: typeof units.$inferSelect, { asc }: any) => [asc(t.unitNo)],
     });
   }
+
+  async delete(tenantId: string, unitId: string): Promise<void> {
+    await this.db
+      .delete(units)
+      .where(and(eq(units.tenantId, tenantId), eq(units.id, unitId)));
+  }
 }
 
 @Injectable()
@@ -140,6 +146,12 @@ export class DrizzleOwnerRepository implements OwnerRepository {
     await this.db
       .update(owners)
       .set({ userId })
+      .where(and(eq(owners.tenantId, tenantId), eq(owners.id, ownerId)));
+  }
+
+  async delete(tenantId: string, ownerId: string): Promise<void> {
+    await this.db
+      .delete(owners)
       .where(and(eq(owners.tenantId, tenantId), eq(owners.id, ownerId)));
   }
 }

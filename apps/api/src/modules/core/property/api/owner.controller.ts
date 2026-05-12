@@ -10,7 +10,12 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
-import { ApiOkResponse, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOkResponse,
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { RevokeOwnerInviteCommand } from '@/modules/core/invitation/application/commands/revoke-owner-invite.command';
 import { SendOwnerInviteCommand } from '@/modules/core/invitation/application/commands/send-owner-invite.command';
@@ -20,6 +25,7 @@ import {
   OwnerResponseDto,
 } from '@/modules/core/property/api/dto/owner.dto';
 import { CreateOwnerCommand } from '@/modules/core/property/application/commands/create-owner.command';
+import { DeleteOwnerCommand } from '@/modules/core/property/application/commands/delete-owner.command';
 import { ListOwnersQuery } from '@/modules/core/property/application/queries/list-owners.query';
 import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
 import {
@@ -111,6 +117,21 @@ export class OwnerController {
   ): Promise<void> {
     return this.commandBus.execute<RevokeOwnerInviteCommand, void>(
       new RevokeOwnerInviteCommand(tenantCtx.tenantId, ownerId),
+    );
+  }
+
+  @Delete(':ownerId')
+  @Roles(TenantMembershipRole.ADMIN)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({
+    description: 'Owner deleted successfully',
+  })
+  async deleteOwner(
+    @Tenant() tenantCtx: TenantContext,
+    @Param('ownerId') ownerId: string,
+  ): Promise<void> {
+    await this.commandBus.execute(
+      new DeleteOwnerCommand(tenantCtx.tenantId, ownerId),
     );
   }
 }

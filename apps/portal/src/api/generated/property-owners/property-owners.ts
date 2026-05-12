@@ -429,3 +429,84 @@ export const useOwnerControllerRevokeInvite = <
         queryClient,
     );
 };
+export const ownerControllerDeleteOwner = (
+    ownerId: string,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<void>(
+        { url: `/api/owners/${ownerId}`, method: "DELETE", signal },
+        options,
+    );
+};
+
+export const getOwnerControllerDeleteOwnerMutationOptions = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof ownerControllerDeleteOwner>>,
+        TError,
+        { ownerId: string },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof ownerControllerDeleteOwner>>,
+    TError,
+    { ownerId: string },
+    TContext
+> => {
+    const mutationKey = ["ownerControllerDeleteOwner"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof ownerControllerDeleteOwner>>,
+        { ownerId: string }
+    > = (props) => {
+        const { ownerId } = props ?? {};
+
+        return ownerControllerDeleteOwner(ownerId, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type OwnerControllerDeleteOwnerMutationResult = NonNullable<
+    Awaited<ReturnType<typeof ownerControllerDeleteOwner>>
+>;
+
+export type OwnerControllerDeleteOwnerMutationError =
+    ErrorType<ErrorResponseDto>;
+
+export const useOwnerControllerDeleteOwner = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof ownerControllerDeleteOwner>>,
+            TError,
+            { ownerId: string },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof ownerControllerDeleteOwner>>,
+    TError,
+    { ownerId: string },
+    TContext
+> => {
+    return useMutation(
+        getOwnerControllerDeleteOwnerMutationOptions(options),
+        queryClient,
+    );
+};

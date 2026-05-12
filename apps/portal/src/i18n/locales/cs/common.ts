@@ -1,6 +1,8 @@
 export default {
     actions: "Akce",
     loading: "Načítání...",
+    save: "Uložit",
+    cancel: "Zrušit",
     profile: "Profil",
     language: "Jazyk",
     logout: "Odhlásit se",

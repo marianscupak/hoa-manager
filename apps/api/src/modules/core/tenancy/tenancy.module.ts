@@ -3,6 +3,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 
 import { AuthModule } from '@/modules/core/auth/auth.module';
 import { IdentityModule } from '@/modules/core/identity/identity.module';
+import { MemberController } from '@/modules/core/tenancy/api/member.controller';
 import { TenancyController } from '@/modules/core/tenancy/api/tenancy.controller';
 import { CreateMembershipHandler } from '@/modules/core/tenancy/application/handlers/create-membership.handler';
 import { CreateTenantHandler } from '@/modules/core/tenancy/application/handlers/create-tenant.handler';
@@ -10,6 +11,8 @@ import { GetMembershipByTenantAndUserHandler } from '@/modules/core/tenancy/appl
 import { GetMembershipsByUserIdHandler } from '@/modules/core/tenancy/application/handlers/get-memberships-by-user-id.handler';
 import { GetTenantByIdHandler } from '@/modules/core/tenancy/application/handlers/get-tenant-by-id.handler';
 import { GetUserTenantsHandler } from '@/modules/core/tenancy/application/handlers/get-user-tenants.handler';
+import { ListTenantMembersHandler } from '@/modules/core/tenancy/application/handlers/list-tenant-members.handler';
+import { UpdateMemberRoleHandler } from '@/modules/core/tenancy/application/handlers/update-member-role.handler';
 import { UpdateMembershipStatusHandler } from '@/modules/core/tenancy/application/handlers/update-membership-status.handler';
 import {
   MEMBERSHIP_REPOSITORY,
@@ -24,17 +27,19 @@ const CommandHandlers = [
   CreateTenantHandler,
   CreateMembershipHandler,
   UpdateMembershipStatusHandler,
+  UpdateMemberRoleHandler,
 ];
 const QueryHandlers = [
   GetUserTenantsHandler,
   GetMembershipByTenantAndUserHandler,
   GetTenantByIdHandler,
   GetMembershipsByUserIdHandler,
+  ListTenantMembersHandler,
 ];
 
 @Module({
   imports: [CqrsModule, IdentityModule, forwardRef(() => AuthModule)],
-  controllers: [TenancyController],
+  controllers: [TenancyController, MemberController],
   providers: [
     { provide: TENANT_REPOSITORY, useClass: DrizzleTenantRepository },
     { provide: MEMBERSHIP_REPOSITORY, useClass: DrizzleMembershipRepository },

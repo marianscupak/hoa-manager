@@ -11,11 +11,13 @@ import { useUnitControllerGetUnitDetail } from "@/api/generated/property-units/p
 import { ReplaceOwnershipDialog } from "../components/replace-ownership-dialog/dialog";
 import { UnitInfoCard } from "../components/unit-info-card";
 import { UnitOwnershipsTable } from "../components/unit-ownerships-table";
+import { UpdateUnitDialog } from "../components/update-unit-dialog";
 
 export function UnitDetailPage() {
     const { id } = useParams();
     const { t } = useTranslation(["admin", "common"]);
     const [isEditOpen, setIsEditOpen] = useState(false);
+    const [isUnitEditOpen, setIsUnitEditOpen] = useState(false);
 
     if (!id) {
         throw new Error("No unit id provided");
@@ -34,20 +36,29 @@ export function UnitDetailPage() {
 
     return (
         <div className="space-y-8">
-            <div className="flex items-center gap-4">
-                <Button variant="ghost" size="icon" asChild>
-                    <Link to="/admin/units">
-                        <ArrowLeftIcon className="h-4 w-4" />
-                    </Link>
-                </Button>
-                <div>
-                    <h1 className="text-foreground text-2xl font-bold tracking-tight">
-                        {t("admin:units.details.title")}
-                    </h1>
-                    <p className="text-muted-foreground text-sm">
-                        {t("admin:units.details.info")}
-                    </p>
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                    <Button variant="ghost" size="icon" asChild>
+                        <Link to="/admin/units">
+                            <ArrowLeftIcon className="h-4 w-4" />
+                        </Link>
+                    </Button>
+                    <div>
+                        <h1 className="text-foreground text-2xl font-bold tracking-tight">
+                            {t("admin:units.details.title")}
+                        </h1>
+                        <p className="text-muted-foreground text-sm">
+                            {t("admin:units.details.info")}
+                        </p>
+                    </div>
                 </div>
+                <Button
+                    variant="outline"
+                    onClick={() => setIsUnitEditOpen(true)}
+                >
+                    <PencilIcon className="mr-2 h-4 w-4" />
+                    {t("admin:units.details.editUnit")}
+                </Button>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
@@ -78,6 +89,13 @@ export function UnitDetailPage() {
                 open={isEditOpen}
                 onOpenChange={setIsEditOpen}
                 currentOwnerships={unit?.ownerships}
+                onSuccess={() => refetch()}
+            />
+
+            <UpdateUnitDialog
+                unit={unit}
+                open={isUnitEditOpen}
+                onOpenChange={setIsUnitEditOpen}
                 onSuccess={() => refetch()}
             />
         </div>

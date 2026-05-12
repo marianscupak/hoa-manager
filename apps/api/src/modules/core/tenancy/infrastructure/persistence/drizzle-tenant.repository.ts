@@ -3,15 +3,17 @@ import { eq, and } from 'drizzle-orm';
 
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
 import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
-import { tenants, tenantMemberships } from '@/infrastructure/db/schema';
+import { tenants, tenantMemberships, users } from '@/infrastructure/db/schema';
 import {
   TenantRepository,
   MembershipRepository,
   type TenantWithMembership,
+  type TenantMembershipWithUser,
 } from '@/modules/core/tenancy/application/ports/tenant.repository.port';
 import {
   Tenant,
   TenantMembership,
+  TenantMembershipStatus,
 } from '@/modules/core/tenancy/domain/tenant.entity';
 
 @Injectable()
@@ -65,6 +67,13 @@ export class DrizzleMembershipRepository implements MembershipRepository {
     return row ?? null;
   }
 
+  async findById(id: string): Promise<TenantMembership | null> {
+    const row = await this.db.query.tenantMemberships.findFirst({
+      where: eq(tenantMemberships.id, id),
+    });
+    return row ?? null;
+  }
+
   async findTenantsWithMembership(
     userId: string,
   ): Promise<TenantWithMembership[]> {
@@ -102,11 +111,42 @@ export class DrizzleMembershipRepository implements MembershipRepository {
 
   async updateStatus(
     id: string,
-    status: 'ACTIVE' | 'SUSPENDED' | 'INVITED',
+    status: TenantMembershipStatus,
   ): Promise<void> {
     await this.db
       .update(tenantMemberships)
       .set({ status })
       .where(eq(tenantMemberships.id, id));
+  }
+
+  async updateRole(id: string, role: TenantMembership['role']): Promise<void> {
+    await this.db
+      .update(tenantMemberships)
+      .set({ role })
+      .where(eq(tenantMemberships.id, id));
+  }
+
+  async listByTenant(tenantId: string): Promise<TenantMembershipWithUser[]> {
+    const rows = await this.db
+      .select({
+        id: tenantMemberships.id,
+        tenantId: tenantMemberships.tenantId,
+        userId: tenantMemberships.userId,
+        role: tenantMemberships.role,
+        status: tenantMemberships.status,
+        createdAt: tenantMemberships.createdAt,
+        updatedAt: tenantMemberships.updatedAt,
+        lastSeenAt: tenantMemberships.lastSeenAt,
+        user: {
+          id: users.id,
+          email: users.email,
+          fullName: users.fullName,
+        },
+      })
+      .from(tenantMemberships)
+      .innerJoin(users, eq(tenantMemberships.userId, users.id))
+      .where(eq(tenantMemberships.tenantId, tenantId));
+
+    return rows as TenantMembershipWithUser[];
   }
 }

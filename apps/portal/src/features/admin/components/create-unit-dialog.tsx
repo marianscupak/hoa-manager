@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import { Resolver, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
@@ -22,7 +23,10 @@ import {
 } from "@hoa-mngr/ui";
 
 import { showApiError } from "@/api/error-utils";
-import { useUnitControllerCreateUnit } from "@/api/generated/property-units/property-units";
+import {
+    getUnitControllerGetUnitsQueryKey,
+    useUnitControllerCreateUnit,
+} from "@/api/generated/property-units/property-units";
 
 const createUnitSchema = z.object({
     unitNo: z.string().min(1, "units.create.unitNoRequired").max(50),
@@ -56,11 +60,15 @@ export function CreateUnitDialog({
     onSuccess,
 }: CreateUnitDialogProps) {
     const { t } = useTranslation(["admin"]);
+    const queryClient = useQueryClient();
 
     const createUnit = useUnitControllerCreateUnit({
         mutation: {
             onSuccess: () => {
                 toast.success(t("units.create.success"));
+                queryClient.invalidateQueries({
+                    queryKey: getUnitControllerGetUnitsQueryKey(),
+                });
                 onOpenChange(false);
                 form.reset();
                 onSuccess?.();

@@ -10,6 +10,7 @@ import { OwnerRowActions } from "./owner-row-actions";
 export const getOwnerColumns = (
     t: TFunction<"admin">,
     onSuccess: () => void,
+    onDelete: (owner: OwnerResponseDto) => void,
 ): ColumnDef<OwnerResponseDto>[] => [
     {
         header: t("owners.table.displayName"),
@@ -43,6 +44,12 @@ export const getOwnerColumns = (
     },
     {
         header: "",
-        cell: ({ row }) => <OwnerRowActions row={row} onSuccess={onSuccess} />,
+        cell: ({ row }) => (
+            <OwnerRowActions
+                row={row}
+                onSuccess={onSuccess}
+                onDelete={onDelete}
+            />
+        ),
     },
 ];

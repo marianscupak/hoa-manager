@@ -12,7 +12,11 @@ export enum TenantMembershipRole {
   UNIT_OWNER = 'UNIT_OWNER',
 }
 
-export type TenantMembershipStatus = 'ACTIVE' | 'SUSPENDED' | 'INVITED';
+export enum TenantMembershipStatus {
+  ACTIVE = 'ACTIVE',
+  SUSPENDED = 'SUSPENDED',
+  INVITED = 'INVITED',
+}
 
 export interface TenantMembership {
   id: string;

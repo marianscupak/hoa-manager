@@ -23,7 +23,10 @@ import { type GetUserByIdResult } from '@/modules/core/identity/application/hand
 import { GetUserByIdQuery } from '@/modules/core/identity/application/queries/get-user-by-id.query';
 import { GetMembershipByTenantAndUserQuery } from '@/modules/core/tenancy/application/queries/get-membership-by-tenant-and-user.query';
 import { GetMembershipsByUserIdQuery } from '@/modules/core/tenancy/application/queries/get-memberships-by-user-id.query';
-import { TenantMembership } from '@/modules/core/tenancy/domain/tenant.entity';
+import {
+  TenantMembership,
+  TenantMembershipStatus,
+} from '@/modules/core/tenancy/domain/tenant.entity';
 import {
   InvalidTokenException,
   ReplayAttackException,
@@ -185,7 +188,7 @@ export class RefreshTokenHandler
         TenantMembership | null
       >(new GetMembershipByTenantAndUserQuery(claims.tid, userId));
 
-      if (!membership || membership.status !== 'ACTIVE') {
+      if (!membership || membership.status !== TenantMembershipStatus.ACTIVE) {
         throw new UnauthorizedException();
       }
       return makeClaimsFromMemberShip(membership);
@@ -197,7 +200,7 @@ export class RefreshTokenHandler
 
       if (memberships.length === 1) {
         const membership = memberships[0];
-        if (membership.status !== 'ACTIVE') {
+        if (membership.status !== TenantMembershipStatus.ACTIVE) {
           throw new UnauthorizedException();
         }
         return makeClaimsFromMemberShip(membership);

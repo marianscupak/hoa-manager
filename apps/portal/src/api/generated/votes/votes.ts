@@ -39,6 +39,7 @@ import type {
     VoteResultsResponseDto,
     VoterStatusResponseDto,
     VotesControllerGetDelegationCandidatesParams,
+    VotesControllerGetVotesParams,
 } from ".././model";
 
 import { customInstance } from "../../axios";
@@ -47,40 +48,46 @@ import type { ErrorType, BodyType } from "../../axios";
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 export const votesControllerGetVotes = (
+    params?: VotesControllerGetVotesParams,
     options?: SecondParameter<typeof customInstance>,
     signal?: AbortSignal,
 ) => {
     return customInstance<VoteListItemResponseDto[]>(
-        { url: `/api/votes`, method: "GET", signal },
+        { url: `/api/votes`, method: "GET", params, signal },
         options,
     );
 };
 
-export const getVotesControllerGetVotesQueryKey = () => {
-    return [`/api/votes`] as const;
+export const getVotesControllerGetVotesQueryKey = (
+    params?: VotesControllerGetVotesParams,
+) => {
+    return [`/api/votes`, ...(params ? [params] : [])] as const;
 };
 
 export const getVotesControllerGetVotesQueryOptions = <
     TData = Awaited<ReturnType<typeof votesControllerGetVotes>>,
     TError = ErrorType<unknown>,
->(options?: {
-    query?: Partial<
-        UseQueryOptions<
-            Awaited<ReturnType<typeof votesControllerGetVotes>>,
-            TError,
-            TData
-        >
-    >;
-    request?: SecondParameter<typeof customInstance>;
-}) => {
+>(
+    params?: VotesControllerGetVotesParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof votesControllerGetVotes>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+) => {
     const { query: queryOptions, request: requestOptions } = options ?? {};
 
     const queryKey =
-        queryOptions?.queryKey ?? getVotesControllerGetVotesQueryKey();
+        queryOptions?.queryKey ?? getVotesControllerGetVotesQueryKey(params);
 
     const queryFn: QueryFunction<
         Awaited<ReturnType<typeof votesControllerGetVotes>>
-    > = ({ signal }) => votesControllerGetVotes(requestOptions, signal);
+    > = ({ signal }) => votesControllerGetVotes(params, requestOptions, signal);
 
     return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
         Awaited<ReturnType<typeof votesControllerGetVotes>>,
@@ -98,6 +105,7 @@ export function useVotesControllerGetVotes<
     TData = Awaited<ReturnType<typeof votesControllerGetVotes>>,
     TError = ErrorType<unknown>,
 >(
+    params: undefined | VotesControllerGetVotesParams,
     options: {
         query: Partial<
             UseQueryOptions<
@@ -124,6 +132,7 @@ export function useVotesControllerGetVotes<
     TData = Awaited<ReturnType<typeof votesControllerGetVotes>>,
     TError = ErrorType<unknown>,
 >(
+    params?: VotesControllerGetVotesParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
@@ -150,6 +159,7 @@ export function useVotesControllerGetVotes<
     TData = Awaited<ReturnType<typeof votesControllerGetVotes>>,
     TError = ErrorType<unknown>,
 >(
+    params?: VotesControllerGetVotesParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
@@ -169,6 +179,7 @@ export function useVotesControllerGetVotes<
     TData = Awaited<ReturnType<typeof votesControllerGetVotes>>,
     TError = ErrorType<unknown>,
 >(
+    params?: VotesControllerGetVotesParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
@@ -183,7 +194,10 @@ export function useVotesControllerGetVotes<
 ): UseQueryResult<TData, TError> & {
     queryKey: DataTag<QueryKey, TData, TError>;
 } {
-    const queryOptions = getVotesControllerGetVotesQueryOptions(options);
+    const queryOptions = getVotesControllerGetVotesQueryOptions(
+        params,
+        options,
+    );
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<
         TData,

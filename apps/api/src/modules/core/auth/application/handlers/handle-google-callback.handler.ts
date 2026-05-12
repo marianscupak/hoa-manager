@@ -29,6 +29,7 @@ import { CreateUserCommand } from '@/modules/core/identity/application/commands/
 import { GetUserByEmailQuery } from '@/modules/core/identity/application/queries/get-user-by-email.query';
 import { GetUserByIdQuery } from '@/modules/core/identity/application/queries/get-user-by-id.query';
 import { GetMembershipsByUserIdQuery } from '@/modules/core/tenancy/application/queries/get-memberships-by-user-id.query';
+import { TenantMembershipStatus } from '@/modules/core/tenancy/domain/tenant.entity';
 import { UnauthorizedException } from '@/shared/application/exceptions/auth.exceptions';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 import {
@@ -144,7 +145,7 @@ export class HandleGoogleCallbackHandler
         new GetMembershipsByUserIdQuery(user.id),
       );
       const activeMemberships = (memberships as any[]).filter(
-        (m) => m.status === 'ACTIVE',
+        (m) => m.status === TenantMembershipStatus.ACTIVE,
       );
 
       let tenantId: string | null = null;

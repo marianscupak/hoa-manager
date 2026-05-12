@@ -8,6 +8,7 @@ import { SelectTenantLayout } from "@/components/layouts/select-tenant-layout";
 import { AdminLayout } from "@/features/admin/components/admin-layout";
 import { OwnersPage } from "@/features/admin/pages/owners-page";
 import { UnitsPage } from "@/features/admin/pages/units-page";
+import { UsersPage } from "@/features/admin/pages/users-page";
 import { GoogleCallbackPage } from "@/features/auth/pages/google-callback-page";
 import { LoginPage } from "@/features/auth/pages/login-page";
 import { SelectTenantPage } from "@/features/auth/pages/select-tenant-page";
@@ -113,6 +114,10 @@ export const router = createBrowserRouter([
                     {
                         path: "units/:id",
                         element: <UnitDetailPage />,
+                    },
+                    {
+                        path: "users",
+                        element: <UsersPage />,
                     },
                 ],
             },

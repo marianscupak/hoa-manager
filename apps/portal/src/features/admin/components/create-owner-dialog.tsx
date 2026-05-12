@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
@@ -17,7 +18,10 @@ import {
 } from "@hoa-mngr/ui";
 
 import { showApiError } from "@/api/error-utils";
-import { useOwnerControllerCreateOwner } from "@/api/generated/property-owners/property-owners";
+import {
+    getOwnerControllerGetOwnersQueryKey,
+    useOwnerControllerCreateOwner,
+} from "@/api/generated/property-owners/property-owners";
 
 const ownerSchema = z.object({
     displayName: z.string().min(1, "admin:owners.create.required"),
@@ -38,11 +42,15 @@ export function CreateOwnerDialog({
     onSuccess,
 }: CreateOwnerDialogProps) {
     const { t } = useTranslation(["admin"]);
+    const queryClient = useQueryClient();
 
     const createOwner = useOwnerControllerCreateOwner({
         mutation: {
             onSuccess: () => {
                 toast.success(t("owners.create.success"));
+                queryClient.invalidateQueries({
+                    queryKey: getOwnerControllerGetOwnersQueryKey(),
+                });
                 onOpenChange(false);
                 form.reset();
                 onSuccess?.();

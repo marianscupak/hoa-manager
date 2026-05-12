@@ -191,6 +191,11 @@ export const voting = {
             rulesetSuccess: "Ruleset configured successfully",
             scheduleSuccess: "Vote scheduled successfully",
         },
+        legalValidityDisclaimer: {
+            title: "Legal Validity Notice",
+            description:
+                "The selected settings deviate from standard statutory rules (unit share weight, all units quorum). Ensure these rules comply with your association's statutes, otherwise the vote might be legally contestable.",
+        },
     },
     list: {
         title: "Active & Scheduled Votings",
@@ -216,6 +221,7 @@ export const voting = {
         card: {
             endsOn: "Ends on ",
             startsOn: "Starts on ",
+            endedOn: "Ended on ",
             noDescription: "No description provided.",
             canVote: "You can vote",
             voteRequired: "Your vote is required.",

@@ -78,13 +78,24 @@ export class VotesController {
     description: 'Returns a list of votes',
     type: [VoteListItemResponseDto],
   })
+  @ApiQuery({ name: 'status', required: false, isArray: true, type: String })
   @UseGuards(AccessTokenAuthGuard, TenantContextGuard)
-  getVotes(@Tenant() tenantCtx: TenantContext) {
+  getVotes(
+    @Tenant() tenantCtx: TenantContext,
+    @Query('status') status?: string | string[],
+  ) {
+    const statuses = Array.isArray(status)
+      ? status
+      : status
+        ? [status]
+        : undefined;
+
     return this.queryBus.execute(
       new GetVotesQuery(
         tenantCtx.tenantId,
         tenantCtx.roles,
         tenantCtx.membershipId,
+        statuses,
       ),
     );
   }

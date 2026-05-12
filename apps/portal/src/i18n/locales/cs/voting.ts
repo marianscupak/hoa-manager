@@ -190,6 +190,11 @@ export const voting = {
             rulesetSuccess: "Pravidla byla úspěšně nastavena",
             scheduleSuccess: "Hlasování bylo úspěšně naplánováno",
         },
+        legalValidityDisclaimer: {
+            title: "Upozornění na právní platnost",
+            description:
+                "Zvolená nastavení se odchylují od standardních zákonných pravidel (váha podle podílu, kvorum ze všech jednotek). Ujistěte se, že tato pravidla jsou v souladu s vašimi stanovami, jinak může být hlasování právně napadnutelné.",
+        },
     },
     list: {
         title: "Aktivní a naplánovaná hlasování",
@@ -215,6 +220,7 @@ export const voting = {
         card: {
             endsOn: "Končí ",
             startsOn: "Začíná ",
+            endedOn: "Ukončeno ",
             noDescription: "Nebyl poskytnut žádný popis.",
             canVote: "Můžete hlasovat",
             voteRequired: "Váš hlas je vyžadován.",

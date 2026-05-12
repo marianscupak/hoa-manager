@@ -29,6 +29,7 @@ import { QuestionHeader } from "./components/question-header";
 import { QuestionRulesetOverride } from "./components/question-ruleset-override";
 import { useQuestionForm } from "./hooks/use-question-form";
 import { OptionsList } from "./options-list";
+import { LegalValidityDisclaimer } from "../shared/legal-validity-disclaimer";
 
 interface QuestionModalProps {
     vote: VoteDetailResponseDto;
@@ -158,6 +159,11 @@ export function QuestionModal({
                                         ]}
                                     />
                                 </div>
+
+                                {form.watch("type") !==
+                                    CreateVoteQuestionDtoType.YES_NO && (
+                                    <LegalValidityDisclaimer />
+                                )}
 
                                 <FormTextarea
                                     name="description"

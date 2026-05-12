@@ -1,6 +1,8 @@
 export default {
     actions: "Actions",
     loading: "Loading...",
+    save: "Save",
+    cancel: "Cancel",
     profile: "Profile",
     language: "Language",
     logout: "Log out",

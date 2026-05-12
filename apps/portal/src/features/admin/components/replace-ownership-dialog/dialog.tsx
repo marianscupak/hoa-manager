@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import { PlusIcon } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -18,7 +19,11 @@ import {
 
 import { showApiError } from "@/api/error-utils";
 import { useOwnerControllerGetOwners } from "@/api/generated/property-owners/property-owners";
-import { useUnitControllerReplaceUnitOwnership } from "@/api/generated/property-units/property-units";
+import {
+    getUnitControllerGetUnitDetailQueryKey,
+    getUnitControllerGetUnitsQueryKey,
+    useUnitControllerReplaceUnitOwnership,
+} from "@/api/generated/property-units/property-units";
 
 import { ReplaceOwnershipFieldItem } from "./field-item";
 import { replaceOwnershipSchema, ReplaceOwnershipValues } from "./schema";
@@ -40,6 +45,7 @@ export function ReplaceOwnershipDialog({
 }: ReplaceOwnershipDialogProps) {
     const { t } = useTranslation(["admin"]);
     const schema = useMemo(() => replaceOwnershipSchema(t), [t]);
+    const queryClient = useQueryClient();
 
     const { data: owners } = useOwnerControllerGetOwners();
     const replaceOwnership = useUnitControllerReplaceUnitOwnership();
@@ -85,6 +91,13 @@ export function ReplaceOwnershipDialog({
             {
                 onSuccess: () => {
                     toast.success(t("units.ownershipEditor.success"));
+                    queryClient.invalidateQueries({
+                        queryKey:
+                            getUnitControllerGetUnitDetailQueryKey(unitId),
+                    });
+                    queryClient.invalidateQueries({
+                        queryKey: getUnitControllerGetUnitsQueryKey(),
+                    });
                     onOpenChange(false);
                     onSuccess?.();
                 },

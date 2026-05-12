@@ -9,6 +9,8 @@ import { OwnerController } from '@/modules/core/property/api/owner.controller';
 import { UnitController } from '@/modules/core/property/api/unit.controller';
 import { CreateOwnerHandler } from '@/modules/core/property/application/handlers/create-owner.handler';
 import { CreateUnitHandler } from '@/modules/core/property/application/handlers/create-unit.handler';
+import { DeleteOwnerHandler } from '@/modules/core/property/application/handlers/delete-owner.handler';
+import { DeleteUnitHandler } from '@/modules/core/property/application/handlers/delete-unit.handler';
 import { GetOwnerByIdHandler } from '@/modules/core/property/application/handlers/get-owner-by-id.handler';
 import { GetUnitDetailHandler } from '@/modules/core/property/application/handlers/get-unit-detail.handler';
 import { ListOwnersHandler } from '@/modules/core/property/application/handlers/list-owners.handler';
@@ -34,6 +36,8 @@ const CommandHandlers = [
   ReplaceUnitOwnershipHandler,
   SetOwnerUserIdHandler,
   UpdateUnitHandler,
+  DeleteUnitHandler,
+  DeleteOwnerHandler,
 ];
 
 const QueryHandlers = [

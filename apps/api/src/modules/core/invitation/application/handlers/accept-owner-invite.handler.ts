@@ -17,7 +17,10 @@ import { GetOwnerByIdQuery } from '@/modules/core/property/application/queries/g
 import { CreateMembershipCommand } from '@/modules/core/tenancy/application/commands/create-membership.command';
 import { UpdateMembershipStatusCommand } from '@/modules/core/tenancy/application/commands/update-membership-status.command';
 import { GetMembershipByTenantAndUserQuery } from '@/modules/core/tenancy/application/queries/get-membership-by-tenant-and-user.query';
-import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
+import {
+  TenantMembershipRole,
+  TenantMembershipStatus,
+} from '@/modules/core/tenancy/domain/tenant.entity';
 import {
   InviteNotFoundException,
   InviteExpiredException,
@@ -116,12 +119,15 @@ export class AcceptOwnerInviteHandler
             invite.tenantId,
             user.id,
             TenantMembershipRole.UNIT_OWNER,
-            'ACTIVE',
+            TenantMembershipStatus.ACTIVE,
           ),
         );
-      } else if (existing.status !== 'ACTIVE') {
+      } else if (existing.status !== TenantMembershipStatus.ACTIVE) {
         await this.commandBus.execute(
-          new UpdateMembershipStatusCommand(existing.id, 'ACTIVE'),
+          new UpdateMembershipStatusCommand(
+            existing.id,
+            TenantMembershipStatus.ACTIVE,
+          ),
         );
       }
 

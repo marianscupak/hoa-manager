@@ -9,7 +9,10 @@ import {
   type MembershipRepository,
   type TenantRepository,
 } from '@/modules/core/tenancy/application/ports/tenant.repository.port';
-import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
+import {
+  TenantMembershipRole,
+  TenantMembershipStatus,
+} from '@/modules/core/tenancy/domain/tenant.entity';
 import {
   UNIT_OF_WORK,
   type UnitOfWork,
@@ -37,7 +40,7 @@ export class CreateTenantHandler
         tenantId: tenant.id,
         userId: command.createdByUserId,
         role: TenantMembershipRole.ADMIN,
-        status: 'ACTIVE',
+        status: TenantMembershipStatus.ACTIVE,
       });
 
       this.logger.log(

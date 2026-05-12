@@ -38,6 +38,15 @@ export default {
             revokeError: "Nepodařilo se zrušit pozvánku",
             noEmail: "Bez e-mailové adresy",
         },
+        delete: {
+            title: "Odstranit vlastníka",
+            description:
+                "Opravdu chcete odstranit vlastníka {{name}}? Tuto akci nelze vzít zpět.",
+            confirm: "Odstranit",
+            cancel: "Zrušit",
+            success: "Vlastník byl úspěšně odstraněn",
+            error: "Nepodařilo se odstranit vlastníka",
+        },
     },
     units: {
         title: "Jednotky",
@@ -65,12 +74,18 @@ export default {
             shareRequired: "Čitatel i jmenovatel jsou povinné",
             shareMustBePositive: "Musí být kladné celé číslo",
         },
+        update: {
+            title: "Upravit jednotku",
+            success: "Jednotka byla úspěšně aktualizována",
+            error: "Nepodařilo se aktualizovat jednotku",
+        },
         details: {
             title: "Detail jednotky",
             backToUnits: "Zpět na jednotky",
             info: "Všeobecné informace",
             unitNo: "Číslo jednotky",
             buildingShare: "Podíl na budově",
+            editUnit: "Upravit jednotku",
             ownership: {
                 title: "Historie vlastnictví",
                 owner: "Vlastník",
@@ -99,9 +114,51 @@ export default {
             duplicateError: "Vlastník je vybrán vícekrát",
             invalidShareError: "Podíl musí být kladné číslo",
         },
+        delete: {
+            title: "Odstranit jednotku",
+            description:
+                "Opravdu chcete odstranit jednotku {{unitNo}}? Tuto akci nelze vzít zpět.",
+            confirm: "Odstranit",
+            cancel: "Zrušit",
+            success: "Jednotka byla úspěšně odstraněna",
+            error: "Nepodařilo se odstranit jednotku",
+        },
+        sumOfFractions: {
+            total: "Celkový součet podílů",
+            warning:
+                "Součet podílů se nerovná 1 (Aktuálně: {{sum}}). To může vést k nesprávným výsledkům hlasování.",
+        },
+    },
+    users: {
+        title: "Správa uživatelů",
+        description: "Správa uživatelů a jejich rolí ve společenství.",
+        empty: "Nebyli nalezeni žádní uživatelé.",
+        table: {
+            name: "Jméno",
+            email: "E-mail",
+            role: "Role",
+            statusLabel: "Stav",
+            status: {
+                ACTIVE: "Aktivní",
+                INVITED: "Pozván",
+                SUSPENDED: "Pozastaven",
+            },
+            joinedAt: "Připojil se",
+        },
+        roles: {
+            ADMIN: "Administrátor",
+            BOARD_MEMBER: "Člen výboru",
+            AUDITOR: "Kontrolor",
+            UNIT_OWNER: "Vlastník jednotky",
+        },
+        updateRole: {
+            success: "Role uživatele byla úspěšně aktualizována",
+            error: "Nepodařilo se aktualizovat roli uživatele",
+        },
     },
     nav: {
         units: "Jednotky",
         owners: "Vlastníci",
+        users: "Uživatelé",
     },
 } as const;

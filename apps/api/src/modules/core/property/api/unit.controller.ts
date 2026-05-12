@@ -4,6 +4,7 @@ import {
   Post,
   Put,
   Patch,
+  Delete,
   Body,
   Param,
   UseGuards,
@@ -11,7 +12,12 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
-import { ApiOkResponse, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOkResponse,
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import {
   CreateUnitDto,
@@ -22,6 +28,7 @@ import {
   UnitDetailResponseDto,
 } from '@/modules/core/property/api/dto/unit.dto';
 import { CreateUnitCommand } from '@/modules/core/property/application/commands/create-unit.command';
+import { DeleteUnitCommand } from '@/modules/core/property/application/commands/delete-unit.command';
 import { ReplaceUnitOwnershipCommand } from '@/modules/core/property/application/commands/replace-unit-ownership.command';
 import { UpdateUnitCommand } from '@/modules/core/property/application/commands/update-unit.command';
 import { GetUnitDetailQuery } from '@/modules/core/property/application/queries/get-unit-detail.query';
@@ -133,6 +140,21 @@ export class UnitController {
         unitId,
         dto.ownerships,
       ),
+    );
+  }
+
+  @Delete(':id')
+  @Roles(TenantMembershipRole.ADMIN)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({
+    description: 'Unit deleted successfully',
+  })
+  async deleteUnit(
+    @Tenant() tenantCtx: TenantContext,
+    @Param('id') unitId: string,
+  ): Promise<void> {
+    await this.commandBus.execute(
+      new DeleteUnitCommand(tenantCtx.tenantId, unitId),
     );
   }
 }

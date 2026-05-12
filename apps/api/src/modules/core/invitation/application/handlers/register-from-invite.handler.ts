@@ -22,7 +22,10 @@ import {
 import { SetOwnerUserIdCommand } from '@/modules/core/property/application/commands/set-owner-user-id.command';
 import { GetOwnerByIdQuery } from '@/modules/core/property/application/queries/get-owner-by-id.query';
 import { CreateMembershipCommand } from '@/modules/core/tenancy/application/commands/create-membership.command';
-import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
+import {
+  TenantMembershipRole,
+  TenantMembershipStatus,
+} from '@/modules/core/tenancy/domain/tenant.entity';
 import {
   InviteNotFoundException,
   InviteExpiredException,
@@ -125,7 +128,7 @@ export class RegisterFromInviteHandler
           invite.tenantId,
           userId,
           TenantMembershipRole.UNIT_OWNER,
-          'ACTIVE',
+          TenantMembershipStatus.ACTIVE,
         ),
       );
 

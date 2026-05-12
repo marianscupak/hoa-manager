@@ -38,6 +38,15 @@ export default {
             revokeError: "Failed to revoke invitation",
             noEmail: "No email address",
         },
+        delete: {
+            title: "Delete Owner",
+            description:
+                "Are you sure you want to delete owner {{name}}? This action cannot be undone.",
+            confirm: "Delete",
+            cancel: "Cancel",
+            success: "Owner deleted successfully",
+            error: "Failed to delete owner",
+        },
     },
     units: {
         title: "Units",
@@ -65,12 +74,18 @@ export default {
             shareRequired: "Both numerator and denominator are required",
             shareMustBePositive: "Must be a positive integer",
         },
+        update: {
+            title: "Edit Unit",
+            success: "Unit updated successfully",
+            error: "Failed to update unit",
+        },
         details: {
             title: "Unit Details",
             backToUnits: "Back to Units",
             info: "General Information",
             unitNo: "Unit Number",
             buildingShare: "Building Share",
+            editUnit: "Edit Unit",
             ownership: {
                 title: "Ownership History",
                 owner: "Owner",
@@ -99,9 +114,51 @@ export default {
             duplicateError: "Duplicate owner selected",
             invalidShareError: "Share must be a positive number",
         },
+        delete: {
+            title: "Delete Unit",
+            description:
+                "Are you sure you want to delete unit {{unitNo}}? This action cannot be undone.",
+            confirm: "Delete",
+            cancel: "Cancel",
+            success: "Unit deleted successfully",
+            error: "Failed to delete unit",
+        },
+        sumOfFractions: {
+            total: "Total sum of fractions",
+            warning:
+                "The sum of fractions is not equal to 1 (Current: {{sum}}). This may lead to incorrect voting results.",
+        },
+    },
+    users: {
+        title: "User Management",
+        description: "Manage users and their roles within the association.",
+        empty: "No users found.",
+        table: {
+            name: "Name",
+            email: "Email",
+            role: "Role",
+            statusLabel: "Status",
+            status: {
+                ACTIVE: "Active",
+                INVITED: "Invited",
+                SUSPENDED: "Suspended",
+            },
+            joinedAt: "Joined At",
+        },
+        roles: {
+            ADMIN: "Administrator",
+            BOARD_MEMBER: "Board Member",
+            AUDITOR: "Auditor",
+            UNIT_OWNER: "Unit Owner",
+        },
+        updateRole: {
+            success: "User role updated successfully",
+            error: "Failed to update user role",
+        },
     },
     nav: {
         units: "Units",
         owners: "Owners",
+        users: "Users",
     },
 } as const;

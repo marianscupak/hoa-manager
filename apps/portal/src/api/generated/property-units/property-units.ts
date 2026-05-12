@@ -519,6 +519,86 @@ export const useUnitControllerUpdateUnit = <
         queryClient,
     );
 };
+export const unitControllerDeleteUnit = (
+    id: string,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<void>(
+        { url: `/api/units/${id}`, method: "DELETE", signal },
+        options,
+    );
+};
+
+export const getUnitControllerDeleteUnitMutationOptions = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof unitControllerDeleteUnit>>,
+        TError,
+        { id: string },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof unitControllerDeleteUnit>>,
+    TError,
+    { id: string },
+    TContext
+> => {
+    const mutationKey = ["unitControllerDeleteUnit"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof unitControllerDeleteUnit>>,
+        { id: string }
+    > = (props) => {
+        const { id } = props ?? {};
+
+        return unitControllerDeleteUnit(id, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type UnitControllerDeleteUnitMutationResult = NonNullable<
+    Awaited<ReturnType<typeof unitControllerDeleteUnit>>
+>;
+
+export type UnitControllerDeleteUnitMutationError = ErrorType<ErrorResponseDto>;
+
+export const useUnitControllerDeleteUnit = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof unitControllerDeleteUnit>>,
+            TError,
+            { id: string },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof unitControllerDeleteUnit>>,
+    TError,
+    { id: string },
+    TContext
+> => {
+    return useMutation(
+        getUnitControllerDeleteUnitMutationOptions(options),
+        queryClient,
+    );
+};
 export const unitControllerReplaceUnitOwnership = (
     id: string,
     replaceOwnershipsDto: BodyType<ReplaceOwnershipsDto>,

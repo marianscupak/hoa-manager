@@ -14,7 +14,10 @@ import {
 import { type GetUserByIdResult } from '@/modules/core/identity/application/handlers/get-user-by-id.handler';
 import { GetUserByIdQuery } from '@/modules/core/identity/application/queries/get-user-by-id.query';
 import { GetMembershipByTenantAndUserQuery } from '@/modules/core/tenancy/application/queries/get-membership-by-tenant-and-user.query';
-import { TenantMembership } from '@/modules/core/tenancy/domain/tenant.entity';
+import {
+  TenantMembership,
+  TenantMembershipStatus,
+} from '@/modules/core/tenancy/domain/tenant.entity';
 import {
   InvalidTokenException,
   UnauthorizedException,
@@ -58,7 +61,7 @@ export class SwitchTenantHandler
       new GetMembershipByTenantAndUserQuery(command.targetTenantId, claims.sub),
     );
 
-    if (!membership || membership.status !== 'ACTIVE') {
+    if (!membership || membership.status !== TenantMembershipStatus.ACTIVE) {
       throw new UnauthorizedException();
     }
 

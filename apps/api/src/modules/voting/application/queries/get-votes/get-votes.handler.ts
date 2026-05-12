@@ -26,16 +26,16 @@ export class GetVotesHandler
       roles.includes(TenantMembershipRole.ADMIN) ||
       roles.includes(TenantMembershipRole.BOARD_MEMBER);
 
-    // If admin or board member, fetch all votes (statuses = undefined)
-    // Otherwise, exclude DRAFT votes
-    const statuses = isAdminOrBoard
-      ? undefined
-      : [
-          VoteStatus.SCHEDULED,
-          VoteStatus.OPEN,
-          VoteStatus.CLOSED,
-          VoteStatus.CANCELLED,
-        ];
+    const statuses =
+      (query.statuses as VoteStatus[]) ??
+      (isAdminOrBoard
+        ? undefined
+        : [
+            VoteStatus.SCHEDULED,
+            VoteStatus.OPEN,
+            VoteStatus.CLOSED,
+            VoteStatus.CANCELLED,
+          ]);
 
     const votes = await this.voteReadRepository.findVotes(tenantId, statuses);
 

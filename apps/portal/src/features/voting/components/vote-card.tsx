@@ -44,10 +44,14 @@ export function VoteCard({ vote }: VoteCardProps) {
                                 <span>
                                     {isVotingOpen
                                         ? t("list.card.endsOn")
-                                        : t("list.card.startsOn")}
+                                        : vote.status === "CLOSED"
+                                          ? t("list.card.endedOn")
+                                          : t("list.card.startsOn")}
                                     {format(
                                         new Date(
-                                            isVotingOpen && vote.scheduledTo
+                                            (isVotingOpen ||
+                                                vote.status === "CLOSED") &&
+                                            vote.scheduledTo
                                                 ? vote.scheduledTo
                                                 : vote.scheduledFrom!,
                                         ),

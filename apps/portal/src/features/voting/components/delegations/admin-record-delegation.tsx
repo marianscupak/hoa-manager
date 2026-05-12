@@ -68,7 +68,9 @@ export function AdminRecordDelegation() {
     const { data: units } = useUnitControllerGetUnits();
 
     const filteredVotes =
-        votes?.filter((v) => !v.allowCoOwnerIndividualVote) || [];
+        votes?.filter(
+            (v) => !v.allowCoOwnerIndividualVote && v.status !== "CLOSED",
+        ) || [];
 
     const { data: candidates } = useVotesControllerGetDelegationCandidates(
         selectedVoteId,

@@ -4,18 +4,25 @@ import { useTranslation } from "react-i18next";
 
 import { Button, DataTable } from "@hoa-mngr/ui";
 
+import type { OwnerResponseDto } from "@/api/generated/model";
 import { useOwnerControllerGetOwners } from "@/api/generated/property-owners/property-owners";
 
 import { CreateOwnerDialog } from "../components/create-owner-dialog";
+import { DeleteOwnerDialog } from "../components/delete-owner-dialog";
 import { getOwnerColumns } from "../components/owners-table/owners-table-columns";
 
 export function OwnersPage() {
     const { t } = useTranslation(["admin"]);
     const [isCreateOpen, setIsCreateOpen] = useState(false);
+    const [deletingOwner, setDeletingOwner] = useState<OwnerResponseDto | null>(
+        null,
+    );
 
     const { data: owners, isLoading, refetch } = useOwnerControllerGetOwners();
 
-    const columns = getOwnerColumns(t, refetch);
+    const columns = getOwnerColumns(t, refetch, (owner) =>
+        setDeletingOwner(owner),
+    );
 
     return (
         <div className="space-y-6">
@@ -44,6 +51,13 @@ export function OwnersPage() {
             <CreateOwnerDialog
                 open={isCreateOpen}
                 onOpenChange={setIsCreateOpen}
+                onSuccess={refetch}
+            />
+
+            <DeleteOwnerDialog
+                owner={deletingOwner}
+                open={!!deletingOwner}
+                onOpenChange={(open) => !open && setDeletingOwner(null)}
                 onSuccess={refetch}
             />
         </div>

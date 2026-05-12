@@ -20,6 +20,7 @@ export interface UnitRepository {
   ): Promise<Unit>;
   findById(tenantId: string, unitId: string): Promise<Unit | null>;
   listByTenant(tenantId: string): Promise<Unit[]>;
+  delete(tenantId: string, unitId: string): Promise<void>;
 }
 
 export const UNIT_REPOSITORY = Symbol('UNIT_REPOSITORY');
@@ -36,6 +37,7 @@ export interface OwnerRepository {
   existsById(tenantId: string, ownerId: string): Promise<boolean>;
   listByTenant(tenantId: string): Promise<Owner[]>;
   setUserId(tenantId: string, ownerId: string, userId: string): Promise<void>;
+  delete(tenantId: string, ownerId: string): Promise<void>;
 }
 
 export const OWNER_REPOSITORY = Symbol('OWNER_REPOSITORY');

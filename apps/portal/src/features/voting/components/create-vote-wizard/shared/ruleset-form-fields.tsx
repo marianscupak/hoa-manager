@@ -10,6 +10,8 @@ import {
     SetVoteRulesetDtoWeightBasis as VoteWeightBasis,
 } from "@/api/generated/model";
 
+import { LegalValidityDisclaimer } from "./legal-validity-disclaimer";
+
 /**
  * Shared form fields for configuring a vote ruleset.
  * Used both in the vote-level ruleset step (as the default for all questions)
@@ -32,8 +34,18 @@ export function RulesetFormFields({
     const isMajorityThresholdDisabled =
         majorityRuleType === MajorityRuleType.SIMPLE_MAJORITY;
 
+    const weightBasis = watch("weightBasis");
+    const quorumElectorateBasis = watch("quorumElectorateBasis");
+    const abstainExcluded = watch("abstainExcludedFromMajorityDenominator");
+
+    const hasNonStandardRules =
+        weightBasis !== VoteWeightBasis.UNIT_SHARE ||
+        quorumElectorateBasis !== QuorumElectorateBasis.ALL_UNITS ||
+        abstainExcluded === true;
+
     return (
         <div className="space-y-6">
+            {hasNonStandardRules && <LegalValidityDisclaimer />}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <FormSelect
                     name="weightBasis"

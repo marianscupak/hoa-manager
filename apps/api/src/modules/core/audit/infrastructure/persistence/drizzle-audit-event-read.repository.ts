@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { and, asc, eq, inArray, or } from 'drizzle-orm';
 
-import { auditEvents } from '@/infrastructure/db/schema/core/audit-events';
-import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
+import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
+import { auditEvents } from '@/infrastructure/db/schema/core/audit-events';
 import type {
   AuditEventReadRecord,
   AuditEventReadRepository,

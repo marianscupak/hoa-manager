@@ -11,7 +11,6 @@ import {
 import { addDays, addMinutes } from 'date-fns';
 
 import { HandleGoogleCallbackCommand } from '@/modules/core/auth/application/commands/handle-google-callback.command';
-import { AccountExistsException } from '@/shared/application/exceptions/invite.exceptions';
 import {
   AUTH_IDENTITY_REPOSITORY,
   AUTH_SESSION_REPOSITORY,
@@ -32,6 +31,7 @@ import { GetUserByIdQuery } from '@/modules/core/identity/application/queries/ge
 import { GetMembershipsByUserIdQuery } from '@/modules/core/tenancy/application/queries/get-memberships-by-user-id.query';
 import { TenantMembershipStatus } from '@/modules/core/tenancy/domain/tenant.entity';
 import { UnauthorizedException } from '@/shared/application/exceptions/auth.exceptions';
+import { AccountExistsException } from '@/shared/application/exceptions/invite.exceptions';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 import {
   UNIT_OF_WORK,

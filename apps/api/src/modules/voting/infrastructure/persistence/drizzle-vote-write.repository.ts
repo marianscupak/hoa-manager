@@ -3,7 +3,6 @@ import { and, eq, inArray, isNull, isNotNull, lte } from 'drizzle-orm';
 
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
 import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
-import { BallotAlreadyCastException } from '@/shared/application/exceptions/vote.exceptions';
 import {
   voteRulesets,
   votes,
@@ -16,6 +15,7 @@ import {
   voteQuestionResults,
   voteOptionResults,
 } from '@/infrastructure/db/schema';
+import { BallotAlreadyCastException } from '@/shared/application/exceptions/vote.exceptions';
 
 import {
   VoteWriteRepository,

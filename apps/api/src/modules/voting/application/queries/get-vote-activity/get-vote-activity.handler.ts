@@ -8,6 +8,7 @@ import {
 import { VisibilityPolicyService } from '@/modules/core/audit/application/services/visibility-policy.service';
 import { VoteNotFoundException } from '@/shared/application/exceptions/vote.exceptions';
 
+import { GetVoteActivityQuery } from './get-vote-activity.query';
 import type { VoteActivityResponseDto } from '../../../api/dto/vote-activity.dto';
 import { VotingTimelineProjector } from '../../../audit/projections/voting-timeline.projector';
 import {
@@ -15,7 +16,6 @@ import {
   type VoteReadRepository,
 } from '../../ports/vote-read.repository.port';
 
-import { GetVoteActivityQuery } from './get-vote-activity.query';
 
 @QueryHandler(GetVoteActivityQuery)
 export class GetVoteActivityHandler

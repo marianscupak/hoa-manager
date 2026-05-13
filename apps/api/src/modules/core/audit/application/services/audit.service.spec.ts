@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
+import type { AuditEventWriteRepository } from '@/modules/core/audit/application/ports/audit-event-write.repository.port';
+import { AuditEventRegistry } from '@/modules/core/audit/application/registry/audit-event.registry';
 import type { AuditEvent } from '@/modules/core/audit/domain/audit-event';
 import { Visibility } from '@/modules/core/audit/domain/visibility';
-import { AuditEventRegistry } from '@/modules/core/audit/application/registry/audit-event.registry';
-import type { AuditEventWriteRepository } from '@/modules/core/audit/application/ports/audit-event-write.repository.port';
 
 import { AuditService } from './audit.service';
 

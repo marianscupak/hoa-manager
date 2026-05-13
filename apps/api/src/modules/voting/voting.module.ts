@@ -6,15 +6,12 @@ import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
 import { AuditModule } from '@/modules/core/audit/audit.module';
 
 import { VotesController } from './api/votes.controller';
-import { AuthModule } from '../core/auth/auth.module';
-import { IdentityModule } from '../core/identity/identity.module';
-import { TenancyModule } from '../core/tenancy/tenancy.module';
-import { TenantLookup } from './audit/exporter/tenant.lookup';
-import { VoteAuditExporterService } from './audit/exporter/vote-audit-exporter.service';
-import { VoteElectorateSnapshotLookup } from './audit/exporter/vote-electorate-snapshot.lookup';
 import { VotingAuditLabelResolver } from './audit/label-resolver.service';
 import { VotingTimelineProjector } from './audit/projections/voting-timeline.projector';
 import { VotingAuditRegistration } from './audit/voting-audit.registration';
+import { AuthModule } from '../core/auth/auth.module';
+import { IdentityModule } from '../core/identity/identity.module';
+import { TenancyModule } from '../core/tenancy/tenancy.module';
 import { CloseVoteCommandHandler } from './application/commands/close-vote/close-vote.handler';
 import { CreateVoteHandler } from './application/commands/create-vote/create-vote.handler';
 import { CreateVoteConsentHandler } from './application/commands/create-vote-consent/create-vote-consent.handler';
@@ -44,6 +41,9 @@ import { GetVoterStatusHandler } from './application/queries/get-voter-status/ge
 import { GetVotesHandler } from './application/queries/get-votes/get-votes.handler';
 import { ElectorateDomainService } from './application/services/electorate.service';
 import { ResultCalculationDomainService } from './application/services/result-calculation.service';
+import { TenantLookup } from './audit/exporter/tenant.lookup';
+import { VoteAuditExporterService } from './audit/exporter/vote-audit-exporter.service';
+import { VoteElectorateSnapshotLookup } from './audit/exporter/vote-electorate-snapshot.lookup';
 import { DrizzleElectorateDataRepository } from './infrastructure/persistence/drizzle-electorate-data.repository';
 import { DrizzleResultCalculationDataRepository } from './infrastructure/persistence/drizzle-result-calculation-data.repository';
 import { DrizzleVoteConsentWriteRepository } from './infrastructure/persistence/drizzle-vote-consent-write.repository';

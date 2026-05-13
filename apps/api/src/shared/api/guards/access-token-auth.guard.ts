@@ -8,9 +8,9 @@ import { QueryBus } from '@nestjs/cqrs';
 import type { Request } from 'express';
 import { ClsService } from 'nestjs-cls';
 
+import { AUDIT_CLS_KEYS } from '@/modules/core/audit/infrastructure/cls/audit-context.keys';
 import { TOKEN_VERIFIER } from '@/modules/core/auth/application/ports/auth.utils.port';
 import type { TokenVerifier } from '@/modules/core/auth/application/ports/auth.utils.port';
-import { AUDIT_CLS_KEYS } from '@/modules/core/audit/infrastructure/cls/audit-context.keys';
 import { type GetUserByIdResult } from '@/modules/core/identity/application/handlers/get-user-by-id.handler';
 import { GetUserByIdQuery } from '@/modules/core/identity/application/queries/get-user-by-id.query';
 import { InvalidTokenException } from '@/shared/application/exceptions/auth.exceptions';

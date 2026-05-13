@@ -1,10 +1,10 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
+import { GetVoteAuditExportQuery } from './get-vote-audit-export.query';
 import type { VoteAuditExportDto } from '../../../api/dto/vote-audit-export.dto';
 import { VoteAuditExporterService } from '../../../audit/exporter/vote-audit-exporter.service';
 import { VotingAuditLabelResolver } from '../../../audit/label-resolver.service';
 
-import { GetVoteAuditExportQuery } from './get-vote-audit-export.query';
 
 @QueryHandler(GetVoteAuditExportQuery)
 export class GetVoteAuditExportHandler

@@ -7,7 +7,7 @@ import { Visibility } from '@/modules/core/audit/domain/visibility';
 import { VotingEventType } from '../voting-event-types';
 
 const PayloadSchema = z.object({
-  closedAt: z.string().datetime(),
+  closedAt: z.string().datetime({ offset: true }),
   labels: z.object({
     voteTitle: z.string(),
     closedBy: z.string(),

@@ -11,6 +11,7 @@ const PayloadSchema = z.object({
   unitId: z.uuid(),
   ownerMembershipId: z.uuid(),
   delegateMembershipId: z.uuid(),
+  recordedByMembershipId: z.uuid(),
   labels: z.object({
     voteTitle: z.string(),
     unitLabel: z.string(),
@@ -39,6 +40,7 @@ export const VoteConsentCreatedAuditEvent = defineAuditEvent({
     ownerLabel: string;
     delegateMembershipId: string;
     delegateLabel: string;
+    recordedByMembershipId: string;
     actor: AuditActor;
     actorLabel: string;
     occurredAt: Date;
@@ -54,6 +56,7 @@ export const VoteConsentCreatedAuditEvent = defineAuditEvent({
         unitId: input.unitId,
         ownerMembershipId: input.ownerMembershipId,
         delegateMembershipId: input.delegateMembershipId,
+        recordedByMembershipId: input.recordedByMembershipId,
         labels: {
           voteTitle: input.voteTitle,
           unitLabel: input.unitLabel,

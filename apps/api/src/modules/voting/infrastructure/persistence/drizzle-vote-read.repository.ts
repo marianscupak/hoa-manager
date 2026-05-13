@@ -970,6 +970,28 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
     return this.resolveOwnerId(tenantId, membershipId);
   }
 
+  async getMembershipByOwnerId(
+    tenantId: string,
+    ownerId: string,
+  ): Promise<string | null> {
+    const rows = await this.drizzle.db
+      .select({ id: tenantMemberships.id })
+      .from(owners)
+      .innerJoin(
+        tenantMemberships,
+        and(
+          eq(tenantMemberships.userId, owners.userId),
+          eq(tenantMemberships.tenantId, owners.tenantId),
+        ),
+      )
+      .where(
+        and(eq(owners.tenantId, tenantId), eq(owners.id, ownerId)),
+      )
+      .limit(1);
+
+    return rows.length > 0 ? rows[0].id : null;
+  }
+
   async hasMutualDelegation(
     tenantId: string,
     unitId: string,

@@ -193,6 +193,8 @@ export class VotingTimelineProjector {
       }
       case VotingEventType.VOTE_CONSENT_CREATED: {
         const p = event.payload as {
+          ownerMembershipId: string;
+          recordedByMembershipId?: string;
           labels: {
             voteTitle: string;
             unitLabel: string;
@@ -201,17 +203,37 @@ export class VotingTimelineProjector {
             actor: string;
           };
         };
+        if (p.recordedByMembershipId === undefined) {
+          return {
+            ...base,
+            message: t(lang, 'vote.consent.created.privileged', {
+              owner: p.labels.owner,
+              delegate: p.labels.delegate,
+              unit: p.labels.unitLabel,
+            }),
+          };
+        }
+        const isSelf = p.recordedByMembershipId === p.ownerMembershipId;
         return {
           ...base,
-          message: t(lang, 'vote.consent.created.privileged', {
-            owner: p.labels.owner,
-            delegate: p.labels.delegate,
-            unit: p.labels.unitLabel,
-          }),
+          message: t(
+            lang,
+            isSelf
+              ? 'vote.consent.created.self'
+              : 'vote.consent.created.byRecorder',
+            {
+              owner: p.labels.owner,
+              delegate: p.labels.delegate,
+              unit: p.labels.unitLabel,
+              recorder: p.labels.actor,
+            },
+          ),
         };
       }
       case VotingEventType.VOTE_CONSENT_REVOKED: {
         const p = event.payload as {
+          ownerMembershipId?: string;
+          revokedByMembershipId?: string;
           labels: {
             voteTitle: string;
             unitLabel: string;
@@ -220,12 +242,30 @@ export class VotingTimelineProjector {
             actor: string;
           };
         };
+        if (p.revokedByMembershipId === undefined) {
+          return {
+            ...base,
+            message: t(lang, 'vote.consent.revoked.privileged', {
+              actor: p.labels.actor,
+              unit: p.labels.unitLabel,
+            }),
+          };
+        }
+        const isSelf = p.revokedByMembershipId === p.ownerMembershipId;
         return {
           ...base,
-          message: t(lang, 'vote.consent.revoked.privileged', {
-            actor: p.labels.actor,
-            unit: p.labels.unitLabel,
-          }),
+          message: t(
+            lang,
+            isSelf
+              ? 'vote.consent.revoked.self'
+              : 'vote.consent.revoked.byRecorder',
+            {
+              owner: p.labels.owner,
+              delegate: p.labels.delegate,
+              unit: p.labels.unitLabel,
+              recorder: p.labels.actor,
+            },
+          ),
         };
       }
       default:

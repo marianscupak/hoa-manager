@@ -186,4 +186,124 @@ describe('VotingTimelineProjector', () => {
       expect(entry.message).not.toContain('Activity recorded'); // i.e. it took a typed branch, not the unknown fallback
     });
   });
+
+  describe('VOTE_CONSENT_CREATED', () => {
+    const basePayload = {
+      consentId: 'c-1',
+      unitId: 'u-1',
+      ownerMembershipId: 'owner-m-1',
+      delegateMembershipId: 'delegate-m-1',
+      labels: {
+        voteTitle: 'Bylaws',
+        unitLabel: '12',
+        owner: 'Bob',
+        delegate: 'Carol',
+        actor: 'Alice (board)',
+      },
+    };
+
+    it('renders self variant when actor recorded their own consent (en)', () => {
+      const e = ev({
+        eventType: VotingEventType.VOTE_CONSENT_CREATED,
+        visibility: Visibility.TENANT_PRIVILEGED,
+        payload: { ...basePayload, recordedByMembershipId: 'owner-m-1' },
+      });
+      const entry = projector.project([e], VIEWER_ADMIN)[0];
+      expect(entry.message).toBe('Bob delegated unit 12 to Carol.');
+    });
+
+    it('renders byRecorder variant when admin recorded on behalf (en)', () => {
+      const e = ev({
+        eventType: VotingEventType.VOTE_CONSENT_CREATED,
+        visibility: Visibility.TENANT_PRIVILEGED,
+        payload: { ...basePayload, recordedByMembershipId: 'admin-m-1' },
+      });
+      const entry = projector.project([e], VIEWER_ADMIN)[0];
+      expect(entry.message).toBe(
+        'Alice (board) recorded a delegation of unit 12 from Bob to Carol.',
+      );
+    });
+
+    it('renders byRecorder variant in Czech', () => {
+      const e = ev({
+        eventType: VotingEventType.VOTE_CONSENT_CREATED,
+        visibility: Visibility.TENANT_PRIVILEGED,
+        payload: { ...basePayload, recordedByMembershipId: 'admin-m-1' },
+      });
+      const entry = projector.project([e], { ...VIEWER_ADMIN, viewerLanguage: 'cs' })[0];
+      expect(entry.message).toBe(
+        'Alice (board) zaznamenal/a delegaci jednotky 12 z Bob na Carol.',
+      );
+    });
+
+    it('falls back to legacy privileged string when recordedByMembershipId is absent (historic event)', () => {
+      const e = ev({
+        eventType: VotingEventType.VOTE_CONSENT_CREATED,
+        visibility: Visibility.TENANT_PRIVILEGED,
+        payload: basePayload,
+      });
+      const entry = projector.project([e], VIEWER_ADMIN)[0];
+      expect(entry.message).toBe('Bob delegated unit 12 to Carol.');
+    });
+  });
+
+  describe('VOTE_CONSENT_REVOKED', () => {
+    const basePayload = {
+      consentId: 'c-1',
+      unitId: 'u-1',
+      ownerMembershipId: 'owner-m-1',
+      delegateMembershipId: 'delegate-m-1',
+      labels: {
+        voteTitle: 'Bylaws',
+        unitLabel: '12',
+        owner: 'Bob',
+        delegate: 'Carol',
+        actor: 'Alice (board)',
+      },
+    };
+
+    it('renders self variant when owner revoked their own delegation (en)', () => {
+      const e = ev({
+        eventType: VotingEventType.VOTE_CONSENT_REVOKED,
+        visibility: Visibility.TENANT_PRIVILEGED,
+        payload: { ...basePayload, revokedByMembershipId: 'owner-m-1' },
+      });
+      const entry = projector.project([e], VIEWER_ADMIN)[0];
+      expect(entry.message).toBe('Bob revoked the delegation of unit 12 to Carol.');
+    });
+
+    it('renders byRecorder variant when admin revoked on behalf (en)', () => {
+      const e = ev({
+        eventType: VotingEventType.VOTE_CONSENT_REVOKED,
+        visibility: Visibility.TENANT_PRIVILEGED,
+        payload: { ...basePayload, revokedByMembershipId: 'admin-m-1' },
+      });
+      const entry = projector.project([e], VIEWER_ADMIN)[0];
+      expect(entry.message).toBe(
+        'Alice (board) revoked the delegation of unit 12 from Bob to Carol.',
+      );
+    });
+
+    it('renders byRecorder variant in Czech', () => {
+      const e = ev({
+        eventType: VotingEventType.VOTE_CONSENT_REVOKED,
+        visibility: Visibility.TENANT_PRIVILEGED,
+        payload: { ...basePayload, revokedByMembershipId: 'admin-m-1' },
+      });
+      const entry = projector.project([e], { ...VIEWER_ADMIN, viewerLanguage: 'cs' })[0];
+      expect(entry.message).toBe(
+        'Alice (board) zrušil/a delegaci jednotky 12 z Bob na Carol.',
+      );
+    });
+
+    it('falls back to legacy privileged string when revokedByMembershipId is absent (historic event)', () => {
+      const e = ev({
+        eventType: VotingEventType.VOTE_CONSENT_REVOKED,
+        visibility: Visibility.TENANT_PRIVILEGED,
+        payload: basePayload,
+      });
+      const entry = projector.project([e], VIEWER_ADMIN)[0];
+      expect(entry.message).toBe('Alice (board) revoked the delegation for unit 12.');
+    });
+  });
 });

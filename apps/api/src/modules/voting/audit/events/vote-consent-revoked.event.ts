@@ -9,6 +9,9 @@ import { VotingEventType } from '../voting-event-types';
 const PayloadSchema = z.object({
   consentId: z.uuid(),
   unitId: z.uuid(),
+  ownerMembershipId: z.uuid(),
+  delegateMembershipId: z.uuid(),
+  revokedByMembershipId: z.uuid(),
   labels: z.object({
     voteTitle: z.string(),
     unitLabel: z.string(),
@@ -33,8 +36,11 @@ export const VoteConsentRevokedAuditEvent = defineAuditEvent({
     consentId: string;
     unitId: string;
     unitLabel: string;
+    ownerMembershipId: string;
     ownerLabel: string;
+    delegateMembershipId: string;
     delegateLabel: string;
+    revokedByMembershipId: string;
     actor: AuditActor;
     actorLabel: string;
     occurredAt: Date;
@@ -48,6 +54,9 @@ export const VoteConsentRevokedAuditEvent = defineAuditEvent({
       payload: {
         consentId: input.consentId,
         unitId: input.unitId,
+        ownerMembershipId: input.ownerMembershipId,
+        delegateMembershipId: input.delegateMembershipId,
+        revokedByMembershipId: input.revokedByMembershipId,
         labels: {
           voteTitle: input.voteTitle,
           unitLabel: input.unitLabel,

@@ -146,6 +146,7 @@ export class CreateVoteConsentHandler
           ownerLabel,
           delegateMembershipId: command.delegateMembershipId,
           delegateLabel,
+          recordedByMembershipId: command.membershipId,
           actor,
           actorLabel,
           occurredAt: this.clock.now(),

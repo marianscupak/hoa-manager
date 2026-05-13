@@ -19,6 +19,14 @@ const STRINGS: Record<Lang, Record<string, (vars: Record<string, string>) => str
       `${v.owner} delegated unit ${v.unit} to ${v.delegate}.`,
     'vote.consent.revoked.privileged': (v) =>
       `${v.actor} revoked the delegation for unit ${v.unit}.`,
+    'vote.consent.created.self': (v) =>
+      `${v.owner} delegated unit ${v.unit} to ${v.delegate}.`,
+    'vote.consent.created.byRecorder': (v) =>
+      `${v.recorder} recorded a delegation of unit ${v.unit} from ${v.owner} to ${v.delegate}.`,
+    'vote.consent.revoked.self': (v) =>
+      `${v.owner} revoked the delegation of unit ${v.unit} to ${v.delegate}.`,
+    'vote.consent.revoked.byRecorder': (v) =>
+      `${v.recorder} revoked the delegation of unit ${v.unit} from ${v.owner} to ${v.delegate}.`,
     'ballot.cast.privileged': (v) => `${v.actor} cast ballot for unit ${v.unit}.`,
     'ballot.cast.self': () => `Your ballot was recorded.`,
     'vote.closed.public': (v) => `Vote "${v.title}" was closed.`,
@@ -44,6 +52,14 @@ const STRINGS: Record<Lang, Record<string, (vars: Record<string, string>) => str
       `${v.owner} delegoval/a jednotku ${v.unit} na ${v.delegate}.`,
     'vote.consent.revoked.privileged': (v) =>
       `${v.actor} zrušil/a delegaci pro jednotku ${v.unit}.`,
+    'vote.consent.created.self': (v) =>
+      `${v.owner} delegoval/a jednotku ${v.unit} na ${v.delegate}.`,
+    'vote.consent.created.byRecorder': (v) =>
+      `${v.recorder} zaznamenal/a delegaci jednotky ${v.unit} z ${v.owner} na ${v.delegate}.`,
+    'vote.consent.revoked.self': (v) =>
+      `${v.owner} zrušil/a delegaci jednotky ${v.unit} na ${v.delegate}.`,
+    'vote.consent.revoked.byRecorder': (v) =>
+      `${v.recorder} zrušil/a delegaci jednotky ${v.unit} z ${v.owner} na ${v.delegate}.`,
     'ballot.cast.privileged': (v) => `${v.actor} hlasoval/a za jednotku ${v.unit}.`,
     'ballot.cast.self': () => `Váš hlas byl zaznamenán.`,
     'vote.closed.public': (v) => `Hlasování "${v.title}" bylo ukončeno.`,

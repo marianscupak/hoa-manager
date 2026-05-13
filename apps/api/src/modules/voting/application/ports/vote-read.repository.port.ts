@@ -19,6 +19,10 @@ export interface VoteReadRepository {
     tenantId: string,
     membershipId: string,
   ): Promise<string | null>;
+  getMembershipByOwnerId(
+    tenantId: string,
+    ownerId: string,
+  ): Promise<string | null>;
   hasMutualDelegation(
     tenantId: string,
     unitId: string,

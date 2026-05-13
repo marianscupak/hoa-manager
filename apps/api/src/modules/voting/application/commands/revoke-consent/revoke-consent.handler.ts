@@ -16,7 +16,10 @@ import { VoteConsentRevokedAuditEvent } from '@/modules/voting/audit/events/vote
 import { VotingAuditLabelResolver } from '@/modules/voting/audit/label-resolver.service';
 import { VoteUnitConsentStatus } from '@/modules/voting/domain/vote/vote.types';
 import { ForbiddenException } from '@/shared/application/exceptions/auth.exceptions';
-import { DelegationNotFoundException } from '@/shared/application/exceptions/vote.exceptions';
+import {
+  DelegationNotFoundException,
+  MembershipHasNoAssociatedOwnerException,
+} from '@/shared/application/exceptions/vote.exceptions';
 import { type Clock, CLOCK } from '@/shared/application/ports/clock.port';
 
 import { RevokeConsentCommand } from './revoke-consent.command';
@@ -67,7 +70,13 @@ export class RevokeConsentHandler
       }
     }
 
-    const ownerMembershipId = consent.recordedByMembershipId;
+    const ownerMembershipId = await this.voteReadRepo.getMembershipByOwnerId(
+      command.tenantId,
+      consent.fromOwnerId,
+    );
+    if (!ownerMembershipId) {
+      throw new MembershipHasNoAssociatedOwnerException();
+    }
     const delegateMembershipId = consent.toMembershipId;
 
     await this.unitOfWork.execute(async () => {
@@ -81,9 +90,7 @@ export class RevokeConsentHandler
         await Promise.all([
           this.labelResolver.resolveVoteTitle(consent.voteId),
           this.labelResolver.resolveUnitLabel(consent.unitId),
-          ownerMembershipId
-            ? this.labelResolver.resolveMembershipLabel(ownerMembershipId)
-            : Promise.resolve('—'),
+          this.labelResolver.resolveMembershipLabel(ownerMembershipId),
           this.labelResolver.resolveMembershipLabel(delegateMembershipId),
           this.labelResolver.resolveActorLabel(actor),
         ]);
@@ -96,8 +103,11 @@ export class RevokeConsentHandler
           consentId: consent.id,
           unitId: consent.unitId,
           unitLabel,
+          ownerMembershipId,
           ownerLabel,
+          delegateMembershipId,
           delegateLabel,
+          revokedByMembershipId: command.membershipId,
           actor,
           actorLabel,
           occurredAt: this.clock.now(),

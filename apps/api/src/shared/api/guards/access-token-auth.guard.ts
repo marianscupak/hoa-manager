@@ -6,9 +6,11 @@ import {
 } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import type { Request } from 'express';
+import { ClsService } from 'nestjs-cls';
 
 import { TOKEN_VERIFIER } from '@/modules/core/auth/application/ports/auth.utils.port';
 import type { TokenVerifier } from '@/modules/core/auth/application/ports/auth.utils.port';
+import { AUDIT_CLS_KEYS } from '@/modules/core/audit/infrastructure/cls/audit-context.keys';
 import { type GetUserByIdResult } from '@/modules/core/identity/application/handlers/get-user-by-id.handler';
 import { GetUserByIdQuery } from '@/modules/core/identity/application/queries/get-user-by-id.query';
 import { InvalidTokenException } from '@/shared/application/exceptions/auth.exceptions';
@@ -21,6 +23,7 @@ export class AccessTokenAuthGuard implements CanActivate {
   constructor(
     @Inject(TOKEN_VERIFIER) private readonly tokenVerifier: TokenVerifier,
     private readonly queryBus: QueryBus,
+    private readonly cls: ClsService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -61,6 +64,12 @@ export class AccessTokenAuthGuard implements CanActivate {
       }
       throw new InvalidTokenException();
     }
+
+    this.cls.set(AUDIT_CLS_KEYS.actor, {
+      type: 'USER',
+      userId: request['user']!.userId,
+      membershipId: null,
+    });
 
     return true;
   }

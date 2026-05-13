@@ -506,5 +506,15 @@ export const voting = {
         invalidQuorum: "Quorum not met",
         downloadAuditReport: "Download audit report",
         downloadAuditReportError: "Failed to download audit report.",
+        tabs: {
+            results: "Results",
+            activity: "Activity",
+        },
+        activity: {
+            empty: "No activity events to display for this vote.",
+            error: "Failed to load activity.",
+            expandDetails: "Show details",
+            collapseDetails: "Hide details",
+        },
     },
 };

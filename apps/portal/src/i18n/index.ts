@@ -9,6 +9,7 @@ import csErrors from "./locales/cs/errors";
 import csHome from "./locales/cs/home";
 import csInvite from "./locales/cs/invite";
 import csNotFound from "./locales/cs/not-found";
+import { audit as csAudit } from "./locales/cs/audit";
 import { voting as csVoting } from "./locales/cs/voting";
 import enAdmin from "./locales/en/admin";
 import enAuth from "./locales/en/auth";
@@ -17,6 +18,7 @@ import enErrors from "./locales/en/errors";
 import enHome from "./locales/en/home";
 import enInvite from "./locales/en/invite";
 import enNotFound from "./locales/en/not-found";
+import { audit as enAudit } from "./locales/en/audit";
 import { voting as enVoting } from "./locales/en/voting";
 
 declare module "i18next" {
@@ -31,6 +33,7 @@ declare module "i18next" {
             "invite": typeof enInvite;
             "errors": typeof enErrors;
             "voting": typeof enVoting;
+            "audit": typeof enAudit;
         };
     }
 }
@@ -46,6 +49,7 @@ i18n.use(initReactI18next).init({
             "invite": enInvite,
             "errors": enErrors,
             "voting": enVoting,
+            "audit": enAudit,
         },
         cs: {
             "home": csHome,
@@ -56,6 +60,7 @@ i18n.use(initReactI18next).init({
             "invite": csInvite,
             "errors": csErrors,
             "voting": csVoting,
+            "audit": csAudit,
         },
     },
     lng: "cs",

@@ -507,5 +507,15 @@ export const voting = {
         invalidQuorum: "Chybí kvórum",
         downloadAuditReport: "Stáhnout audit report",
         downloadAuditReportError: "Nepodařilo se stáhnout audit report.",
+        tabs: {
+            results: "Výsledky",
+            activity: "Průběh hlasování",
+        },
+        activity: {
+            empty: "Pro toto hlasování nejsou žádné události k zobrazení.",
+            error: "Nepodařilo se načíst průběh hlasování.",
+            expandDetails: "Zobrazit detaily",
+            collapseDetails: "Skrýt detaily",
+        },
     },
 };

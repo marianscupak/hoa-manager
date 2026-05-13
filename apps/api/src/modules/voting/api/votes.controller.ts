@@ -23,6 +23,7 @@ import {
 } from '@nestjs/swagger';
 
 import { VoteActivityResponseDto } from './dto/vote-activity.dto';
+import { VoteAuditExportDto } from './dto/vote-audit-export.dto';
 import {
   CreateVoteDto,
   CreateVoteQuestionDto,
@@ -66,6 +67,7 @@ import { UpdateVoteQuestionCommand } from '../application/commands/update-vote-q
 import { GetConsentsQuery } from '../application/queries/get-consents/get-consents.query';
 import { GetDelegationCandidatesQuery } from '../application/queries/get-delegation-candidates/get-delegation-candidates.query';
 import { GetVoteActivityQuery } from '../application/queries/get-vote-activity/get-vote-activity.query';
+import { GetVoteAuditExportQuery } from '../application/queries/get-vote-audit-export/get-vote-audit-export.query';
 import { GetVoteDetailQuery } from '../application/queries/get-vote-detail/get-vote-detail.query';
 import { GetVoteResultsQuery } from '../application/queries/get-vote-results/get-vote-results.query';
 import { GetVoterStatusQuery } from '../application/queries/get-voter-status/get-voter-status.query';
@@ -397,6 +399,29 @@ export class VotesController {
         user.userId,
         tenantCtx.roles,
         user.preferredLanguage ?? 'cs',
+      ),
+    );
+  }
+
+  @Get(':id/audit-export')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
+  @Roles(
+    TenantMembershipRole.ADMIN,
+    TenantMembershipRole.BOARD_MEMBER,
+    TenantMembershipRole.AUDITOR,
+  )
+  @ApiOkResponse({ type: VoteAuditExportDto })
+  getAuditExport(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Tenant() tenantCtx: TenantContext,
+  ): Promise<VoteAuditExportDto> {
+    return this.queryBus.execute(
+      new GetVoteAuditExportQuery(
+        tenantCtx.tenantId,
+        id,
+        tenantCtx.membershipId,
+        tenantCtx.roles,
       ),
     );
   }

@@ -485,6 +485,12 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
     };
   }
 
+  async delete(tenantId: string, voteId: string): Promise<void> {
+    await this.db
+      .delete(votes)
+      .where(and(eq(votes.tenantId, tenantId), eq(votes.id, voteId)));
+  }
+
   async saveElectorateUnits(
     tenantId: string,
     voteId: string,

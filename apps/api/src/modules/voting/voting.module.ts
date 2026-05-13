@@ -16,6 +16,7 @@ import { CloseVoteCommandHandler } from './application/commands/close-vote/close
 import { CreateVoteHandler } from './application/commands/create-vote/create-vote.handler';
 import { CreateVoteConsentHandler } from './application/commands/create-vote-consent/create-vote-consent.handler';
 import { CreateVoteQuestionHandler } from './application/commands/create-vote-question/create-vote-question.handler';
+import { DeleteVoteHandler } from './application/commands/delete-vote/delete-vote.handler';
 import { DeleteVoteQuestionHandler } from './application/commands/delete-vote-question/delete-vote-question.handler';
 import { OpenVoteCommandHandler } from './application/commands/open-vote/open-vote.handler';
 import { RevokeConsentHandler } from './application/commands/revoke-consent/revoke-consent.handler';
@@ -58,6 +59,7 @@ const COMMAND_HANDLERS = [
   CreateVoteQuestionHandler,
   UpdateVoteQuestionHandler,
   DeleteVoteQuestionHandler,
+  DeleteVoteHandler,
   UpdateVoteHandler,
   ScheduleVoteHandler,
   CreateVoteConsentHandler,

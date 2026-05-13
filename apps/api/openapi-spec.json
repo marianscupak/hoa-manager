@@ -665,6 +665,15 @@
             }
           },
           {
+            "name": "iss",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uri",
+              "type": "string"
+            }
+          },
+          {
             "name": "error",
             "required": false,
             "in": "query",
@@ -2114,6 +2123,27 @@
         "tags": [
           "Votes"
         ]
+      },
+      "delete": {
+        "operationId": "VotesController_deleteVote",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Draft vote deleted"
+          }
+        },
+        "tags": [
+          "Votes"
+        ]
       }
     },
     "/api/votes/{id}/voter-status": {
@@ -2479,6 +2509,14 @@
             "name": "id",
             "required": true,
             "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "accept-language",
+            "required": true,
+            "in": "header",
             "schema": {
               "type": "string"
             }

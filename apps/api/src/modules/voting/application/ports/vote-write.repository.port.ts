@@ -12,6 +12,7 @@ export interface BallotInput {
 export interface VoteWriteRepository {
   findById(tenantId: string, id: string): Promise<VoteAggregate | null>;
   save(vote: VoteAggregate): Promise<void>;
+  delete(tenantId: string, voteId: string): Promise<void>;
   saveElectorateUnits(
     tenantId: string,
     voteId: string,

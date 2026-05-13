@@ -33,6 +33,7 @@ import {
     useVotesControllerGetVoteDetail,
 } from "@/api/generated/votes/votes";
 
+import { DeleteDraftVoteDialog } from "../delete-draft-vote-dialog";
 import { ScheduleValidationModal } from "../schedule-validation-modal";
 import { CreateVoteBasicInfoStep } from "./steps/basic-info-step";
 import { CreateVoteQuestionsStep } from "./steps/questions-step";
@@ -248,9 +249,16 @@ export function CreateVoteWizard({
 
             {(initialVoteId || createdVoteId) && (
                 <div className="mt-8 flex items-center justify-between gap-3 border-t pt-8">
-                    <Button variant="ghost" asChild className="h-11 px-6">
-                        <Link to="/voting">{t("create.actions.back")}</Link>
-                    </Button>
+                    <div className="flex items-center gap-3">
+                        <Button variant="ghost" asChild className="h-11 px-6">
+                            <Link to="/voting">{t("create.actions.back")}</Link>
+                        </Button>
+                        {voteData?.status === "DRAFT" && (
+                            <DeleteDraftVoteDialog
+                                voteId={initialVoteId ?? createdVoteId ?? ""}
+                            />
+                        )}
+                    </div>
 
                     <div className="flex items-center gap-3">
                         <Button

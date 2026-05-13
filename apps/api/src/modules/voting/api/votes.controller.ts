@@ -58,6 +58,7 @@ import { CloseVoteCommand } from '../application/commands/close-vote/close-vote.
 import { CreateVoteCommand } from '../application/commands/create-vote/create-vote.command';
 import { CreateVoteConsentCommand } from '../application/commands/create-vote-consent/create-vote-consent.command';
 import { CreateVoteQuestionCommand } from '../application/commands/create-vote-question/create-vote-question.command';
+import { DeleteVoteCommand } from '../application/commands/delete-vote/delete-vote.command';
 import { DeleteVoteQuestionCommand } from '../application/commands/delete-vote-question/delete-vote-question.command';
 import { RevokeConsentCommand } from '../application/commands/revoke-consent/revoke-consent.command';
 import { ScheduleVoteCommand } from '../application/commands/schedule-vote/schedule-vote.command';
@@ -286,6 +287,20 @@ export class VotesController {
   ) {
     return this.commandBus.execute(
       new UpdateVoteCommand(tenantCtx.tenantId, id, body),
+    );
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({ description: 'Draft vote deleted' })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  deleteVote(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Tenant() tenantCtx: TenantContext,
+  ) {
+    return this.commandBus.execute(
+      new DeleteVoteCommand(tenantCtx.tenantId, id),
     );
   }
 

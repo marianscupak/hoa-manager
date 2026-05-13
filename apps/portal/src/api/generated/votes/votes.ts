@@ -773,6 +773,86 @@ export const useVotesControllerUpdateVote = <
         queryClient,
     );
 };
+export const votesControllerDeleteVote = (
+    id: string,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<void>(
+        { url: `/api/votes/${id}`, method: "DELETE", signal },
+        options,
+    );
+};
+
+export const getVotesControllerDeleteVoteMutationOptions = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof votesControllerDeleteVote>>,
+        TError,
+        { id: string },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof votesControllerDeleteVote>>,
+    TError,
+    { id: string },
+    TContext
+> => {
+    const mutationKey = ["votesControllerDeleteVote"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof votesControllerDeleteVote>>,
+        { id: string }
+    > = (props) => {
+        const { id } = props ?? {};
+
+        return votesControllerDeleteVote(id, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type VotesControllerDeleteVoteMutationResult = NonNullable<
+    Awaited<ReturnType<typeof votesControllerDeleteVote>>
+>;
+
+export type VotesControllerDeleteVoteMutationError = ErrorType<unknown>;
+
+export const useVotesControllerDeleteVote = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof votesControllerDeleteVote>>,
+            TError,
+            { id: string },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof votesControllerDeleteVote>>,
+    TError,
+    { id: string },
+    TContext
+> => {
+    return useMutation(
+        getVotesControllerDeleteVoteMutationOptions(options),
+        queryClient,
+    );
+};
 export const votesControllerGetVoterStatus = (
     id: string,
     options?: SecondParameter<typeof customInstance>,

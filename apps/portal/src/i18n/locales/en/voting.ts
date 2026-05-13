@@ -276,6 +276,12 @@ export const voting = {
                 "Are you sure you want to schedule this vote? This action will make the vote visible to regular users and is irreversible. You will no longer be able to edit the vote details or ruleset.",
             cancel: "Cancel",
             confirm: "Yes, Schedule Vote",
+            delete: "Delete Draft",
+            deleteConfirmTitle: "Delete Draft Vote",
+            deleteConfirmDescription:
+                "Are you sure you want to delete this draft? All questions, options, and ruleset settings will be permanently removed. This action cannot be undone.",
+            deleteConfirm: "Yes, Delete Draft",
+            deleteSuccess: "Draft vote deleted",
         },
         validation: {
             title: "Incomplete Vote Configuration",

@@ -17,6 +17,7 @@ import {
 import { useVotesControllerGetVoteDetail } from "@/api/generated/votes/votes";
 import { tenantContextAtom } from "@/auth/atoms";
 
+import { DeleteDraftVoteDialog } from "../components/delete-draft-vote-dialog";
 import { ScheduleValidationModal } from "../components/schedule-validation-modal";
 import { StatusBadge } from "../components/status-badge";
 import { VoteDetailTimeline } from "../components/vote-detail-timeline";
@@ -87,6 +88,7 @@ export function VoteDetailPage() {
 
                 {isAdmin && vote.status === "DRAFT" && (
                     <div className="flex gap-3">
+                        <DeleteDraftVoteDialog voteId={vote.id} />
                         <Button
                             variant="outline"
                             size="sm"

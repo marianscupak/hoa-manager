@@ -275,6 +275,12 @@ export const voting = {
                 "Opravdu chcete toto hlasování naplánovat? Tato akce zpřístupní hlasování běžným uživatelům a nelze ji vzít zpět. Po naplánování již nebude možné upravovat detaily hlasování ani ruleset.",
             cancel: "Zrušit",
             confirm: "Ano, naplánovat hlasování",
+            delete: "Smazat koncept",
+            deleteConfirmTitle: "Smazat koncept hlasování",
+            deleteConfirmDescription:
+                "Opravdu chcete tento koncept smazat? Všechny otázky, možnosti a nastavení pravidel budou trvale odstraněny. Tuto akci nelze vrátit zpět.",
+            deleteConfirm: "Ano, smazat koncept",
+            deleteSuccess: "Koncept hlasování byl smazán",
         },
         validation: {
             title: "Neúplná konfigurace hlasování",

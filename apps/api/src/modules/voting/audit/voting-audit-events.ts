@@ -4,6 +4,7 @@ import { VoteClosedAuditEvent } from './events/vote-closed.event';
 import { VoteConsentCreatedAuditEvent } from './events/vote-consent-created.event';
 import { VoteConsentRevokedAuditEvent } from './events/vote-consent-revoked.event';
 import { VoteCreatedAuditEvent } from './events/vote-created.event';
+import { VoteDeletedAuditEvent } from './events/vote-deleted.event';
 import { VoteElectorateSnapshottedAuditEvent } from './events/vote-electorate-snapshotted.event';
 import { VoteOpenedAuditEvent } from './events/vote-opened.event';
 import { VoteQuestionCreatedAuditEvent } from './events/vote-question-created.event';
@@ -17,6 +18,7 @@ import { VoteUpdatedAuditEvent } from './events/vote-updated.event';
 export const VOTING_AUDIT_EVENTS = [
   VoteCreatedAuditEvent,
   VoteUpdatedAuditEvent,
+  VoteDeletedAuditEvent,
   VoteRulesetSetAuditEvent,
   VoteScheduledAuditEvent,
   VoteOpenedAuditEvent,

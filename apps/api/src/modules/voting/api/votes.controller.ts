@@ -22,6 +22,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import { VoteActivityResponseDto } from './dto/vote-activity.dto';
 import {
   CreateVoteDto,
   CreateVoteQuestionDto,
@@ -40,10 +41,15 @@ import {
   SubmitBallotResponseDto,
   VoteResultsResponseDto,
 } from './dto/vote.dto';
-import { Roles, Tenant } from '../../../shared/api/decorators/auth.decorators';
+import {
+  CurrentAuthUser,
+  Roles,
+  Tenant,
+} from '../../../shared/api/decorators/auth.decorators';
 import { AccessTokenAuthGuard } from '../../../shared/api/guards/access-token-auth.guard';
 import { RolesGuard } from '../../../shared/api/guards/roles.guard';
 import { TenantContextGuard } from '../../../shared/api/guards/tenant-context.guard';
+import { type AuthPrincipal } from '../../../shared/domain/auth-principal';
 import { type TenantContext } from '../../../shared/domain/tenant-context';
 import { TenantMembershipRole } from '../../core/tenancy/domain/tenant.entity';
 import { CloseVoteCommand } from '../application/commands/close-vote/close-vote.command';
@@ -59,6 +65,7 @@ import { UpdateVoteCommand } from '../application/commands/update-vote/update-vo
 import { UpdateVoteQuestionCommand } from '../application/commands/update-vote-question/update-vote-question.command';
 import { GetConsentsQuery } from '../application/queries/get-consents/get-consents.query';
 import { GetDelegationCandidatesQuery } from '../application/queries/get-delegation-candidates/get-delegation-candidates.query';
+import { GetVoteActivityQuery } from '../application/queries/get-vote-activity/get-vote-activity.query';
 import { GetVoteDetailQuery } from '../application/queries/get-vote-detail/get-vote-detail.query';
 import { GetVoteResultsQuery } from '../application/queries/get-vote-results/get-vote-results.query';
 import { GetVoterStatusQuery } from '../application/queries/get-voter-status/get-voter-status.query';
@@ -371,6 +378,26 @@ export class VotesController {
   ) {
     return this.queryBus.execute(
       new GetVoteResultsQuery(tenantCtx.tenantId, id),
+    );
+  }
+
+  @Get(':id/activity')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard)
+  @ApiOkResponse({ type: VoteActivityResponseDto })
+  getActivity(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Tenant() tenantCtx: TenantContext,
+    @CurrentAuthUser() user: AuthPrincipal,
+  ): Promise<VoteActivityResponseDto> {
+    return this.queryBus.execute(
+      new GetVoteActivityQuery(
+        tenantCtx.tenantId,
+        id,
+        user.userId,
+        tenantCtx.roles,
+        user.preferredLanguage ?? 'cs',
+      ),
     );
   }
 

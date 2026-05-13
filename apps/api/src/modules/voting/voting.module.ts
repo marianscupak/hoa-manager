@@ -10,6 +10,7 @@ import { AuthModule } from '../core/auth/auth.module';
 import { IdentityModule } from '../core/identity/identity.module';
 import { TenancyModule } from '../core/tenancy/tenancy.module';
 import { VotingAuditLabelResolver } from './audit/label-resolver.service';
+import { VotingTimelineProjector } from './audit/projections/voting-timeline.projector';
 import { VotingAuditRegistration } from './audit/voting-audit.registration';
 import { CloseVoteCommandHandler } from './application/commands/close-vote/close-vote.handler';
 import { CreateVoteHandler } from './application/commands/create-vote/create-vote.handler';
@@ -32,6 +33,7 @@ import { VOTE_READ_REPOSITORY } from './application/ports/vote-read.repository.p
 import { VOTE_WRITE_REPOSITORY } from './application/ports/vote-write.repository.port';
 import { GetConsentsHandler } from './application/queries/get-consents/get-consents.handler';
 import { GetDelegationCandidatesHandler } from './application/queries/get-delegation-candidates/get-delegation-candidates.handler';
+import { GetVoteActivityHandler } from './application/queries/get-vote-activity/get-vote-activity.handler';
 import { GetVoteDetailHandler } from './application/queries/get-vote-detail/get-vote-detail.handler';
 import { GetVoteResultsHandler } from './application/queries/get-vote-results/get-vote-results.handler';
 import { GetVoterStatusHandler } from './application/queries/get-voter-status/get-voter-status.handler';
@@ -66,6 +68,7 @@ const QUERY_HANDLERS = [
   GetDelegationCandidatesHandler,
   GetConsentsHandler,
   GetVoteResultsHandler,
+  GetVoteActivityHandler,
 ];
 const REPOSITORIES = [
   { provide: VOTE_WRITE_REPOSITORY, useClass: DrizzleVoteWriteRepository },
@@ -107,6 +110,7 @@ const REPOSITORIES = [
     ...REPOSITORIES,
     VotingAuditLabelResolver,
     VotingAuditRegistration,
+    VotingTimelineProjector,
   ],
 })
 export class VotingModule {}

@@ -532,12 +532,14 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
     tenantId: string,
     voteId: string,
     ballotInputs: BallotInput[],
-  ): Promise<void> {
-    if (ballotInputs.length === 0) return;
+  ): Promise<{ ballotId: string; unitId: string }[]> {
+    if (ballotInputs.length === 0) return [];
+
+    const inserted: { ballotId: string; unitId: string }[] = [];
 
     try {
       for (const input of ballotInputs) {
-        const [inserted] = await this.db
+        const [row] = await this.db
           .insert(ballots)
           .values({
             tenantId,
@@ -549,10 +551,12 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
           })
           .returning({ id: ballots.id });
 
+        inserted.push({ ballotId: row.id, unitId: input.unitId });
+
         if (input.answers.length > 0) {
           await this.db.insert(ballotAnswers).values(
             input.answers.map((a) => ({
-              ballotId: inserted.id,
+              ballotId: row.id,
               questionId: a.questionId,
               optionId: a.optionId,
             })),
@@ -568,6 +572,8 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
       }
       throw error;
     }
+
+    return inserted;
   }
 
   async findElectorateUnitsForMembership(

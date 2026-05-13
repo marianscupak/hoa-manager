@@ -6,6 +6,7 @@ import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
 import { tenantMemberships } from '@/infrastructure/db/schema/core/tenant-memberships';
 import { units } from '@/infrastructure/db/schema/core/units';
 import { users } from '@/infrastructure/db/schema/core/users';
+import type { AuditActor } from '@/modules/core/audit/domain/actor';
 
 @Injectable()
 export class VotingAuditLabelResolver {
@@ -14,6 +15,12 @@ export class VotingAuditLabelResolver {
   private get db() {
     return (DRIZZLE_TX_STORAGE.getStore() ??
       this.drizzle.db) as typeof this.drizzle.db;
+  }
+
+  async resolveActorLabel(actor: AuditActor): Promise<string> {
+    return actor.type === 'SYSTEM'
+      ? `System (${actor.reason})`
+      : this.resolveUserLabel(actor.userId);
   }
 
   async resolveUserLabel(userId: string): Promise<string> {

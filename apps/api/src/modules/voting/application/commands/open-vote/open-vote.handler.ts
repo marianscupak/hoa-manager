@@ -1,6 +1,11 @@
 import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
+import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
+import { AuditService } from '@/modules/core/audit/application/services/audit.service';
+import { VoteElectorateSnapshottedAuditEvent } from '@/modules/voting/audit/events/vote-electorate-snapshotted.event';
+import { VoteOpenedAuditEvent } from '@/modules/voting/audit/events/vote-opened.event';
+import { VotingAuditLabelResolver } from '@/modules/voting/audit/label-resolver.service';
 import { VoteNotFoundException } from '@/shared/application/exceptions/vote.exceptions';
 import { type Clock, CLOCK } from '@/shared/application/ports/clock.port';
 import {
@@ -31,6 +36,9 @@ export class OpenVoteCommandHandler
     private readonly uow: UnitOfWork,
     @Inject(CLOCK)
     private readonly clock: Clock,
+    private readonly auditService: AuditService,
+    private readonly auditContext: AuditContextService,
+    private readonly labelResolver: VotingAuditLabelResolver,
   ) {}
 
   async execute(command: OpenVoteCommand): Promise<void> {
@@ -51,6 +59,39 @@ export class OpenVoteCommandHandler
         tenantId,
         voteId,
         electorate,
+      );
+
+      const actor = this.auditContext.requireActor();
+      const openedByLabel = await this.labelResolver.resolveActorLabel(actor);
+
+      const openedAt = this.clock.now();
+      const totalWeight = electorate.reduce(
+        (sum, u) => sum + u.votingWeight,
+        0,
+      );
+
+      await this.auditService.append(
+        VoteOpenedAuditEvent.build({
+          voteId: vote.id,
+          tenantId: vote.tenantId,
+          voteTitle: vote.title,
+          actor,
+          openedByLabel,
+          electorateSize: electorate.length,
+          openedAt,
+        }),
+      );
+
+      await this.auditService.append(
+        VoteElectorateSnapshottedAuditEvent.build({
+          voteId: vote.id,
+          tenantId: vote.tenantId,
+          voteTitle: vote.title,
+          actor,
+          totalUnits: electorate.length,
+          totalWeight,
+          occurredAt: openedAt,
+        }),
       );
     });
   }

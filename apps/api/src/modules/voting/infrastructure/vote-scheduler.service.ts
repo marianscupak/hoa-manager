@@ -2,6 +2,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
+import { SystemActorRunner } from '@/modules/core/audit/infrastructure/cls/system-actor.runner';
 import { type Clock, CLOCK } from '@/shared/application/ports/clock.port';
 
 import { CloseVoteCommand } from '../application/commands/close-vote/close-vote.command';
@@ -21,6 +22,7 @@ export class VoteSchedulerService {
     private readonly commandBus: CommandBus,
     @Inject(CLOCK)
     private readonly clock: Clock,
+    private readonly systemActorRunner: SystemActorRunner,
   ) {}
 
   @Cron(CronExpression.EVERY_MINUTE)
@@ -37,8 +39,8 @@ export class VoteSchedulerService {
 
     for (const vote of votesToOpen) {
       try {
-        await this.commandBus.execute(
-          new OpenVoteCommand(vote.tenantId, vote.id),
+        await this.systemActorRunner.run('vote-scheduler:auto-open', () =>
+          this.commandBus.execute(new OpenVoteCommand(vote.tenantId, vote.id)),
         );
         this.logger.log(`Vote ${vote.id} opened successfully.`);
       } catch (error: unknown) {
@@ -62,8 +64,8 @@ export class VoteSchedulerService {
 
     for (const vote of votesToClose) {
       try {
-        await this.commandBus.execute(
-          new CloseVoteCommand(vote.tenantId, vote.id),
+        await this.systemActorRunner.run('vote-scheduler:auto-close', () =>
+          this.commandBus.execute(new CloseVoteCommand(vote.tenantId, vote.id)),
         );
         this.logger.log(`Vote ${vote.id} closed successfully.`);
       } catch (error: unknown) {

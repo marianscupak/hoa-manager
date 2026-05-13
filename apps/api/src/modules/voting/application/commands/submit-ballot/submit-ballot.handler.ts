@@ -1,7 +1,11 @@
 import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
+import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
+import { AuditService } from '@/modules/core/audit/application/services/audit.service';
 import { type SubmitBallotResponseDto } from '@/modules/voting/api/dto/vote.dto';
+import { BallotCastDirectAuditEvent } from '@/modules/voting/audit/events/ballot-cast-direct.event';
+import { VotingAuditLabelResolver } from '@/modules/voting/audit/label-resolver.service';
 import { VoteStatus } from '@/modules/voting/domain/vote/vote.types';
 import {
   VoteNotFoundException,
@@ -10,6 +14,7 @@ import {
   InvalidBallotAnswersException,
   NotUnitRepresentativeException,
 } from '@/shared/application/exceptions/vote.exceptions';
+import { type Clock, CLOCK } from '@/shared/application/ports/clock.port';
 import {
   type UnitOfWork,
   UNIT_OF_WORK,
@@ -36,6 +41,11 @@ export class SubmitBallotHandler
     private readonly voteWriteRepository: VoteWriteRepository,
     @Inject(UNIT_OF_WORK)
     private readonly uow: UnitOfWork,
+    @Inject(CLOCK)
+    private readonly clock: Clock,
+    private readonly auditService: AuditService,
+    private readonly auditContext: AuditContextService,
+    private readonly labelResolver: VotingAuditLabelResolver,
   ) {}
 
   async execute(
@@ -114,8 +124,8 @@ export class SubmitBallotHandler
       }
 
       // 5. Persist all ballots atomically
-      const now = new Date();
-      await this.voteWriteRepository.saveBallots(
+      const occurredAt = this.clock.now();
+      const inserted = await this.voteWriteRepository.saveBallots(
         tenantId,
         voteId,
         ballotInputs.map((b) => ({
@@ -126,7 +136,51 @@ export class SubmitBallotHandler
         })),
       );
 
-      return { submittedAt: now };
+      // 6. Emit audit event per ballot
+      const actor = this.auditContext.requireActor();
+      const castByLabel = await this.labelResolver.resolveActorLabel(actor);
+
+      for (const ballot of ballotInputs) {
+        const record = inserted.find((r) => r.unitId === ballot.unitId);
+        if (!record) {
+          throw new Error(
+            `Internal: saved ballot record for unit ${ballot.unitId} not found`,
+          );
+        }
+
+        const unitLabel = await this.labelResolver.resolveUnitLabel(
+          ballot.unitId,
+        );
+
+        const labeledAnswers = ballot.answers.map((a) => {
+          const question = vote.questions.find((q) => q.id === a.questionId);
+          const option = question?.options.find((o) => o.id === a.optionId);
+          if (!question || !option) {
+            throw new Error(
+              'Internal: ballot answer references missing question/option',
+            );
+          }
+          return { questionText: question.title, optionText: option.label };
+        });
+
+        await this.auditService.append(
+          BallotCastDirectAuditEvent.build({
+            voteId,
+            tenantId,
+            voteTitle: vote.title,
+            ballotId: record.ballotId,
+            unitId: ballot.unitId,
+            unitLabel,
+            actor,
+            castByLabel,
+            answers: ballot.answers,
+            labeledAnswers,
+            occurredAt,
+          }),
+        );
+      }
+
+      return { submittedAt: occurredAt };
     });
   }
 }

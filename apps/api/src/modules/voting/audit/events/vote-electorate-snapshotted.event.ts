@@ -4,12 +4,11 @@ import { defineAuditEvent } from '@/modules/core/audit/application/registry/defi
 import type { AuditActor } from '@/modules/core/audit/domain/actor';
 import { Visibility } from '@/modules/core/audit/domain/visibility';
 
-import { FractionSchema } from './_shared.schemas';
 import { VotingEventType } from '../voting-event-types';
 
 const PayloadSchema = z.object({
   totalUnits: z.number().int().nonnegative(),
-  totalWeight: FractionSchema,
+  totalWeight: z.number().nonnegative(),
   labels: z.object({
     voteTitle: z.string(),
   }),
@@ -29,7 +28,7 @@ export const VoteElectorateSnapshottedAuditEvent = defineAuditEvent({
     voteTitle: string;
     actor: AuditActor;
     totalUnits: number;
-    totalWeight: { numerator: number; denominator: number };
+    totalWeight: number;
     occurredAt: Date;
   }) {
     return {

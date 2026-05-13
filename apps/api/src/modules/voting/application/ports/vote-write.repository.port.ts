@@ -22,7 +22,7 @@ export interface VoteWriteRepository {
     tenantId: string,
     voteId: string,
     ballots: BallotInput[],
-  ): Promise<void>;
+  ): Promise<{ ballotId: string; unitId: string }[]>;
   findElectorateUnitsForMembership(
     tenantId: string,
     voteId: string,

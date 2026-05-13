@@ -140,6 +140,94 @@ export class VotingTimelineProjector {
           }),
         };
       }
+      case VotingEventType.VOTE_UPDATED: {
+        const p = event.payload as {
+          labels: { voteTitle: string; updatedBy: string };
+        };
+        return {
+          ...base,
+          message: t(lang, 'vote.updated.privileged', {
+            title: p.labels.voteTitle,
+            actor: p.labels.updatedBy,
+          }),
+        };
+      }
+      case VotingEventType.VOTE_QUESTION_CREATED: {
+        const p = event.payload as {
+          labels: { voteTitle: string; questionTitle: string; actor: string };
+        };
+        return {
+          ...base,
+          message: t(lang, 'vote.question.created.privileged', {
+            actor: p.labels.actor,
+            question: p.labels.questionTitle,
+            title: p.labels.voteTitle,
+          }),
+        };
+      }
+      case VotingEventType.VOTE_QUESTION_UPDATED: {
+        const p = event.payload as {
+          labels: { voteTitle: string; questionTitle: string; actor: string };
+        };
+        return {
+          ...base,
+          message: t(lang, 'vote.question.updated.privileged', {
+            actor: p.labels.actor,
+            question: p.labels.questionTitle,
+            title: p.labels.voteTitle,
+          }),
+        };
+      }
+      case VotingEventType.VOTE_QUESTION_DELETED: {
+        const p = event.payload as {
+          labels: { voteTitle: string; questionTitle: string; actor: string };
+        };
+        return {
+          ...base,
+          message: t(lang, 'vote.question.deleted.privileged', {
+            actor: p.labels.actor,
+            question: p.labels.questionTitle,
+            title: p.labels.voteTitle,
+          }),
+        };
+      }
+      case VotingEventType.VOTE_CONSENT_CREATED: {
+        const p = event.payload as {
+          labels: {
+            voteTitle: string;
+            unitLabel: string;
+            owner: string;
+            delegate: string;
+            actor: string;
+          };
+        };
+        return {
+          ...base,
+          message: t(lang, 'vote.consent.created.privileged', {
+            owner: p.labels.owner,
+            delegate: p.labels.delegate,
+            unit: p.labels.unitLabel,
+          }),
+        };
+      }
+      case VotingEventType.VOTE_CONSENT_REVOKED: {
+        const p = event.payload as {
+          labels: {
+            voteTitle: string;
+            unitLabel: string;
+            owner: string;
+            delegate: string;
+            actor: string;
+          };
+        };
+        return {
+          ...base,
+          message: t(lang, 'vote.consent.revoked.privileged', {
+            actor: p.labels.actor,
+            unit: p.labels.unitLabel,
+          }),
+        };
+      }
       default:
         return {
           ...base,

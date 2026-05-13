@@ -1,6 +1,9 @@
 import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
+import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
+import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
+import { AuditService } from '@/modules/core/audit/application/services/audit.service';
 import {
   VOTE_CONSENT_WRITE_REPOSITORY,
   type VoteConsentWriteRepository,
@@ -9,9 +12,12 @@ import {
   VOTE_READ_REPOSITORY,
   type VoteReadRepository,
 } from '@/modules/voting/application/ports/vote-read.repository.port';
+import { VoteConsentRevokedAuditEvent } from '@/modules/voting/audit/events/vote-consent-revoked.event';
+import { VotingAuditLabelResolver } from '@/modules/voting/audit/label-resolver.service';
 import { VoteUnitConsentStatus } from '@/modules/voting/domain/vote/vote.types';
 import { ForbiddenException } from '@/shared/application/exceptions/auth.exceptions';
 import { DelegationNotFoundException } from '@/shared/application/exceptions/vote.exceptions';
+import { type Clock, CLOCK } from '@/shared/application/ports/clock.port';
 
 import { RevokeConsentCommand } from './revoke-consent.command';
 
@@ -24,6 +30,12 @@ export class RevokeConsentHandler
     private readonly consentWriteRepo: VoteConsentWriteRepository,
     @Inject(VOTE_READ_REPOSITORY)
     private readonly voteReadRepo: VoteReadRepository,
+    private readonly unitOfWork: DrizzleUnitOfWork,
+    @Inject(CLOCK)
+    private readonly clock: Clock,
+    private readonly auditService: AuditService,
+    private readonly auditContext: AuditContextService,
+    private readonly labelResolver: VotingAuditLabelResolver,
   ) {}
 
   async execute(command: RevokeConsentCommand): Promise<void> {
@@ -55,9 +67,42 @@ export class RevokeConsentHandler
       }
     }
 
-    await this.consentWriteRepo.updateStatus(
-      command.consentId,
-      VoteUnitConsentStatus.REVOKED,
-    );
+    const ownerMembershipId = consent.recordedByMembershipId;
+    const delegateMembershipId = consent.toMembershipId;
+
+    await this.unitOfWork.execute(async () => {
+      await this.consentWriteRepo.updateStatus(
+        command.consentId,
+        VoteUnitConsentStatus.REVOKED,
+      );
+
+      const actor = this.auditContext.requireActor();
+      const [voteTitle, unitLabel, ownerLabel, delegateLabel, actorLabel] =
+        await Promise.all([
+          this.labelResolver.resolveVoteTitle(consent.voteId),
+          this.labelResolver.resolveUnitLabel(consent.unitId),
+          ownerMembershipId
+            ? this.labelResolver.resolveMembershipLabel(ownerMembershipId)
+            : Promise.resolve('—'),
+          this.labelResolver.resolveMembershipLabel(delegateMembershipId),
+          this.labelResolver.resolveActorLabel(actor),
+        ]);
+
+      await this.auditService.append(
+        VoteConsentRevokedAuditEvent.build({
+          voteId: consent.voteId,
+          tenantId: consent.tenantId,
+          voteTitle,
+          consentId: consent.id,
+          unitId: consent.unitId,
+          unitLabel,
+          ownerLabel,
+          delegateLabel,
+          actor,
+          actorLabel,
+          occurredAt: this.clock.now(),
+        }),
+      );
+    });
   }
 }

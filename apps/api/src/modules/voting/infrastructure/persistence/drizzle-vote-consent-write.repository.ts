@@ -21,7 +21,7 @@ export class DrizzleVoteConsentWriteRepository
       this.drizzle.db) as typeof this.drizzle.db;
   }
 
-  async save(data: SaveVoteUnitConsentInput): Promise<void> {
+  async save(data: SaveVoteUnitConsentInput): Promise<string> {
     const existing = await this.db.query.voteUnitConsents.findFirst({
       where: and(
         eq(voteUnitConsents.tenantId, data.tenantId),
@@ -41,8 +41,12 @@ export class DrizzleVoteConsentWriteRepository
           updatedAt: new Date(),
         })
         .where(eq(voteUnitConsents.id, existing.id));
-    } else {
-      await this.db.insert(voteUnitConsents).values({
+      return existing.id;
+    }
+
+    const [inserted] = await this.db
+      .insert(voteUnitConsents)
+      .values({
         tenantId: data.tenantId,
         voteId: data.voteId,
         unitId: data.unitId,
@@ -50,8 +54,9 @@ export class DrizzleVoteConsentWriteRepository
         toMembershipId: data.toMembershipId,
         recordedByMembershipId: data.recordedByMembershipId,
         status: data.status,
-      });
-    }
+      })
+      .returning({ id: voteUnitConsents.id });
+    return inserted.id;
   }
 
   async findById(

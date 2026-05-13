@@ -1,6 +1,9 @@
 import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
+import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
+import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
+import { AuditService } from '@/modules/core/audit/application/services/audit.service';
 import {
   VOTE_CONSENT_WRITE_REPOSITORY,
   type VoteConsentWriteRepository,
@@ -13,6 +16,8 @@ import {
   VOTE_WRITE_REPOSITORY,
   type VoteWriteRepository,
 } from '@/modules/voting/application/ports/vote-write.repository.port';
+import { VoteConsentCreatedAuditEvent } from '@/modules/voting/audit/events/vote-consent-created.event';
+import { VotingAuditLabelResolver } from '@/modules/voting/audit/label-resolver.service';
 import {
   VoteStatus,
   VoteUnitConsentStatus,
@@ -25,6 +30,7 @@ import {
   NotAUnitOwnerException,
   VoteNotFoundException,
 } from '@/shared/application/exceptions/vote.exceptions';
+import { type Clock, CLOCK } from '@/shared/application/ports/clock.port';
 
 import { CreateVoteConsentCommand } from './create-vote-consent.command';
 
@@ -39,6 +45,12 @@ export class CreateVoteConsentHandler
     private readonly consentWriteRepo: VoteConsentWriteRepository,
     @Inject(VOTE_READ_REPOSITORY)
     private readonly voteReadRepo: VoteReadRepository,
+    private readonly unitOfWork: DrizzleUnitOfWork,
+    @Inject(CLOCK)
+    private readonly clock: Clock,
+    private readonly auditService: AuditService,
+    private readonly auditContext: AuditContextService,
+    private readonly labelResolver: VotingAuditLabelResolver,
   ) {}
 
   async execute(command: CreateVoteConsentCommand): Promise<void> {
@@ -68,7 +80,6 @@ export class CreateVoteConsentHandler
       effectiveMembershipId = command.ownerMembershipId;
     }
 
-    // Verify the user is an owner of the unit
     const statuses = await this.voteReadRepo.findVoterStatus(
       command.tenantId,
       command.voteId,
@@ -80,7 +91,6 @@ export class CreateVoteConsentHandler
       throw new NotAUnitOwnerException();
     }
 
-    // Resolve exactly which owner this membership maps to for this unit.
     const ownerId = await this.voteReadRepo.getOwnerIdByMembership(
       command.tenantId,
       effectiveMembershipId,
@@ -90,7 +100,6 @@ export class CreateVoteConsentHandler
       throw new MembershipHasNoAssociatedOwnerException();
     }
 
-    // Prevent mutual delegation: Check if the delegate has already delegated to THIS owner
     const hasMutual = await this.voteReadRepo.hasMutualDelegation(
       command.tenantId,
       command.unitId,
@@ -103,14 +112,45 @@ export class CreateVoteConsentHandler
       throw new MutualDelegationNotAllowedException();
     }
 
-    await this.consentWriteRepo.save({
-      tenantId: command.tenantId,
-      voteId: command.voteId,
-      unitId: command.unitId,
-      fromOwnerId: ownerId,
-      toMembershipId: command.delegateMembershipId,
-      recordedByMembershipId: command.membershipId,
-      status: VoteUnitConsentStatus.VALID,
+    await this.unitOfWork.execute(async () => {
+      const consentId = await this.consentWriteRepo.save({
+        tenantId: command.tenantId,
+        voteId: command.voteId,
+        unitId: command.unitId,
+        fromOwnerId: ownerId,
+        toMembershipId: command.delegateMembershipId,
+        recordedByMembershipId: command.membershipId,
+        status: VoteUnitConsentStatus.VALID,
+      });
+
+      const actor = this.auditContext.requireActor();
+      const [actorLabel, unitLabel, ownerLabel, delegateLabel] =
+        await Promise.all([
+          this.labelResolver.resolveActorLabel(actor),
+          this.labelResolver.resolveUnitLabel(command.unitId),
+          this.labelResolver.resolveMembershipLabel(effectiveMembershipId),
+          this.labelResolver.resolveMembershipLabel(
+            command.delegateMembershipId,
+          ),
+        ]);
+
+      await this.auditService.append(
+        VoteConsentCreatedAuditEvent.build({
+          voteId: vote.id,
+          tenantId: vote.tenantId,
+          voteTitle: vote.title,
+          consentId,
+          unitId: command.unitId,
+          unitLabel,
+          ownerMembershipId: effectiveMembershipId,
+          ownerLabel,
+          delegateMembershipId: command.delegateMembershipId,
+          delegateLabel,
+          actor,
+          actorLabel,
+          occurredAt: this.clock.now(),
+        }),
+      );
     });
   }
 }

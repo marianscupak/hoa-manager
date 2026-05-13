@@ -16,7 +16,7 @@ export interface VoteConsentWriteRepository {
    * Saves or updates a consent record for a specific unit and vote.
    * Identifies the record by tenantId, voteId, unitId, and fromOwnerId.
    */
-  save(data: SaveVoteUnitConsentInput): Promise<void>;
+  save(data: SaveVoteUnitConsentInput): Promise<string>;
 
   /**
    * Finds a consent record by its exact ID and Tenant ID.

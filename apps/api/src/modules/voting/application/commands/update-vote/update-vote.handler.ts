@@ -2,10 +2,14 @@ import { Inject } from '@nestjs/common';
 import { CommandHandler, type ICommandHandler } from '@nestjs/cqrs';
 
 import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
+import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
+import { AuditService } from '@/modules/core/audit/application/services/audit.service';
 import {
   VOTE_WRITE_REPOSITORY,
   type VoteWriteRepository,
 } from '@/modules/voting/application/ports/vote-write.repository.port';
+import { VoteUpdatedAuditEvent } from '@/modules/voting/audit/events/vote-updated.event';
+import { VotingAuditLabelResolver } from '@/modules/voting/audit/label-resolver.service';
 import { type Clock, CLOCK } from '@/shared/application/ports/clock.port';
 import { DomainException } from '@/shared/errors/domain.exception';
 import { ErrorCode } from '@/shared/errors/error-codes';
@@ -23,6 +27,9 @@ export class UpdateVoteHandler implements ICommandHandler<UpdateVoteCommand> {
     @Inject(CLOCK)
     private readonly clock: Clock,
     private readonly unitOfWork: DrizzleUnitOfWork,
+    private readonly auditService: AuditService,
+    private readonly auditContext: AuditContextService,
+    private readonly labelResolver: VotingAuditLabelResolver,
   ) {}
 
   async execute(command: UpdateVoteCommand): Promise<UpdateVoteResult> {
@@ -39,6 +46,20 @@ export class UpdateVoteHandler implements ICommandHandler<UpdateVoteCommand> {
 
     await this.unitOfWork.execute(async () => {
       await this.voteRepository.save(vote);
+
+      const actor = this.auditContext.requireActor();
+      const updatedByLabel = await this.labelResolver.resolveActorLabel(actor);
+
+      await this.auditService.append(
+        VoteUpdatedAuditEvent.build({
+          voteId: vote.id,
+          tenantId: vote.tenantId,
+          voteTitle: vote.title,
+          actor,
+          updatedByLabel,
+          occurredAt: this.clock.now(),
+        }),
+      );
     });
 
     return vote;

@@ -6,6 +6,8 @@ import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
 import { tenantMemberships } from '@/infrastructure/db/schema/core/tenant-memberships';
 import { units } from '@/infrastructure/db/schema/core/units';
 import { users } from '@/infrastructure/db/schema/core/users';
+import { voteQuestions } from '@/infrastructure/db/schema/voting/vote-questions';
+import { votes } from '@/infrastructure/db/schema/voting/votes';
 import type { AuditActor } from '@/modules/core/audit/domain/actor';
 
 @Injectable()
@@ -49,5 +51,23 @@ export class VotingAuditLabelResolver {
       .where(eq(units.id, unitId))
       .limit(1);
     return row?.unitNo ?? `Unit ${unitId.slice(0, 8)}`;
+  }
+
+  async resolveVoteTitle(voteId: string): Promise<string> {
+    const [row] = await this.db
+      .select({ title: votes.title })
+      .from(votes)
+      .where(eq(votes.id, voteId))
+      .limit(1);
+    return row?.title ?? `Vote ${voteId.slice(0, 8)}`;
+  }
+
+  async resolveQuestionLabel(questionId: string): Promise<string> {
+    const [row] = await this.db
+      .select({ title: voteQuestions.title })
+      .from(voteQuestions)
+      .where(eq(voteQuestions.id, questionId))
+      .limit(1);
+    return row?.title ?? `Question ${questionId.slice(0, 8)}`;
   }
 }

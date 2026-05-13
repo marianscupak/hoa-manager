@@ -13,7 +13,9 @@ import {
     useVotesControllerGetVoteResults,
 } from "@/api/generated/votes/votes";
 import { tenantContextAtom } from "@/auth/atoms";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@hoa-mngr/ui";
 
+import { VoteActivityTab } from "../components/activity/vote-activity-tab";
 import { AuditExportButton } from "../components/audit-export-button";
 import { ResultsQuestionCard } from "../components/results/results-question-card";
 import { ResultsQuestionDetail } from "../components/results/results-question-detail";
@@ -24,6 +26,8 @@ type EnrichedQuestion = VoteResultsResponseDto["questionResults"][number] & {
     title: string;
     type?: string;
 };
+
+type ActiveTab = "results" | "activity";
 
 function buildOptionLabelMap(
     vote: VoteDetailResponseDto,
@@ -62,6 +66,14 @@ export function VoteResultsPage() {
         tenantCtx?.roles.includes("AUDITOR");
 
     const [selectedIndex, setSelectedIndex] = useState(0);
+    const [activeTab, setActiveTab] = useState<ActiveTab>("results");
+    const [activityTouched, setActivityTouched] = useState(false);
+
+    const handleTabChange = (value: string) => {
+        const next = value as ActiveTab;
+        setActiveTab(next);
+        if (next === "activity") setActivityTouched(true);
+    };
 
     const detailQuery = useVotesControllerGetVoteDetail(id ?? "", {
         query: { enabled: !!id },
@@ -122,63 +134,93 @@ export function VoteResultsPage() {
                 {canExportAudit && id && <AuditExportButton voteId={id} />}
             </div>
 
-            {enrichedQuestions.length > 0 && (
-                <div
-                    className={`mb-8 grid gap-4 ${
-                        enrichedQuestions.length === 1
-                            ? "max-w-sm grid-cols-1"
-                            : enrichedQuestions.length === 2
-                              ? "grid-cols-1 sm:grid-cols-2"
-                              : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-                    }`}
-                >
-                    {enrichedQuestions.map((q, i) => (
-                        <ResultsQuestionCard
-                            key={q.questionId}
-                            index={i}
-                            question={q}
-                            isSelected={i === selectedIndex}
-                            onClick={() => setSelectedIndex(i)}
-                            participationWeight={results.participationWeight}
-                            denominatorWeight={results.denominatorWeight}
-                            optionLabels={optionLabelMap}
-                            quorumMeasure={vote.ruleset?.quorumMeasure}
-                            denominatorUnitCount={results.denominatorUnitCount}
-                            participationUnitCount={
-                                results.participationUnitCount
-                            }
-                            quorumMet={results.quorumMet}
+            <Tabs value={activeTab} onValueChange={handleTabChange}>
+                <TabsList>
+                    <TabsTrigger value="results">
+                        {t("voting:results.tabs.results")}
+                    </TabsTrigger>
+                    <TabsTrigger value="activity">
+                        {t("voting:results.tabs.activity")}
+                    </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="results">
+                    {enrichedQuestions.length > 0 && (
+                        <div
+                            className={`mt-4 mb-8 grid gap-4 ${
+                                enrichedQuestions.length === 1
+                                    ? "max-w-sm grid-cols-1"
+                                    : enrichedQuestions.length === 2
+                                      ? "grid-cols-1 sm:grid-cols-2"
+                                      : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                            }`}
+                        >
+                            {enrichedQuestions.map((q, i) => (
+                                <ResultsQuestionCard
+                                    key={q.questionId}
+                                    index={i}
+                                    question={q}
+                                    isSelected={i === selectedIndex}
+                                    onClick={() => setSelectedIndex(i)}
+                                    participationWeight={
+                                        results.participationWeight
+                                    }
+                                    denominatorWeight={
+                                        results.denominatorWeight
+                                    }
+                                    optionLabels={optionLabelMap}
+                                    quorumMeasure={vote.ruleset?.quorumMeasure}
+                                    denominatorUnitCount={
+                                        results.denominatorUnitCount
+                                    }
+                                    participationUnitCount={
+                                        results.participationUnitCount
+                                    }
+                                    quorumMet={results.quorumMet}
+                                />
+                            ))}
+                        </div>
+                    )}
+
+                    {selectedQuestion && (
+                        <>
+                            <h2 className="mb-4 text-lg font-bold text-slate-700">
+                                {t("voting:results.resolutionDetails", {
+                                    index: selectedIndex + 1,
+                                    title: selectedQuestion.title,
+                                })}
+                            </h2>
+
+                            <div className="mb-8 grid grid-cols-1 gap-4 lg:grid-cols-3">
+                                <div className="rounded-xl border border-slate-200 bg-white p-6 lg:col-span-2">
+                                    <ResultsQuestionDetail
+                                        question={selectedQuestion}
+                                        optionLabels={optionLabelMap}
+                                        quorumMet={results.quorumMet}
+                                    />
+                                </div>
+                                <div>
+                                    <ResultsQuorumPanel
+                                        results={results}
+                                        quorumMeasure={
+                                            vote.ruleset?.quorumMeasure
+                                        }
+                                    />
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </TabsContent>
+
+                <TabsContent value="activity">
+                    {id && activityTouched && (
+                        <VoteActivityTab
+                            voteId={id}
+                            enabled={activityTouched}
                         />
-                    ))}
-                </div>
-            )}
-
-            {selectedQuestion && (
-                <>
-                    <h2 className="mb-4 text-lg font-bold text-slate-700">
-                        {t("voting:results.resolutionDetails", {
-                            index: selectedIndex + 1,
-                            title: selectedQuestion.title,
-                        })}
-                    </h2>
-
-                    <div className="mb-8 grid grid-cols-1 gap-4 lg:grid-cols-3">
-                        <div className="rounded-xl border border-slate-200 bg-white p-6 lg:col-span-2">
-                            <ResultsQuestionDetail
-                                question={selectedQuestion}
-                                optionLabels={optionLabelMap}
-                                quorumMet={results.quorumMet}
-                            />
-                        </div>
-                        <div>
-                            <ResultsQuorumPanel
-                                results={results}
-                                quorumMeasure={vote.ruleset?.quorumMeasure}
-                            />
-                        </div>
-                    </div>
-                </>
-            )}
+                    )}
+                </TabsContent>
+            </Tabs>
         </div>
     );
 }

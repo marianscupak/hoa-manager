@@ -13,6 +13,7 @@ import {
 } from "@/auth/atoms";
 import { refreshAccessToken } from "@/auth/refresh";
 import { env } from "@/config/env";
+import i18n from "@/i18n";
 import { StorageService } from "@/storage/storage";
 
 import { ApiError } from "./types";
@@ -25,8 +26,11 @@ export const AXIOS_INSTANCE = Axios.create({
 AXIOS_INSTANCE.interceptors.request.use((config) => {
     const store = getDefaultStore();
     const token = store.get(accessTokenAtom);
-    if (token && config.headers) {
-        config.headers.Authorization = `Bearer ${token}`;
+    if (config.headers) {
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        config.headers["Accept-Language"] = i18n.language;
     }
     return config;
 });

@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   HttpCode,
   HttpStatus,
   Param,
@@ -72,6 +73,17 @@ import { GetVoteDetailQuery } from '../application/queries/get-vote-detail/get-v
 import { GetVoteResultsQuery } from '../application/queries/get-vote-results/get-vote-results.query';
 import { GetVoterStatusQuery } from '../application/queries/get-voter-status/get-voter-status.query';
 import { GetVotesQuery } from '../application/queries/get-votes/get-votes.query';
+
+function parsePrimaryLanguage(header: string | undefined): string | undefined {
+  if (!header) return undefined;
+  const primary = header
+    .split(',')[0]
+    ?.split(';')[0]
+    ?.split('-')[0]
+    ?.trim()
+    .toLowerCase();
+  return primary || undefined;
+}
 
 @ApiTags('Votes')
 @Controller('votes')
@@ -391,14 +403,18 @@ export class VotesController {
     @Param('id', ParseUUIDPipe) id: string,
     @Tenant() tenantCtx: TenantContext,
     @CurrentAuthUser() user: AuthPrincipal,
+    @Headers('accept-language') acceptLanguage?: string,
   ): Promise<VoteActivityResponseDto> {
+    const language =
+      parsePrimaryLanguage(acceptLanguage) ?? user.preferredLanguage ?? 'cs';
+
     return this.queryBus.execute(
       new GetVoteActivityQuery(
         tenantCtx.tenantId,
         id,
         user.userId,
         tenantCtx.roles,
-        user.preferredLanguage ?? 'cs',
+        language,
       ),
     );
   }

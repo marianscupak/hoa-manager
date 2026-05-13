@@ -16,34 +16,43 @@ import { useVotesControllerUpdateVoteQuestion } from "@/api/generated/votes/vote
 import { mapQuestionToUpdateDto } from "../../shared/voting-wizard.utils";
 import {
     createVoteRulesetSchema,
+    majorityThresholdRefinement,
     rulesetDefaultValues,
 } from "../../steps/ruleset-step";
 
-const questionSchema = z.object({
-    title: z.string().min(1),
-    description: z.string().optional(),
-    type: z.nativeEnum(CreateVoteQuestionDtoType),
-    useCustomRuleset: z.boolean(),
-    weightBasis: createVoteRulesetSchema.shape.weightBasis,
-    quorumMeasure: createVoteRulesetSchema.shape.quorumMeasure,
-    quorumElectorateBasis: createVoteRulesetSchema.shape.quorumElectorateBasis,
-    quorumThreshold: createVoteRulesetSchema.shape.quorumThreshold,
-    majorityRuleType: createVoteRulesetSchema.shape.majorityRuleType,
-    majorityThreshold: createVoteRulesetSchema.shape.majorityThreshold,
-    allowAbstain: createVoteRulesetSchema.shape.allowAbstain,
-    abstainExcludedFromMajorityDenominator:
-        createVoteRulesetSchema.shape.abstainExcludedFromMajorityDenominator,
-    allowCoOwnerIndividualVote:
-        createVoteRulesetSchema.shape.allowCoOwnerIndividualVote,
-    options: z.array(
-        z.object({
-            id: z.string().optional(),
-            label: z.string().min(1),
-            sortOrder: z.number(),
-            optionKey: z.string().optional(),
-        }),
-    ),
-});
+const questionSchema = z
+    .object({
+        title: z.string().min(1),
+        description: z.string().optional(),
+        type: z.nativeEnum(CreateVoteQuestionDtoType),
+        useCustomRuleset: z.boolean(),
+        weightBasis: createVoteRulesetSchema.shape.weightBasis,
+        quorumMeasure: createVoteRulesetSchema.shape.quorumMeasure,
+        quorumElectorateBasis:
+            createVoteRulesetSchema.shape.quorumElectorateBasis,
+        quorumThreshold: createVoteRulesetSchema.shape.quorumThreshold,
+        majorityRuleType: createVoteRulesetSchema.shape.majorityRuleType,
+        majorityThreshold: createVoteRulesetSchema.shape.majorityThreshold,
+        allowAbstain: createVoteRulesetSchema.shape.allowAbstain,
+        abstainExcludedFromMajorityDenominator:
+            createVoteRulesetSchema.shape
+                .abstainExcludedFromMajorityDenominator,
+        allowCoOwnerIndividualVote:
+            createVoteRulesetSchema.shape.allowCoOwnerIndividualVote,
+        options: z.array(
+            z.object({
+                id: z.string().optional(),
+                label: z.string().min(1),
+                sortOrder: z.number(),
+                optionKey: z.string().optional(),
+            }),
+        ),
+    })
+    .superRefine((data, ctx) => {
+        if (data.useCustomRuleset) {
+            majorityThresholdRefinement(data, ctx);
+        }
+    });
 
 export type QuestionFormValues = z.infer<typeof questionSchema>;
 

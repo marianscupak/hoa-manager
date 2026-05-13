@@ -43,16 +43,37 @@ export const createVoteRulesetSchema = z.object({
     allowCoOwnerIndividualVote: z.boolean(),
 });
 
+export const majorityThresholdRefinement = (
+    data: {
+        majorityRuleType: MajorityRuleType;
+        majorityThreshold?: number | null;
+    },
+    ctx: z.RefinementCtx,
+) => {
+    if (
+        data.majorityRuleType === MajorityRuleType.QUALIFIED_MAJORITY &&
+        (data.majorityThreshold === undefined ||
+            data.majorityThreshold === null)
+    ) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message:
+                "voting:create.fields.majorityThreshold.errors.requiredForQualified",
+            path: ["majorityThreshold"],
+        });
+    }
+};
+
 export type CreateVoteRulesetValues = z.infer<typeof createVoteRulesetSchema>;
 
 export const rulesetDefaultValues: CreateVoteRulesetValues = {
     weightBasis: VoteWeightBasis.UNIT_SHARE,
     quorumMeasure: QuorumMeasure.UNIT_SHARE,
     quorumElectorateBasis: QuorumElectorateBasis.ALL_UNITS,
-    quorumThreshold: 0,
+    quorumThreshold: 50,
     majorityRuleType: MajorityRuleType.SIMPLE_MAJORITY,
     majorityThreshold: undefined,
-    allowAbstain: false,
+    allowAbstain: true,
     abstainExcludedFromMajorityDenominator: false,
     allowCoOwnerIndividualVote: false,
 };
@@ -71,8 +92,10 @@ export function CreateVoteRulesetStep({
     const { t } = useTranslation(["voting", "errors"]);
 
     const rulesetForm = useForm<CreateVoteRulesetValues>({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        resolver: zodResolver(createVoteRulesetSchema) as any,
+        resolver: zodResolver(
+            createVoteRulesetSchema.superRefine(majorityThresholdRefinement),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ) as any,
         defaultValues: initialData ?? rulesetDefaultValues,
     });
 

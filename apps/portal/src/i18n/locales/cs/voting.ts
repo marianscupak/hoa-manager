@@ -133,8 +133,7 @@ export const voting = {
                 },
             },
             quorumThreshold: {
-                label: "Požadované kvórum (%)",
-                placeholder: "např. 50",
+                label: "Požadované kvórum",
                 errors: {
                     positiveNumber: "Musí být kladné číslo",
                     max: "Nesmí být více než 100 %",
@@ -144,16 +143,17 @@ export const voting = {
                 label: "Typ většiny",
                 placeholder: "Vyberte typ většiny",
                 options: {
-                    SIMPLE_MAJORITY: "Prostá většina",
+                    SIMPLE_MAJORITY: "Prostá většina (>50 %)",
                     QUALIFIED_MAJORITY: "Kvalifikovaná většina",
                 },
             },
             majorityThreshold: {
-                label: "Požadovaná většina (%)",
-                placeholder: "např. 66",
+                label: "Požadovaná většina",
                 errors: {
                     positiveNumber: "Musí být kladné číslo",
                     max: "Nesmí být více než 100 %",
+                    requiredForQualified:
+                        "Při kvalifikované většině je nutné vyplnit",
                 },
             },
             allowAbstain: {

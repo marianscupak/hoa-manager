@@ -37,11 +37,13 @@ export function RulesetFormFields({
     const weightBasis = watch("weightBasis");
     const quorumElectorateBasis = watch("quorumElectorateBasis");
     const abstainExcluded = watch("abstainExcludedFromMajorityDenominator");
+    const allowCoOwnerIndividualVote = watch("allowCoOwnerIndividualVote");
 
     const hasNonStandardRules =
         weightBasis !== VoteWeightBasis.UNIT_SHARE ||
         quorumElectorateBasis !== QuorumElectorateBasis.ALL_UNITS ||
-        abstainExcluded === true;
+        abstainExcluded === true ||
+        allowCoOwnerIndividualVote === true;
 
     return (
         <div className="space-y-6">
@@ -117,22 +119,15 @@ export function RulesetFormFields({
                     ]}
                 />
 
-                <div className="relative">
-                    <FormInput
-                        name="quorumThreshold"
-                        type="number"
-                        min="0"
-                        max="100"
-                        step="1"
-                        label={t("voting:create.fields.quorumThreshold.label")}
-                        placeholder={t(
-                            "voting:create.fields.quorumThreshold.placeholder",
-                        )}
-                    />
-                    <span className="text-muted-foreground pointer-events-none absolute right-10 bottom-0 flex h-9 items-center text-sm">
-                        %
-                    </span>
-                </div>
+                <FormInput
+                    name="quorumThreshold"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="1"
+                    suffix="%"
+                    label={t("voting:create.fields.quorumThreshold.label")}
+                />
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -158,25 +153,16 @@ export function RulesetFormFields({
                     ]}
                 />
 
-                <div className="relative">
-                    <FormInput
-                        name="majorityThreshold"
-                        type="number"
-                        min="0"
-                        max="100"
-                        step="1"
-                        label={t(
-                            "voting:create.fields.majorityThreshold.label",
-                        )}
-                        placeholder={t(
-                            "voting:create.fields.majorityThreshold.placeholder",
-                        )}
-                        disabled={isMajorityThresholdDisabled}
-                    />
-                    <span className="text-muted-foreground pointer-events-none absolute right-10 bottom-0 flex h-9 items-center text-sm">
-                        %
-                    </span>
-                </div>
+                <FormInput
+                    name="majorityThreshold"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="1"
+                    suffix="%"
+                    label={t("voting:create.fields.majorityThreshold.label")}
+                    disabled={isMajorityThresholdDisabled}
+                />
             </div>
 
             <div

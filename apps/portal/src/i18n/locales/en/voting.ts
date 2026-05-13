@@ -134,8 +134,7 @@ export const voting = {
                 },
             },
             quorumThreshold: {
-                label: "Quorum Threshold (%)",
-                placeholder: "e.g. 50",
+                label: "Quorum Threshold",
                 errors: {
                     positiveNumber: "Must be a positive number",
                     max: "Must be at most 100 %",
@@ -145,16 +144,17 @@ export const voting = {
                 label: "Majority Rule Type",
                 placeholder: "Select rule type",
                 options: {
-                    SIMPLE_MAJORITY: "Simple Majority",
+                    SIMPLE_MAJORITY: "Simple Majority (>50 %)",
                     QUALIFIED_MAJORITY: "Qualified Majority",
                 },
             },
             majorityThreshold: {
-                label: "Majority Threshold (%)",
-                placeholder: "e.g. 66",
+                label: "Majority Threshold",
                 errors: {
                     positiveNumber: "Must be a positive number",
                     max: "Must be at most 100 %",
+                    requiredForQualified:
+                        "Required when majority rule is qualified",
                 },
             },
             allowAbstain: {

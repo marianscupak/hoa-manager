@@ -127,6 +127,13 @@
       "when": 1778517032432,
       "tag": "0017_colorful_miracleman",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1778659294457,
+      "tag": "0018_audit_events",
+      "breakpoints": true
     }
   ]
 }

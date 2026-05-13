@@ -9,4 +9,5 @@ export * from '@/infrastructure/db/schema/core/units';
 export * from '@/infrastructure/db/schema/core/owners';
 export * from '@/infrastructure/db/schema/core/owner-invites';
 export * from '@/infrastructure/db/schema/core/unit-ownerships';
+export * from '@/infrastructure/db/schema/core/audit-events';
 export * from '@/infrastructure/db/schema/voting';

@@ -18,7 +18,9 @@ async function seed() {
 
   try {
     console.log('🧹 Clearing existing data...');
-    await db.execute(sql`TRUNCATE TABLE users, tenants CASCADE;`);
+    await db.execute(sql`ALTER TABLE audit_events DISABLE TRIGGER USER;`);
+    await db.execute(sql`TRUNCATE TABLE users, tenants, audit_events CASCADE;`);
+    await db.execute(sql`ALTER TABLE audit_events ENABLE TRIGGER USER;`);
     console.log('✅ Database cleared.');
 
     const adminEmail = 'admin@hoa.local';

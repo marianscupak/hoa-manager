@@ -7,6 +7,17 @@
  */
 
 export type AuthControllerHandleGoogleCallbackParams = {
-    code: string;
-    state: string;
+    /**
+     * @minLength 1
+     */
+    code?: string;
+    /**
+     * @minLength 1
+     */
+    state?: string;
+    /**
+     * @minLength 1
+     */
+    error?: string;
+    error_description?: string;
 };

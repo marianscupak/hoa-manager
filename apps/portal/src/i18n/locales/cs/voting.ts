@@ -505,5 +505,7 @@ export const voting = {
         weightLabel: "podílu",
         invalid: "Neplatné",
         invalidQuorum: "Chybí kvórum",
+        downloadAuditReport: "Stáhnout audit report",
+        downloadAuditReportError: "Nepodařilo se stáhnout audit report.",
     },
 };

@@ -504,5 +504,7 @@ export const voting = {
         weightLabel: "weight",
         invalid: "Invalid",
         invalidQuorum: "Quorum not met",
+        downloadAuditReport: "Download audit report",
+        downloadAuditReportError: "Failed to download audit report.",
     },
 };

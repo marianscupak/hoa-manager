@@ -1,4 +1,5 @@
 import { Calendar, Loader2 } from "lucide-react";
+import { useAtomValue } from "jotai";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
@@ -11,7 +12,9 @@ import {
     useVotesControllerGetVoteDetail,
     useVotesControllerGetVoteResults,
 } from "@/api/generated/votes/votes";
+import { tenantContextAtom } from "@/auth/atoms";
 
+import { AuditExportButton } from "../components/audit-export-button";
 import { ResultsQuestionCard } from "../components/results/results-question-card";
 import { ResultsQuestionDetail } from "../components/results/results-question-detail";
 import { ResultsQuorumPanel } from "../components/results/results-quorum-panel";
@@ -51,6 +54,12 @@ function buildEnrichedQuestions(
 export function VoteResultsPage() {
     const { t } = useTranslation(["voting"]);
     const { id } = useParams<{ id: string }>();
+    const tenantCtx = useAtomValue(tenantContextAtom);
+
+    const canExportAudit =
+        tenantCtx?.roles.includes("ADMIN") ||
+        tenantCtx?.roles.includes("BOARD_MEMBER") ||
+        tenantCtx?.roles.includes("AUDITOR");
 
     const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -110,6 +119,7 @@ export function VoteResultsPage() {
                         )}
                     </div>
                 </div>
+                {canExportAudit && id && <AuditExportButton voteId={id} />}
             </div>
 
             {enrichedQuestions.length > 0 && (

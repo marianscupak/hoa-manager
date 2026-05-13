@@ -271,7 +271,7 @@ export function useAuthControllerStartGoogleLogin<
 }
 
 export const authControllerHandleGoogleCallback = (
-    params: AuthControllerHandleGoogleCallbackParams,
+    params?: AuthControllerHandleGoogleCallbackParams,
     options?: SecondParameter<typeof customInstance>,
     signal?: AbortSignal,
 ) => {
@@ -291,7 +291,7 @@ export const getAuthControllerHandleGoogleCallbackQueryOptions = <
     TData = Awaited<ReturnType<typeof authControllerHandleGoogleCallback>>,
     TError = ErrorType<ErrorResponseDto>,
 >(
-    params: AuthControllerHandleGoogleCallbackParams,
+    params?: AuthControllerHandleGoogleCallbackParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
@@ -331,7 +331,7 @@ export function useAuthControllerHandleGoogleCallback<
     TData = Awaited<ReturnType<typeof authControllerHandleGoogleCallback>>,
     TError = ErrorType<ErrorResponseDto>,
 >(
-    params: AuthControllerHandleGoogleCallbackParams,
+    params: undefined | AuthControllerHandleGoogleCallbackParams,
     options: {
         query: Partial<
             UseQueryOptions<
@@ -362,7 +362,7 @@ export function useAuthControllerHandleGoogleCallback<
     TData = Awaited<ReturnType<typeof authControllerHandleGoogleCallback>>,
     TError = ErrorType<ErrorResponseDto>,
 >(
-    params: AuthControllerHandleGoogleCallbackParams,
+    params?: AuthControllerHandleGoogleCallbackParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
@@ -393,7 +393,7 @@ export function useAuthControllerHandleGoogleCallback<
     TData = Awaited<ReturnType<typeof authControllerHandleGoogleCallback>>,
     TError = ErrorType<ErrorResponseDto>,
 >(
-    params: AuthControllerHandleGoogleCallbackParams,
+    params?: AuthControllerHandleGoogleCallbackParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
@@ -413,7 +413,7 @@ export function useAuthControllerHandleGoogleCallback<
     TData = Awaited<ReturnType<typeof authControllerHandleGoogleCallback>>,
     TError = ErrorType<ErrorResponseDto>,
 >(
-    params: AuthControllerHandleGoogleCallbackParams,
+    params?: AuthControllerHandleGoogleCallbackParams,
     options?: {
         query?: Partial<
             UseQueryOptions<

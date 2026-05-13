@@ -3,11 +3,14 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { ScheduleModule } from '@nestjs/schedule';
 
 import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
+import { AuditModule } from '@/modules/core/audit/audit.module';
 
 import { VotesController } from './api/votes.controller';
 import { AuthModule } from '../core/auth/auth.module';
 import { IdentityModule } from '../core/identity/identity.module';
 import { TenancyModule } from '../core/tenancy/tenancy.module';
+import { VotingAuditLabelResolver } from './audit/label-resolver.service';
+import { VotingAuditRegistration } from './audit/voting-audit.registration';
 import { CloseVoteCommandHandler } from './application/commands/close-vote/close-vote.handler';
 import { CreateVoteHandler } from './application/commands/create-vote/create-vote.handler';
 import { CreateVoteConsentHandler } from './application/commands/create-vote-consent/create-vote-consent.handler';
@@ -95,8 +98,15 @@ const REPOSITORIES = [
     IdentityModule,
     AuthModule,
     TenancyModule,
+    AuditModule,
   ],
   controllers: [VotesController],
-  providers: [...COMMAND_HANDLERS, ...QUERY_HANDLERS, ...REPOSITORIES],
+  providers: [
+    ...COMMAND_HANDLERS,
+    ...QUERY_HANDLERS,
+    ...REPOSITORIES,
+    VotingAuditLabelResolver,
+    VotingAuditRegistration,
+  ],
 })
 export class VotingModule {}

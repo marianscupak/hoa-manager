@@ -15,6 +15,7 @@ export interface CodeExchangeResult {
 export interface GoogleCallbackParams {
   code?: string;
   state?: string;
+  iss?: string;
   error?: string;
   error_description?: string;
 }

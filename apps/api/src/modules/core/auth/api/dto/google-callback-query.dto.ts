@@ -5,6 +5,7 @@ const GoogleCallbackQuerySchema = z
   .object({
     code: z.string().min(1).optional(),
     state: z.string().min(1).optional(),
+    iss: z.string().url().optional(),
     error: z.string().min(1).optional(),
     error_description: z.string().optional(),
   })

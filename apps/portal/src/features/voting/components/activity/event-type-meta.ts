@@ -4,10 +4,15 @@ import {
     CheckSquare,
     Circle,
     FilePlus,
+    HelpCircle,
     Lock,
+    PencilLine,
     PlayCircle,
     Settings,
+    Trash2,
     UserCheck,
+    UserMinus,
+    UserPlus,
     Users,
     type LucideIcon,
 } from "lucide-react";
@@ -19,12 +24,33 @@ interface EventTypeMeta {
 
 const META: Record<string, EventTypeMeta> = {
     "VOTING.VOTE_CREATED": { icon: FilePlus, dotColor: "bg-slate-400" },
+    "VOTING.VOTE_UPDATED": { icon: PencilLine, dotColor: "bg-slate-400" },
     "VOTING.VOTE_RULESET_SET": { icon: Settings, dotColor: "bg-slate-400" },
     "VOTING.VOTE_SCHEDULED": { icon: CalendarClock, dotColor: "bg-blue-500" },
     "VOTING.VOTE_OPENED": { icon: PlayCircle, dotColor: "bg-green-500" },
     "VOTING.VOTE_ELECTORATE_SNAPSHOTTED": {
         icon: Users,
         dotColor: "bg-slate-400",
+    },
+    "VOTING.VOTE_QUESTION_CREATED": {
+        icon: HelpCircle,
+        dotColor: "bg-slate-400",
+    },
+    "VOTING.VOTE_QUESTION_UPDATED": {
+        icon: PencilLine,
+        dotColor: "bg-slate-400",
+    },
+    "VOTING.VOTE_QUESTION_DELETED": {
+        icon: Trash2,
+        dotColor: "bg-rose-400",
+    },
+    "VOTING.VOTE_CONSENT_CREATED": {
+        icon: UserPlus,
+        dotColor: "bg-blue-500",
+    },
+    "VOTING.VOTE_CONSENT_REVOKED": {
+        icon: UserMinus,
+        dotColor: "bg-rose-400",
     },
     "VOTING.BALLOT_CAST_DIRECT": { icon: CheckSquare, dotColor: "bg-blue-500" },
     "VOTING.BALLOT_CAST_PROXY": { icon: UserCheck, dotColor: "bg-blue-500" },

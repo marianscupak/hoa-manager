@@ -1,10 +1,16 @@
 export const audit = {
     VOTING: {
         VOTE_CREATED: "Vote created",
+        VOTE_UPDATED: "Vote updated",
         VOTE_RULESET_SET: "Ruleset configured",
         VOTE_SCHEDULED: "Vote scheduled",
         VOTE_OPENED: "Vote opened",
         VOTE_ELECTORATE_SNAPSHOTTED: "Electorate snapshotted",
+        VOTE_QUESTION_CREATED: "Question added",
+        VOTE_QUESTION_UPDATED: "Question edited",
+        VOTE_QUESTION_DELETED: "Question removed",
+        VOTE_CONSENT_CREATED: "Delegation recorded",
+        VOTE_CONSENT_REVOKED: "Delegation revoked",
         BALLOT_CAST_DIRECT: "Ballot cast",
         BALLOT_CAST_PROXY: "Ballot cast by proxy",
         VOTE_CLOSED: "Vote closed",

@@ -14,8 +14,25 @@ export interface UnitOverview {
   buildingShareSum: number;
 }
 
+/**
+ * One row per unit owned by the calling membership. Shares are
+ * already converted to percentages (0..100) and rounded to two
+ * decimal places, matching the rounding convention used by
+ * `buildingShareSum` in `UnitOverview`.
+ */
+export interface OwnedUnitRow {
+  id: string;
+  unitNo: string;
+  ownerSharePct: number;
+  buildingSharePct: number;
+}
+
 export interface UnitReadRepository {
   getOverview(tenantId: string): Promise<UnitOverview>;
+  findOwnedByMembership(params: {
+    tenantId: string;
+    membershipId: string;
+  }): Promise<OwnedUnitRow[]>;
 }
 
 export const UNIT_READ_REPOSITORY = Symbol('UNIT_READ_REPOSITORY');

@@ -16,7 +16,7 @@ describe('GetPropertyOverviewHandler', () => {
   const fixedNow = new Date('2026-05-14T12:00:00Z');
 
   beforeEach(() => {
-    units = { getOverview: jest.fn() };
+    units = { getOverview: jest.fn(), findOwnedByMembership: jest.fn() };
     owners = { countActive: jest.fn() };
     invites = { getPendingSummary: jest.fn() };
     clock = { now: () => fixedNow };

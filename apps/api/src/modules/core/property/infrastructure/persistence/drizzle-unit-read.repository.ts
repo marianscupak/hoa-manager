@@ -1,10 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, isNull, sql } from 'drizzle-orm';
 
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
 import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
-import { unitOwnerships, units } from '@/infrastructure/db/schema';
 import {
+  owners,
+  tenantMemberships,
+  unitOwnerships,
+  units,
+} from '@/infrastructure/db/schema';
+import {
+  OwnedUnitRow,
   UnitOverview,
   UnitReadRepository,
 } from '@/modules/core/property/application/ports/unit-read.repository.port';
@@ -58,5 +64,88 @@ export class DrizzleUnitReadRepository implements UnitReadRepository {
       withoutOwnersCount: Number(row?.withoutOwnersCount ?? 0),
       buildingShareSum: Number(row?.buildingShareSum ?? 0),
     };
+  }
+
+  async findOwnedByMembership(params: {
+    tenantId: string;
+    membershipId: string;
+  }): Promise<OwnedUnitRow[]> {
+    // `unit_ownerships` has no `membership_id` column — it points at
+    // `owner_id`, and owners link to a user via `owners.user_id`. The
+    // owner -> membership join therefore mirrors the pattern used by
+    // `DrizzleElectorateDataRepository.findOwnershipRecords`: match the
+    // owner to the membership row sharing the same `(tenant_id, user_id)`
+    // pair.
+    //
+    // `share` is stored on a 0..1 scale (per `list-units.handler`'s
+    // `Math.abs(sum - 1.0)` completeness check), so multiplying by 100
+    // converts it to a percentage. `buildingShareNumerator /
+    // buildingShareDenominator * 100` matches the formula used by
+    // `getOverview`'s `buildingShareSum`. Both are rounded to two
+    // decimal places for consistency.
+    //
+    // GROUP BY unit guarantees one row per unit even in the (data-bug)
+    // case where a membership owns the same unit through two active
+    // ownership rows — the percentages are summed rather than
+    // duplicated.
+    const rows = await this.db
+      .select({
+        id: units.id,
+        unitNo: units.unitNo,
+        ownerSharePct: sql<number>`ROUND(
+          (SUM(${unitOwnerships.share}) * 100)::numeric,
+          2
+        )::float8`,
+        buildingSharePct: sql<number>`ROUND(
+          (
+            ${units.buildingShareNumerator}::numeric
+            / NULLIF(${units.buildingShareDenominator}, 0)::numeric
+          ) * 100,
+          2
+        )::float8`,
+      })
+      .from(units)
+      .innerJoin(
+        unitOwnerships,
+        and(
+          eq(unitOwnerships.unitId, units.id),
+          eq(unitOwnerships.tenantId, units.tenantId),
+          isNull(unitOwnerships.validTo),
+        ),
+      )
+      .innerJoin(owners, eq(unitOwnerships.ownerId, owners.id))
+      .innerJoin(
+        tenantMemberships,
+        and(
+          eq(tenantMemberships.userId, owners.userId),
+          eq(tenantMemberships.tenantId, owners.tenantId),
+        ),
+      )
+      .where(
+        and(
+          eq(units.tenantId, params.tenantId),
+          eq(tenantMemberships.id, params.membershipId),
+        ),
+      )
+      .groupBy(
+        units.id,
+        units.unitNo,
+        units.buildingShareNumerator,
+        units.buildingShareDenominator,
+      );
+
+    return rows.map(
+      (r: {
+        id: string;
+        unitNo: string;
+        ownerSharePct: number | null;
+        buildingSharePct: number | null;
+      }) => ({
+        id: r.id,
+        unitNo: r.unitNo,
+        ownerSharePct: Number(r.ownerSharePct ?? 0),
+        buildingSharePct: Number(r.buildingSharePct ?? 0),
+      }),
+    );
   }
 }

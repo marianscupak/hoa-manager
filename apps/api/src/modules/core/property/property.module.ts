@@ -26,6 +26,7 @@ import {
   UNIT_REPOSITORY,
 } from '@/modules/core/property/application/ports/property.repository.port';
 import { UNIT_READ_REPOSITORY } from '@/modules/core/property/application/ports/unit-read.repository.port';
+import { GetOwnedUnitsHandler } from '@/modules/core/property/application/queries/get-owned-units/get-owned-units.handler';
 import { GetPropertyOverviewHandler } from '@/modules/core/property/application/queries/get-property-overview/get-property-overview.handler';
 import { DrizzleOwnerReadRepository } from '@/modules/core/property/infrastructure/persistence/drizzle-owner-read.repository';
 import {
@@ -52,6 +53,7 @@ const QueryHandlers = [
   GetUnitDetailHandler,
   GetOwnerByIdHandler,
   GetPropertyOverviewHandler,
+  GetOwnedUnitsHandler,
 ];
 
 const Repositories = [

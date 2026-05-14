@@ -19,6 +19,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import { OwnedUnitResponseDto } from '@/modules/core/property/api/dto/owned-unit-response.dto';
 import {
   CreateUnitDto,
   CreateUnitResponseDto,
@@ -31,6 +32,7 @@ import { CreateUnitCommand } from '@/modules/core/property/application/commands/
 import { DeleteUnitCommand } from '@/modules/core/property/application/commands/delete-unit.command';
 import { ReplaceUnitOwnershipCommand } from '@/modules/core/property/application/commands/replace-unit-ownership.command';
 import { UpdateUnitCommand } from '@/modules/core/property/application/commands/update-unit.command';
+import { GetOwnedUnitsQuery } from '@/modules/core/property/application/queries/get-owned-units/get-owned-units.query';
 import { GetUnitDetailQuery } from '@/modules/core/property/application/queries/get-unit-detail.query';
 import { ListUnitsQuery } from '@/modules/core/property/application/queries/list-units.query';
 import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
@@ -50,6 +52,24 @@ export class UnitController {
     private readonly queryBus: QueryBus,
     private readonly commandBus: CommandBus,
   ) {}
+
+  // Declared before `@Get(':id')` so the literal `mine` segment is
+  // matched before the `:id` route parameter. Any authenticated tenant
+  // member can call this — no `@Roles` decorator. The class-level
+  // `RolesGuard` is a no-op when no `@Roles()` metadata is present.
+  @Get('mine')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: "Units owned by the caller's membership",
+    type: [OwnedUnitResponseDto],
+  })
+  async getMyOwnedUnits(
+    @Tenant() tenantCtx: TenantContext,
+  ): Promise<OwnedUnitResponseDto[]> {
+    return this.queryBus.execute(
+      new GetOwnedUnitsQuery(tenantCtx.tenantId, tenantCtx.membershipId),
+    );
+  }
 
   @Get()
   @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)

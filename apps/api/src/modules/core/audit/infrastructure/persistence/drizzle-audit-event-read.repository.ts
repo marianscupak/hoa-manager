@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { and, asc, eq, inArray, or } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, or } from 'drizzle-orm';
 
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
 import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
@@ -8,6 +8,7 @@ import type {
   AuditEventReadRecord,
   AuditEventReadRepository,
   FindByAggregateParams,
+  FindRecentParams,
 } from '@/modules/core/audit/application/ports/audit-event-read.repository.port';
 import type { AuditActor } from '@/modules/core/audit/domain/actor';
 import type { AuditEventType } from '@/modules/core/audit/domain/audit-event-types';
@@ -51,6 +52,30 @@ export class DrizzleAuditEventReadRepository implements AuditEventReadRepository
       .orderBy(asc(auditEvents.occurredAt));
 
     const rows = limit !== undefined ? await baseQuery.limit(limit) : await baseQuery;
+
+    return rows.map((r) => this.mapRow(r));
+  }
+
+  async findRecent(params: FindRecentParams): Promise<AuditEventReadRecord[]> {
+    const { tenantId, scope, limit } = params;
+
+    const visibilityCondition = inArray(
+      auditEvents.visibility,
+      scope.allowedVisibilities,
+    );
+    const filter = scope.alwaysIncludeForActorUserId
+      ? or(
+          visibilityCondition,
+          eq(auditEvents.actorUserId, scope.alwaysIncludeForActorUserId),
+        )
+      : visibilityCondition;
+
+    const rows = await this.db
+      .select()
+      .from(auditEvents)
+      .where(and(eq(auditEvents.tenantId, tenantId), filter))
+      .orderBy(desc(auditEvents.occurredAt))
+      .limit(limit);
 
     return rows.map((r) => this.mapRow(r));
   }

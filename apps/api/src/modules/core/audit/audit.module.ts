@@ -1,7 +1,10 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { CqrsModule } from '@nestjs/cqrs';
 
+import { AuditController } from './api/audit.controller';
 import { AUDIT_EVENT_READ_REPOSITORY } from './application/ports/audit-event-read.repository.port';
 import { AUDIT_EVENT_WRITE_REPOSITORY } from './application/ports/audit-event-write.repository.port';
+import { GetTenantActivityHandler } from './application/queries/get-tenant-activity/get-tenant-activity.handler';
 import { AuditEventRegistry } from './application/registry/audit-event.registry';
 import { AuditContextService } from './application/services/audit-context.service';
 import { AuditFormatterRegistry } from './application/services/audit-formatter-registry';
@@ -13,6 +16,8 @@ import { DrizzleAuditEventReadRepository } from './infrastructure/persistence/dr
 import { DrizzleAuditEventWriteRepository } from './infrastructure/persistence/drizzle-audit-event-write.repository';
 
 @Module({
+  imports: [CqrsModule],
+  controllers: [AuditController],
   providers: [
     AuditEventRegistry,
     AuditService,
@@ -20,6 +25,7 @@ import { DrizzleAuditEventWriteRepository } from './infrastructure/persistence/d
     VisibilityPolicyService,
     AuditFormatterRegistry,
     SystemActorRunner,
+    GetTenantActivityHandler,
     {
       provide: AUDIT_EVENT_WRITE_REPOSITORY,
       useClass: DrizzleAuditEventWriteRepository,

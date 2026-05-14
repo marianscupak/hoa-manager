@@ -21,8 +21,15 @@ export interface FindByAggregateParams {
   limit?: number;
 }
 
+export interface FindRecentParams {
+  tenantId: string;
+  scope: VisibilityScope;
+  limit: number;
+}
+
 export interface AuditEventReadRepository {
   findByAggregate(params: FindByAggregateParams): Promise<AuditEventReadRecord[]>;
+  findRecent(params: FindRecentParams): Promise<AuditEventReadRecord[]>;
 }
 
 export const AUDIT_EVENT_READ_REPOSITORY = Symbol('AUDIT_EVENT_READ_REPOSITORY');

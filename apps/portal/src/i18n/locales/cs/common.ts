@@ -3,6 +3,7 @@ export default {
     loading: "Načítání...",
     save: "Uložit",
     cancel: "Zrušit",
+    retry: "Zkusit znovu",
     profile: "Profil",
     language: "Jazyk",
     logout: "Odhlásit se",

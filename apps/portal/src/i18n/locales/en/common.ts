@@ -3,6 +3,7 @@ export default {
     loading: "Loading...",
     save: "Save",
     cancel: "Cancel",
+    retry: "Retry",
     profile: "Profile",
     language: "Language",
     logout: "Log out",

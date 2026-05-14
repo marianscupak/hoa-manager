@@ -14,7 +14,9 @@ import { GetPendingInviteByOwnerIdHandler } from '@/modules/core/invitation/appl
 import { RegisterFromInviteHandler } from '@/modules/core/invitation/application/handlers/register-from-invite.handler';
 import { RevokeOwnerInviteHandler } from '@/modules/core/invitation/application/handlers/revoke-owner-invite.handler';
 import { SendOwnerInviteHandler } from '@/modules/core/invitation/application/handlers/send-owner-invite.handler';
+import { INVITE_READ_REPOSITORY } from '@/modules/core/invitation/application/ports/invite-read.repository.port';
 import { OWNER_INVITE_REPOSITORY } from '@/modules/core/invitation/application/ports/owner-invite.repository.port';
+import { DrizzleInviteReadRepository } from '@/modules/core/invitation/infrastructure/persistence/drizzle-invite-read.repository';
 import { DrizzleOwnerInviteRepository } from '@/modules/core/invitation/infrastructure/persistence/drizzle-owner-invite.repository';
 import { PropertyModule } from '@/modules/core/property/property.module';
 import { TenancyModule } from '@/modules/core/tenancy/tenancy.module';
@@ -49,9 +51,13 @@ const QueryHandlers = [
       provide: OWNER_INVITE_REPOSITORY,
       useClass: DrizzleOwnerInviteRepository,
     },
+    {
+      provide: INVITE_READ_REPOSITORY,
+      useClass: DrizzleInviteReadRepository,
+    },
     { provide: EMAIL_SENDER, useClass: ConsoleEmailSender },
     { provide: UNIT_OF_WORK, useClass: DrizzleUnitOfWork },
   ],
-  exports: [OWNER_INVITE_REPOSITORY],
+  exports: [OWNER_INVITE_REPOSITORY, INVITE_READ_REPOSITORY],
 })
 export class InvitationModule {}

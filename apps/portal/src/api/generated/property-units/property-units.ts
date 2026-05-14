@@ -25,6 +25,7 @@ import type {
     CreateUnitDto,
     CreateUnitResponseDto,
     ErrorResponseDto,
+    OwnedUnitResponseDto,
     ReplaceOwnershipsDto,
     UnitDetailResponseDto,
     UnitResponseDto,
@@ -35,6 +36,154 @@ import { customInstance } from "../../axios";
 import type { ErrorType, BodyType } from "../../axios";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+export const unitControllerGetMyOwnedUnits = (
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<OwnedUnitResponseDto[]>(
+        { url: `/api/units/mine`, method: "GET", signal },
+        options,
+    );
+};
+
+export const getUnitControllerGetMyOwnedUnitsQueryKey = () => {
+    return [`/api/units/mine`] as const;
+};
+
+export const getUnitControllerGetMyOwnedUnitsQueryOptions = <
+    TData = Awaited<ReturnType<typeof unitControllerGetMyOwnedUnits>>,
+    TError = ErrorType<ErrorResponseDto>,
+>(options?: {
+    query?: Partial<
+        UseQueryOptions<
+            Awaited<ReturnType<typeof unitControllerGetMyOwnedUnits>>,
+            TError,
+            TData
+        >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ?? getUnitControllerGetMyOwnedUnitsQueryKey();
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof unitControllerGetMyOwnedUnits>>
+    > = ({ signal }) => unitControllerGetMyOwnedUnits(requestOptions, signal);
+
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof unitControllerGetMyOwnedUnits>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type UnitControllerGetMyOwnedUnitsQueryResult = NonNullable<
+    Awaited<ReturnType<typeof unitControllerGetMyOwnedUnits>>
+>;
+export type UnitControllerGetMyOwnedUnitsQueryError =
+    ErrorType<ErrorResponseDto>;
+
+export function useUnitControllerGetMyOwnedUnits<
+    TData = Awaited<ReturnType<typeof unitControllerGetMyOwnedUnits>>,
+    TError = ErrorType<ErrorResponseDto>,
+>(
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof unitControllerGetMyOwnedUnits>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof unitControllerGetMyOwnedUnits>>,
+                    TError,
+                    Awaited<ReturnType<typeof unitControllerGetMyOwnedUnits>>
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useUnitControllerGetMyOwnedUnits<
+    TData = Awaited<ReturnType<typeof unitControllerGetMyOwnedUnits>>,
+    TError = ErrorType<ErrorResponseDto>,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof unitControllerGetMyOwnedUnits>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof unitControllerGetMyOwnedUnits>>,
+                    TError,
+                    Awaited<ReturnType<typeof unitControllerGetMyOwnedUnits>>
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useUnitControllerGetMyOwnedUnits<
+    TData = Awaited<ReturnType<typeof unitControllerGetMyOwnedUnits>>,
+    TError = ErrorType<ErrorResponseDto>,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof unitControllerGetMyOwnedUnits>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useUnitControllerGetMyOwnedUnits<
+    TData = Awaited<ReturnType<typeof unitControllerGetMyOwnedUnits>>,
+    TError = ErrorType<ErrorResponseDto>,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof unitControllerGetMyOwnedUnits>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
+    const queryOptions = getUnitControllerGetMyOwnedUnitsQueryOptions(options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+        TData,
+        TError
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+    return { ...query, queryKey: queryOptions.queryKey };
+}
 
 export const unitControllerGetUnits = (
     options?: SecondParameter<typeof customInstance>,

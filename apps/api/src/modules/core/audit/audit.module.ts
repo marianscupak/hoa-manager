@@ -1,6 +1,9 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
+import { AuthModule } from '../auth/auth.module';
+import { TenancyModule } from '../tenancy/tenancy.module';
+
 import { AuditController } from './api/audit.controller';
 import { AUDIT_EVENT_READ_REPOSITORY } from './application/ports/audit-event-read.repository.port';
 import { AUDIT_EVENT_WRITE_REPOSITORY } from './application/ports/audit-event-write.repository.port';
@@ -16,7 +19,7 @@ import { DrizzleAuditEventReadRepository } from './infrastructure/persistence/dr
 import { DrizzleAuditEventWriteRepository } from './infrastructure/persistence/drizzle-audit-event-write.repository';
 
 @Module({
-  imports: [CqrsModule],
+  imports: [CqrsModule, AuthModule, TenancyModule],
   controllers: [AuditController],
   providers: [
     AuditEventRegistry,

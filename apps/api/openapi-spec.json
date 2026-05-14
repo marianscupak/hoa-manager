@@ -1325,6 +1325,131 @@
         ]
       }
     },
+    "/api/property/overview": {
+      "get": {
+        "operationId": "PropertyController_getOverview",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Aggregated configuration metrics for the current tenant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PropertyOverviewResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Validation or Domain logic error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Property"
+        ]
+      }
+    },
+    "/api/units/mine": {
+      "get": {
+        "operationId": "UnitController_getMyOwnedUnits",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Units owned by the caller's membership",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OwnedUnitResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Validation or Domain logic error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Property Units"
+        ]
+      }
+    },
     "/api/units": {
       "get": {
         "operationId": "UnitController_getUnits",
@@ -1942,6 +2067,44 @@
         },
         "tags": [
           "Owner Invitations"
+        ]
+      }
+    },
+    "/api/audit/activity": {
+      "get": {
+        "operationId": "AuditController_getActivity",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "accept-language",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantActivityResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "audit"
         ]
       }
     },
@@ -2921,6 +3084,99 @@
           "ownerId"
         ]
       },
+      "UnitsOverviewDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number"
+          },
+          "withoutOwnersCount": {
+            "type": "number"
+          },
+          "buildingShareSum": {
+            "type": "number",
+            "description": "Sum of unit buildingShare values as a percentage"
+          }
+        },
+        "required": [
+          "total",
+          "withoutOwnersCount",
+          "buildingShareSum"
+        ]
+      },
+      "OwnersOverviewDto": {
+        "type": "object",
+        "properties": {
+          "active": {
+            "type": "number",
+            "description": "Active owners (excludes pending-invite owners)"
+          }
+        },
+        "required": [
+          "active"
+        ]
+      },
+      "InvitesOverviewDto": {
+        "type": "object",
+        "properties": {
+          "pending": {
+            "type": "number"
+          },
+          "oldestPendingCreatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "pending",
+          "oldestPendingCreatedAt"
+        ]
+      },
+      "PropertyOverviewResponseDto": {
+        "type": "object",
+        "properties": {
+          "units": {
+            "$ref": "#/components/schemas/UnitsOverviewDto"
+          },
+          "owners": {
+            "$ref": "#/components/schemas/OwnersOverviewDto"
+          },
+          "invites": {
+            "$ref": "#/components/schemas/InvitesOverviewDto"
+          }
+        },
+        "required": [
+          "units",
+          "owners",
+          "invites"
+        ]
+      },
+      "OwnedUnitResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "unitNo": {
+            "type": "string"
+          },
+          "ownerSharePct": {
+            "type": "number",
+            "description": "Caller's share of the unit, as a percentage"
+          },
+          "buildingSharePct": {
+            "type": "number",
+            "description": "Unit's share of the building, as a percentage"
+          }
+        },
+        "required": [
+          "id",
+          "unitNo",
+          "ownerSharePct",
+          "buildingSharePct"
+        ]
+      },
       "UnitResponseDto": {
         "type": "object",
         "properties": {
@@ -3223,6 +3479,49 @@
         "required": [
           "accessToken",
           "tenantId"
+        ]
+      },
+      "TenantActivityEntryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "eventType": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "navigateTo": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "occurredAt",
+          "eventType",
+          "message",
+          "navigateTo"
+        ]
+      },
+      "TenantActivityResponseDto": {
+        "type": "object",
+        "properties": {
+          "entries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TenantActivityEntryDto"
+            }
+          }
+        },
+        "required": [
+          "entries"
         ]
       },
       "VoterSummaryDto": {
@@ -4215,6 +4514,10 @@
           "message": {
             "type": "string"
           },
+          "navigateTo": {
+            "type": "string",
+            "nullable": true
+          },
           "details": {
             "type": "object"
           }
@@ -4223,7 +4526,8 @@
           "id",
           "occurredAt",
           "eventType",
-          "message"
+          "message",
+          "navigateTo"
         ]
       },
       "VoteActivityResponseDto": {

@@ -5,14 +5,12 @@
  * The HOA Manager API description
  * OpenAPI spec version: 1.0
  */
-import type { TimelineEntryDtoDetails } from "./timelineEntryDtoDetails";
 
-export interface TimelineEntryDto {
+export interface TenantActivityEntryDto {
     id: string;
     occurredAt: string;
     eventType: string;
     message: string;
     /** @nullable */
     navigateTo: string | null;
-    details?: TimelineEntryDtoDetails;
 }

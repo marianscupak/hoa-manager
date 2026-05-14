@@ -2,8 +2,7 @@ import { Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { useVotesControllerGetActivity } from "@/api/generated/votes/votes";
-
-import { VoteActivityTimeline } from "./vote-activity-timeline";
+import { ActivityTimeline } from "@/features/audit/components/activity-timeline";
 
 interface VoteActivityTabProps {
     voteId: string;
@@ -44,7 +43,7 @@ export function VoteActivityTab({ voteId, enabled }: VoteActivityTabProps) {
 
     return (
         <div className="py-4">
-            <VoteActivityTimeline entries={entries} />
+            <ActivityTimeline entries={entries} />
         </div>
     );
 }

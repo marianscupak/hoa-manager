@@ -2,13 +2,13 @@ import { format } from "date-fns";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router";
 
-import { type TimelineEntryDto } from "@/api/generated/model";
-
+import { type ActivityTimelineEntry } from "./activity-timeline";
 import { getEventTypeMeta } from "./event-type-meta";
 
-interface VoteActivityTimelineItemProps {
-    entry: TimelineEntryDto;
+interface ActivityTimelineItemProps {
+    entry: ActivityTimelineEntry;
     isLast: boolean;
 }
 
@@ -18,7 +18,7 @@ interface BallotAnswer {
 }
 
 function getBallotAnswers(
-    details: TimelineEntryDto["details"],
+    details: Record<string, unknown> | undefined,
 ): BallotAnswer[] | null {
     if (!details) return null;
     const answers = (details as { answers?: unknown }).answers;
@@ -33,10 +33,10 @@ function getBallotAnswers(
     return parsed.length > 0 ? parsed : null;
 }
 
-export function VoteActivityTimelineItem({
+export function ActivityTimelineItem({
     entry,
     isLast,
-}: VoteActivityTimelineItemProps) {
+}: ActivityTimelineItemProps) {
     const { t } = useTranslation(["voting", "audit"]);
     const { icon: Icon, dotColor } = getEventTypeMeta(entry.eventType);
     const headline = t(entry.eventType, {
@@ -70,9 +70,18 @@ export function VoteActivityTimelineItem({
                         {formattedTimestamp}
                     </span>
                     <span className="text-slate-300">·</span>
-                    <span className="text-sm font-semibold text-slate-800">
-                        {headline}
-                    </span>
+                    {entry.navigateTo ? (
+                        <Link
+                            to={entry.navigateTo}
+                            className="text-sm font-semibold text-slate-800 hover:underline"
+                        >
+                            {headline}
+                        </Link>
+                    ) : (
+                        <span className="text-sm font-semibold text-slate-800">
+                            {headline}
+                        </span>
+                    )}
                     {hasDetails && (
                         <button
                             type="button"

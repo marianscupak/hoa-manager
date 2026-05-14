@@ -7,7 +7,7 @@ import { AuditModule } from '@/modules/core/audit/audit.module';
 
 import { VotesController } from './api/votes.controller';
 import { VotingAuditLabelResolver } from './audit/label-resolver.service';
-import { VotingTimelineProjector } from './audit/projections/voting-timeline.projector';
+import { VotingAuditFormatter } from './audit/voting-audit-formatter';
 import { VotingAuditRegistration } from './audit/voting-audit.registration';
 import { AuthModule } from '../core/auth/auth.module';
 import { IdentityModule } from '../core/identity/identity.module';
@@ -117,7 +117,7 @@ const REPOSITORIES = [
     ...REPOSITORIES,
     VotingAuditLabelResolver,
     VotingAuditRegistration,
-    VotingTimelineProjector,
+    VotingAuditFormatter,
     VoteAuditExporterService,
     VoteElectorateSnapshotLookup,
     TenantLookup,

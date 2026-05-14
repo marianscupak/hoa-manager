@@ -1,33 +1,38 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 
 import type { AuditEventReadRecord } from '@/modules/core/audit/application/ports/audit-event-read.repository.port';
+import type {
+  AuditEventFormatter,
+  TimelineEntry,
+  ViewerContext,
+} from '@/modules/core/audit/application/services/audit-event-formatter';
+import { AuditFormatterRegistry } from '@/modules/core/audit/application/services/audit-formatter-registry';
 import { VisibilityPolicyService } from '@/modules/core/audit/application/services/visibility-policy.service';
 import { Visibility } from '@/modules/core/audit/domain/visibility';
-import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
 
-import { VotingEventType } from '../voting-event-types';
-import { t } from './voting-audit-strings';
-
-export interface TimelineEntry {
-  id: string;
-  occurredAt: string;
-  eventType: string;
-  message: string;
-  details?: Record<string, unknown>;
-}
-
-export interface ViewerContext {
-  viewerUserId: string;
-  viewerRoles: TenantMembershipRole[];
-  viewerLanguage: string;
-}
+import { t } from './projections/voting-audit-strings';
+import { VotingEventType } from './voting-event-types';
 
 @Injectable()
-export class VotingTimelineProjector {
-  constructor(private readonly visibilityPolicy: VisibilityPolicyService) {}
+export class VotingAuditFormatter
+  implements AuditEventFormatter, OnModuleInit
+{
+  readonly module = 'VOTING';
 
-  project(events: AuditEventReadRecord[], viewer: ViewerContext): TimelineEntry[] {
-    return events.map((e) => this.renderOne(e, viewer));
+  constructor(
+    private readonly registry: AuditFormatterRegistry,
+    private readonly visibilityPolicy: VisibilityPolicyService,
+  ) {}
+
+  onModuleInit(): void {
+    this.registry.register(this);
+  }
+
+  format(
+    event: AuditEventReadRecord,
+    viewer: ViewerContext,
+  ): TimelineEntry {
+    return this.renderOne(event, viewer);
   }
 
   private renderOne(
@@ -35,10 +40,16 @@ export class VotingTimelineProjector {
     viewer: ViewerContext,
   ): TimelineEntry {
     const lang = viewer.viewerLanguage;
+    const navigateTo =
+      event.aggregate?.type === 'VOTE' && event.aggregate.id
+        ? `/votes/${event.aggregate.id}`
+        : null;
+
     const base = {
       id: event.id,
       occurredAt: event.occurredAt.toISOString(),
       eventType: event.eventType,
+      navigateTo,
     };
 
     switch (event.eventType) {
@@ -70,7 +81,9 @@ export class VotingTimelineProjector {
         const p = event.payload as { labels: { voteTitle: string } };
         return {
           ...base,
-          message: t(lang, 'vote.scheduled.public', { title: p.labels.voteTitle }),
+          message: t(lang, 'vote.scheduled.public', {
+            title: p.labels.voteTitle,
+          }),
         };
       }
       case VotingEventType.VOTE_OPENED: {
@@ -79,7 +92,9 @@ export class VotingTimelineProjector {
         };
         return {
           ...base,
-          message: t(lang, 'vote.opened.public', { title: p.labels.voteTitle }),
+          message: t(lang, 'vote.opened.public', {
+            title: p.labels.voteTitle,
+          }),
         };
       }
       case VotingEventType.VOTE_ELECTORATE_SNAPSHOTTED: {
@@ -128,7 +143,9 @@ export class VotingTimelineProjector {
         const p = event.payload as { labels: { voteTitle: string } };
         return {
           ...base,
-          message: t(lang, 'vote.closed.public', { title: p.labels.voteTitle }),
+          message: t(lang, 'vote.closed.public', {
+            title: p.labels.voteTitle,
+          }),
         };
       }
       case VotingEventType.VOTE_RESULTS_COMPUTED: {

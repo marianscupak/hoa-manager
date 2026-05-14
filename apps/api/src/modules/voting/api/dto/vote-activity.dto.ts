@@ -5,6 +5,8 @@ export class TimelineEntryDto {
   @ApiProperty() occurredAt!: string;
   @ApiProperty() eventType!: string;
   @ApiProperty() message!: string;
+  @ApiProperty({ type: String, nullable: true })
+  navigateTo!: string | null;
   @ApiProperty({ required: false, type: Object })
   details?: Record<string, unknown>;
 }

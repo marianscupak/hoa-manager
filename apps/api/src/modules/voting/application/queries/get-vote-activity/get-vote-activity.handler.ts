@@ -5,12 +5,12 @@ import {
   AUDIT_EVENT_READ_REPOSITORY,
   type AuditEventReadRepository,
 } from '@/modules/core/audit/application/ports/audit-event-read.repository.port';
+import { AuditFormatterRegistry } from '@/modules/core/audit/application/services/audit-formatter-registry';
 import { VisibilityPolicyService } from '@/modules/core/audit/application/services/visibility-policy.service';
 import { VoteNotFoundException } from '@/shared/application/exceptions/vote.exceptions';
 
 import { GetVoteActivityQuery } from './get-vote-activity.query';
 import type { VoteActivityResponseDto } from '../../../api/dto/vote-activity.dto';
-import { VotingTimelineProjector } from '../../../audit/projections/voting-timeline.projector';
 import {
   VOTE_READ_REPOSITORY,
   type VoteReadRepository,
@@ -27,7 +27,7 @@ export class GetVoteActivityHandler
     @Inject(AUDIT_EVENT_READ_REPOSITORY)
     private readonly auditReadRepo: AuditEventReadRepository,
     private readonly visibilityPolicy: VisibilityPolicyService,
-    private readonly projector: VotingTimelineProjector,
+    private readonly registry: AuditFormatterRegistry,
   ) {}
 
   async execute(query: GetVoteActivityQuery): Promise<VoteActivityResponseDto> {
@@ -49,7 +49,7 @@ export class GetVoteActivityHandler
       },
     });
 
-    const entries = this.projector.project(events, {
+    const entries = this.registry.formatMany(events, {
       viewerUserId: query.viewerUserId,
       viewerRoles: query.viewerRoles,
       viewerLanguage: query.viewerLanguage,

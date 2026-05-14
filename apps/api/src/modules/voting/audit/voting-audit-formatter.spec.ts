@@ -1,11 +1,12 @@
 import type { AuditEventReadRecord } from '@/modules/core/audit/application/ports/audit-event-read.repository.port';
+import { AuditFormatterRegistry } from '@/modules/core/audit/application/services/audit-formatter-registry';
 import { VisibilityPolicyService } from '@/modules/core/audit/application/services/visibility-policy.service';
 import type { AuditEventType } from '@/modules/core/audit/domain/audit-event-types';
 import { Visibility } from '@/modules/core/audit/domain/visibility';
 import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
 import { VotingEventType } from '@/modules/voting/audit/voting-event-types';
 
-import { VotingTimelineProjector } from './voting-timeline.projector';
+import { VotingAuditFormatter } from './voting-audit-formatter';
 
 function ev(partial: Partial<AuditEventReadRecord>): AuditEventReadRecord {
   return {
@@ -42,26 +43,28 @@ const VIEWER_ADMIN = {
   viewerLanguage: 'en',
 };
 
-describe('VotingTimelineProjector', () => {
-  let projector: VotingTimelineProjector;
+describe('VotingAuditFormatter', () => {
+  let formatter: VotingAuditFormatter;
 
   beforeEach(() => {
-    projector = new VotingTimelineProjector(new VisibilityPolicyService());
+    formatter = new VotingAuditFormatter(
+      new AuditFormatterRegistry(),
+      new VisibilityPolicyService(),
+    );
   });
 
   it('renders VOTE_OPENED for any viewer (public event)', () => {
-    const entries = projector.project([ev({})], VIEWER_OWNER);
-    expect(entries).toHaveLength(1);
-    expect(entries[0].message).toContain('Bylaws change');
+    const entry = formatter.format(ev({}), VIEWER_OWNER);
+    expect(entry.message).toContain('Bylaws change');
   });
 
   it('renders messages in Czech when viewer language is cs', () => {
-    const entries = projector.project([ev({})], {
+    const entry = formatter.format(ev({}), {
       ...VIEWER_OWNER,
       viewerLanguage: 'cs',
     });
-    expect(entries[0].message).toContain('Hlasování');
-    expect(entries[0].message).toContain('Bylaws change');
+    expect(entry.message).toContain('Hlasování');
+    expect(entry.message).toContain('Bylaws change');
   });
 
   it('renders BALLOT_CAST as self-message when viewer is the actor', () => {
@@ -80,12 +83,12 @@ describe('VotingTimelineProjector', () => {
         },
       },
     });
-    const entries = projector.project([ballotEv], {
+    const entry = formatter.format(ballotEv, {
       ...VIEWER_OWNER,
       viewerUserId: 'voter-1',
     });
-    expect(entries[0].message).toBe('Your ballot was recorded.');
-    expect(entries[0].details).toBeUndefined();
+    expect(entry.message).toBe('Your ballot was recorded.');
+    expect(entry.details).toBeUndefined();
   });
 
   it('renders BALLOT_CAST as privileged-message for ADMIN viewer', () => {
@@ -104,10 +107,10 @@ describe('VotingTimelineProjector', () => {
         },
       },
     });
-    const entries = projector.project([ballotEv], VIEWER_ADMIN);
-    expect(entries[0].message).toContain('Voter Name');
-    expect(entries[0].message).toContain('12');
-    expect(entries[0].details).toEqual({
+    const entry = formatter.format(ballotEv, VIEWER_ADMIN);
+    expect(entry.message).toContain('Voter Name');
+    expect(entry.message).toContain('12');
+    expect(entry.details).toEqual({
       answers: [{ questionText: 'Q1?', optionText: 'Yes' }],
     });
   });
@@ -117,8 +120,31 @@ describe('VotingTimelineProjector', () => {
       eventType: 'VOTING.SOMETHING_NEW' as AuditEventType,
       payload: {},
     });
-    const entries = projector.project([unknownEv], VIEWER_OWNER);
-    expect(entries[0].message).toContain('VOTING.SOMETHING_NEW');
+    const entry = formatter.format(unknownEv, VIEWER_OWNER);
+    expect(entry.message).toContain('VOTING.SOMETHING_NEW');
+  });
+
+  it('sets navigateTo to /votes/{id} for VOTE_OPENED', () => {
+    const entry = formatter.format(
+      ev({
+        eventType: VotingEventType.VOTE_OPENED,
+        aggregate: { type: 'VOTE', id: 'v-42' },
+      }),
+      VIEWER_OWNER,
+    );
+    expect(entry.navigateTo).toBe('/votes/v-42');
+  });
+
+  it('sets navigateTo to null when aggregate is not a VOTE', () => {
+    const entry = formatter.format(
+      ev({
+        eventType: 'VOTING.SOMETHING_NEW' as AuditEventType,
+        aggregate: null,
+        payload: {},
+      }),
+      VIEWER_OWNER,
+    );
+    expect(entry.navigateTo).toBeNull();
   });
 
   // Smoke test: every defined event type renders a non-empty message for a
@@ -178,10 +204,10 @@ describe('VotingTimelineProjector', () => {
     ],
   ])('every event type renders a non-empty message: %s', (eventType, payload) => {
     it('renders', () => {
-      const entry = projector.project(
-        [ev({ eventType, payload })],
+      const entry = formatter.format(
+        ev({ eventType, payload }),
         VIEWER_ADMIN,
-      )[0];
+      );
       expect(entry.message.length).toBeGreaterThan(0);
       expect(entry.message).not.toContain('Activity recorded'); // i.e. it took a typed branch, not the unknown fallback
     });
@@ -208,7 +234,7 @@ describe('VotingTimelineProjector', () => {
         visibility: Visibility.TENANT_PRIVILEGED,
         payload: { ...basePayload, recordedByMembershipId: 'owner-m-1' },
       });
-      const entry = projector.project([e], VIEWER_ADMIN)[0];
+      const entry = formatter.format(e, VIEWER_ADMIN);
       expect(entry.message).toBe('Bob delegated unit 12 to Carol.');
     });
 
@@ -218,7 +244,7 @@ describe('VotingTimelineProjector', () => {
         visibility: Visibility.TENANT_PRIVILEGED,
         payload: { ...basePayload, recordedByMembershipId: 'admin-m-1' },
       });
-      const entry = projector.project([e], VIEWER_ADMIN)[0];
+      const entry = formatter.format(e, VIEWER_ADMIN);
       expect(entry.message).toBe(
         'Alice (board) recorded a delegation of unit 12 from Bob to Carol.',
       );
@@ -230,7 +256,10 @@ describe('VotingTimelineProjector', () => {
         visibility: Visibility.TENANT_PRIVILEGED,
         payload: { ...basePayload, recordedByMembershipId: 'admin-m-1' },
       });
-      const entry = projector.project([e], { ...VIEWER_ADMIN, viewerLanguage: 'cs' })[0];
+      const entry = formatter.format(e, {
+        ...VIEWER_ADMIN,
+        viewerLanguage: 'cs',
+      });
       expect(entry.message).toBe(
         'Alice (board) zaznamenal/a delegaci jednotky 12 z Bob na Carol.',
       );
@@ -242,7 +271,7 @@ describe('VotingTimelineProjector', () => {
         visibility: Visibility.TENANT_PRIVILEGED,
         payload: basePayload,
       });
-      const entry = projector.project([e], VIEWER_ADMIN)[0];
+      const entry = formatter.format(e, VIEWER_ADMIN);
       expect(entry.message).toBe('Bob delegated unit 12 to Carol.');
     });
   });
@@ -268,7 +297,7 @@ describe('VotingTimelineProjector', () => {
         visibility: Visibility.TENANT_PRIVILEGED,
         payload: { ...basePayload, revokedByMembershipId: 'owner-m-1' },
       });
-      const entry = projector.project([e], VIEWER_ADMIN)[0];
+      const entry = formatter.format(e, VIEWER_ADMIN);
       expect(entry.message).toBe('Bob revoked the delegation of unit 12 to Carol.');
     });
 
@@ -278,7 +307,7 @@ describe('VotingTimelineProjector', () => {
         visibility: Visibility.TENANT_PRIVILEGED,
         payload: { ...basePayload, revokedByMembershipId: 'admin-m-1' },
       });
-      const entry = projector.project([e], VIEWER_ADMIN)[0];
+      const entry = formatter.format(e, VIEWER_ADMIN);
       expect(entry.message).toBe(
         'Alice (board) revoked the delegation of unit 12 from Bob to Carol.',
       );
@@ -290,7 +319,10 @@ describe('VotingTimelineProjector', () => {
         visibility: Visibility.TENANT_PRIVILEGED,
         payload: { ...basePayload, revokedByMembershipId: 'admin-m-1' },
       });
-      const entry = projector.project([e], { ...VIEWER_ADMIN, viewerLanguage: 'cs' })[0];
+      const entry = formatter.format(e, {
+        ...VIEWER_ADMIN,
+        viewerLanguage: 'cs',
+      });
       expect(entry.message).toBe(
         'Alice (board) zrušil/a delegaci jednotky 12 z Bob na Carol.',
       );
@@ -302,7 +334,7 @@ describe('VotingTimelineProjector', () => {
         visibility: Visibility.TENANT_PRIVILEGED,
         payload: basePayload,
       });
-      const entry = projector.project([e], VIEWER_ADMIN)[0];
+      const entry = formatter.format(e, VIEWER_ADMIN);
       expect(entry.message).toBe('Alice (board) revoked the delegation for unit 12.');
     });
   });

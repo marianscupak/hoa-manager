@@ -42,7 +42,7 @@ export class VotingAuditFormatter
     const lang = viewer.viewerLanguage;
     const navigateTo =
       event.aggregate?.type === 'VOTE' && event.aggregate.id
-        ? `/votes/${event.aggregate.id}`
+        ? `/voting/${event.aggregate.id}`
         : null;
 
     const base = {

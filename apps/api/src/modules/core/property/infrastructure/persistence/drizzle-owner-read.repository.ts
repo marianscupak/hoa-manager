@@ -26,19 +26,22 @@ export class DrizzleOwnerReadRepository implements OwnerReadRepository {
    * are counted as active here.
    */
   async countActive(tenantId: string, now: Date): Promise<number> {
+    // Inside the correlated subquery, column refs need explicit table
+    // prefixes — Drizzle's `${table.column}` drops the table name, which
+    // makes the inner WHERE resolve both sides to `owner_invites`.
     const [row] = await this.db
       .select({
         active: sql<number>`COUNT(*) FILTER (
           WHERE NOT (
-            ${owners.userId} IS NULL
-            AND ${owners.email} IS NOT NULL
+            ${owners}.user_id IS NULL
+            AND ${owners}.email IS NOT NULL
             AND EXISTS (
               SELECT 1
               FROM ${ownerInvites}
-              WHERE ${ownerInvites.tenantId} = ${owners.tenantId}
-                AND ${ownerInvites.ownerId} = ${owners.id}
-                AND ${ownerInvites.acceptedAt} IS NULL
-                AND ${ownerInvites.expiresAt} > ${now}
+              WHERE ${ownerInvites}.tenant_id = ${owners}.tenant_id
+                AND ${ownerInvites}.owner_id = ${owners}.id
+                AND ${ownerInvites}.accepted_at IS NULL
+                AND ${ownerInvites}.expires_at > ${now}
             )
           )
         )::int`,

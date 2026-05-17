@@ -21,6 +21,10 @@ import { ApiError } from "./types";
 export const AXIOS_INSTANCE = Axios.create({
     baseURL: env.VITE_API_URL,
     withCredentials: true,
+    // Serialize array params as repeated keys (`?k=a&k=b`) so NestJS
+    // recognizes them as arrays. Default axios behavior emits `?k[]=a&k[]=b`
+    // which Nest does not parse.
+    paramsSerializer: { indexes: null },
 });
 
 AXIOS_INSTANCE.interceptors.request.use((config) => {

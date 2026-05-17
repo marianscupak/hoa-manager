@@ -124,7 +124,7 @@ describe('VotingAuditFormatter', () => {
     expect(entry.message).toContain('VOTING.SOMETHING_NEW');
   });
 
-  it('sets navigateTo to /votes/{id} for VOTE_OPENED', () => {
+  it('sets navigateTo to /voting/{id} for VOTE_OPENED', () => {
     const entry = formatter.format(
       ev({
         eventType: VotingEventType.VOTE_OPENED,
@@ -132,7 +132,7 @@ describe('VotingAuditFormatter', () => {
       }),
       VIEWER_OWNER,
     );
-    expect(entry.navigateTo).toBe('/votes/v-42');
+    expect(entry.navigateTo).toBe('/voting/v-42');
   });
 
   it('sets navigateTo to null when aggregate is not a VOTE', () => {

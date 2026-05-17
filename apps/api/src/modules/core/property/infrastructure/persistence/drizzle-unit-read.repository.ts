@@ -24,15 +24,9 @@ export class DrizzleUnitReadRepository implements UnitReadRepository {
   }
 
   async getOverview(tenantId: string): Promise<UnitOverview> {
-    // One aggregation pass over units in the tenant. `withoutOwnersCount`
-    // uses a NOT EXISTS subquery against `unit_ownerships` (active rows
-    // are those with `valid_to IS NULL` — matches the existing predicate
-    // used by `DrizzleUnitOwnershipRepository.listActiveByUnit`).
-    //
-    // `buildingShareSum` converts each unit's integer fraction
-    // (numerator / denominator) to a percentage, sums it, and rounds to
-    // two decimals so consumers can render and threshold without
-    // worrying about float drift.
+    // Inside the correlated subquery, column refs need explicit table
+    // prefixes — Drizzle's `${table.column}` drops the table name, which
+    // makes the inner WHERE resolve both sides to `unit_ownerships`.
     const [row] = await this.db
       .select({
         total: sql<number>`COUNT(*)::int`,
@@ -40,9 +34,9 @@ export class DrizzleUnitReadRepository implements UnitReadRepository {
           WHERE NOT EXISTS (
             SELECT 1
             FROM ${unitOwnerships}
-            WHERE ${unitOwnerships.tenantId} = ${units.tenantId}
-              AND ${unitOwnerships.unitId} = ${units.id}
-              AND ${unitOwnerships.validTo} IS NULL
+            WHERE ${unitOwnerships}.tenant_id = ${units}.tenant_id
+              AND ${unitOwnerships}.unit_id = ${units}.id
+              AND ${unitOwnerships}.valid_to IS NULL
           )
         )::int`,
         buildingShareSum: sql<number>`COALESCE(

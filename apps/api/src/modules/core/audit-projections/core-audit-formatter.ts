@@ -222,7 +222,7 @@ export class CoreAuditFormatter implements AuditEventFormatter, OnModuleInit {
       case 'OWNER':
         return `/admin/owners`;
       case 'MEMBERSHIP':
-        return `/admin/members`;
+        return `/admin/users`;
       case 'TENANT':
       default:
         return null;

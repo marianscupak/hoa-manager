@@ -241,7 +241,7 @@ describe('CoreAuditFormatter', () => {
     expect(entry.navigateTo).toBe('/admin/owners');
   });
 
-  it('sets navigateTo to /admin/members for MEMBERSHIP aggregates', () => {
+  it('sets navigateTo to /admin/users for MEMBERSHIP aggregates', () => {
     const entry = formatter.format(
       ev({
         eventType: CoreEventType.MEMBERSHIP_CREATED,
@@ -250,7 +250,7 @@ describe('CoreAuditFormatter', () => {
       }),
       VIEWER_ADMIN,
     );
-    expect(entry.navigateTo).toBe('/admin/members');
+    expect(entry.navigateTo).toBe('/admin/users');
   });
 
   it('sets navigateTo to null for TENANT aggregates', () => {

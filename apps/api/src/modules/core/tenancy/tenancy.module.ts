@@ -45,7 +45,7 @@ const QueryHandlers = [
     CqrsModule,
     IdentityModule,
     forwardRef(() => AuthModule),
-    AuditModule,
+    forwardRef(() => AuditModule),
     AuditProjectionsModule,
   ],
   controllers: [TenancyController, MemberController],

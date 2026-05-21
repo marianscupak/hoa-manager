@@ -1,9 +1,12 @@
 import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { SystemClock } from '@/infrastructure/clock/system-clock';
 import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
+import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
+import { AuditService } from '@/modules/core/audit/application/services/audit.service';
+import { CoreAuditLabelResolver } from '@/modules/core/audit-projections/core-audit-label-resolver.service';
 import { ReplaceUnitOwnershipCommand } from '@/modules/core/property/application/commands/replace-unit-ownership.command';
+import { UnitOwnershipReplacedAuditEvent } from '@/modules/core/property/audit/events/unit-ownership-replaced.event';
 import {
   OWNER_REPOSITORY,
   UNIT_OWNERSHIP_REPOSITORY,
@@ -18,7 +21,7 @@ import {
   OwnerNotFoundException,
   UnitNotFoundException,
 } from '@/shared/application/exceptions/property.exceptions';
-import { CLOCK } from '@/shared/application/ports/clock.port';
+import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 
 @CommandHandler(ReplaceUnitOwnershipCommand)
 export class ReplaceUnitOwnershipHandler
@@ -33,7 +36,10 @@ export class ReplaceUnitOwnershipHandler
     private readonly ownershipRepo: UnitOwnershipRepository,
     private readonly unitOfWork: DrizzleUnitOfWork,
     @Inject(CLOCK)
-    private readonly clock: SystemClock,
+    private readonly clock: Clock,
+    private readonly auditService: AuditService,
+    private readonly auditContext: AuditContextService,
+    private readonly labelResolver: CoreAuditLabelResolver,
   ) {}
 
   async execute(command: ReplaceUnitOwnershipCommand): Promise<void> {
@@ -80,6 +86,26 @@ export class ReplaceUnitOwnershipHandler
 
       // Insert new rows
       await this.ownershipRepo.createMany(tenantId, unitId, ownerships, now);
+
+      const actor = this.auditContext.requireActor();
+      const actorLabel = await this.labelResolver.resolveActorLabel(actor);
+      const unitLabel = await this.labelResolver.resolveUnitLabel(unitId);
+      const ownerLabels = await Promise.all(
+        ownerships.map((o) => this.labelResolver.resolveOwnerLabel(o.ownerId)),
+      );
+
+      await this.auditService.append(
+        UnitOwnershipReplacedAuditEvent.build({
+          tenantId,
+          unitId,
+          ownerships: ownerships.map((o) => ({ ownerId: o.ownerId, share: o.share })),
+          actor,
+          unitLabel,
+          changedByLabel: actorLabel,
+          ownerLabels,
+          occurredAt: now,
+        }),
+      );
     });
   }
 }

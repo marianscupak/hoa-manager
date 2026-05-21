@@ -3,8 +3,11 @@ import { CqrsModule } from '@nestjs/cqrs';
 
 import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
 import { AuthModule } from '@/modules/core/auth/auth.module';
+import { AuditModule } from '@/modules/core/audit/audit.module';
+import { AuditProjectionsModule } from '@/modules/core/audit-projections/audit-projections.module';
 import { IdentityModule } from '@/modules/core/identity/identity.module';
 import { InvitationModule } from '@/modules/core/invitation/invitation.module';
+import { PropertyAuditRegistration } from '@/modules/core/property/audit/property-audit.registration';
 import { OwnerController } from '@/modules/core/property/api/owner.controller';
 import { PropertyController } from '@/modules/core/property/api/property.controller';
 import { UnitController } from '@/modules/core/property/api/unit.controller';
@@ -74,10 +77,12 @@ const Repositories = [
     IdentityModule,
     TenancyModule,
     AuthModule,
+    AuditModule,
+    AuditProjectionsModule,
     forwardRef(() => InvitationModule),
   ],
   controllers: [OwnerController, PropertyController, UnitController],
-  providers: [...CommandHandlers, ...QueryHandlers, ...Repositories],
+  providers: [...CommandHandlers, ...QueryHandlers, ...Repositories, PropertyAuditRegistration],
   exports: [],
 })
 export class PropertyModule {}

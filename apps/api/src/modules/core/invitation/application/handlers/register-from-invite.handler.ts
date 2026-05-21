@@ -119,7 +119,7 @@ export class RegisterFromInviteHandler
 
       // Link owner (Property)
       await this.commandBus.execute(
-        new SetOwnerUserIdCommand(invite.tenantId, invite.ownerId, userId),
+        new SetOwnerUserIdCommand(invite.tenantId, invite.ownerId, userId, 'INVITE_REGISTER'),
       );
 
       // Create membership (Tenancy)

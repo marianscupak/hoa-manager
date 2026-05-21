@@ -105,7 +105,7 @@ export class AcceptOwnerInviteHandler
 
       if (!owner.userId) {
         await this.commandBus.execute(
-          new SetOwnerUserIdCommand(invite.tenantId, invite.ownerId, user.id),
+          new SetOwnerUserIdCommand(invite.tenantId, invite.ownerId, user.id, 'INVITE_ACCEPT'),
         );
       }
 

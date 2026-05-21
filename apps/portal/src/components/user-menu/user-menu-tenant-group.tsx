@@ -1,6 +1,7 @@
 import { useAtomValue } from "jotai";
-import { Building, Check } from "lucide-react";
+import { Building, Check, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router";
 
 import {
     DropdownMenuItem,
@@ -18,11 +19,11 @@ interface UserMenuTenantGroupProps {
 }
 
 export function UserMenuTenantGroup({ tenants }: UserMenuTenantGroupProps) {
-    const { t } = useTranslation(["common"]);
+    const { t } = useTranslation(["common", "auth"]);
     const tenantContext = useAtomValue(tenantContextAtom);
     const { switchTenant, isSwitching } = useTenantSwitcher();
 
-    if (!tenants || tenants.length <= 1) return null;
+    if (!tenants) return null;
 
     const handleSwitchTenant = (tenantId: string) => {
         if (tenantId === tenantContext?.tenantId) return;
@@ -52,6 +53,12 @@ export function UserMenuTenantGroup({ tenants }: UserMenuTenantGroupProps) {
                     )}
                 </DropdownMenuItem>
             ))}
+            <DropdownMenuItem asChild className="cursor-pointer">
+                <Link to="/tenant/new">
+                    <Plus className="mr-2 h-4 w-4" />
+                    {t("auth:selectTenant.createNew")}
+                </Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
         </>
     );

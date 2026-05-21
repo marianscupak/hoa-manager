@@ -1,5 +1,5 @@
 import { useAtomValue } from "jotai";
-import { Navigate, Outlet } from "react-router";
+import { Navigate, Outlet, useLocation } from "react-router";
 
 import { authStatusAtom } from "@/auth/atoms";
 import { LocaleSwitcher } from "@/components/locale-switcher";
@@ -7,12 +7,18 @@ import { LogoutButton } from "@/components/logout-button";
 
 export function SelectTenantLayout() {
     const authStatus = useAtomValue(authStatusAtom);
+    const location = useLocation();
 
     if (authStatus === "anonymous") {
         return <Navigate to="/login" replace />;
     }
 
-    if (authStatus === "authenticated") {
+    // Authenticated users (already inside a tenant) shouldn't see the tenant
+    // picker, but they ARE allowed to create another tenant from /tenant/new.
+    if (
+        authStatus === "authenticated" &&
+        location.pathname !== "/tenant/new"
+    ) {
         return <Navigate to="/" replace />;
     }
 

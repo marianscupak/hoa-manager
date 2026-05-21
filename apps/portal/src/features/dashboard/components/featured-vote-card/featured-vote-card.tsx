@@ -44,7 +44,13 @@ export function FeaturedVoteCard() {
 
     const votesQuery = useVotesControllerGetVotes(
         { status: ["OPEN", "SCHEDULED"] },
-        { query: { select: (data) => pickFeaturedVote(data) } },
+        {
+            query: {
+                select: (data) => pickFeaturedVote(data),
+                staleTime: 0,
+                refetchOnMount: "always",
+            },
+        },
     );
 
     const featuredVote = votesQuery.data;

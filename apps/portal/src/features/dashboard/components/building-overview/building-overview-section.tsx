@@ -11,7 +11,9 @@ import { UnitsCard } from "./units-card";
 
 export function BuildingOverviewSection() {
     const { t } = useTranslation(["dashboard", "common"]);
-    const overviewQuery = usePropertyControllerGetOverview();
+    const overviewQuery = usePropertyControllerGetOverview({
+        query: { staleTime: 0, refetchOnMount: "always" },
+    });
 
     if (overviewQuery.isLoading) {
         return (

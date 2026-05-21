@@ -8,7 +8,9 @@ import { OwnedUnitsTable } from "./owned-units-table";
 
 export function OwnedUnitsSection() {
     const { t } = useTranslation(["dashboard", "common"]);
-    const query = useUnitControllerGetMyOwnedUnits();
+    const query = useUnitControllerGetMyOwnedUnits({
+        query: { staleTime: 0, refetchOnMount: "always" },
+    });
 
     if (query.isLoading) {
         return (

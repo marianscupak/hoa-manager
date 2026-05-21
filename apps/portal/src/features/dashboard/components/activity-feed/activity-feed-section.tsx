@@ -7,7 +7,10 @@ import { ActivityTimeline } from "@/features/audit/components/activity-timeline"
 
 export function ActivityFeedSection() {
     const { t } = useTranslation(["dashboard", "common"]);
-    const query = useAuditControllerGetActivity({ limit: 10 });
+    const query = useAuditControllerGetActivity(
+        { limit: 10 },
+        { query: { staleTime: 0, refetchOnMount: "always" } },
+    );
 
     if (query.isLoading) {
         return (

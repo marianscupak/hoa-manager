@@ -2,12 +2,11 @@ import { Module, forwardRef } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
 import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
-import { AuthModule } from '@/modules/core/auth/auth.module';
 import { AuditModule } from '@/modules/core/audit/audit.module';
 import { AuditProjectionsModule } from '@/modules/core/audit-projections/audit-projections.module';
+import { AuthModule } from '@/modules/core/auth/auth.module';
 import { IdentityModule } from '@/modules/core/identity/identity.module';
 import { InvitationModule } from '@/modules/core/invitation/invitation.module';
-import { PropertyAuditRegistration } from '@/modules/core/property/audit/property-audit.registration';
 import { OwnerController } from '@/modules/core/property/api/owner.controller';
 import { PropertyController } from '@/modules/core/property/api/property.controller';
 import { UnitController } from '@/modules/core/property/api/unit.controller';
@@ -31,6 +30,7 @@ import {
 import { UNIT_READ_REPOSITORY } from '@/modules/core/property/application/ports/unit-read.repository.port';
 import { GetOwnedUnitsHandler } from '@/modules/core/property/application/queries/get-owned-units/get-owned-units.handler';
 import { GetPropertyOverviewHandler } from '@/modules/core/property/application/queries/get-property-overview/get-property-overview.handler';
+import { PropertyAuditRegistration } from '@/modules/core/property/audit/property-audit.registration';
 import { DrizzleOwnerReadRepository } from '@/modules/core/property/infrastructure/persistence/drizzle-owner-read.repository';
 import {
   DrizzleOwnerRepository,

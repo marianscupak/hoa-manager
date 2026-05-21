@@ -11,11 +11,11 @@ import { AuditService } from '@/modules/core/audit/application/services/audit.se
 import { CoreAuditLabelResolver } from '@/modules/core/audit-projections/core-audit-label-resolver.service';
 import { GetUserByIdQuery } from '@/modules/core/identity/application/queries/get-user-by-id.query';
 import { AcceptOwnerInviteCommand } from '@/modules/core/invitation/application/commands/accept-owner-invite.command';
-import { OwnerInviteAcceptedAuditEvent } from '@/modules/core/invitation/audit/events/owner-invite-accepted.event';
 import {
   OWNER_INVITE_REPOSITORY,
   type OwnerInviteRepository,
 } from '@/modules/core/invitation/application/ports/owner-invite.repository.port';
+import { OwnerInviteAcceptedAuditEvent } from '@/modules/core/invitation/audit/events/owner-invite-accepted.event';
 import { SetOwnerUserIdCommand } from '@/modules/core/property/application/commands/set-owner-user-id.command';
 import { GetOwnerByIdQuery } from '@/modules/core/property/application/queries/get-owner-by-id.query';
 import { CreateMembershipCommand } from '@/modules/core/tenancy/application/commands/create-membership.command';

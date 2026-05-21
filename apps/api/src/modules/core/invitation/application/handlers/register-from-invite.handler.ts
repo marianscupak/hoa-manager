@@ -7,24 +7,24 @@ import {
 } from '@nestjs/cqrs';
 import { ClsService } from 'nestjs-cls';
 
+import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
+import { AuditService } from '@/modules/core/audit/application/services/audit.service';
+import { AUDIT_CLS_KEYS } from '@/modules/core/audit/infrastructure/cls/audit-context.keys';
+import { CoreAuditLabelResolver } from '@/modules/core/audit-projections/core-audit-label-resolver.service';
 import { CreateAuthIdentityCommand } from '@/modules/core/auth/application/commands/create-auth-identity.command';
 import { CreateSessionCommand } from '@/modules/core/auth/application/commands/create-session.command';
 import {
   PASSWORD_HASHER,
   type PasswordHasher,
 } from '@/modules/core/auth/application/ports/auth.utils.port';
-import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
-import { AuditService } from '@/modules/core/audit/application/services/audit.service';
-import { AUDIT_CLS_KEYS } from '@/modules/core/audit/infrastructure/cls/audit-context.keys';
-import { CoreAuditLabelResolver } from '@/modules/core/audit-projections/core-audit-label-resolver.service';
 import { CreateUserCommand } from '@/modules/core/identity/application/commands/create-user.command';
 import { GetUserByEmailQuery } from '@/modules/core/identity/application/queries/get-user-by-email.query';
 import { RegisterFromInviteCommand } from '@/modules/core/invitation/application/commands/register-from-invite.command';
-import { OwnerInviteAcceptedAuditEvent } from '@/modules/core/invitation/audit/events/owner-invite-accepted.event';
 import {
   OWNER_INVITE_REPOSITORY,
   type OwnerInviteRepository,
 } from '@/modules/core/invitation/application/ports/owner-invite.repository.port';
+import { OwnerInviteAcceptedAuditEvent } from '@/modules/core/invitation/audit/events/owner-invite-accepted.event';
 import { SetOwnerUserIdCommand } from '@/modules/core/property/application/commands/set-owner-user-id.command';
 import { GetOwnerByIdQuery } from '@/modules/core/property/application/queries/get-owner-by-id.query';
 import { CreateMembershipCommand } from '@/modules/core/tenancy/application/commands/create-membership.command';

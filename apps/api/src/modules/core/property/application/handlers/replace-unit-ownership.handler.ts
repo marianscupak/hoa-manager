@@ -6,7 +6,6 @@ import { AuditContextService } from '@/modules/core/audit/application/services/a
 import { AuditService } from '@/modules/core/audit/application/services/audit.service';
 import { CoreAuditLabelResolver } from '@/modules/core/audit-projections/core-audit-label-resolver.service';
 import { ReplaceUnitOwnershipCommand } from '@/modules/core/property/application/commands/replace-unit-ownership.command';
-import { UnitOwnershipReplacedAuditEvent } from '@/modules/core/property/audit/events/unit-ownership-replaced.event';
 import {
   OWNER_REPOSITORY,
   UNIT_OWNERSHIP_REPOSITORY,
@@ -15,6 +14,7 @@ import {
   type UnitOwnershipRepository,
   type UnitRepository,
 } from '@/modules/core/property/application/ports/property.repository.port';
+import { UnitOwnershipReplacedAuditEvent } from '@/modules/core/property/audit/events/unit-ownership-replaced.event';
 import {
   InvalidOwnershipShareException,
   InvalidOwnershipSumException,

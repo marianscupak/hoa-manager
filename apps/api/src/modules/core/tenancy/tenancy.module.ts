@@ -1,9 +1,9 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
-import { AuthModule } from '@/modules/core/auth/auth.module';
 import { AuditModule } from '@/modules/core/audit/audit.module';
 import { AuditProjectionsModule } from '@/modules/core/audit-projections/audit-projections.module';
+import { AuthModule } from '@/modules/core/auth/auth.module';
 import { IdentityModule } from '@/modules/core/identity/identity.module';
 import { MemberController } from '@/modules/core/tenancy/api/member.controller';
 import { TenancyController } from '@/modules/core/tenancy/api/tenancy.controller';
@@ -20,11 +20,11 @@ import {
   MEMBERSHIP_REPOSITORY,
   TENANT_REPOSITORY,
 } from '@/modules/core/tenancy/application/ports/tenant.repository.port';
+import { TenancyAuditRegistration } from '@/modules/core/tenancy/audit/tenancy-audit.registration';
 import {
   DrizzleMembershipRepository,
   DrizzleTenantRepository,
 } from '@/modules/core/tenancy/infrastructure/persistence/drizzle-tenant.repository';
-import { TenancyAuditRegistration } from '@/modules/core/tenancy/audit/tenancy-audit.registration';
 
 const CommandHandlers = [
   CreateTenantHandler,

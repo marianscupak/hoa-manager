@@ -9,6 +9,7 @@ import { ClsModule } from 'nestjs-cls';
 
 import { InfrastructureModule } from '@/infrastructure/infrastructure.module';
 import { AuditModule } from '@/modules/core/audit/audit.module';
+import { AuditProjectionsModule } from '@/modules/core/audit-projections/audit-projections.module';
 import { AuthModule } from '@/modules/core/auth/auth.module';
 import { IdentityModule } from '@/modules/core/identity/identity.module';
 import { InvitationModule } from '@/modules/core/invitation/invitation.module';
@@ -37,6 +38,7 @@ import { DomainExceptionFilter } from '@/shared/filters/domain-exception.filter'
     PropertyModule,
     InvitationModule,
     AuditModule,
+    AuditProjectionsModule,
     VotingModule,
   ],
   controllers: [],

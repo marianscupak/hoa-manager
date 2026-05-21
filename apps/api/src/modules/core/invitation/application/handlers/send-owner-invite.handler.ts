@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+
 import { Inject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
@@ -7,11 +9,15 @@ import {
   EMAIL_SENDER,
   type EmailSender,
 } from '@/infrastructure/email/email-sender.port';
+import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
+import { AuditService } from '@/modules/core/audit/application/services/audit.service';
+import { CoreAuditLabelResolver } from '@/modules/core/audit-projections/core-audit-label-resolver.service';
 import { SendOwnerInviteCommand } from '@/modules/core/invitation/application/commands/send-owner-invite.command';
 import {
   OWNER_INVITE_REPOSITORY,
   type OwnerInviteRepository,
 } from '@/modules/core/invitation/application/ports/owner-invite.repository.port';
+import { OwnerInviteSentAuditEvent } from '@/modules/core/invitation/audit/events/owner-invite-sent.event';
 import { GetOwnerByIdQuery } from '@/modules/core/property/application/queries/get-owner-by-id.query';
 import { GetTenantByIdQuery } from '@/modules/core/tenancy/application/queries/get-tenant-by-id.query';
 import {
@@ -28,6 +34,13 @@ import {
 
 const INVITE_TTL_HOURS = 72;
 
+function maskEmail(email: string): string {
+  const [local, domain] = email.split('@');
+  if (!local || !domain) return '***';
+  const head = local.slice(0, 1);
+  return `${head}***@${domain}`;
+}
+
 @CommandHandler(SendOwnerInviteCommand)
 export class SendOwnerInviteHandler
   implements ICommandHandler<SendOwnerInviteCommand>
@@ -41,6 +54,9 @@ export class SendOwnerInviteHandler
     private readonly clock: Clock,
     private readonly configService: ConfigService,
     private readonly queryBus: QueryBus,
+    private readonly auditService: AuditService,
+    private readonly auditContext: AuditContextService,
+    private readonly labelResolver: CoreAuditLabelResolver,
   ) {}
 
   async execute(
@@ -67,7 +83,7 @@ export class SendOwnerInviteHandler
     const expiresAt = addHours(now, INVITE_TTL_HOURS);
     const emailNormalized = normalizeEmail(owner.email);
 
-    await this.inviteRepo.upsertForOwner({
+    const invite = await this.inviteRepo.upsertForOwner({
       tenantId: command.tenantId,
       ownerId: command.ownerId,
       emailNormalized,
@@ -75,6 +91,25 @@ export class SendOwnerInviteHandler
       expiresAt,
       createdByUserId: command.senderUserId,
     });
+
+    const actor = this.auditContext.requireActor();
+    const actorLabel = await this.labelResolver.resolveActorLabel(actor);
+    const ownerLabel = await this.labelResolver.resolveOwnerLabel(command.ownerId);
+    const emailHash = createHash('sha256').update(emailNormalized).digest('hex');
+
+    await this.auditService.append(
+      OwnerInviteSentAuditEvent.build({
+        tenantId: command.tenantId,
+        ownerId: command.ownerId,
+        inviteId: invite.id,
+        emailHash,
+        actor,
+        ownerLabel,
+        emailMaskedLabel: maskEmail(emailNormalized),
+        sentByLabel: actorLabel,
+        occurredAt: now,
+      }),
+    );
 
     const tenant = await this.queryBus.execute(
       new GetTenantByIdQuery(command.tenantId),

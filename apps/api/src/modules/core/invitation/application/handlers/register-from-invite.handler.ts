@@ -5,6 +5,7 @@ import {
   ICommandHandler,
   QueryBus,
 } from '@nestjs/cqrs';
+import { ClsService } from 'nestjs-cls';
 
 import { CreateAuthIdentityCommand } from '@/modules/core/auth/application/commands/create-auth-identity.command';
 import { CreateSessionCommand } from '@/modules/core/auth/application/commands/create-session.command';
@@ -12,9 +13,14 @@ import {
   PASSWORD_HASHER,
   type PasswordHasher,
 } from '@/modules/core/auth/application/ports/auth.utils.port';
+import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
+import { AuditService } from '@/modules/core/audit/application/services/audit.service';
+import { AUDIT_CLS_KEYS } from '@/modules/core/audit/infrastructure/cls/audit-context.keys';
+import { CoreAuditLabelResolver } from '@/modules/core/audit-projections/core-audit-label-resolver.service';
 import { CreateUserCommand } from '@/modules/core/identity/application/commands/create-user.command';
 import { GetUserByEmailQuery } from '@/modules/core/identity/application/queries/get-user-by-email.query';
 import { RegisterFromInviteCommand } from '@/modules/core/invitation/application/commands/register-from-invite.command';
+import { OwnerInviteAcceptedAuditEvent } from '@/modules/core/invitation/audit/events/owner-invite-accepted.event';
 import {
   OWNER_INVITE_REPOSITORY,
   type OwnerInviteRepository,
@@ -58,6 +64,10 @@ export class RegisterFromInviteHandler
     @Inject(CLOCK) private readonly clock: Clock,
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
+    private readonly cls: ClsService,
+    private readonly auditService: AuditService,
+    private readonly auditContext: AuditContextService,
+    private readonly labelResolver: CoreAuditLabelResolver,
   ) {}
 
   async execute(
@@ -106,6 +116,14 @@ export class RegisterFromInviteHandler
       );
       const userId = (userResult as { id: string }).id;
 
+      // Establish audit actor for the rest of this request. The new user IS the
+      // actor of the downstream owner-link / membership-create / invite-accept events.
+      this.cls.set(AUDIT_CLS_KEYS.actor, {
+        type: 'USER',
+        userId,
+        membershipId: null,
+      });
+
       // Create LOCAL auth identity (Auth)
       const passwordHash = await this.passwordHasher.hash(command.password);
       await this.commandBus.execute(
@@ -136,6 +154,23 @@ export class RegisterFromInviteHandler
 
       // Mark invite accepted (Local)
       await this.inviteRepo.markAccepted(invite.id, now);
+
+      const actor = this.auditContext.requireActor();
+      const ownerLabel = await this.labelResolver.resolveOwnerLabel(invite.ownerId);
+      const userLabel = await this.labelResolver.resolveUserLabel(userId);
+
+      await this.auditService.append(
+        OwnerInviteAcceptedAuditEvent.build({
+          tenantId: invite.tenantId,
+          ownerId: invite.ownerId,
+          userId,
+          flow: 'NEW_REGISTRATION',
+          actor,
+          ownerLabel,
+          userLabel,
+          occurredAt: this.clock.now(),
+        }),
+      );
 
       // Create auth session with tenant-scoped token (Auth)
       const session = await this.commandBus.execute(

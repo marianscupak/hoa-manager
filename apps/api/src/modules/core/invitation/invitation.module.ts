@@ -6,7 +6,10 @@ import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
 import { ConsoleEmailSender } from '@/infrastructure/email/console-email-sender';
 import { EMAIL_SENDER } from '@/infrastructure/email/email-sender.port';
 import { AuthModule } from '@/modules/core/auth/auth.module';
+import { AuditModule } from '@/modules/core/audit/audit.module';
+import { AuditProjectionsModule } from '@/modules/core/audit-projections/audit-projections.module';
 import { IdentityModule } from '@/modules/core/identity/identity.module';
+import { InvitationAuditRegistration } from '@/modules/core/invitation/audit/invitation-audit.registration';
 import { InviteController } from '@/modules/core/invitation/api/invite.controller';
 import { AcceptOwnerInviteHandler } from '@/modules/core/invitation/application/handlers/accept-owner-invite.handler';
 import { GetOwnerInviteStatusHandler } from '@/modules/core/invitation/application/handlers/get-owner-invite-status.handler';
@@ -42,6 +45,8 @@ const QueryHandlers = [
     TenancyModule,
     forwardRef(() => PropertyModule),
     forwardRef(() => AuthModule),
+    AuditModule,
+    AuditProjectionsModule,
   ],
   controllers: [InviteController],
   providers: [
@@ -57,6 +62,7 @@ const QueryHandlers = [
     },
     { provide: EMAIL_SENDER, useClass: ConsoleEmailSender },
     { provide: UNIT_OF_WORK, useClass: DrizzleUnitOfWork },
+    InvitationAuditRegistration,
   ],
   exports: [OWNER_INVITE_REPOSITORY, INVITE_READ_REPOSITORY],
 })

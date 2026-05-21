@@ -6,8 +6,12 @@ import {
   QueryBus,
 } from '@nestjs/cqrs';
 
+import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
+import { AuditService } from '@/modules/core/audit/application/services/audit.service';
+import { CoreAuditLabelResolver } from '@/modules/core/audit-projections/core-audit-label-resolver.service';
 import { GetUserByIdQuery } from '@/modules/core/identity/application/queries/get-user-by-id.query';
 import { AcceptOwnerInviteCommand } from '@/modules/core/invitation/application/commands/accept-owner-invite.command';
+import { OwnerInviteAcceptedAuditEvent } from '@/modules/core/invitation/audit/events/owner-invite-accepted.event';
 import {
   OWNER_INVITE_REPOSITORY,
   type OwnerInviteRepository,
@@ -53,6 +57,9 @@ export class AcceptOwnerInviteHandler
     private readonly commandBus: CommandBus,
     @Inject(CLOCK)
     private readonly clock: Clock,
+    private readonly auditService: AuditService,
+    private readonly auditContext: AuditContextService,
+    private readonly labelResolver: CoreAuditLabelResolver,
   ) {}
 
   async execute(
@@ -133,6 +140,23 @@ export class AcceptOwnerInviteHandler
 
       // Mark invite as accepted
       await this.inviteRepo.markAccepted(invite.id, now);
+
+      const actor = this.auditContext.requireActor();
+      const ownerLabel = await this.labelResolver.resolveOwnerLabel(invite.ownerId);
+      const userLabel = await this.labelResolver.resolveUserLabel(user.id);
+
+      await this.auditService.append(
+        OwnerInviteAcceptedAuditEvent.build({
+          tenantId: invite.tenantId,
+          ownerId: invite.ownerId,
+          userId: user.id,
+          flow: 'EXISTING_USER',
+          actor,
+          ownerLabel,
+          userLabel,
+          occurredAt: this.clock.now(),
+        }),
+      );
 
       return { tenantId: invite.tenantId };
     });

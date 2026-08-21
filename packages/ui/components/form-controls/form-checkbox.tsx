@@ -28,7 +28,7 @@ export const FormCheckbox = React.forwardRef<
             control={control}
             name={name}
             render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-y-0 space-x-3 rounded-md border p-4 shadow-sm">
+                <FormItem className="flex flex-row items-start space-y-0 space-x-3 rounded-panel border p-4 shadow-sm">
                     <FormControl>
                         <Checkbox
                             checked={field.value}

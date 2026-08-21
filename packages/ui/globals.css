@@ -1,45 +1,81 @@
 @import "tailwindcss";
 
 @theme {
-    /* Font */
-    --font-sans: "Public Sans", ui-sans-serif, system-ui, sans-serif;
+    /* Fonts — body stays system; display face for headings/numbers/buttons/badges */
+    --font-sans:
+        ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+        "Helvetica Neue", Arial, sans-serif;
+    --font-display: "Nunito", var(--font-sans);
 
-    /* Light mode colors */
-    --color-background: hsl(0 0% 100%);
-    --color-foreground: hsl(222.2 84% 4.9%);
-    --color-card: hsl(0 0% 100%);
-    --color-card-foreground: hsl(222.2 84% 4.9%);
-    --color-popover: hsl(0 0% 100%);
-    --color-popover-foreground: hsl(222.2 84% 4.9%);
-    --color-primary: hsl(215 72% 53%);
-    --color-primary-foreground: hsl(0 0% 100%);
-    --color-secondary: hsl(210 40% 96.1%);
-    --color-secondary-foreground: hsl(222.2 47.4% 11.2%);
-    --color-muted: hsl(210 40% 96.1%);
-    --color-muted-foreground: hsl(215.4 16.3% 46.9%);
-    --color-accent: hsl(210 40% 96.1%);
-    --color-accent-foreground: hsl(222.2 47.4% 11.2%);
-    --color-destructive: hsl(0 84.2% 60.2%);
-    --color-destructive-foreground: hsl(0 0% 100%);
-    --color-destructive-muted: hsl(0 86% 97%);
-    --color-border: hsl(214.3 31.8% 91.4%);
-    --color-input: hsl(214.3 31.8% 91.4%);
-    --color-ring: hsl(215 72% 53%);
+    /* Base */
+    --color-background: #f8fafc;
+    --color-foreground: #0f172a;
+    --color-card: #ffffff;
+    --color-card-foreground: #0f172a;
+    --color-popover: #ffffff;
+    --color-popover-foreground: #0f172a;
+    --color-primary: #7c3aed;
+    --color-primary-hover: #6d28d9;
+    --color-primary-pressed: #5b21b6;
+    --color-primary-foreground: #ffffff;
+    --color-primary-tint: #f5f3ff;
+    --color-primary-tint-border: #ede9fe;
+    --color-primary-tint-foreground: #6d28d9;
+    --color-secondary: #f1f5f9;
+    --color-secondary-foreground: #475569;
+    --color-muted: #f1f5f9;
+    --color-muted-foreground: #64748b;
+    --color-faint: #94a3b8;
+    --color-accent: #f1f5f9; /* subtle hover tone — amber accents use the warning family */
+    --color-accent-foreground: #0f172a;
+    --color-destructive: #dc2626;
+    --color-destructive-foreground: #ffffff;
+    --color-destructive-muted: #fee2e2;
+    --color-destructive-muted-foreground: #b91c1c;
+    --color-destructive-bar: #f43f5e;
+    --color-border: #e2e8f0;
+    --color-hairline: #f1f5f9;
+    --color-input: #e2e8f0;
+    --color-ring: #7c3aed;
 
-    /* Semantic status colors */
-    --color-success: hsl(142 71% 45%);
-    --color-success-foreground: hsl(0 0% 100%);
-    --color-success-muted: hsl(138 76% 97%);
-    --color-warning: hsl(38 92% 50%);
-    --color-warning-foreground: hsl(0 0% 100%);
-    --color-warning-muted: hsl(48 96% 89%);
-    --color-info: hsl(215 72% 53%);
-    --color-info-foreground: hsl(0 0% 100%);
+    /* Status */
+    --color-success: #10b981;
+    --color-success-foreground: #ffffff;
+    --color-success-muted: #ecfdf5;
+    --color-success-tint-border: #a7f3d0;
+    --color-success-tint-foreground: #047857;
+    --color-warning: #f59e0b;
+    --color-warning-foreground: #ffffff;
+    --color-warning-muted: #fffbeb;
+    --color-warning-tint-border: #fde68a;
+    --color-warning-tint-foreground: #b45309;
+    --color-warning-deep: #92400e;
+    --color-info: #7c3aed;
+    --color-info-foreground: #ffffff;
 
-    /* Border radius */
-    --radius: 0.5rem;
-    --radius-md: calc(var(--radius) - 2px);
-    --radius-sm: calc(var(--radius) - 4px);
+    /* Radii */
+    --radius: 0.5625rem; /* 9px — inputs/selects */
+    --radius-md: 0.5rem;
+    --radius-sm: 0.375rem;
+    --radius-card: 1.125rem; /* 18px */
+    --radius-card-lg: 1.25rem; /* 20px — hero cards */
+    --radius-panel: 1rem; /* 16px — small panels/banners */
+    --radius-tile: 0.875rem; /* 14px — icon tiles */
+
+    /* Clay shadows */
+    --shadow-clay-card: 0 3px 0 rgba(124, 58, 237, 0.06);
+    --shadow-clay-card-amber: 0 3px 0 rgba(245, 158, 11, 0.12);
+    --shadow-clay-hero:
+        0 4px 0 rgba(124, 58, 237, 0.1), 0 16px 40px rgba(124, 58, 237, 0.12);
+    --shadow-clay-btn:
+        0 4px 0 #5b21b6, 0 12px 26px rgba(124, 58, 237, 0.25);
+    --shadow-clay-btn-hover:
+        0 6px 0 #5b21b6, 0 16px 32px rgba(124, 58, 237, 0.3);
+    --shadow-clay-btn-active:
+        0 2px 0 #5b21b6, 0 6px 14px rgba(124, 58, 237, 0.2);
+    --shadow-clay-secondary: 0 3px 0 rgba(2, 6, 23, 0.05);
+    --shadow-clay-inset: inset 0 -2px 0 rgba(124, 58, 237, 0.1);
+    --shadow-clay-inset-lg: inset 0 -3px 0 rgba(124, 58, 237, 0.12);
 }
 
 @layer base {

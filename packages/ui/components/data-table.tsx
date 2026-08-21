@@ -21,6 +21,7 @@ export interface DataTableProps<TData> {
     data: TData[];
     isLoading?: boolean;
     emptyMessage?: string;
+    loadingMessage?: string;
 }
 
 export function DataTable<TData>({
@@ -28,9 +29,10 @@ export function DataTable<TData>({
     data,
     isLoading,
     emptyMessage = "No results.",
+    loadingMessage,
 }: DataTableProps<TData>) {
     return (
-        <div className="bg-card rounded-md border">
+        <div className="bg-card rounded-card shadow-clay-card overflow-hidden border">
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -48,7 +50,7 @@ export function DataTable<TData>({
                                 colSpan={columns.length}
                                 className="h-24 text-center"
                             >
-                                Loading...
+                                {loadingMessage ?? "Loading..."}
                             </TableCell>
                         </TableRow>
                     ) : data.length === 0 ? (

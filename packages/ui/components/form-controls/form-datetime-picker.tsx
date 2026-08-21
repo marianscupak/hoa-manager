@@ -156,7 +156,7 @@ export const FormDatetimePicker = React.forwardRef<
                                                 value={timeStr}
                                                 onChange={handleTimeChange}
                                                 disabled={!dateValue}
-                                                className="bg-background w-[110px] cursor-text text-center text-sm focus-visible:ring-1 focus-visible:ring-offset-0"
+                                                className="bg-card w-[110px] cursor-text text-center text-sm focus-visible:ring-1 focus-visible:ring-offset-0"
                                             />
                                         </div>
                                     </div>

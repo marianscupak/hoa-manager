@@ -4,20 +4,30 @@ import * as React from "react";
 import { cn } from "../lib/utils";
 
 const badgeVariants = cva(
-    "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+    "font-display focus:ring-ring inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-bold transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none",
     {
         variants: {
             variant: {
-                default: "border-transparent bg-brand text-brand-foreground",
+                default:
+                    "bg-primary text-primary-foreground border-transparent",
                 secondary:
-                    "border-transparent bg-secondary text-secondary-foreground",
+                    "bg-secondary text-secondary-foreground border-transparent",
                 destructive:
-                    "border-transparent bg-destructive text-destructive-foreground",
+                    "bg-destructive text-destructive-foreground border-transparent",
                 success:
-                    "border-transparent bg-success text-success-foreground",
+                    "bg-success text-success-foreground border-transparent",
                 warning:
-                    "border-transparent bg-warning text-warning-foreground",
+                    "bg-warning text-warning-foreground border-transparent",
                 outline: "text-foreground",
+                primaryTint:
+                    "bg-primary-tint text-primary-tint-foreground border-primary-tint-border",
+                warningTint:
+                    "bg-warning-muted text-warning-tint-foreground border-warning-tint-border",
+                successTint:
+                    "bg-success-muted text-success-tint-foreground border-success-tint-border",
+                destructiveTint:
+                    "bg-destructive-muted text-destructive-muted-foreground border-transparent",
+                neutral: "bg-muted text-secondary-foreground border-transparent",
             },
         },
         defaultVariants: {

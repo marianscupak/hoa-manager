@@ -1,75 +1,92 @@
+import type { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
 
-import { type VoteDetailResponseDto } from "@/api/generated/model";
+import { Badge, Card, CardContent, CardHeader, CardTitle } from "@hoa-mngr/ui";
+
+import {
+    type VoteDetailResponseDto,
+    VoteOptionResponseDtoOptionKey,
+} from "@/api/generated/model";
+
+import { buildRuleSentence } from "../utils/rule-sentence";
 
 interface VoteQuestionsListProps {
     questions: VoteDetailResponseDto["questions"];
 }
 
-function formatMajorityRule(question: VoteDetailResponseDto["questions"][0]) {
-    const ruleset = question.effectiveRuleset;
-    if (!ruleset) return null;
+const SYSTEM_OPTION_KEYS: readonly string[] = [
+    VoteOptionResponseDtoOptionKey.YES,
+    VoteOptionResponseDtoOptionKey.NO,
+    VoteOptionResponseDtoOptionKey.ABSTAIN,
+];
 
-    if (ruleset.majorityRuleType === "SIMPLE_MAJORITY") {
-        return ">50%";
+function optionLabel(
+    option: VoteDetailResponseDto["questions"][number]["options"][number],
+    t: TFunction<"voting">,
+): string {
+    if (SYSTEM_OPTION_KEYS.includes(option.optionKey)) {
+        return t(
+            // Safe: guarded by SYSTEM_OPTION_KEYS above.
+            `create.optionLabels.${option.optionKey as "YES" | "NO" | "ABSTAIN"}`,
+        );
     }
-    if (
-        ruleset.majorityRuleType === "QUALIFIED_MAJORITY" &&
-        ruleset.majorityThreshold
-    ) {
-        return `≥${ruleset.majorityThreshold}%`;
-    }
-    return ">50%";
+    return option.label;
 }
 
 export function VoteQuestionsList({ questions }: VoteQuestionsListProps) {
-    const { t } = useTranslation(["voting"]);
+    const { t } = useTranslation("voting");
 
     if (!questions || questions.length === 0) return null;
 
     return (
-        <div className="mb-8">
-            <h2 className="mb-4 text-xl font-bold">
-                {t("voting:detail.questions.title")}
-            </h2>
-            <div className="overflow-hidden rounded-lg border bg-white shadow-sm">
-                <div className="border-b border-slate-100 bg-slate-50 px-6 py-3">
-                    <span className="text-sm font-semibold text-slate-700">
-                        {t("voting:detail.questions.preview")}
-                    </span>
-                </div>
+        <Card>
+            <CardHeader>
+                <CardTitle className="text-muted-foreground text-[13px] font-semibold tracking-wide uppercase">
+                    {t("detail.questions.title")}
+                </CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col pt-0">
+                {questions.map((question, index) => {
+                    const ruleSentence = question.effectiveRuleset
+                        ? buildRuleSentence(question.effectiveRuleset, t)
+                        : null;
+                    const optionsSummary = question.options
+                        .map((option) => optionLabel(option, t))
+                        .join(" / ");
 
-                <div className="divide-y divide-slate-100">
-                    {questions.map((question, index) => (
-                        <div key={question.id} className="flex gap-4 p-6">
-                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-200 text-sm font-bold text-slate-700">
+                    return (
+                        <div
+                            key={question.id}
+                            className="border-hairline flex gap-3.5 border-b py-3.5 first:pt-0 last:border-b-0 last:pb-0"
+                        >
+                            <div className="bg-primary-tint text-primary-tint-foreground font-display flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-lg text-[13px] font-extrabold">
                                 {index + 1}
                             </div>
-                            <div className="flex flex-col gap-1 pt-1">
-                                <h3 className="font-semibold text-slate-900">
+                            <div className="min-w-0 pt-px">
+                                <h3 className="text-[15px] leading-[22px] font-semibold">
                                     {question.title}
                                 </h3>
-                                <p className="text-sm text-slate-500">
-                                    {t(
-                                        "voting:detail.questions.majorityPrefix",
-                                    )}{" "}
-                                    {formatMajorityRule(question)}{" "}
-                                    {t(
-                                        "voting:detail.questions.majoritySuffix",
+                                <div className="text-muted-foreground mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[13px] leading-[19px]">
+                                    {ruleSentence && (
+                                        <span>{ruleSentence}</span>
+                                    )}
+                                    {ruleSentence && optionsSummary && (
+                                        <span aria-hidden="true">·</span>
+                                    )}
+                                    {optionsSummary && (
+                                        <span>{optionsSummary}</span>
                                     )}
                                     {question.rulesetOverride && (
-                                        <span className="text-primary ml-2 text-xs font-medium">
-                                            {t(
-                                                "voting:detail.questions.customRules",
-                                            )}
-                                        </span>
+                                        <Badge variant="primaryTint">
+                                            {t("rules.customRule")}
+                                        </Badge>
                                     )}
-                                </p>
+                                </div>
                             </div>
                         </div>
-                    ))}
-                </div>
-            </div>
-        </div>
+                    );
+                })}
+            </CardContent>
+        </Card>
     );
 }

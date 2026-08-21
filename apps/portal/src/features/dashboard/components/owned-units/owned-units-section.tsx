@@ -16,9 +16,11 @@ export function OwnedUnitsSection() {
         return (
             <Card>
                 <CardHeader>
-                    <CardTitle>{t("ownedUnits.sectionTitle")}</CardTitle>
+                    <CardTitle className="text-muted-foreground text-[13px] font-semibold tracking-wide uppercase">
+                        {t("ownedUnits.sectionTitle")}
+                    </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-0">
                     <div className="space-y-2">
                         {[0, 1, 2].map((i) => (
                             <div
@@ -56,9 +58,11 @@ export function OwnedUnitsSection() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>{t("ownedUnits.sectionTitle")}</CardTitle>
+                <CardTitle className="text-muted-foreground text-[13px] font-semibold tracking-wide uppercase">
+                    {t("ownedUnits.sectionTitle")}
+                </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
                 {units.length === 0 ? (
                     <p className="text-muted-foreground text-sm">
                         {t("ownedUnits.emptyTitle")}

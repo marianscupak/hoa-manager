@@ -1,5 +1,7 @@
 import { useTranslation } from "react-i18next";
 
+import { Badge } from "@hoa-mngr/ui";
+
 import type { OwnedUnitResponseDto } from "@/api/generated/model";
 
 interface OwnedUnitsTableProps {
@@ -28,7 +30,16 @@ export function OwnedUnitsTable({ units }: OwnedUnitsTableProps) {
             <tbody>
                 {sorted.map((u) => (
                     <tr key={u.id} className="border-t">
-                        <td className="py-2">{u.unitNo}</td>
+                        <td className="py-2">
+                            <span className="inline-flex items-center gap-2">
+                                {u.unitNo}
+                                {u.ownerSharePct < 100 && (
+                                    <Badge variant="warningTint">
+                                        {t("ownedUnits.coOwned")}
+                                    </Badge>
+                                )}
+                            </span>
+                        </td>
                         <td className="py-2 text-right">
                             {u.ownerSharePct.toFixed(2)}%
                         </td>

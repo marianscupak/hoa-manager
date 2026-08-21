@@ -38,6 +38,7 @@ import { GetVoteActivityHandler } from './application/queries/get-vote-activity/
 import { GetVoteAuditExportHandler } from './application/queries/get-vote-audit-export/get-vote-audit-export.handler';
 import { GetVoteDetailHandler } from './application/queries/get-vote-detail/get-vote-detail.handler';
 import { GetVoteResultsHandler } from './application/queries/get-vote-results/get-vote-results.handler';
+import { GetVoteTurnoutHandler } from './application/queries/get-vote-turnout/get-vote-turnout.handler';
 import { GetVoterStatusHandler } from './application/queries/get-voter-status/get-voter-status.handler';
 import { GetVotesHandler } from './application/queries/get-votes/get-votes.handler';
 import { ElectorateDomainService } from './application/services/electorate.service';
@@ -76,6 +77,7 @@ const QUERY_HANDLERS = [
   GetVoteResultsHandler,
   GetVoteActivityHandler,
   GetVoteAuditExportHandler,
+  GetVoteTurnoutHandler,
 ];
 const REPOSITORIES = [
   { provide: VOTE_WRITE_REPOSITORY, useClass: DrizzleVoteWriteRepository },

@@ -65,6 +65,23 @@ export class GetVotesHandler
       }
     }
 
+    const closedVoteIds = votes
+      .filter((v) => v.status === VoteStatus.CLOSED)
+      .map((v) => v.id);
+    if (closedVoteIds.length > 0) {
+      const outcomes =
+        await this.voteReadRepository.findQuestionOutcomesForVotes(
+          tenantId,
+          closedVoteIds,
+        );
+
+      for (const vote of votes) {
+        if (vote.status === VoteStatus.CLOSED) {
+          vote.questionOutcomes = outcomes.get(vote.id);
+        }
+      }
+    }
+
     return votes;
   }
 }

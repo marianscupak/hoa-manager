@@ -16,9 +16,11 @@ export function ActivityFeedSection() {
         return (
             <Card>
                 <CardHeader>
-                    <CardTitle>{t("activityFeed.sectionTitle")}</CardTitle>
+                    <CardTitle className="text-muted-foreground text-[13px] font-semibold tracking-wide uppercase">
+                        {t("activityFeed.sectionTitle")}
+                    </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-0">
                     <div className="space-y-2">
                         {[0, 1, 2, 3, 4].map((i) => (
                             <div
@@ -56,9 +58,11 @@ export function ActivityFeedSection() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>{t("activityFeed.sectionTitle")}</CardTitle>
+                <CardTitle className="text-muted-foreground text-[13px] font-semibold tracking-wide uppercase">
+                    {t("activityFeed.sectionTitle")}
+                </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
                 {entries.length === 0 ? (
                     <p className="text-muted-foreground text-sm">
                         {t("activityFeed.emptyTitle")}

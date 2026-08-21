@@ -13,6 +13,7 @@ export const dashboard = {
         personalDelegated: "Delegovali jste svůj hlas",
         emptyTitle: "Žádná hlasování nejsou aktuálně otevřená ani naplánovaná.",
         errorMessage: "Nepodařilo se načíst hlasování.",
+        turnoutLine: "Hlasovalo {{voted}} z {{total}} jednotek",
     },
 
     buildingOverview: {
@@ -22,6 +23,7 @@ export const dashboard = {
             countOther: "Čekajících pozvánek: {{count}}",
             oldest: "Nejstarší odeslána před {{when}}",
             action: "Spravovat pozvánky",
+            label: "Čekající pozvánky",
         },
         units: {
             total: "Jednotky",
@@ -40,6 +42,21 @@ export const dashboard = {
             action: "Zkontrolovat jednotky",
         },
         errorMessage: "Nepodařilo se načíst přehled.",
+        sectionTitle: "Budova",
+        manage: "Spravovat",
+    },
+
+    attention: {
+        sectionTitle: "Vyžaduje pozornost",
+        shareDrift: "Součet podílů je {{sum}} % — zkontrolujte podíly jednotek",
+        unitsWithoutOwner: "Jednotky bez vlastníka: {{count}}",
+        pendingInvites: "Čekající pozvánky vlastníků: {{count}}",
+    },
+
+    comingUp: {
+        sectionTitle: "Nadcházející",
+        opens: "Začátek hlasování",
+        closes: "Konec hlasování",
     },
 
     ownedUnits: {
@@ -49,6 +66,7 @@ export const dashboard = {
         columnBuildingShare: "Podíl v domě",
         emptyTitle: "Zatím vám nejsou přiřazeny žádné jednotky",
         errorMessage: "Nepodařilo se načíst vaše jednotky.",
+        coOwned: "spoluvlastnictví",
     },
 
     activityFeed: {

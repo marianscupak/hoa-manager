@@ -18,6 +18,17 @@ export const voting = {
         save: "Save",
         cancel: "Cancel",
     },
+    rules: {
+        sentence: "Passes with {{majority}} {{denominator}}, {{weighting}}.",
+        majoritySimple: "a simple majority (more than 50 %)",
+        majorityQualified: "a qualified majority (at least {{threshold}} %)",
+        ofVotesCast: "of votes cast",
+        ofVotesCastExclAbstain: "of votes cast (abstentions excluded)",
+        weightedByShares: "weighted by ownership shares",
+        onePerUnit: "one vote per unit",
+        inPlainLanguage: "In plain language",
+        customRule: "custom rule",
+    },
     create: {
         title: "Create Vote",
         titleEdit: "Edit Vote",
@@ -269,6 +280,9 @@ export const voting = {
         error: "Failed to load voting results.",
     },
     detail: {
+        backToVoting: "Voting",
+        metaLine: "Opened {{opened}} · closes {{closes}} ({{relative}})",
+        metaLineEnded: "Opened {{opened}} · ended {{closes}}",
         timeline: {
             startDate: "START DATE",
             endDate: "END DATE",
@@ -276,6 +290,9 @@ export const voting = {
         },
         description: {
             title: "Description",
+        },
+        about: {
+            title: "About this vote",
         },
         actions: {
             edit: "Edit Vote",
@@ -346,6 +363,7 @@ export const voting = {
             alreadyVotedButton: "Already Voted",
             secureBoothHint:
                 'By clicking "Vote", you will enter the secure voting booth.',
+            ballotsFinal: "Ballots are final and cannot be changed.",
             help: {
                 title: "Have Questions?",
                 description:

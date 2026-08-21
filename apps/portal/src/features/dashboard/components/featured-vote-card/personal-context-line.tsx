@@ -18,7 +18,7 @@ export function PersonalContextLine({ voterStatus }: PersonalContextLineProps) {
         )
     ) {
         return (
-            <p className="text-muted-foreground text-sm">
+            <p className="text-secondary-foreground mt-1 text-sm">
                 {t("featuredVote.personalUncast")}
             </p>
         );
@@ -27,7 +27,7 @@ export function PersonalContextLine({ voterStatus }: PersonalContextLineProps) {
     // 2. Any unit VOTED.
     if (units.some((u) => u.status === "VOTED")) {
         return (
-            <p className="text-muted-foreground text-sm">
+            <p className="text-secondary-foreground mt-1 text-sm">
                 {t("featuredVote.personalCast")}
             </p>
         );
@@ -38,7 +38,7 @@ export function PersonalContextLine({ voterStatus }: PersonalContextLineProps) {
     // fabricating a name. See plan §8.3 — wording is implementer's call.
     if (units.some((u) => u.status === "DELEGATED")) {
         return (
-            <p className="text-muted-foreground text-sm">
+            <p className="text-secondary-foreground mt-1 text-sm">
                 {t("featuredVote.personalDelegated")}
             </p>
         );

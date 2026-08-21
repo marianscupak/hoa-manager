@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import { cs, enUS } from "date-fns/locale";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -37,7 +38,7 @@ export function ActivityTimelineItem({
     entry,
     isLast,
 }: ActivityTimelineItemProps) {
-    const { t } = useTranslation(["voting", "audit"]);
+    const { t, i18n } = useTranslation(["voting", "audit"]);
     const { icon: Icon, dotColor } = getEventTypeMeta(entry.eventType);
     const headline = t(entry.eventType, {
         ns: "audit",
@@ -46,9 +47,11 @@ export function ActivityTimelineItem({
     const ballotAnswers = getBallotAnswers(entry.details);
     const hasDetails = ballotAnswers !== null;
     const [expanded, setExpanded] = useState(false);
+    const locale = i18n.language === "cs" ? cs : enUS;
     const formattedTimestamp = format(
         new Date(entry.occurredAt),
         "d. M. yyyy HH:mm",
+        { locale },
     );
 
     return (
@@ -56,7 +59,7 @@ export function ActivityTimelineItem({
             {!isLast && (
                 <span
                     aria-hidden="true"
-                    className="absolute top-6 left-3 -ml-px h-full w-0.5 bg-slate-200"
+                    className="bg-border absolute top-6 left-3 -ml-px h-full w-0.5"
                 />
             )}
             <span
@@ -66,19 +69,19 @@ export function ActivityTimelineItem({
             </span>
             <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
+                    <span className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
                         {formattedTimestamp}
                     </span>
-                    <span className="text-slate-300">·</span>
+                    <span className="text-faint">·</span>
                     {entry.navigateTo ? (
                         <Link
                             to={entry.navigateTo}
-                            className="text-sm font-semibold text-slate-800 hover:underline"
+                            className="text-foreground text-sm font-semibold hover:underline"
                         >
                             {headline}
                         </Link>
                     ) : (
-                        <span className="text-sm font-semibold text-slate-800">
+                        <span className="text-foreground text-sm font-semibold">
                             {headline}
                         </span>
                     )}
@@ -86,7 +89,7 @@ export function ActivityTimelineItem({
                         <button
                             type="button"
                             onClick={() => setExpanded((v) => !v)}
-                            className="ml-auto inline-flex items-center gap-1 text-xs text-slate-500 hover:text-slate-700"
+                            className="text-muted-foreground hover:text-foreground ml-auto inline-flex cursor-pointer items-center gap-1 text-xs"
                             aria-expanded={expanded}
                         >
                             {expanded ? (
@@ -100,15 +103,20 @@ export function ActivityTimelineItem({
                         </button>
                     )}
                 </div>
-                <p className="mt-1 text-sm text-slate-600">{entry.message}</p>
+                <p className="text-secondary-foreground mt-1 text-sm">
+                    {entry.message}
+                </p>
                 {hasDetails && expanded && ballotAnswers && (
-                    <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                    <ul className="text-secondary-foreground mt-2 list-disc space-y-1 pl-5 text-sm">
                         {ballotAnswers.map((a, i) => (
                             <li key={i}>
                                 <span className="font-medium">
                                     {a.questionText}
                                 </span>
-                                <span className="text-slate-500"> — </span>
+                                <span className="text-muted-foreground">
+                                    {" "}
+                                    —{" "}
+                                </span>
                                 <span>{a.optionText}</span>
                             </li>
                         ))}

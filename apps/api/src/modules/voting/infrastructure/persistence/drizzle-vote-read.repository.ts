@@ -38,8 +38,10 @@ import {
   type DelegationCandidateDto,
   type VoteConsentResponseDto,
   type VoteResultsResponseDto,
+  type QuestionOutcomeDto,
 } from '@/modules/voting/api/dto/vote.dto';
 import { type VoteReadRepository } from '@/modules/voting/application/ports/vote-read.repository.port';
+import { deriveQuestionOutcome } from '@/modules/voting/domain/vote/question-outcome';
 import {
   type MajorityRuleType,
   type QuorumElectorateBasis,
@@ -1107,5 +1109,73 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       computedAt: result.computedAt,
       questionResults,
     };
+  }
+
+  async findQuestionOutcomesForVotes(
+    tenantId: string,
+    voteIds: string[],
+  ): Promise<Map<string, QuestionOutcomeDto[]>> {
+    if (voteIds.length === 0) {
+      return new Map();
+    }
+
+    const rows = await this.drizzle.db
+      .select({
+        voteId: voteResults.voteId,
+        quorumMet: voteResults.quorumMet,
+        questionId: voteQuestionResults.questionId,
+        majorityMet: voteQuestionResults.majorityMet,
+        title: voteQuestions.title,
+        sortOrder: voteQuestions.sortOrder,
+        questionType: voteQuestions.questionType,
+        winningOptionKey: voteOptions.optionKey,
+        winningOptionLabel: voteOptions.label,
+      })
+      .from(voteResults)
+      .innerJoin(
+        voteQuestionResults,
+        and(
+          eq(voteQuestionResults.voteResultId, voteResults.id),
+          eq(voteQuestionResults.tenantId, tenantId),
+        ),
+      )
+      .innerJoin(
+        voteQuestions,
+        and(
+          eq(voteQuestions.id, voteQuestionResults.questionId),
+          eq(voteQuestions.tenantId, tenantId),
+        ),
+      )
+      .leftJoin(
+        voteOptions,
+        eq(voteOptions.id, voteQuestionResults.winningOptionId),
+      )
+      .where(
+        and(
+          eq(voteResults.tenantId, tenantId),
+          inArray(voteResults.voteId, voteIds),
+          eq(voteResults.resultStatus, 'COMPUTED'),
+        ),
+      )
+      .orderBy(voteQuestions.sortOrder);
+
+    const outcomesByVote = new Map<string, QuestionOutcomeDto[]>();
+    for (const row of rows) {
+      const outcome = deriveQuestionOutcome({
+        questionType: row.questionType as VoteQuestionType,
+        quorumMet: row.quorumMet,
+        majorityMet: row.majorityMet,
+        winningOptionKey: row.winningOptionKey,
+      });
+      const list = outcomesByVote.get(row.voteId) ?? [];
+      list.push({
+        questionId: row.questionId,
+        title: row.title,
+        outcome,
+        winningOptionLabel: row.winningOptionLabel ?? null,
+      });
+      outcomesByVote.set(row.voteId, list);
+    }
+    return outcomesByVote;
   }
 }

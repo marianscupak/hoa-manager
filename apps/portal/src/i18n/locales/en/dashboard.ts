@@ -13,6 +13,7 @@ export const dashboard = {
         personalDelegated: "You've delegated your vote",
         emptyTitle: "No votes are currently open or scheduled.",
         errorMessage: "Couldn't load the featured vote.",
+        turnoutLine: "{{voted}} of {{total}} units have voted",
     },
 
     buildingOverview: {
@@ -22,6 +23,7 @@ export const dashboard = {
             countOther: "{{count}} pending invites",
             oldest: "Oldest sent {{when}} ago",
             action: "Review invites",
+            label: "Invites pending",
         },
         units: {
             total: "Units",
@@ -40,6 +42,21 @@ export const dashboard = {
             action: "Review units",
         },
         errorMessage: "Couldn't load building overview.",
+        sectionTitle: "Building",
+        manage: "Manage",
+    },
+
+    attention: {
+        sectionTitle: "Needs attention",
+        shareDrift: "Building shares sum to {{sum}} % — review unit shares",
+        unitsWithoutOwner: "{{count}} unit(s) without an assigned owner",
+        pendingInvites: "{{count}} pending owner invite(s)",
+    },
+
+    comingUp: {
+        sectionTitle: "Coming up",
+        opens: "Voting opens",
+        closes: "Voting closes",
     },
 
     ownedUnits: {
@@ -49,6 +66,7 @@ export const dashboard = {
         columnBuildingShare: "Share of building",
         emptyTitle: "No units assigned to you yet",
         errorMessage: "Couldn't load your units.",
+        coOwned: "co-owned",
     },
 
     activityFeed: {

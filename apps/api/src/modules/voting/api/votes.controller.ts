@@ -42,6 +42,7 @@ import {
   SubmitBallotDto,
   SubmitBallotResponseDto,
   VoteResultsResponseDto,
+  VoteTurnoutResponseDto,
 } from './dto/vote.dto';
 import {
   CurrentAuthUser,
@@ -72,6 +73,7 @@ import { GetVoteActivityQuery } from '../application/queries/get-vote-activity/g
 import { GetVoteAuditExportQuery } from '../application/queries/get-vote-audit-export/get-vote-audit-export.query';
 import { GetVoteDetailQuery } from '../application/queries/get-vote-detail/get-vote-detail.query';
 import { GetVoteResultsQuery } from '../application/queries/get-vote-results/get-vote-results.query';
+import { GetVoteTurnoutQuery } from '../application/queries/get-vote-turnout/get-vote-turnout.query';
 import { GetVoterStatusQuery } from '../application/queries/get-voter-status/get-voter-status.query';
 import { GetVotesQuery } from '../application/queries/get-votes/get-votes.query';
 
@@ -407,6 +409,23 @@ export class VotesController {
   ) {
     return this.queryBus.execute(
       new GetVoteResultsQuery(tenantCtx.tenantId, id),
+    );
+  }
+
+  @Get(':id/turnout')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Turnout for an open or closed vote',
+    type: VoteTurnoutResponseDto,
+  })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  getVoteTurnout(
+    @Tenant() tenantCtx: TenantContext,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<VoteTurnoutResponseDto> {
+    return this.queryBus.execute(
+      new GetVoteTurnoutQuery(tenantCtx.tenantId, id),
     );
   }
 

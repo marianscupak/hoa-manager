@@ -1,21 +1,21 @@
 import { formatDistanceToNow } from "date-fns";
 import { cs, enUS } from "date-fns/locale";
 import { useAtomValue } from "jotai";
+import { Vote } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
-import { Button, Card, CardContent } from "@hoa-mngr/ui";
+import { Badge, Button, Card, CardContent } from "@hoa-mngr/ui";
 
 import {
+    useVotesControllerGetVoteTurnout,
     useVotesControllerGetVotes,
     useVotesControllerGetVoterStatus,
 } from "@/api/generated/votes/votes";
 import { tenantContextAtom } from "@/auth/atoms";
-import type { Role } from "@/auth/roles";
+import { isAdminOrBoard, isAdminView } from "@/auth/role-checks";
 
 import { PersonalContextLine } from "./personal-context-line";
-
-const ADMIN_VIEW_ROLES: Role[] = ["ADMIN", "BOARD_MEMBER", "AUDITOR"];
 
 function pickFeaturedVote<T extends { scheduledTo?: string | null }>(
     votes: T[] | undefined,
@@ -37,9 +37,8 @@ function pickFeaturedVote<T extends { scheduledTo?: string | null }>(
 export function FeaturedVoteCard() {
     const { t, i18n } = useTranslation(["dashboard", "common"]);
     const tenantCtx = useAtomValue(tenantContextAtom);
-    const isAdminView = (tenantCtx?.roles ?? []).some((r) =>
-        ADMIN_VIEW_ROLES.includes(r),
-    );
+    const adminView = isAdminView(tenantCtx?.roles);
+    const canSeeTurnout = isAdminOrBoard(tenantCtx?.roles);
     const locale = i18n.language === "cs" ? cs : enUS;
 
     const votesQuery = useVotesControllerGetVotes(
@@ -61,7 +60,19 @@ export function FeaturedVoteCard() {
             query: {
                 enabled:
                     Boolean(featuredVote?.id) &&
-                    !isAdminView &&
+                    !adminView &&
+                    featuredVote?.status === "OPEN",
+            },
+        },
+    );
+
+    const turnoutQuery = useVotesControllerGetVoteTurnout(
+        featuredVote?.id ?? "",
+        {
+            query: {
+                enabled:
+                    Boolean(featuredVote?.id) &&
+                    canSeeTurnout &&
                     featuredVote?.status === "OPEN",
             },
         },
@@ -108,10 +119,13 @@ export function FeaturedVoteCard() {
     // For OPEN: show "Closes in …". For SCHEDULED: show "Starts in …, closes …".
     let timing: string | null = null;
     if (featuredVote.scheduledTo) {
-        const closesIn = formatDistanceToNow(new Date(featuredVote.scheduledTo), {
-            addSuffix: true,
-            locale,
-        });
+        const closesIn = formatDistanceToNow(
+            new Date(featuredVote.scheduledTo),
+            {
+                addSuffix: true,
+                locale,
+            },
+        );
         if (isScheduled && featuredVote.scheduledFrom) {
             const startsIn = formatDistanceToNow(
                 new Date(featuredVote.scheduledFrom),
@@ -138,7 +152,7 @@ export function FeaturedVoteCard() {
     const hasUncastBallot = (voterStatusQuery.data?.owningUnits ?? []).some(
         (u) => u.status === "READY" || u.status === "REQUIRES_DELEGATION",
     );
-    const showCastCta = !isAdminView && isOpen && hasUncastBallot;
+    const showCastCta = !adminView && isOpen && hasUncastBallot;
     const ctaLabel = showCastCta
         ? t("featuredVote.ctaCast")
         : t("featuredVote.ctaOpen");
@@ -146,44 +160,37 @@ export function FeaturedVoteCard() {
     // delegate flows correctly given the viewer's eligibility.
     const ctaTarget = `/voting/${featuredVote.id}`;
 
+    const showTurnoutLine =
+        canSeeTurnout && isOpen && Boolean(turnoutQuery.data);
+
     return (
-        <Card>
-            <CardContent className="flex flex-col gap-3 p-4 md:flex-row md:items-start md:justify-between">
-                <div className="flex min-w-0 flex-col gap-2">
-                    <div className="flex flex-wrap items-center gap-2">
-                        <h2 className="text-lg font-semibold">
-                            {featuredVote.title}
-                        </h2>
-                        <span
-                            className={
-                                "rounded-full px-2 py-0.5 text-xs font-medium " +
-                                (isOpen
-                                    ? "bg-emerald-100 text-emerald-700"
-                                    : "bg-blue-100 text-blue-700")
-                            }
-                        >
-                            {isOpen
-                                ? t("featuredVote.open")
-                                : t("featuredVote.scheduled")}
-                        </span>
-                    </div>
-                    {timing && (
-                        <p className="text-muted-foreground text-sm">{timing}</p>
-                    )}
-                    {!isAdminView && voterStatusQuery.data && isOpen && (
-                        <PersonalContextLine
-                            voterStatus={voterStatusQuery.data}
-                        />
-                    )}
+        <div className="rounded-card-lg border-primary-tint-border shadow-clay-hero flex flex-col gap-4 border bg-gradient-to-b from-[#faf9ff] to-white p-5 sm:flex-row sm:items-center sm:gap-5 sm:p-6">
+            <div className="bg-primary-tint text-primary shadow-clay-inset-lg rounded-panel flex h-11 w-11 shrink-0 items-center justify-center">
+                <Vote className="h-[22px] w-[22px]" />
+            </div>
+            <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-baseline gap-2">
+                    <h2 className="font-display text-[17px] leading-6 font-extrabold tracking-tight">
+                        {featuredVote.title}
+                    </h2>
+                    {timing && <Badge variant="warningTint">{timing}</Badge>}
                 </div>
-                <Button
-                    asChild
-                    className="self-start md:self-center"
-                >
-                    <Link to={ctaTarget}>{ctaLabel}</Link>
-                </Button>
-            </CardContent>
-        </Card>
+                {showTurnoutLine && turnoutQuery.data && (
+                    <p className="text-secondary-foreground mt-1 text-sm">
+                        {t("featuredVote.turnoutLine", {
+                            voted: turnoutQuery.data.participationUnitCount,
+                            total: turnoutQuery.data.eligibleUnitCount,
+                        })}
+                    </p>
+                )}
+                {!adminView && voterStatusQuery.data && isOpen && (
+                    <PersonalContextLine voterStatus={voterStatusQuery.data} />
+                )}
+            </div>
+            <Button asChild className="shrink-0 self-start sm:self-center">
+                <Link to={ctaTarget}>{ctaLabel}</Link>
+            </Button>
+        </div>
     );
 }
 

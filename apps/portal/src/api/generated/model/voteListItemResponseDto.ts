@@ -5,6 +5,7 @@
  * The HOA Manager API description
  * OpenAPI spec version: 1.0
  */
+import type { QuestionOutcomeDto } from "./questionOutcomeDto";
 import type { VoterSummaryDto } from "./voterSummaryDto";
 
 export interface VoteListItemResponseDto {
@@ -19,4 +20,5 @@ export interface VoteListItemResponseDto {
     status: string;
     voterSummary?: VoterSummaryDto | null;
     allowCoOwnerIndividualVote: boolean;
+    questionOutcomes?: QuestionOutcomeDto[];
 }

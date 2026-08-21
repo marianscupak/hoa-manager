@@ -1005,6 +1005,44 @@
         ]
       }
     },
+    "/api/audit/activity": {
+      "get": {
+        "operationId": "AuditController_getActivity",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "accept-language",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantActivityResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "audit"
+        ]
+      }
+    },
     "/api/owners": {
       "get": {
         "operationId": "OwnerController_getOwners",
@@ -2070,44 +2108,6 @@
         ]
       }
     },
-    "/api/audit/activity": {
-      "get": {
-        "operationId": "AuditController_getActivity",
-        "parameters": [
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "accept-language",
-            "required": true,
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TenantActivityResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "audit"
-        ]
-      }
-    },
     "/api/votes": {
       "get": {
         "operationId": "VotesController_getVotes",
@@ -2664,6 +2664,36 @@
         ]
       }
     },
+    "/api/votes/{id}/turnout": {
+      "get": {
+        "operationId": "VotesController_getVoteTurnout",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Turnout for an open or closed vote",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoteTurnoutResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Votes"
+        ]
+      }
+    },
     "/api/votes/{id}/activity": {
       "get": {
         "operationId": "VotesController_getActivity",
@@ -2994,6 +3024,49 @@
         },
         "required": [
           "success"
+        ]
+      },
+      "TenantActivityEntryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "eventType": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "navigateTo": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "occurredAt",
+          "eventType",
+          "message",
+          "navigateTo"
+        ]
+      },
+      "TenantActivityResponseDto": {
+        "type": "object",
+        "properties": {
+          "entries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TenantActivityEntryDto"
+            }
+          }
+        },
+        "required": [
+          "entries"
         ]
       },
       "OwnerResponseDto": {
@@ -3481,49 +3554,6 @@
           "tenantId"
         ]
       },
-      "TenantActivityEntryDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "occurredAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "eventType": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          },
-          "navigateTo": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "required": [
-          "id",
-          "occurredAt",
-          "eventType",
-          "message",
-          "navigateTo"
-        ]
-      },
-      "TenantActivityResponseDto": {
-        "type": "object",
-        "properties": {
-          "entries": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TenantActivityEntryDto"
-            }
-          }
-        },
-        "required": [
-          "entries"
-        ]
-      },
       "VoterSummaryDto": {
         "type": "object",
         "properties": {
@@ -3544,6 +3574,36 @@
           "canVote",
           "isDelegated",
           "hasVoted"
+        ]
+      },
+      "QuestionOutcomeDto": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "APPROVED",
+              "REJECTED",
+              "WINNER",
+              "NOT_DECIDED"
+            ]
+          },
+          "winningOptionLabel": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "questionId",
+          "title",
+          "outcome",
+          "winningOptionLabel"
         ]
       },
       "VoteListItemResponseDto": {
@@ -3582,6 +3642,12 @@
           },
           "allowCoOwnerIndividualVote": {
             "type": "boolean"
+          },
+          "questionOutcomes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestionOutcomeDto"
+            }
           }
         },
         "required": [
@@ -4497,6 +4563,29 @@
           "denominatorUnitCount",
           "computedAt",
           "questionResults"
+        ]
+      },
+      "VoteTurnoutResponseDto": {
+        "type": "object",
+        "properties": {
+          "participationUnitCount": {
+            "type": "number"
+          },
+          "eligibleUnitCount": {
+            "type": "number"
+          },
+          "participationWeight": {
+            "type": "number"
+          },
+          "eligibleWeight": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "participationUnitCount",
+          "eligibleUnitCount",
+          "participationWeight",
+          "eligibleWeight"
         ]
       },
       "TimelineEntryDto": {

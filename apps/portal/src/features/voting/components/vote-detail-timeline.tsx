@@ -2,6 +2,8 @@ import { format } from "date-fns";
 import { Calendar } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { cn } from "@hoa-mngr/ui/lib/utils";
+
 interface VoteDetailTimelineProps {
     scheduledFrom: string | null;
     scheduledTo: string | null;
@@ -14,15 +16,20 @@ export function VoteDetailTimeline({
     const { t } = useTranslation(["voting"]);
 
     return (
-        <div className="mb-8 flex flex-col gap-4 sm:flex-row">
-            <div className="flex w-full items-center gap-4 rounded-lg border bg-white p-4 shadow-sm sm:w-64">
+        <div className="flex flex-col gap-4 sm:flex-row">
+            <div className="rounded-panel border-hairline bg-card flex w-full items-center gap-4 border p-4 sm:w-64">
                 <div
-                    className={`rounded-md p-2 ${scheduledFrom ? "bg-blue-50 text-blue-600" : "bg-slate-100 text-slate-400"}`}
+                    className={cn(
+                        "rounded-tile p-2",
+                        scheduledFrom
+                            ? "bg-primary-tint text-primary"
+                            : "bg-muted text-faint",
+                    )}
                 >
                     <Calendar className="h-5 w-5" />
                 </div>
                 <div>
-                    <p className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
+                    <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
                         {t("voting:detail.timeline.startDate")}
                     </p>
                     {scheduledFrom ? (
@@ -40,14 +47,19 @@ export function VoteDetailTimeline({
                 </div>
             </div>
 
-            <div className="flex w-full items-center gap-4 rounded-lg border bg-white p-4 shadow-sm sm:w-64">
+            <div className="rounded-panel border-hairline bg-card flex w-full items-center gap-4 border p-4 sm:w-64">
                 <div
-                    className={`rounded-md p-2 ${scheduledTo ? "bg-blue-50 text-blue-600" : "bg-slate-100 text-slate-400"}`}
+                    className={cn(
+                        "rounded-tile p-2",
+                        scheduledTo
+                            ? "bg-warning-muted text-warning-tint-foreground"
+                            : "bg-muted text-faint",
+                    )}
                 >
                     <Calendar className="h-5 w-5" />
                 </div>
                 <div>
-                    <p className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
+                    <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
                         {t("voting:detail.timeline.endDate")}
                     </p>
                     {scheduledTo ? (

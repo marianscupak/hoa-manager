@@ -1,9 +1,6 @@
-import { Download } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { Download, File } from "lucide-react";
 
 export function VoteDocuments() {
-    const { t } = useTranslation(["voting"]);
-
     // Mocked documents for visual representation until backend supports it
     const mockDocuments = [
         {
@@ -21,37 +18,33 @@ export function VoteDocuments() {
     ];
 
     return (
-        <div className="mb-8">
-            <h2 className="mb-4 text-xl font-bold">
-                {t("voting:detail.documents.title")}
-            </h2>
-            <div className="flex flex-col gap-3">
-                {mockDocuments.map((doc) => (
-                    <div
-                        key={doc.id}
-                        className="group flex cursor-pointer items-center justify-between rounded-lg border bg-white p-4 shadow-sm transition-colors hover:border-slate-300"
-                    >
-                        <div className="flex items-center gap-4">
-                            <div className="flex h-10 w-10 items-center justify-center rounded bg-red-50 text-xs font-bold text-red-500 select-none">
-                                PDF
-                            </div>
-                            <div>
-                                <p className="text-sm font-semibold">
-                                    {doc.name}
-                                </p>
-                                <p className="mt-0.5 text-xs text-slate-500">
-                                    {doc.size},{" "}
-                                    {t("voting:detail.documents.uploaded")}{" "}
-                                    {doc.uploaded}
-                                </p>
-                            </div>
+        <div className="flex flex-col gap-2">
+            {mockDocuments.map((doc) => (
+                <div
+                    key={doc.id}
+                    className="rounded-panel border-hairline hover:bg-muted flex items-center justify-between gap-3 border p-3 transition-colors"
+                >
+                    <div className="flex min-w-0 flex-1 items-center gap-3">
+                        <div className="bg-destructive-muted text-destructive-muted-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
+                            <File className="h-[17px] w-[17px]" />
                         </div>
-                        <button className="p-2 text-slate-400 transition-colors group-hover:text-slate-600">
-                            <Download className="h-5 w-5" />
+                        <span className="truncate text-sm font-medium">
+                            {doc.name}
+                        </span>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-3">
+                        <span className="text-muted-foreground text-xs">
+                            {doc.size}
+                        </span>
+                        <button
+                            type="button"
+                            className="text-muted-foreground hover:text-foreground shrink-0 rounded-md p-1 transition-colors"
+                        >
+                            <Download className="h-[15px] w-[15px]" />
                         </button>
                     </div>
-                ))}
-            </div>
+                </div>
+            ))}
         </div>
     );
 }

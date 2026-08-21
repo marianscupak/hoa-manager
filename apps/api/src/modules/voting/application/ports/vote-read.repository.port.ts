@@ -6,6 +6,7 @@ import {
   type DelegationCandidateDto,
   type VoteConsentResponseDto,
   type VoteResultsResponseDto,
+  type QuestionOutcomeDto,
 } from '@/modules/voting/api/dto/vote.dto';
 import { VoteStatus } from '@/modules/voting/domain/vote/vote.types';
 
@@ -64,6 +65,10 @@ export interface VoteReadRepository {
     tenantId: string,
     voteId: string,
   ): Promise<VoteResultsResponseDto | null>;
+  findQuestionOutcomesForVotes(
+    tenantId: string,
+    voteIds: string[],
+  ): Promise<Map<string, QuestionOutcomeDto[]>>;
 }
 
 export const VOTE_READ_REPOSITORY = Symbol('VOTE_READ_REPOSITORY');

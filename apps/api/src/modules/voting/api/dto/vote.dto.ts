@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
+import { type QuestionOutcome } from '@/modules/voting/domain/vote/question-outcome';
 import {
   MajorityRuleType,
   QuorumElectorateBasis,
@@ -199,12 +200,29 @@ export class VoterSummaryDto {
   hasVoted!: boolean;
 }
 
+export class QuestionOutcomeDto {
+  @ApiProperty()
+  questionId!: string;
+
+  @ApiProperty()
+  title!: string;
+
+  @ApiProperty({ enum: ['APPROVED', 'REJECTED', 'WINNER', 'NOT_DECIDED'] })
+  outcome!: QuestionOutcome;
+
+  @ApiProperty({ type: 'string', nullable: true })
+  winningOptionLabel!: string | null;
+}
+
 export class VoteListItemResponseDto extends CreateVoteResponseDto {
   @ApiProperty({ type: VoterSummaryDto, required: false, nullable: true })
   voterSummary?: VoterSummaryDto | null;
 
   @ApiProperty()
   allowCoOwnerIndividualVote!: boolean;
+
+  @ApiProperty({ type: [QuestionOutcomeDto], required: false })
+  questionOutcomes?: QuestionOutcomeDto[];
 }
 
 export class OwningUnitStatusDto {
@@ -406,4 +424,18 @@ export class VoteResultsResponseDto {
 
   @ApiProperty({ type: [VoteQuestionResultDto] })
   questionResults!: VoteQuestionResultDto[];
+}
+
+export class VoteTurnoutResponseDto {
+  @ApiProperty()
+  participationUnitCount!: number;
+
+  @ApiProperty()
+  eligibleUnitCount!: number;
+
+  @ApiProperty()
+  participationWeight!: number;
+
+  @ApiProperty()
+  eligibleWeight!: number;
 }

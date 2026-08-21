@@ -18,6 +18,18 @@ export const voting = {
         save: "Uložit",
         cancel: "Zrušit",
     },
+    rules: {
+        sentence:
+            "Ke schválení je potřeba {{majority}} {{denominator}}, {{weighting}}.",
+        majoritySimple: "prostá většina (více než 50 %)",
+        majorityQualified: "kvalifikovaná většina (alespoň {{threshold}} %)",
+        ofVotesCast: "z odevzdaných hlasů",
+        ofVotesCastExclAbstain: "z odevzdaných hlasů (bez zdržení se)",
+        weightedByShares: "vážených podle vlastnických podílů",
+        onePerUnit: "jeden hlas za jednotku",
+        inPlainLanguage: "Srozumitelně řečeno",
+        customRule: "vlastní pravidlo",
+    },
     create: {
         title: "Vytvořit hlasování",
         titleEdit: "Upravit hlasování",
@@ -268,6 +280,9 @@ export const voting = {
         error: "Nepodařilo se načíst výsledky hlasování.",
     },
     detail: {
+        backToVoting: "Hlasování",
+        metaLine: "Zahájeno {{opened}} · končí {{closes}} ({{relative}})",
+        metaLineEnded: "Zahájeno {{opened}} · ukončeno {{closes}}",
         timeline: {
             startDate: "DATUM ZAHÁJENÍ",
             endDate: "DATUM UKONČENÍ",
@@ -275,6 +290,9 @@ export const voting = {
         },
         description: {
             title: "Popis",
+        },
+        about: {
+            title: "O tomto hlasování",
         },
         actions: {
             edit: "Upravit hlasování",
@@ -346,6 +364,7 @@ export const voting = {
             alreadyVotedButton: "Již odhlasováno",
             secureBoothHint:
                 "Kliknutím na „Hlasovat“ vstoupíte do zabezpečené hlasovací místnosti.",
+            ballotsFinal: "Odevzdané hlasy jsou konečné a nelze je změnit.",
             help: {
                 title: "Máte dotazy?",
                 description:

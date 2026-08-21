@@ -17,7 +17,6 @@ import {
 } from "@hoa-mngr/ui";
 
 import { useAuthControllerLogout } from "@/api/generated/auth/auth";
-import { useTenancyControllerGetUserTenants } from "@/api/generated/tenants/tenants";
 import {
     accessTokenAtom,
     authStatusAtom,
@@ -26,23 +25,18 @@ import {
 } from "@/auth/atoms";
 import { StorageService } from "@/storage/storage";
 
+import { getInitials } from "./get-initials";
 import { UserMenuLocaleGroup } from "./user-menu-locale-group";
-import { UserMenuTenantGroup } from "./user-menu-tenant-group";
 
-function getInitials(name?: string, email?: string): string {
-    if (name) {
-        return name
-            .split(" ")
-            .map((w) => w[0])
-            .join("")
-            .toUpperCase()
-            .slice(0, 2);
-    }
-    if (email) return email[0].toUpperCase();
-    return "U";
+export interface UserMenuProps {
+    /**
+     * Optional custom trigger. Defaults to the round avatar button.
+     * Rendered through `DropdownMenuTrigger asChild`.
+     */
+    trigger?: React.ReactNode;
 }
 
-export function UserMenu() {
+export function UserMenu({ trigger }: UserMenuProps) {
     const { t } = useTranslation(["common"]);
     const queryClient = useQueryClient();
 
@@ -52,7 +46,6 @@ export function UserMenu() {
     const setTenantContext = useSetAtom(tenantContextAtom);
     const setUser = useSetAtom(userAtom);
 
-    const { data: tenants } = useTenancyControllerGetUserTenants();
     const logoutMutation = useAuthControllerLogout();
 
     const handleLogout = () => {
@@ -73,16 +66,18 @@ export function UserMenu() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    className="relative h-10 w-10 rounded-full"
-                    aria-label="User menu"
-                >
-                    <Avatar className="h-10 w-10">
-                        <AvatarFallback>{initials}</AvatarFallback>
-                    </Avatar>
-                </Button>
+                {trigger ?? (
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="relative h-10 w-10 rounded-full"
+                        aria-label="User menu"
+                    >
+                        <Avatar className="h-10 w-10">
+                            <AvatarFallback>{initials}</AvatarFallback>
+                        </Avatar>
+                    </Button>
+                )}
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end" className="w-64">
@@ -114,7 +109,6 @@ export function UserMenu() {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
 
-                <UserMenuTenantGroup tenants={tenants} />
                 <UserMenuLocaleGroup />
 
                 <DropdownMenuItem

@@ -11,11 +11,24 @@ export default {
     roles: {
         ADMIN: "Administrátor",
         BOARD_MEMBER: "Člen výboru",
+        AUDITOR: "Revizor",
         UNIT_OWNER: "Vlastník jednotky",
     },
     nav: {
         dashboard: "Nástěnka",
         voting: "Hlasování",
         admin: "Administrace",
+        property: "Nemovitost",
+        members: "Členové",
+        finances: "Finance",
+        documents: "Dokumenty",
+        maintenance: "Údržba",
+    },
+    shell: {
+        administrationGroup: "Správa",
+        plannedGroup: "Připravujeme",
+        soon: "Brzy",
+        openMenu: "Otevřít menu",
+        closeMenu: "Zavřít menu",
     },
 } as const;

@@ -4,9 +4,9 @@ import { useTranslation } from "react-i18next";
 
 import { useVotesControllerGetVotes } from "@/api/generated/votes/votes";
 
-import { VoteCard } from "../components/vote-card";
+import { VoteCard } from "../vote-card";
 
-export function VotingResultsOverviewPage() {
+export function VotingResultsTab() {
     const { t } = useTranslation(["voting"]);
     const { data: votes, isLoading, error } = useVotesControllerGetVotes();
 
@@ -32,16 +32,7 @@ export function VotingResultsOverviewPage() {
     }
 
     return (
-        <div className="mx-auto flex max-w-5xl flex-col gap-6 p-2 md:p-6">
-            <div className="flex flex-col gap-1">
-                <h1 className="text-3xl font-bold tracking-tight">
-                    {t("resultsOverview.title")}
-                </h1>
-                <p className="text-slate-500">
-                    {t("resultsOverview.description")}
-                </p>
-            </div>
-
+        <div className="flex flex-col gap-6">
             {!closedVotes || closedVotes.length === 0 ? (
                 <div className="rounded-lg border border-dashed p-12 text-center text-slate-500">
                     {t("resultsOverview.empty")}

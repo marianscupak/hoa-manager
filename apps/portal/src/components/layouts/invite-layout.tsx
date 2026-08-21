@@ -4,7 +4,7 @@ import { LocaleSwitcher } from "@/components/locale-switcher";
 
 /**
  * Layout for invite pages that should be accessible regardless of auth status.
- * Unlike PublicLayout (which redirects authenticated users) or AuthLayout
+ * Unlike PublicLayout (which redirects authenticated users) or AuthGuard
  * (which redirects anonymous users), this layout renders its children
  * unconditionally.
  */

@@ -5,6 +5,15 @@ export const voting = {
         createVote: "Create Vote",
         delegations: "Delegations",
     },
+    hub: {
+        title: "Voting",
+        newVote: "New vote",
+        tabs: {
+            active: "Active & upcoming",
+            results: "Results",
+            delegations: "Delegations",
+        },
+    },
     common: {
         save: "Save",
         cancel: "Cancel",

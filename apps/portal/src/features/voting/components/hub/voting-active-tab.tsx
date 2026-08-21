@@ -4,10 +4,10 @@ import { useTranslation } from "react-i18next";
 
 import { useVotesControllerGetVotes } from "@/api/generated/votes/votes";
 
-import { VoteCard } from "../components/vote-card";
-import { VotingFilter, type FilterType } from "../components/voting-filter";
+import { VoteCard } from "../vote-card";
+import { VotingFilter, type FilterType } from "../voting-filter";
 
-export function VotingPage() {
+export function VotingActiveTab() {
     const { t } = useTranslation(["voting"]);
     const { data: votes, isLoading, error } = useVotesControllerGetVotes();
     const [filter, setFilter] = useState<FilterType>("ALL");
@@ -35,15 +35,8 @@ export function VotingPage() {
     }
 
     return (
-        <div className="mx-auto flex max-w-5xl flex-col gap-6 p-2 md:p-6">
-            <div className="flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between">
-                <div className="flex flex-col gap-1">
-                    <h1 className="text-3xl font-bold tracking-tight">
-                        {t("list.title")}
-                    </h1>
-                    <p className="text-slate-500">{t("list.description")}</p>
-                </div>
-
+        <div className="flex flex-col gap-6">
+            <div className="flex flex-wrap items-center justify-end gap-4">
                 <VotingFilter filter={filter} onFilterChange={setFilter} />
             </div>
 

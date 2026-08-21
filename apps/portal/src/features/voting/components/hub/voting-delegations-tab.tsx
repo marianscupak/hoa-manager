@@ -5,10 +5,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@hoa-mngr/ui";
 
 import { tenantContextAtom } from "@/auth/atoms";
 
-import { AdminRecordDelegation } from "../components/delegations/admin-record-delegation";
-import { UserDelegationList } from "../components/delegations/user-delegation-list";
+import { AdminRecordDelegation } from "../delegations/admin-record-delegation";
+import { UserDelegationList } from "../delegations/user-delegation-list";
 
-export function DelegationsPage() {
+export function VotingDelegationsTab() {
     const { t } = useTranslation(["voting"]);
     const tenantCtx = useAtomValue(tenantContextAtom);
 
@@ -17,18 +17,7 @@ export function DelegationsPage() {
         tenantCtx?.roles.includes("BOARD_MEMBER");
 
     return (
-        <div className="mx-auto max-w-6xl space-y-8 p-6">
-            <div className="flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between">
-                <div className="flex flex-col gap-1">
-                    <h1 className="text-3xl font-bold tracking-tight">
-                        {t("voting:delegations.title")}
-                    </h1>
-                    <p className="text-slate-500">
-                        {t("voting:delegations.description")}
-                    </p>
-                </div>
-            </div>
-
+        <div className="space-y-8">
             {isAdmin ? (
                 <Tabs defaultValue="list" className="space-y-6">
                     <TabsList>

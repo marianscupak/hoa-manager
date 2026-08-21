@@ -161,4 +161,13 @@ export default {
         owners: "Owners",
         users: "Users",
     },
+    property: {
+        title: "Property",
+        addUnit: "Add unit",
+        addOwner: "Add owner",
+        tabs: {
+            units: "Units",
+            owners: "Owners",
+        },
+    },
 } as const;

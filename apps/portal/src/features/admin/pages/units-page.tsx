@@ -1,9 +1,4 @@
-import {
-    AlertTriangleIcon,
-    PencilIcon,
-    PlusIcon,
-    Trash2Icon,
-} from "lucide-react";
+import { AlertTriangleIcon, PencilIcon, Trash2Icon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
@@ -26,10 +21,14 @@ import { useUnitControllerGetUnits } from "@/api/generated/property-units/proper
 import { CreateUnitDialog } from "../components/create-unit-dialog";
 import { DeleteUnitDialog } from "../components/delete-unit-dialog";
 
-export function UnitsPage() {
+export interface UnitsPageProps {
+    createOpen: boolean;
+    onCreateOpenChange: (open: boolean) => void;
+}
+
+export function UnitsPage({ createOpen, onCreateOpenChange }: UnitsPageProps) {
     const { t } = useTranslation("admin");
     const { t: tCommon } = useTranslation("common");
-    const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [deletingUnit, setDeletingUnit] = useState<UnitResponseDto | null>(
         null,
     );
@@ -95,21 +94,6 @@ export function UnitsPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-foreground text-2xl font-bold tracking-tight">
-                        {t("units.title")}
-                    </h1>
-                    <p className="text-muted-foreground mt-2 text-sm">
-                        {t("units.description")}
-                    </p>
-                </div>
-                <Button onClick={() => setIsCreateOpen(true)}>
-                    <PlusIcon className="mr-2 h-4 w-4" />
-                    {t("units.addUnit")}
-                </Button>
-            </div>
-
             {units && units.length > 0 && (
                 <Card
                     className={
@@ -161,8 +145,8 @@ export function UnitsPage() {
             />
 
             <CreateUnitDialog
-                open={isCreateOpen}
-                onOpenChange={setIsCreateOpen}
+                open={createOpen}
+                onOpenChange={onCreateOpenChange}
                 onSuccess={refetch}
             />
 

@@ -11,12 +11,25 @@ export default {
     roles: {
         ADMIN: "Admin",
         BOARD_MEMBER: "Board Member",
+        AUDITOR: "Auditor",
         UNIT_OWNER: "Unit Owner",
     },
     nav: {
         dashboard: "Dashboard",
         voting: "Voting",
         admin: "Admin",
+        property: "Property",
+        members: "Members",
+        finances: "Finances",
+        documents: "Documents",
+        maintenance: "Maintenance",
+    },
+    shell: {
+        administrationGroup: "Administration",
+        plannedGroup: "Planned",
+        soon: "Soon",
+        openMenu: "Open menu",
+        closeMenu: "Close menu",
     },
     menu: "Menu",
 } as const;

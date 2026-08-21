@@ -5,6 +5,15 @@ export const voting = {
         createVote: "Vytvořit hlasování",
         delegations: "Delegace",
     },
+    hub: {
+        title: "Hlasování",
+        newVote: "Nové hlasování",
+        tabs: {
+            active: "Aktivní a nadcházející",
+            results: "Výsledky",
+            delegations: "Plné moci",
+        },
+    },
     common: {
         save: "Uložit",
         cancel: "Zrušit",

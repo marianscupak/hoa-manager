@@ -1,5 +1,5 @@
 import { Loader2, Plus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@hoa-mngr/ui";
@@ -18,10 +18,12 @@ import { QuestionsList } from "../questions/questions-list";
 
 interface CreateVoteQuestionsStepProps {
     voteId: string | null;
+    onSavingChange?: (saving: boolean) => void;
 }
 
 export function CreateVoteQuestionsStep({
     voteId,
+    onSavingChange,
 }: CreateVoteQuestionsStepProps) {
     const { t } = useTranslation(["voting"]);
 
@@ -32,6 +34,13 @@ export function CreateVoteQuestionsStep({
     const createQuestionMutation = useVotesControllerCreateVoteQuestion();
 
     const [autoOpenId, setAutoOpenId] = useState<string | null>(null);
+
+    const { isPending } = createQuestionMutation;
+
+    useEffect(() => {
+        onSavingChange?.(isPending);
+        return () => onSavingChange?.(false);
+    }, [isPending, onSavingChange]);
 
     const handleAddQuestion = () => {
         if (!voteId) return;
@@ -84,10 +93,15 @@ export function CreateVoteQuestionsStep({
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between gap-4">
-                <p className="text-muted-foreground text-base">
-                    {t("create.steps.questions.description")}
-                </p>
+            <div className="flex items-start justify-between gap-4">
+                <div>
+                    <h1 className="font-display text-2xl font-extrabold tracking-tight">
+                        {t("create.steps.questions.title")}
+                    </h1>
+                    <p className="text-muted-foreground mt-1.5 text-sm">
+                        {t("create.steps.questions.description")}
+                    </p>
+                </div>
                 <Button
                     onClick={handleAddQuestion}
                     disabled={createQuestionMutation.isPending}

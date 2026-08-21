@@ -26,7 +26,7 @@ export function QuestionRulesetOverride({
                 type="button"
                 onClick={onToggleVisibility}
                 className={cn(
-                    "flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                    "flex w-full cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                     hasOverride
                         ? "bg-primary/10 text-primary"
                         : "text-muted-foreground hover:text-foreground hover:bg-muted",
@@ -70,7 +70,10 @@ export function QuestionRulesetOverride({
                         )}
                     </div>
 
-                    <RulesetFormFields showCoOwnerOption={false} />
+                    <RulesetFormFields
+                        showCoOwnerOption={false}
+                        variant="majorityOnly"
+                    />
                 </div>
             )}
         </div>

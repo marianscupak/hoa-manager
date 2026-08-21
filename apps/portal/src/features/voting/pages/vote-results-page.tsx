@@ -1,10 +1,13 @@
-import { Calendar, Loader2 } from "lucide-react";
+import { format } from "date-fns";
+import { cs, enUS } from "date-fns/locale";
 import { useAtomValue } from "jotai";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 
 import {
+    type SetVoteRulesetResponseDto,
     type VoteDetailResponseDto,
     type VoteResultsResponseDto,
 } from "@/api/generated/model";
@@ -17,14 +20,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@hoa-mngr/ui";
 
 import { VoteActivityTab } from "../components/activity/vote-activity-tab";
 import { AuditExportButton } from "../components/audit-export-button";
-import { ResultsQuestionCard } from "../components/results/results-question-card";
-import { ResultsQuestionDetail } from "../components/results/results-question-detail";
-import { ResultsQuorumPanel } from "../components/results/results-quorum-panel";
+import { ParticipationBanner } from "../components/results/participation-banner";
+import { VerdictCard } from "../components/results/verdict-card";
 import { StatusBadge } from "../components/status-badge";
 
 type EnrichedQuestion = VoteResultsResponseDto["questionResults"][number] & {
     title: string;
     type?: string;
+    // Threaded through so VerdictCard can read the actual majorityRuleType
+    // for its reason sentence instead of inferring simple-vs-qualified from
+    // majorityThresholdValue === null — that field is also null whenever
+    // there's no winner (tie) or a zero denominator, regardless of rule
+    // type, so it can't be trusted alone for a legally meaningful sentence.
+    effectiveRuleset?: SetVoteRulesetResponseDto | null;
 };
 
 type ActiveTab = "results" | "activity";
@@ -51,21 +59,22 @@ function buildEnrichedQuestions(
             ...qr,
             title: question?.title ?? qr.questionId,
             type: question?.type,
+            effectiveRuleset: question?.effectiveRuleset,
         };
     });
 }
 
 export function VoteResultsPage() {
-    const { t } = useTranslation(["voting"]);
+    const { t, i18n } = useTranslation(["voting"]);
     const { id } = useParams<{ id: string }>();
     const tenantCtx = useAtomValue(tenantContextAtom);
+    const locale = i18n.language === "cs" ? cs : enUS;
 
     const canExportAudit =
         tenantCtx?.roles.includes("ADMIN") ||
         tenantCtx?.roles.includes("BOARD_MEMBER") ||
         tenantCtx?.roles.includes("AUDITOR");
 
-    const [selectedIndex, setSelectedIndex] = useState(0);
     const [activeTab, setActiveTab] = useState<ActiveTab>("results");
     const [activityTouched, setActivityTouched] = useState(false);
 
@@ -111,25 +120,47 @@ export function VoteResultsPage() {
 
     const enrichedQuestions = buildEnrichedQuestions(vote, results);
     const optionLabelMap = buildOptionLabelMap(vote);
-    const selectedQuestion = enrichedQuestions[selectedIndex];
+
+    const ranLine =
+        vote.scheduledFrom && vote.scheduledTo && results.computedAt
+            ? t("voting:resultsV2.ranLine", {
+                  from: format(new Date(vote.scheduledFrom), "d. M. yyyy", {
+                      locale,
+                  }),
+                  to: format(new Date(vote.scheduledTo), "d. M. yyyy", {
+                      locale,
+                  }),
+                  computed: format(
+                      new Date(results.computedAt),
+                      "d. M. yyyy HH:mm",
+                      { locale },
+                  ),
+              })
+            : null;
 
     return (
-        <div className="container mx-auto py-8">
-            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex flex-col gap-6">
+            <Link
+                to="/voting"
+                className="text-muted-foreground hover:text-foreground inline-flex w-fit items-center gap-1.5 text-sm font-medium transition-colors"
+            >
+                <ArrowLeft className="h-3.5 w-3.5" />
+                {t("voting:results.breadcrumbVoting")}
+            </Link>
+
+            <div className="flex flex-col items-start justify-between gap-4 sm:flex-row">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900">
-                        {vote.title} — {t("voting:results.pageTitle")}
-                    </h1>
-                    <div className="mt-3 flex flex-wrap items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-3">
+                        <h1 className="font-display text-3xl font-black tracking-tight">
+                            {vote.title}
+                        </h1>
                         <StatusBadge status={vote.status} />
-                        {results.computedAt && (
-                            <span className="flex items-center gap-1.5 text-sm text-slate-500">
-                                <Calendar className="h-3.5 w-3.5" />
-                                {t("voting:results.finalizedAt")}:{" "}
-                                {new Date(results.computedAt).toLocaleString()}
-                            </span>
-                        )}
                     </div>
+                    {ranLine && (
+                        <p className="text-muted-foreground mt-2 text-sm">
+                            {ranLine}
+                        </p>
+                    )}
                 </div>
                 {canExportAudit && id && <AuditExportButton voteId={id} />}
             </div>
@@ -144,72 +175,26 @@ export function VoteResultsPage() {
                     </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="results">
-                    {enrichedQuestions.length > 0 && (
-                        <div
-                            className={`mt-4 mb-8 grid gap-4 ${
-                                enrichedQuestions.length === 1
-                                    ? "max-w-sm grid-cols-1"
-                                    : enrichedQuestions.length === 2
-                                      ? "grid-cols-1 sm:grid-cols-2"
-                                      : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-                            }`}
-                        >
-                            {enrichedQuestions.map((q, i) => (
-                                <ResultsQuestionCard
-                                    key={q.questionId}
-                                    index={i}
-                                    question={q}
-                                    isSelected={i === selectedIndex}
-                                    onClick={() => setSelectedIndex(i)}
-                                    participationWeight={
-                                        results.participationWeight
-                                    }
-                                    denominatorWeight={
-                                        results.denominatorWeight
-                                    }
-                                    optionLabels={optionLabelMap}
-                                    quorumMeasure={vote.ruleset?.quorumMeasure}
-                                    denominatorUnitCount={
-                                        results.denominatorUnitCount
-                                    }
-                                    participationUnitCount={
-                                        results.participationUnitCount
-                                    }
-                                    quorumMet={results.quorumMet}
-                                />
-                            ))}
-                        </div>
-                    )}
+                <TabsContent value="results" className="flex flex-col gap-5">
+                    <ParticipationBanner
+                        results={results}
+                        ruleset={vote.ruleset}
+                    />
 
-                    {selectedQuestion && (
-                        <>
-                            <h2 className="mb-4 text-lg font-bold text-slate-700">
-                                {t("voting:results.resolutionDetails", {
-                                    index: selectedIndex + 1,
-                                    title: selectedQuestion.title,
-                                })}
-                            </h2>
+                    {enrichedQuestions.map((q, i) => (
+                        <VerdictCard
+                            key={q.questionId}
+                            index={i + 1}
+                            question={q}
+                            results={results}
+                            optionLabels={optionLabelMap}
+                            ruleset={vote.ruleset}
+                        />
+                    ))}
 
-                            <div className="mb-8 grid grid-cols-1 gap-4 lg:grid-cols-3">
-                                <div className="rounded-xl border border-slate-200 bg-white p-6 lg:col-span-2">
-                                    <ResultsQuestionDetail
-                                        question={selectedQuestion}
-                                        optionLabels={optionLabelMap}
-                                        quorumMet={results.quorumMet}
-                                    />
-                                </div>
-                                <div>
-                                    <ResultsQuorumPanel
-                                        results={results}
-                                        quorumMeasure={
-                                            vote.ruleset?.quorumMeasure
-                                        }
-                                    />
-                                </div>
-                            </div>
-                        </>
-                    )}
+                    <p className="text-muted-foreground text-[12.5px]">
+                        {t("voting:resultsV2.footnote")}
+                    </p>
                 </TabsContent>
 
                 <TabsContent value="activity">

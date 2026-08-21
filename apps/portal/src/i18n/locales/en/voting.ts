@@ -1,10 +1,4 @@
 export const voting = {
-    navigation: {
-        activeVotes: "Active Votes",
-        results: "Results",
-        createVote: "Create Vote",
-        delegations: "Delegations",
-    },
     hub: {
         title: "Voting",
         newVote: "New vote",
@@ -13,6 +7,12 @@ export const voting = {
             results: "Results",
             delegations: "Delegations",
         },
+        groups: {
+            needsAction: "Needs your action",
+            upcoming: "Upcoming & open",
+            drafts: "Drafts",
+        },
+        continueEditing: "Continue editing",
     },
     common: {
         save: "Save",
@@ -30,12 +30,10 @@ export const voting = {
         customRule: "custom rule",
     },
     create: {
-        title: "Create Vote",
-        titleEdit: "Edit Vote",
         description: "Set up a new vote for the association.",
         steps: {
             basicInfo: {
-                title: "Basic Information",
+                title: "Details",
                 description: "Provide the primary details for this vote.",
             },
             ruleset: {
@@ -98,7 +96,7 @@ export const voting = {
                     remove: "Revert to Default Rules",
                     badge: "Custom rules",
                     defaultHint:
-                        "This question uses the vote-level default ruleset. Click to customize.",
+                        "Overrides the vote-level majority rules for this question only. Quorum always applies to the whole vote.",
                 },
             },
         },
@@ -136,6 +134,14 @@ export const voting = {
                     UNIT_SHARE: "Unit Share",
                     ONE_UNIT_ONE_VOTE: "One Unit One Vote",
                 },
+                cards: {
+                    UNIT_SHARE: {
+                        hint: "Votes weighted by ownership share",
+                    },
+                    ONE_UNIT_ONE_VOTE: {
+                        hint: "Every unit counts equally",
+                    },
+                },
             },
             quorumElectorateBasis: {
                 label: "Quorum Electorate Basis",
@@ -167,6 +173,14 @@ export const voting = {
                     SIMPLE_MAJORITY: "Simple Majority (>50 %)",
                     QUALIFIED_MAJORITY: "Qualified Majority",
                 },
+                cards: {
+                    SIMPLE_MAJORITY: {
+                        hint: "More than 50% of votes cast",
+                    },
+                    QUALIFIED_MAJORITY: {
+                        hint: "A higher threshold you set, e.g. 75%",
+                    },
+                },
             },
             majorityThreshold: {
                 label: "Majority Threshold",
@@ -194,15 +208,6 @@ export const voting = {
             },
             time: "Time",
         },
-        actions: {
-            next: "Next step",
-            back: "Back",
-            submit: "Apply Rules & Finish",
-            saved: "Saved",
-            saveNext: "Save and Continue",
-            finishLater: "Finish Later",
-            finish: "Review Vote Draft",
-        },
         toast: {
             createSuccess: "Vote created successfully",
             updateSuccess: "Vote updated successfully",
@@ -217,20 +222,50 @@ export const voting = {
                 "The selected settings deviate from standard statutory rules (unit share weight, all units quorum). Ensure these rules comply with your association's statutes, otherwise the vote might be legally contestable.",
         },
     },
-    list: {
-        title: "Active & Scheduled Votings",
-        description:
-            "Overview of all upcoming votings requiring you attention or upcoming soon.",
-        error: "Failed to load votes.",
-        filters: {
-            all: "All",
-            open: "Open",
-            scheduled: "Scheduled",
-            closed: "Closed",
+    wizard: {
+        newVote: "New vote",
+        exit: "Exit",
+        draft: "Draft",
+        saved: "All changes saved",
+        unsaved: "Unsaved changes",
+        saving: "Saving…",
+        railTitle: "Set up in 4 steps",
+        steps: {
+            details: "Details",
+            rules: "Voting rules",
+            questions: "Questions",
+            review: "Review & schedule",
         },
+        note: "Your draft saves automatically as you complete each step. Owners see nothing until the vote is scheduled.",
+        back: "Back",
+        continue: "Continue",
+        toReview: "Review",
+        stepOf: "Step {{n}} of {{total}}",
+        review: {
+            title: "Review & schedule",
+            edit: "Edit",
+            scheduleTitle: "Schedule this vote?",
+            scheduleCopy:
+                "Once scheduled, owners are notified and the setup can no longer be edited.",
+            keepDraft: "Keep as draft",
+            scheduleAction: "Schedule vote",
+            checks: {
+                VOTE_SCHEDULE_MISSING_DATES:
+                    "Opening and closing dates are set",
+                VOTE_SCHEDULE_IN_PAST: "Opening date is in the future",
+                VOTE_SCHEDULE_INVALID_RANGE: "Closing date is after opening",
+                VOTE_RULESET_REQUIRED: "Voting rules are configured",
+                VOTE_MISSING_QUESTIONS: "At least one question exists",
+                VOTE_QUESTION_MISSING_OPTIONS:
+                    "Every question has answer options",
+                SHORT_VOTING_PERIOD: "Voting period is at least 15 days",
+            },
+        },
+    },
+    list: {
+        error: "Failed to load votes.",
         empty: {
             all: "No votes found.",
-            filtered: "No {{status}} votes found.",
         },
         status: {
             OPEN: "Open",
@@ -243,41 +278,34 @@ export const voting = {
             startsOn: "Starts on ",
             endedOn: "Ended on ",
             noDescription: "No description provided.",
-            canVote: "You can vote",
             voteRequired: "Your vote is required.",
             voteAction: "Vote",
-            delegationNeeded: "Delegation needed",
             fromCoOwners: "From co-owners",
             manageDelegation: "Manage Delegation",
-            readyToVote: "Ready to vote",
             readyToVoteSubtitle: "You are eligible when voting opens.",
-            alreadyDelegated: "Delegated",
             alreadyDelegatedSubtitle: "You have assigned a representative.",
-            scheduledStatus: "Scheduled",
             scheduledSubtitle: "This vote has not started yet.",
             viewDetails: "View Details",
-            alreadyDelegatedOpen: "Delegated",
             alreadyDelegatedOpenSubtitle:
                 "Other co-owners have chosen a representative for your units.",
-            cannotVoteOpen: "Cannot Vote",
             cannotVoteOpenSubtitle:
                 "None of your units are eligible in this vote.",
-            completed: "Voting Completed",
             viewOutcomes: "View final outcomes",
             viewResults: "View Results",
-            voted: "Voted",
             votedSubtitle: "You have already cast your ballot.",
             alreadyVotedAction: "Already Voted",
-            draftStatus: "Draft Vote",
             editDraft: "Configuration is incomplete",
-            editAction: "Edit Vote",
         },
     },
     resultsOverview: {
-        title: "Voting Results",
-        description: "Review outcomes and records of completed votings.",
         empty: "No closed votings found.",
         error: "Failed to load voting results.",
+    },
+    outcomes: {
+        APPROVED: "Approved",
+        REJECTED: "Rejected",
+        NOT_DECIDED: "Not decided",
+        winner: "{{option}} wins",
     },
     detail: {
         backToVoting: "Voting",
@@ -329,20 +357,14 @@ export const voting = {
             },
         },
         documents: {
-            title: "Documents",
-            uploaded: "Uploaded",
+            download: "Download",
         },
         questions: {
             title: "Voting Items",
-            preview: "Preview of questions you will vote on",
-            majorityPrefix: "Requires",
-            majoritySuffix: "majority of all shares.",
-            customRules: "(custom rules)",
         },
         statusSidebar: {
             title: "Your Voting Status",
             opensIn: "Voting starts",
-            closesIn: "Voting ends",
             owningUnits: "OWNING UNITS",
             share: "Share:",
             statusReady: "Ready",
@@ -361,11 +383,8 @@ export const voting = {
             totalPower: "Total Voting Power:",
             voteButton: "Vote",
             alreadyVotedButton: "Already Voted",
-            secureBoothHint:
-                'By clicking "Vote", you will enter the secure voting booth.',
             ballotsFinal: "Ballots are final and cannot be changed.",
             help: {
-                title: "Have Questions?",
                 description:
                     "If you have questions about the questions, contact the chairman.",
                 contact: "Contact chairman",
@@ -428,8 +447,6 @@ export const voting = {
         },
     },
     delegations: {
-        title: "Delegations",
-        description: "Manage who can vote on your behalf.",
         tabs: {
             myDelegations: "My Delegations",
             recordProxy: "Record Proxy (Admin)",
@@ -455,6 +472,8 @@ export const voting = {
             vote: "Filter by Vote",
             allVotes: "All Scheduled Votes",
         },
+        footnote:
+            "Proxies can also be recorded by the board on an owner's behalf.",
         admin: {
             title: "Record Proxy Delegation",
             description:
@@ -464,6 +483,12 @@ export const voting = {
             selectOwner: "Principal",
             selectDelegate: "Proxy",
             success: "Proxy delegation recorded successfully",
+            errors: {
+                vote: "Select a vote",
+                unit: "Select a unit",
+                owner: "Select an owner",
+                delegate: "Select a proxy",
+            },
         },
     },
     castVote: {
@@ -512,31 +537,10 @@ export const voting = {
         backToDetail: "Back to Vote Detail",
     },
     results: {
-        pageTitle: "Results",
         breadcrumbVoting: "Voting",
-        finalizedAt: "Finalized",
-        approved: "Approved",
-        rejected: "Rejected",
-        quorum: "Quorum",
-        inFavor: "In Favor",
-        finalResolution: "Final Resolution",
-        majorityThresholdNote:
-            "Qualified majority required: {{threshold}}% of eligible votes.",
-        quorumValidation: "Quorum Validation",
-        quorumMet:
-            "Participation threshold met. The required quorum was exceeded.",
-        quorumNotMet:
-            "Participation threshold not met. The required quorum was not reached.",
-        totalEligibleUnits: "Total Eligible Units",
-        votesCast: "Votes Cast",
-        participationWeight: "Participation Weight",
-        resolutionDetails: "Resolution {{index}} Details: {{title}}",
         viewResults: "View Results",
         unitCount_one: "{{count}} unit",
         unitCount_other: "{{count}} units",
-        weightLabel: "weight",
-        invalid: "Invalid",
-        invalidQuorum: "Quorum not met",
         downloadAuditReport: "Download audit report",
         downloadAuditReportError: "Failed to download audit report.",
         tabs: {
@@ -549,5 +553,30 @@ export const voting = {
             expandDetails: "Show details",
             collapseDetails: "Hide details",
         },
+    },
+    resultsV2: {
+        participationLine:
+            "Owners holding {{pct}} % of building shares took part ({{units}} of {{total}} units).",
+        participationLineUnits:
+            "{{pct}} % of units took part ({{units}} of {{total}} units).",
+        quorumMetLine: "Quorum of {{threshold}} % was met.",
+        quorumNotMetLine:
+            "Quorum of {{threshold}} % was not met — resolutions are not decided.",
+        multipleChoice: "multiple choice",
+        ranLine: "Voting ran {{from}} – {{to}} · results computed {{computed}}",
+        footnote:
+            "Bar percentages are shares of the whole building (or of all units for unit-counted votes); each verdict states its own basis. Majority rules are evaluated per question from its effective ruleset; quorum applies to the vote as a whole.",
+        resolutionLabel: "Resolution {{index}}",
+        didntVote: "Didn't vote",
+        winnerChip: "winner",
+        reasonApproved:
+            "For received {{pct}} % of votes cast — above {{majority}} required.",
+        reasonRejected:
+            "For received only {{pct}} % of votes cast — below {{majority}} required.",
+        reasonWinner:
+            '"{{option}}" received {{pct}} % of votes cast — a majority.',
+        reasonNoQuorum:
+            "Only {{turnout}} % took part — below the {{threshold}} % quorum, so the resolution is not decided (even where most cast votes were in favor).",
+        reasonNoMajority: "No option reached the required majority.",
     },
 };

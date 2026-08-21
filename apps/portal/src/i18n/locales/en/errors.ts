@@ -16,6 +16,8 @@ export default {
         "An account with this email already exists but is not linked to this association invitation. Please log in with your existing account.",
     USER_INACTIVE:
         "Your account is currently inactive or suspended. Please contact support.",
+    INTERNAL_SERVER_ERROR:
+        "An unexpected error occurred. Please try again later.",
     UNIT_NOT_FOUND: "The requested property unit was not found.",
     OWNER_NOT_FOUND: "The requested property owner was not found.",
     TENANT_NOT_FOUND: "The requested association was not found.",

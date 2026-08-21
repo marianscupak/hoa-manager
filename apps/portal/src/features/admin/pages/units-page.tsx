@@ -5,8 +5,6 @@ import { Link } from "react-router";
 
 import {
     Button,
-    Card,
-    CardContent,
     ColumnDef,
     DataTable,
     Tooltip,
@@ -47,24 +45,52 @@ export function UnitsPage({ createOpen, onCreateOpenChange }: UnitsPageProps) {
 
     const isSumValid = Math.abs(sumOfFractions - 1) < 0.000001;
 
+    // The drift, expressed in the same unit as the sum itself (percent) so the
+    // banner does not mix a percentage with a bare fraction. The validity gate
+    // is 1e-6 on the fraction — 0.0001 % — so two decimals would print a real
+    // drift as "0.00 %"; keep four and trim the zeros toFixed pads with.
+    const offPercent = (Math.abs(1 - sumOfFractions) * 100)
+        .toFixed(4)
+        .replace(/\.?0+$/, "");
+
     const columns: ColumnDef<UnitResponseDto>[] = [
         {
             header: t("units.table.unitNumber"),
             accessorKey: "unitNo",
-            className: "font-medium",
+            className: "font-semibold",
         },
         {
             header: t("units.table.buildingShare"),
             accessorKey: "buildingShareNumerator",
-            cell: ({ row }) =>
-                `${row.buildingShareNumerator}/${row.buildingShareDenominator}`,
+            cell: ({ row }) => {
+                const percent = (
+                    (row.buildingShareNumerator /
+                        row.buildingShareDenominator) *
+                    100
+                ).toFixed(2);
+                return (
+                    <span>
+                        {row.buildingShareNumerator}/
+                        {row.buildingShareDenominator}{" "}
+                        <span className="text-muted-foreground">
+                            ({percent} %)
+                        </span>
+                    </span>
+                );
+            },
         },
         {
             header: tCommon("actions"),
+            className: "text-right",
             cell: ({ row }) => {
                 return (
-                    <div className="flex items-center gap-2">
-                        <Button variant="outline" size="icon" asChild>
+                    <div className="flex items-center justify-end gap-2">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            asChild
+                        >
                             <Link to={`/admin/units/${row.id}`}>
                                 <TooltipProvider>
                                     <Tooltip>
@@ -79,9 +105,9 @@ export function UnitsPage({ createOpen, onCreateOpenChange }: UnitsPageProps) {
                             </Link>
                         </Button>
                         <Button
-                            variant="outline"
+                            variant="ghost"
                             size="icon"
-                            className="text-destructive hover:bg-destructive/10"
+                            className="text-destructive hover:bg-destructive/10 hover:text-destructive h-8 w-8"
                             onClick={() => setDeletingUnit(row)}
                         >
                             <Trash2Icon className="h-4 w-4" />
@@ -94,47 +120,16 @@ export function UnitsPage({ createOpen, onCreateOpenChange }: UnitsPageProps) {
 
     return (
         <div className="space-y-6">
-            {units && units.length > 0 && (
-                <Card
-                    className={
-                        isSumValid
-                            ? "bg-muted/30"
-                            : "border-warning bg-warning/5"
-                    }
-                >
-                    <CardContent className="flex items-center justify-between py-4">
-                        <div className="flex items-center gap-3">
-                            <div
-                                className={`rounded-full p-2 ${
-                                    isSumValid
-                                        ? "bg-primary/10 text-primary"
-                                        : "bg-warning/20 text-warning"
-                                }`}
-                            >
-                                <AlertTriangleIcon className="h-5 w-5" />
-                            </div>
-                            <div>
-                                <p className="text-sm font-medium">
-                                    {t("units.sumOfFractions.total")}
-                                </p>
-                                <p
-                                    className={`text-2xl font-bold ${!isSumValid && "text-warning"}`}
-                                >
-                                    {sumOfFractions.toLocaleString(undefined, {
-                                        maximumFractionDigits: 6,
-                                    })}
-                                </p>
-                            </div>
-                        </div>
-                        {!isSumValid && (
-                            <p className="text-warning text-sm font-medium">
-                                {t("units.sumOfFractions.warning", {
-                                    sum: sumOfFractions.toFixed(6),
-                                })}
-                            </p>
-                        )}
-                    </CardContent>
-                </Card>
+            {!isSumValid && units && units.length > 0 && (
+                <div className="rounded-panel border-warning-tint-border bg-warning-muted shadow-clay-card-amber flex items-center gap-3 border px-[18px] py-3">
+                    <AlertTriangleIcon className="text-warning-tint-foreground h-[17px] w-[17px] shrink-0" />
+                    <p className="text-warning-deep flex-1 text-sm leading-[19px]">
+                        {t("units.sumBanner", {
+                            sum: (sumOfFractions * 100).toFixed(2),
+                            off: offPercent,
+                        })}
+                    </p>
+                </div>
             )}
 
             <DataTable
@@ -142,6 +137,7 @@ export function UnitsPage({ createOpen, onCreateOpenChange }: UnitsPageProps) {
                 data={units ?? []}
                 isLoading={isLoading}
                 emptyMessage={t("units.empty")}
+                loadingMessage={tCommon("loading")}
             />
 
             <CreateUnitDialog

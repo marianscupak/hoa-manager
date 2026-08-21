@@ -1,6 +1,7 @@
 export default {
     actions: "Akce",
     loading: "Načítání...",
+    loadingApp: "Načítání aplikace…",
     save: "Uložit",
     cancel: "Zrušit",
     retry: "Zkusit znovu",
@@ -15,9 +16,8 @@ export default {
         UNIT_OWNER: "Vlastník jednotky",
     },
     nav: {
-        dashboard: "Nástěnka",
+        dashboard: "Přehled",
         voting: "Hlasování",
-        admin: "Administrace",
         property: "Nemovitost",
         members: "Členové",
         finances: "Finance",
@@ -31,4 +31,5 @@ export default {
         openMenu: "Otevřít menu",
         closeMenu: "Zavřít menu",
     },
+    menu: "Menu",
 } as const;

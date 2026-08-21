@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import type { SetVoteRulesetResponseDto } from "@/api/generated/model";
 
-import { buildRuleSentence } from "./rule-sentence";
+import { buildMajorityFragment, buildRuleSentence } from "./rule-sentence";
 
 const fakeT = ((key: string, params?: Record<string, unknown>) =>
     `${key}${params ? ":" + JSON.stringify(params) : ""}`) as unknown as TFunction<"voting">;
@@ -55,5 +55,42 @@ describe("buildRuleSentence", () => {
         );
 
         expect(sentence).toContain("rules.onePerUnit");
+    });
+});
+
+describe("buildMajorityFragment", () => {
+    it("returns the simple-majority fragment for a SIMPLE_MAJORITY ruleset", () => {
+        const fragment = buildMajorityFragment(baseRuleset, fakeT);
+
+        expect(fragment).toBe("rules.majoritySimple");
+    });
+
+    it("returns the qualified-majority fragment with the threshold for a QUALIFIED_MAJORITY ruleset", () => {
+        const fragment = buildMajorityFragment(
+            {
+                ...baseRuleset,
+                majorityRuleType: "QUALIFIED_MAJORITY",
+                majorityThreshold: 75,
+            },
+            fakeT,
+        );
+
+        expect(fragment).toBe('rules.majorityQualified:{"threshold":75}');
+    });
+
+    it("defaults the qualified threshold to 50 when majorityThreshold is unset", () => {
+        const fragment = buildMajorityFragment(
+            { ...baseRuleset, majorityRuleType: "QUALIFIED_MAJORITY" },
+            fakeT,
+        );
+
+        expect(fragment).toBe('rules.majorityQualified:{"threshold":50}');
+    });
+
+    it("falls back to the simple-majority fragment when the ruleset is null or undefined", () => {
+        expect(buildMajorityFragment(null, fakeT)).toBe("rules.majoritySimple");
+        expect(buildMajorityFragment(undefined, fakeT)).toBe(
+            "rules.majoritySimple",
+        );
     });
 });

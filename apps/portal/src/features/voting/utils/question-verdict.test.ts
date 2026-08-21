@@ -31,7 +31,10 @@ describe("mapQuestionVerdict", () => {
         const outcome = mapQuestionVerdict({
             quorumMet: false,
             questionType: "YES_NO",
-            result: buildResult({ majorityMet: true, winningOptionId: "o-yes" }),
+            result: buildResult({
+                majorityMet: true,
+                winningOptionId: "o-yes",
+            }),
             options,
         });
 
@@ -42,7 +45,10 @@ describe("mapQuestionVerdict", () => {
         const outcome = mapQuestionVerdict({
             quorumMet: true,
             questionType: "YES_NO",
-            result: buildResult({ majorityMet: true, winningOptionId: "o-yes" }),
+            result: buildResult({
+                majorityMet: true,
+                winningOptionId: "o-yes",
+            }),
             options,
         });
 
@@ -78,7 +84,10 @@ describe("mapQuestionVerdict", () => {
         const outcome = mapQuestionVerdict({
             quorumMet: true,
             questionType: "SINGLE_CHOICE",
-            result: buildResult({ majorityMet: true, winningOptionId: "o-yes" }),
+            result: buildResult({
+                majorityMet: true,
+                winningOptionId: "o-yes",
+            }),
             options,
         });
 

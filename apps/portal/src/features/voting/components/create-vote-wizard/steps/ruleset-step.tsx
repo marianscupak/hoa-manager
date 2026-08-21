@@ -3,93 +3,45 @@ import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { z } from "zod";
-
-import { Button } from "@hoa-mngr/ui";
 
 import { showApiError } from "@/api/error-utils";
 import {
-    SetVoteRulesetDtoMajorityRuleType as MajorityRuleType,
-    SetVoteRulesetDtoQuorumElectorateBasis as QuorumElectorateBasis,
-    SetVoteRulesetDtoQuorumMeasure as QuorumMeasure,
-    SetVoteRulesetDtoWeightBasis as VoteWeightBasis,
+    SetVoteRulesetResponseDto,
     VoteDetailResponseDto,
 } from "@/api/generated/model";
 import { useVotesControllerSetVoteRuleset } from "@/api/generated/votes/votes";
+import { buildRuleSentence } from "@/features/voting/utils/rule-sentence";
 
 import { RulesetFormFields } from "../shared/ruleset-form-fields";
-
-export const createVoteRulesetSchema = z.object({
-    weightBasis: z.nativeEnum(VoteWeightBasis),
-    quorumMeasure: z.nativeEnum(QuorumMeasure),
-    quorumElectorateBasis: z.nativeEnum(QuorumElectorateBasis),
-    quorumThreshold: z.coerce
-        .number()
-        .min(0, "voting:create.fields.quorumThreshold.errors.positiveNumber")
-        .max(100, "voting:create.fields.quorumThreshold.errors.max"),
-    majorityRuleType: z.nativeEnum(MajorityRuleType),
-    majorityThreshold: z.coerce
-        .number()
-        .optional()
-        .refine((v) => v === undefined || (!isNaN(v) && v >= 0), {
-            message:
-                "voting:create.fields.majorityThreshold.errors.positiveNumber",
-        })
-        .refine((v) => v === undefined || (typeof v === "number" && v <= 100), {
-            message: "voting:create.fields.majorityThreshold.errors.max",
-        }),
-    allowAbstain: z.boolean(),
-    abstainExcludedFromMajorityDenominator: z.boolean(),
-    allowCoOwnerIndividualVote: z.boolean(),
-});
-
-export const majorityThresholdRefinement = (
-    data: {
-        majorityRuleType: MajorityRuleType;
-        majorityThreshold?: number | null;
-    },
-    ctx: z.RefinementCtx,
-) => {
-    if (
-        data.majorityRuleType === MajorityRuleType.QUALIFIED_MAJORITY &&
-        (data.majorityThreshold === undefined ||
-            data.majorityThreshold === null)
-    ) {
-        ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message:
-                "voting:create.fields.majorityThreshold.errors.requiredForQualified",
-            path: ["majorityThreshold"],
-        });
-    }
-};
-
-export type CreateVoteRulesetValues = z.infer<typeof createVoteRulesetSchema>;
-
-export const rulesetDefaultValues: CreateVoteRulesetValues = {
-    weightBasis: VoteWeightBasis.UNIT_SHARE,
-    quorumMeasure: QuorumMeasure.UNIT_SHARE,
-    quorumElectorateBasis: QuorumElectorateBasis.ALL_UNITS,
-    quorumThreshold: 50,
-    majorityRuleType: MajorityRuleType.SIMPLE_MAJORITY,
-    majorityThreshold: undefined,
-    allowAbstain: true,
-    abstainExcludedFromMajorityDenominator: false,
-    allowCoOwnerIndividualVote: false,
-};
+import {
+    createVoteRulesetSchema,
+    majorityThresholdRefinement,
+    rulesetDefaultValues,
+    type CreateVoteRulesetValues,
+} from "../shared/ruleset-schema";
 
 export interface CreateVoteRulesetStepProps {
     voteId: string | null;
     onSuccess: () => void;
     initialData?: VoteDetailResponseDto["ruleset"];
+    /** Id the wizard footer's Continue button submits via `form={formId}`. */
+    formId: string;
+    onDirtyChange: (dirty: boolean) => void;
+    onSavingChange?: (saving: boolean) => void;
 }
 
 export function CreateVoteRulesetStep({
     voteId,
     onSuccess,
     initialData,
+    formId,
+    onDirtyChange,
+    onSavingChange,
 }: CreateVoteRulesetStepProps) {
     const { t } = useTranslation(["voting", "errors"]);
+    // buildRuleSentence requires a namespace-scoped TFunction<"voting">;
+    // the array-scoped `t` above doesn't satisfy that contract.
+    const { t: tVoting } = useTranslation("voting");
 
     const rulesetForm = useForm<CreateVoteRulesetValues>({
         resolver: zodResolver(
@@ -106,6 +58,35 @@ export function CreateVoteRulesetStep({
     }, [initialData, rulesetForm]);
 
     const setRulesetMutation = useVotesControllerSetVoteRuleset();
+
+    const { isDirty } = rulesetForm.formState;
+    const { isPending } = setRulesetMutation;
+
+    useEffect(() => {
+        onDirtyChange(isDirty);
+        return () => onDirtyChange(false);
+    }, [isDirty, onDirtyChange]);
+
+    useEffect(() => {
+        onSavingChange?.(isPending);
+        return () => onSavingChange?.(false);
+    }, [isPending, onSavingChange]);
+
+    // Live-updates as the user picks selection cards / toggles checkboxes.
+    // Field names already match SetVoteRulesetResponseDto; numeric fields
+    // are coerced since native number inputs keep string values in RHF
+    // state until zod coerces them on submit (mirrors mapQuestionToUpdateDto).
+    const watchedValues = rulesetForm.watch();
+    const watchedValuesAsRuleset: SetVoteRulesetResponseDto = {
+        ...watchedValues,
+        quorumThreshold: Number(watchedValues.quorumThreshold) || 0,
+        majorityThreshold:
+            watchedValues.majorityThreshold !== undefined &&
+            watchedValues.majorityThreshold !== null &&
+            String(watchedValues.majorityThreshold) !== ""
+                ? Number(watchedValues.majorityThreshold)
+                : undefined,
+    };
 
     const onSubmit = (values: CreateVoteRulesetValues) => {
         if (!voteId) return;
@@ -132,10 +113,14 @@ export function CreateVoteRulesetStep({
     return (
         <FormProvider {...rulesetForm}>
             <form
+                id={formId}
                 onSubmit={rulesetForm.handleSubmit(onSubmit)}
                 className="space-y-6"
             >
                 <div className="space-y-1">
+                    <h1 className="font-display text-2xl font-extrabold tracking-tight">
+                        {t("create.steps.ruleset.title")}
+                    </h1>
                     <p className="text-muted-foreground text-sm">
                         {t("create.steps.ruleset.description")}
                     </p>
@@ -144,18 +129,16 @@ export function CreateVoteRulesetStep({
                     </p>
                 </div>
 
-                <RulesetFormFields />
-
-                <div className="flex justify-end space-x-4 pt-4">
-                    <Button
-                        type="submit"
-                        disabled={setRulesetMutation.isPending}
-                    >
-                        {setRulesetMutation.isPending
-                            ? "..."
-                            : t("voting:create.actions.saveNext")}
-                    </Button>
+                <div className="rounded-panel bg-primary-tint border-primary-tint-border border p-4">
+                    <p className="text-primary text-[11px] font-bold tracking-wider uppercase">
+                        {t("voting:rules.inPlainLanguage")}
+                    </p>
+                    <p className="mt-1 text-sm font-medium">
+                        {buildRuleSentence(watchedValuesAsRuleset, tVoting)}
+                    </p>
                 </div>
+
+                <RulesetFormFields />
             </form>
         </FormProvider>
     );

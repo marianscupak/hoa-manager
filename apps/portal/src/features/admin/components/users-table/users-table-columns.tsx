@@ -1,24 +1,32 @@
 import { format } from "date-fns";
+import { cs, enUS } from "date-fns/locale";
 import { TFunction } from "i18next";
-import { MailIcon, UserIcon } from "lucide-react";
+import { MailIcon } from "lucide-react";
 
-import { ColumnDef } from "@hoa-mngr/ui";
+import { Badge, ColumnDef } from "@hoa-mngr/ui";
 
 import type { MemberResponseDto } from "@/api/generated/model";
+import { getInitials } from "@/components/user-menu";
 
 import { UserRowActions } from "./user-row-actions";
+
+const STATUS_BADGE_VARIANT = {
+    ACTIVE: "successTint",
+    INVITED: "warningTint",
+} as const;
 
 export const getUserColumns = (
     t: TFunction<"admin">,
     onSuccess: () => void,
     adminsCount: number,
+    language: string,
 ): ColumnDef<MemberResponseDto>[] => [
     {
         header: t("users.table.name"),
         cell: ({ row }) => (
             <div className="flex items-center gap-2">
-                <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-full">
-                    <UserIcon className="text-muted-foreground h-4 w-4" />
+                <div className="bg-primary-tint text-primary-tint-foreground font-display flex h-8 w-8 items-center justify-center rounded-full text-xs font-extrabold">
+                    {getInitials(row.user.fullName, row.user.email)}
                 </div>
                 <span className="font-medium">{row.user.fullName}</span>
             </div>
@@ -36,29 +44,30 @@ export const getUserColumns = (
     {
         header: t("users.table.statusLabel"),
         cell: ({ row }) => (
-            <span
-                className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${
-                    row.status === "ACTIVE"
-                        ? "bg-success-muted text-success ring-success/20"
-                        : row.status === "INVITED"
-                          ? "bg-amber-50 text-amber-700 ring-amber-600/20"
-                          : "bg-muted text-muted-foreground ring-border"
-                }`}
+            <Badge
+                variant={
+                    STATUS_BADGE_VARIANT[
+                        row.status as keyof typeof STATUS_BADGE_VARIANT
+                    ] ?? "neutral"
+                }
             >
                 {t(`users.table.status.${row.status}`)}
-            </span>
+            </Badge>
         ),
     },
     {
         header: t("users.table.joinedAt"),
         cell: ({ row }) => (
             <span className="text-muted-foreground text-sm">
-                {format(new Date(row.createdAt), "d. M. yyyy")}
+                {format(new Date(row.createdAt), "d. M. yyyy", {
+                    locale: language === "cs" ? cs : enUS,
+                })}
             </span>
         ),
     },
     {
         header: "",
+        className: "text-right",
         cell: ({ row }) => (
             <UserRowActions
                 member={row}

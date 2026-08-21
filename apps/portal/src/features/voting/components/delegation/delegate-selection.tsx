@@ -81,7 +81,7 @@ export const DelegateSelection = ({
                                 "bg-muted/20 cursor-not-allowed opacity-60",
                             selectedDelegateId === candidate.membershipId
                                 ? "bg-primary/5 border-primary"
-                                : "bg-background hover:border-primary/50",
+                                : "bg-card hover:border-primary/50",
                         )}
                     >
                         <div className="flex items-center gap-3">

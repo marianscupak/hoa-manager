@@ -1,6 +1,8 @@
 import { Download, File } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export function VoteDocuments() {
+    const { t } = useTranslation("voting");
     // Mocked documents for visual representation until backend supports it
     const mockDocuments = [
         {
@@ -38,7 +40,8 @@ export function VoteDocuments() {
                         </span>
                         <button
                             type="button"
-                            className="text-muted-foreground hover:text-foreground shrink-0 rounded-md p-1 transition-colors"
+                            aria-label={t("detail.documents.download")}
+                            className="text-muted-foreground hover:text-foreground shrink-0 cursor-pointer rounded-md p-1 transition-colors"
                         >
                             <Download className="h-[15px] w-[15px]" />
                         </button>

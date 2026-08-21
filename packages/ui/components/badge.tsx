@@ -27,7 +27,8 @@ const badgeVariants = cva(
                     "bg-success-muted text-success-tint-foreground border-success-tint-border",
                 destructiveTint:
                     "bg-destructive-muted text-destructive-muted-foreground border-transparent",
-                neutral: "bg-muted text-secondary-foreground border-transparent",
+                neutral:
+                    "bg-muted text-secondary-foreground border-transparent",
             },
         },
         defaultVariants: {

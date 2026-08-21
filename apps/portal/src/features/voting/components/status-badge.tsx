@@ -9,39 +9,38 @@ export function StatusBadge({ status }: StatusBadgeProps) {
 
     if (status === "OPEN") {
         return (
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
+            <div className="bg-success-muted text-success-tint-foreground inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold">
+                <span className="bg-success h-1.5 w-1.5 rounded-full" />
                 {t("list.status.OPEN")}
             </div>
         );
     }
     if (status === "SCHEDULED") {
         return (
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-700">
-                <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+            <div className="bg-primary-tint text-primary-tint-foreground inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold">
+                <span className="bg-primary h-1.5 w-1.5 rounded-full" />
                 {t("list.status.SCHEDULED")}
             </div>
         );
     }
     if (status === "CLOSED") {
         return (
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-700">
-                <span className="h-1.5 w-1.5 rounded-full bg-slate-600" />
+            <div className="bg-muted text-secondary-foreground inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold">
+                <span className="bg-faint h-1.5 w-1.5 rounded-full" />
                 {t("list.status.CLOSED")}
             </div>
         );
     }
     if (status === "DRAFT") {
         return (
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs font-semibold text-neutral-700">
-                <span className="h-1.5 w-1.5 rounded-full bg-neutral-600" />
+            <div className="text-muted-foreground border-faint inline-flex items-center rounded-full border border-dashed px-2.5 py-0.5 text-xs font-semibold">
                 {t("list.status.DRAFT")}
             </div>
         );
     }
     return (
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs font-semibold text-neutral-700">
-            <span className="h-1.5 w-1.5 rounded-full bg-neutral-600" />
+        <div className="bg-muted text-secondary-foreground inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold">
+            <span className="bg-faint h-1.5 w-1.5 rounded-full" />
             {status}
         </div>
     );

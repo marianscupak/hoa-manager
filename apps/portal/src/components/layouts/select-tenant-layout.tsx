@@ -15,10 +15,7 @@ export function SelectTenantLayout() {
 
     // Authenticated users (already inside a tenant) shouldn't see the tenant
     // picker, but they ARE allowed to create another tenant from /tenant/new.
-    if (
-        authStatus === "authenticated" &&
-        location.pathname !== "/tenant/new"
-    ) {
+    if (authStatus === "authenticated" && location.pathname !== "/tenant/new") {
         return <Navigate to="/" replace />;
     }
 

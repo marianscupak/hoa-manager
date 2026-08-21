@@ -1,205 +1,151 @@
-import {
-    AlertTriangle,
-    ArrowRight,
-    BadgeCheck,
-    Calendar,
-    CheckCircle2,
-    Pencil,
-    Users,
-} from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
-
-import { Button } from "@hoa-mngr/ui";
-import { cn } from "@hoa-mngr/ui/lib/utils";
+import type { TFunction } from "i18next";
 
 import { VoteListItemResponseDto } from "@/api/generated/model";
 
-interface VoteStatusSectionProps {
-    vote: VoteListItemResponseDto;
+export type VoteStatusLineTone = "destructive" | "warning" | "muted";
+
+export interface VoteStatusResolution {
+    line: { text: string; tone: VoteStatusLineTone } | null;
+    action: {
+        to: string;
+        label: string;
+        variant?: "default" | "outline";
+    };
 }
 
-export function VoteStatusSection({ vote }: VoteStatusSectionProps) {
-    const { t } = useTranslation(["voting"]);
+/**
+ * Resolves the personal status line and call-to-action for a vote card,
+ * based on the vote's status and the current member's voter summary.
+ *
+ * Kept as a plain function (not a component) rather than the previous
+ * `VoteStatusSection` JSX component: the new card layout needs the status
+ * line inside the card's text column and the action button pinned to the
+ * card's right edge, which are two different places in the DOM tree — a
+ * single component call can't render into both. `VoteCard` is the only
+ * caller and owns the layout; this only owns the per-status branching.
+ */
+export function resolveVoteStatus(
+    vote: VoteListItemResponseDto,
+    t: TFunction<"voting">,
+): VoteStatusResolution {
     const summary = vote.voterSummary;
 
     if (vote.status === "OPEN") {
-        return (
-            <div className="flex flex-col items-center">
-                <div className="mb-4 flex flex-col items-center text-center">
-                    {summary?.hasVoted ? (
-                        <StatusDisplay
-                            icon={BadgeCheck}
-                            iconColor="text-emerald-500"
-                            title={t("list.card.voted")}
-                            subtitle={t("list.card.votedSubtitle")}
-                        />
-                    ) : summary?.canVote ? (
-                        <StatusDisplay
-                            icon={CheckCircle2}
-                            iconColor="text-emerald-500"
-                            title={t("list.card.canVote")}
-                            subtitle={t("list.card.voteRequired")}
-                        />
-                    ) : summary?.isDelegated ? (
-                        <StatusDisplay
-                            icon={Users}
-                            iconColor="text-slate-500"
-                            title={t("list.card.alreadyDelegatedOpen")}
-                            subtitle={t(
-                                "list.card.alreadyDelegatedOpenSubtitle",
-                            )}
-                        />
-                    ) : (
-                        <StatusDisplay
-                            icon={AlertTriangle}
-                            iconColor="text-slate-400"
-                            title={t("list.card.cannotVoteOpen")}
-                            subtitle={t("list.card.cannotVoteOpenSubtitle")}
-                        />
-                    )}
-                </div>
-                <ActionButton
-                    to={`/voting/${vote.id}`}
-                    label={
-                        summary?.hasVoted
-                            ? t("list.card.alreadyVotedAction")
-                            : summary?.canVote
-                              ? t("list.card.voteAction")
-                              : t("list.card.viewDetails")
-                    }
-                />
-            </div>
-        );
+        if (summary?.hasVoted) {
+            return {
+                line: { text: t("list.card.votedSubtitle"), tone: "muted" },
+                action: {
+                    to: `/voting/${vote.id}`,
+                    label: t("list.card.alreadyVotedAction"),
+                    variant: "outline",
+                },
+            };
+        }
+        if (summary?.canVote) {
+            return {
+                line: {
+                    text: t("list.card.voteRequired"),
+                    tone: "destructive",
+                },
+                action: {
+                    to: `/voting/${vote.id}`,
+                    label: t("list.card.voteAction"),
+                },
+            };
+        }
+        if (summary?.isDelegated) {
+            return {
+                line: {
+                    text: t("list.card.alreadyDelegatedOpenSubtitle"),
+                    tone: "muted",
+                },
+                action: {
+                    to: `/voting/${vote.id}`,
+                    label: t("list.card.viewDetails"),
+                    variant: "outline",
+                },
+            };
+        }
+        return {
+            line: {
+                text: t("list.card.cannotVoteOpenSubtitle"),
+                tone: "muted",
+            },
+            action: {
+                to: `/voting/${vote.id}`,
+                label: t("list.card.viewDetails"),
+                variant: "outline",
+            },
+        };
     }
 
     if (vote.status === "SCHEDULED") {
-        return (
-            <div className="flex flex-col items-center">
-                <div className="mb-4 flex flex-col items-center text-center">
-                    {summary?.requiresDelegation ? (
-                        <StatusDisplay
-                            icon={Users}
-                            iconColor="text-orange-500"
-                            title={t("list.card.delegationNeeded")}
-                            subtitle={t("list.card.fromCoOwners")}
-                        />
-                    ) : summary?.canVote ? (
-                        <StatusDisplay
-                            icon={CheckCircle2}
-                            iconColor="text-emerald-500"
-                            title={t("list.card.readyToVote")}
-                            subtitle={t("list.card.readyToVoteSubtitle")}
-                        />
-                    ) : summary?.isDelegated ? (
-                        <StatusDisplay
-                            icon={Users}
-                            iconColor="text-slate-500"
-                            title={t("list.card.alreadyDelegated")}
-                            subtitle={t("list.card.alreadyDelegatedSubtitle")}
-                        />
-                    ) : (
-                        <StatusDisplay
-                            icon={Calendar}
-                            iconColor="text-blue-500"
-                            title={t("list.card.scheduledStatus")}
-                            subtitle={t("list.card.scheduledSubtitle")}
-                        />
-                    )}
-                </div>
-                {summary?.requiresDelegation ? (
-                    <ActionButton
-                        to={`/voting/${vote.id}/delegate`}
-                        label={t("list.card.manageDelegation")}
-                    />
-                ) : (
-                    <ActionButton
-                        to={`/voting/${vote.id}`}
-                        label={t("list.card.viewDetails")}
-                    />
-                )}
-            </div>
-        );
+        if (summary?.requiresDelegation) {
+            return {
+                line: { text: t("list.card.fromCoOwners"), tone: "warning" },
+                action: {
+                    to: `/voting/${vote.id}/delegate`,
+                    label: t("list.card.manageDelegation"),
+                    variant: "outline",
+                },
+            };
+        }
+        if (summary?.canVote) {
+            return {
+                line: {
+                    text: t("list.card.readyToVoteSubtitle"),
+                    tone: "muted",
+                },
+                action: {
+                    to: `/voting/${vote.id}`,
+                    label: t("list.card.viewDetails"),
+                    variant: "outline",
+                },
+            };
+        }
+        if (summary?.isDelegated) {
+            return {
+                line: {
+                    text: t("list.card.alreadyDelegatedSubtitle"),
+                    tone: "muted",
+                },
+                action: {
+                    to: `/voting/${vote.id}`,
+                    label: t("list.card.viewDetails"),
+                    variant: "outline",
+                },
+            };
+        }
+        return {
+            line: { text: t("list.card.scheduledSubtitle"), tone: "muted" },
+            action: {
+                to: `/voting/${vote.id}`,
+                label: t("list.card.viewDetails"),
+                variant: "outline",
+            },
+        };
     }
 
     if (vote.status === "DRAFT") {
-        return (
-            <div className="flex flex-col items-center">
-                <StatusDisplay
-                    icon={Pencil}
-                    iconColor="text-slate-500"
-                    title={t("list.card.draftStatus")}
-                    subtitle={t("list.card.editDraft")}
-                />
-                <Button variant="outline" className="w-full" asChild>
-                    <Link to={`/voting/${vote.id}/edit`}>
-                        {t("list.card.editAction")}
-                    </Link>
-                </Button>
-            </div>
-        );
+        return {
+            line: { text: t("list.card.editDraft"), tone: "muted" },
+            action: {
+                to: `/voting/${vote.id}/edit`,
+                label: t("hub.continueEditing"),
+                variant: "outline",
+            },
+        };
     }
 
-    return (
-        <div className="flex flex-col items-center">
-            <StatusDisplay
-                icon={CheckCircle2}
-                iconColor="text-slate-400"
-                title={t("list.card.completed")}
-                subtitle={t("list.card.viewOutcomes")}
-            />
-            <Button
-                variant="outline"
-                className="w-full border-slate-200"
-                asChild
-            >
-                <Link to={`/voting/${vote.id}/results`}>
-                    {t("list.card.viewResults")}{" "}
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-            </Button>
-        </div>
-    );
-}
-
-interface StatusDisplayProps {
-    icon: React.ComponentType<{ className?: string }>;
-    iconColor: string;
-    title: string;
-    subtitle?: string;
-}
-
-function StatusDisplay({
-    icon: Icon,
-    iconColor,
-    title,
-    subtitle,
-}: StatusDisplayProps) {
-    return (
-        <div className="mb-4 flex flex-col items-center text-center">
-            <Icon className={cn("mb-2 h-8 w-8", iconColor)} />
-            <span className="font-semibold text-slate-700">{title}</span>
-            {subtitle && (
-                <span className="text-sm text-slate-500">{subtitle}</span>
-            )}
-        </div>
-    );
-}
-
-interface ActionButtonProps {
-    to: string;
-    label: string;
-}
-
-function ActionButton({ to, label }: ActionButtonProps) {
-    return (
-        <Button
-            className="w-full bg-blue-600 text-white hover:bg-blue-700"
-            asChild
-        >
-            <Link to={to}>
-                {label} <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-        </Button>
-    );
+    // Fallback (e.g. CLOSED). The hub's Results tab renders closed votes
+    // with its own row markup and doesn't use VoteCard, but this keeps a
+    // sane default in case VoteCard is ever reused for a closed vote.
+    return {
+        line: { text: t("list.card.viewOutcomes"), tone: "muted" },
+        action: {
+            to: `/voting/${vote.id}/results`,
+            label: t("list.card.viewResults"),
+            variant: "outline",
+        },
+    };
 }

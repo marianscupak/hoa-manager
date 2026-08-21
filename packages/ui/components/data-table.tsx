@@ -22,6 +22,11 @@ export interface DataTableProps<TData> {
     isLoading?: boolean;
     emptyMessage?: string;
     loadingMessage?: string;
+    /**
+     * Extra className applied to every data `TableRow`. Useful for e.g.
+     * `"group"` so cell content can be revealed with `group-hover:`.
+     */
+    rowClassName?: string;
 }
 
 export function DataTable<TData>({
@@ -30,6 +35,7 @@ export function DataTable<TData>({
     isLoading,
     emptyMessage = "No results.",
     loadingMessage,
+    rowClassName,
 }: DataTableProps<TData>) {
     return (
         <div className="bg-card rounded-card shadow-clay-card overflow-hidden border">
@@ -64,7 +70,7 @@ export function DataTable<TData>({
                         </TableRow>
                     ) : (
                         data.map((row, rowIndex) => (
-                            <TableRow key={rowIndex}>
+                            <TableRow key={rowIndex} className={rowClassName}>
                                 {columns.map((col, colIndex) => {
                                     let content: React.ReactNode = null;
                                     if (col.cell) {

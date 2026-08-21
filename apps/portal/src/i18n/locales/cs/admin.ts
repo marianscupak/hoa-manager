@@ -11,6 +11,8 @@ export default {
             linked: "Propojeno",
             unlinked: "Nepropojeno",
         },
+        noEmail: "Bez e-mailu",
+        notInvited: "Nepozván",
         create: {
             title: "Přidat vlastníka",
             description:
@@ -123,11 +125,7 @@ export default {
             success: "Jednotka byla úspěšně odstraněna",
             error: "Nepodařilo se odstranit jednotku",
         },
-        sumOfFractions: {
-            total: "Celkový součet podílů",
-            warning:
-                "Součet podílů se nerovná 1 (Aktuálně: {{sum}}). To může vést k nesprávným výsledkům hlasování.",
-        },
+        sumBanner: "Součet podílů je {{sum}} % — rozdíl {{off}} %.",
     },
     users: {
         title: "Správa uživatelů",
@@ -155,11 +153,7 @@ export default {
             success: "Role uživatele byla úspěšně aktualizována",
             error: "Nepodařilo se aktualizovat roli uživatele",
         },
-    },
-    nav: {
-        units: "Jednotky",
-        owners: "Vlastníci",
-        users: "Uživatelé",
+        lastAdminHint: "Posledního správce nelze odebrat.",
     },
     property: {
         title: "Nemovitost",

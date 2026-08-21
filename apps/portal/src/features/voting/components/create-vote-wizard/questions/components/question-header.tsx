@@ -5,9 +5,10 @@ import {
 import { GripVertical, Pencil, Settings2, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Button } from "@hoa-mngr/ui";
+import { Badge, Button } from "@hoa-mngr/ui";
 
 interface QuestionHeaderProps {
+    index: number;
     title: string;
     hasOverride: boolean;
     onEdit: () => void;
@@ -18,6 +19,7 @@ interface QuestionHeaderProps {
 }
 
 export function QuestionHeader({
+    index,
     title,
     hasOverride,
     onEdit,
@@ -38,16 +40,20 @@ export function QuestionHeader({
                 <GripVertical className="h-4 w-4" />
             </button>
 
+            <span className="text-muted-foreground w-4 shrink-0 text-center text-xs font-bold">
+                {index}
+            </span>
+
             <div className="flex-1 truncate font-medium">
                 {title || t("voting:create.steps.questions.defaultTitle")}
             </div>
 
             <div className="flex items-center gap-1">
                 {hasOverride && (
-                    <div className="bg-primary/10 text-primary flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase">
+                    <Badge variant="primaryTint">
                         <Settings2 className="h-3 w-3" />
                         {t("voting:create.steps.questions.override.badge")}
-                    </div>
+                    </Badge>
                 )}
                 <Button
                     variant="ghost"

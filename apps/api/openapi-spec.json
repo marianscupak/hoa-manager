@@ -4579,13 +4579,21 @@
           },
           "eligibleWeight": {
             "type": "number"
+          },
+          "denominatorUnitCount": {
+            "type": "number"
+          },
+          "denominatorWeight": {
+            "type": "number"
           }
         },
         "required": [
           "participationUnitCount",
           "eligibleUnitCount",
           "participationWeight",
-          "eligibleWeight"
+          "eligibleWeight",
+          "denominatorUnitCount",
+          "denominatorWeight"
         ]
       },
       "TimelineEntryDto": {

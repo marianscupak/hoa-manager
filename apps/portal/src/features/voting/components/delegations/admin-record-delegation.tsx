@@ -1,10 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { Building2, Check, UserPlus, Vote as VoteIcon } from "lucide-react";
+import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { z } from "zod";
 
 import {
     Button,
@@ -35,23 +35,18 @@ import {
     getVotesControllerGetVoterStatusQueryKey,
 } from "@/api/generated/votes/votes";
 
-const adminRecordDelegationSchema = z.object({
-    voteId: z.string().min(1, "Vyberte hlasování"),
-    unitId: z.string().min(1, "Vyberte jednotku"),
-    ownerMembershipId: z.string().min(1, "Vyberte vlastníka"),
-    delegateMembershipId: z.string().min(1, "Vyberte zmocněnce"),
-});
-
-type AdminRecordDelegationFormValues = z.infer<
-    typeof adminRecordDelegationSchema
->;
+import {
+    adminRecordDelegationSchema,
+    AdminRecordDelegationFormValues,
+} from "./schema";
 
 export function AdminRecordDelegation() {
     const { t } = useTranslation(["voting", "common"]);
     const queryClient = useQueryClient();
+    const schema = useMemo(() => adminRecordDelegationSchema(t), [t]);
 
     const form = useForm<AdminRecordDelegationFormValues>({
-        resolver: zodResolver(adminRecordDelegationSchema),
+        resolver: zodResolver(schema),
         defaultValues: {
             voteId: "",
             unitId: "",

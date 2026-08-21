@@ -1,86 +1,84 @@
 import { format } from "date-fns";
-import { Calendar } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
-import { Card, CardContent, CardDescription, CardTitle } from "@hoa-mngr/ui";
+import { Button, Card } from "@hoa-mngr/ui";
 import { cn } from "@hoa-mngr/ui/lib/utils";
 
 import { VoteListItemResponseDto } from "@/api/generated/model";
 
 import { StatusBadge } from "./status-badge";
-import { VoteStatusSection } from "./vote-status-section";
+import { resolveVoteStatus, VoteStatusLineTone } from "./vote-status-section";
 
 interface VoteCardProps {
     vote: VoteListItemResponseDto;
 }
 
+const LINE_TONE_CLASSES: Record<VoteStatusLineTone, string> = {
+    destructive: "text-destructive-muted-foreground",
+    warning: "text-warning-tint-foreground",
+    muted: "text-muted-foreground",
+};
+
 export function VoteCard({ vote }: VoteCardProps) {
     const { t } = useTranslation(["voting"]);
-
-    const isVotingOpen = vote.status === "OPEN";
-    const isScheduled = vote.status === "SCHEDULED";
-
-    const borderColor = isVotingOpen
-        ? "border-l-emerald-500"
-        : isScheduled
-          ? "border-l-blue-500"
-          : "border-l-slate-300";
+    const isDraft = vote.status === "DRAFT";
+    const isOpen = vote.status === "OPEN";
+    const { line, action } = resolveVoteStatus(vote, t);
+    // An open vote is described by when it closes, anything else by when it
+    // starts — and a draft may well have only one of the two dates set, so
+    // the row is skipped rather than falling back to the epoch.
+    const whenDate =
+        isOpen && vote.scheduledTo ? vote.scheduledTo : vote.scheduledFrom;
 
     return (
         <Card
             className={cn(
-                "overflow-hidden rounded-lg border-l-4 shadow-sm",
-                borderColor,
+                "flex items-center gap-5 px-[22px] py-[18px]",
+                isDraft && "border-2 border-dashed shadow-none",
             )}
         >
-            <div className="flex flex-col md:flex-row">
-                <CardContent className="flex-1 p-6">
-                    <div className="mb-4 flex items-center gap-4">
-                        <StatusBadge status={vote.status} />
-                        {(vote.scheduledFrom || vote.scheduledTo) && (
-                            <div className="flex items-center gap-1.5 text-sm text-slate-500">
-                                <Calendar className="h-4 w-4" />
-                                <span>
-                                    {isVotingOpen
-                                        ? t("list.card.endsOn")
-                                        : vote.status === "CLOSED"
-                                          ? t("list.card.endedOn")
-                                          : t("list.card.startsOn")}
-                                    {format(
-                                        new Date(
-                                            (isVotingOpen ||
-                                                vote.status === "CLOSED") &&
-                                            vote.scheduledTo
-                                                ? vote.scheduledTo
-                                                : vote.scheduledFrom!,
-                                        ),
-                                        "d. M. yyyy HH:mm",
-                                    )}
-                                </span>
-                            </div>
-                        )}
-                    </div>
+            <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2.5">
+                    <StatusBadge status={vote.status} />
                     <Link
-                        to={
-                            vote.status === "CLOSED"
-                                ? `/voting/${vote.id}/results`
-                                : `/voting/${vote.id}`
-                        }
+                        to={`/voting/${vote.id}`}
+                        className="font-display hover:text-primary-hover text-[16.5px] font-extrabold tracking-tight"
                     >
-                        <CardTitle className="mb-2 cursor-pointer text-xl hover:underline">
-                            {vote.title}
-                        </CardTitle>
+                        {vote.title}
                     </Link>
-                    <CardDescription className="leading-relaxed text-slate-500">
-                        {vote.description || t("list.card.noDescription")}
-                    </CardDescription>
-                </CardContent>
-
-                <div className="flex flex-col items-center justify-center border-t border-slate-100 bg-slate-50/50 p-6 md:w-72 md:border-t-0 md:border-l">
-                    <VoteStatusSection vote={vote} />
                 </div>
+                {whenDate && (
+                    <p className="text-secondary-foreground mt-1.5 text-sm leading-5">
+                        {isOpen
+                            ? t("list.card.endsOn")
+                            : t("list.card.startsOn")}
+                        {format(new Date(whenDate), "d. M. yyyy HH:mm")}
+                    </p>
+                )}
+                {!isDraft && (
+                    <p className="text-secondary-foreground mt-1.5 text-sm leading-5">
+                        {vote.description || t("list.card.noDescription")}
+                    </p>
+                )}
+                {line && (
+                    <p
+                        className={cn(
+                            "mt-1.5 text-sm font-medium",
+                            LINE_TONE_CLASSES[line.tone],
+                        )}
+                    >
+                        {line.text}
+                    </p>
+                )}
             </div>
+            <Button
+                variant={action.variant ?? "default"}
+                className="shrink-0"
+                asChild
+            >
+                <Link to={action.to}>{action.label}</Link>
+            </Button>
         </Card>
     );
 }

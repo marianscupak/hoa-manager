@@ -7,12 +7,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import {
-    Button,
-    FormDatetimePicker,
-    FormInput,
-    FormTextarea,
-} from "@hoa-mngr/ui";
+import { FormDatetimePicker, FormInput, FormTextarea } from "@hoa-mngr/ui";
 
 import { showApiError } from "@/api/error-utils";
 import { VoteDetailResponseDto } from "@/api/generated/model";
@@ -32,16 +27,21 @@ type CreateVoteFormValues = z.infer<typeof createVoteFormSchema>;
 
 export interface CreateVoteBasicInfoStepProps {
     onSuccess: (id: string) => void;
-    isSaved: boolean;
     voteId?: string | null;
     initialData?: VoteDetailResponseDto;
+    /** Id the wizard footer's Continue button submits via `form={formId}`. */
+    formId: string;
+    onDirtyChange: (dirty: boolean) => void;
+    onSavingChange?: (saving: boolean) => void;
 }
 
 export function CreateVoteBasicInfoStep({
     onSuccess,
-    isSaved,
     voteId,
     initialData,
+    formId,
+    onDirtyChange,
+    onSavingChange,
 }: CreateVoteBasicInfoStepProps) {
     const { t } = useTranslation(["voting", "errors"]);
 
@@ -71,6 +71,18 @@ export function CreateVoteBasicInfoStep({
 
     const isPending =
         createVoteMutation.isPending || updateVoteMutation.isPending;
+
+    const { isDirty } = basicInfoForm.formState;
+
+    useEffect(() => {
+        onDirtyChange(isDirty);
+        return () => onDirtyChange(false);
+    }, [isDirty, onDirtyChange]);
+
+    useEffect(() => {
+        onSavingChange?.(isPending);
+        return () => onSavingChange?.(false);
+    }, [isPending, onSavingChange]);
 
     const onSubmit = (values: CreateVoteFormValues) => {
         const data = {
@@ -133,12 +145,18 @@ export function CreateVoteBasicInfoStep({
     return (
         <FormProvider {...basicInfoForm}>
             <form
+                id={formId}
                 onSubmit={basicInfoForm.handleSubmit(onSubmit)}
                 className="space-y-6"
             >
-                <p className="text-muted-foreground text-sm">
-                    {t("create.steps.basicInfo.description")}
-                </p>
+                <div>
+                    <h1 className="font-display text-2xl font-extrabold tracking-tight">
+                        {t("create.steps.basicInfo.title")}
+                    </h1>
+                    <p className="text-muted-foreground mt-1.5 text-sm">
+                        {t("create.steps.basicInfo.description")}
+                    </p>
+                </div>
                 <div className="space-y-4">
                     <FormInput
                         name="title"
@@ -180,19 +198,6 @@ export function CreateVoteBasicInfoStep({
                     </div>
 
                     {renderShortVotingPeriodWarning()}
-                </div>
-
-                <div className="flex justify-end pt-4">
-                    <Button
-                        type="submit"
-                        disabled={isPending || (isSaved && !voteId)}
-                    >
-                        {isPending
-                            ? "..."
-                            : isSaved && !voteId
-                              ? t("voting:create.actions.saved")
-                              : t("voting:create.actions.saveNext")}
-                    </Button>
                 </div>
             </form>
         </FormProvider>

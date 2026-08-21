@@ -3,11 +3,7 @@ import type {
     VoteQuestionResultDto,
 } from "@/api/generated/model";
 
-export type QuestionVerdict =
-    | "approved"
-    | "rejected"
-    | "winner"
-    | "notDecided";
+export type QuestionVerdict = "approved" | "rejected" | "winner" | "notDecided";
 
 export interface QuestionVerdictOutcome {
     verdict: QuestionVerdict;

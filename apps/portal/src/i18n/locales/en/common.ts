@@ -1,6 +1,7 @@
 export default {
     actions: "Actions",
     loading: "Loading...",
+    loadingApp: "Loading application…",
     save: "Save",
     cancel: "Cancel",
     retry: "Retry",
@@ -15,9 +16,8 @@ export default {
         UNIT_OWNER: "Unit Owner",
     },
     nav: {
-        dashboard: "Dashboard",
+        dashboard: "Overview",
         voting: "Voting",
-        admin: "Admin",
         property: "Property",
         members: "Members",
         finances: "Finances",

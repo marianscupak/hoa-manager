@@ -2,8 +2,6 @@ export const dashboard = {
     pageTitle: "Dashboard",
 
     featuredVote: {
-        open: "Open",
-        scheduled: "Scheduled",
         closesIn: "Closes {{when}}",
         startsAndCloses: "Starts {{startWhen}}, closes {{closeWhen}}",
         ctaCast: "Cast your ballot",
@@ -18,28 +16,16 @@ export const dashboard = {
 
     buildingOverview: {
         pendingInvites: {
-            none: "No pending invites",
-            countOne: "1 pending invite",
-            countOther: "{{count}} pending invites",
-            oldest: "Oldest sent {{when}} ago",
-            action: "Review invites",
             label: "Invites pending",
         },
         units: {
             total: "Units",
-            withoutOwnersOne: "1 without owner",
-            withoutOwnersOther: "{{count}} without owner",
-            allAssigned: "All units have owners",
-            action: "Assign owners",
         },
         owners: {
             active: "Owners",
         },
         buildingShare: {
             title: "Building shares",
-            ok: "Shares add up to 100%",
-            off: "Off by {{drift}}%",
-            action: "Review units",
         },
         errorMessage: "Couldn't load building overview.",
         sectionTitle: "Building",

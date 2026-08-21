@@ -7,7 +7,8 @@ import { useMemberControllerGetMembers } from "@/api/generated/tenant-members/te
 import { getUserColumns } from "../components/users-table/users-table-columns";
 
 export function UsersPage() {
-    const { t } = useTranslation(["admin"]);
+    const { t, i18n } = useTranslation(["admin"]);
+    const { t: tCommon } = useTranslation("common");
 
     const {
         data: members,
@@ -17,7 +18,7 @@ export function UsersPage() {
 
     const adminsCount = members?.filter((m) => m.role === "ADMIN").length ?? 0;
 
-    const columns = getUserColumns(t, refetch, adminsCount);
+    const columns = getUserColumns(t, refetch, adminsCount, i18n.language);
 
     return (
         <div className="space-y-6">
@@ -35,6 +36,7 @@ export function UsersPage() {
                 data={members ?? []}
                 isLoading={isLoading}
                 emptyMessage={t("users.empty")}
+                loadingMessage={tCommon("loading")}
             />
         </div>
     );

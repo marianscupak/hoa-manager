@@ -18,6 +18,20 @@ export function MobileTopBar({ className }: { className?: string }) {
         setIsDrawerOpen(false);
     }, [pathname]);
 
+    // Close the drawer on Escape (no focus trap — accepted gap for now).
+    useEffect(() => {
+        if (!isDrawerOpen) return;
+
+        function handleKeyDown(event: KeyboardEvent) {
+            if (event.key === "Escape") {
+                setIsDrawerOpen(false);
+            }
+        }
+
+        document.addEventListener("keydown", handleKeyDown);
+        return () => document.removeEventListener("keydown", handleKeyDown);
+    }, [isDrawerOpen]);
+
     return (
         <>
             <header
@@ -56,7 +70,16 @@ export function MobileTopBar({ className }: { className?: string }) {
                         aria-hidden
                         onClick={() => setIsDrawerOpen(false)}
                     />
-                    <AppSidebar className="absolute top-0 left-0 h-full shadow-2xl" />
+                    <div
+                        role="dialog"
+                        // No aria-modal: the drawer has no focus trap, so
+                        // claiming the background is inert would lie to
+                        // assistive tech. Escape still closes it.
+                        aria-label={t("common:menu")}
+                        className="absolute top-0 left-0 h-full"
+                    >
+                        <AppSidebar className="h-full shadow-2xl" />
+                    </div>
                 </div>
             )}
         </>

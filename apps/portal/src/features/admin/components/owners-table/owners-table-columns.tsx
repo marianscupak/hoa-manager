@@ -1,7 +1,7 @@
 import { TFunction } from "i18next";
 import { MailIcon } from "lucide-react";
 
-import { ColumnDef } from "@hoa-mngr/ui";
+import { Badge, ColumnDef } from "@hoa-mngr/ui";
 
 import type { OwnerResponseDto } from "@/api/generated/model";
 
@@ -15,7 +15,7 @@ export const getOwnerColumns = (
     {
         header: t("owners.table.displayName"),
         accessorKey: "displayName",
-        className: "font-medium",
+        className: "font-semibold",
     },
     {
         header: t("owners.table.email"),
@@ -26,24 +26,41 @@ export const getOwnerColumns = (
                     {row.email}
                 </span>
             ) : (
-                <span className="text-muted-foreground/50 text-sm">—</span>
+                <span className="text-faint text-sm">
+                    {t("owners.noEmail")}
+                </span>
             ),
     },
     {
         header: t("owners.table.userAccount"),
-        cell: ({ row }) =>
-            row.userId ? (
-                <span className="bg-success-muted text-success ring-success/20 inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset">
-                    {t("owners.table.linked")}
-                </span>
-            ) : (
-                <span className="bg-muted text-muted-foreground ring-border inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset">
-                    {t("owners.table.unlinked")}
-                </span>
-            ),
+        cell: ({ row }) => {
+            if (row.userId) {
+                return (
+                    <Badge variant="successTint">
+                        {t("owners.table.linked")}
+                    </Badge>
+                );
+            }
+            if (row.inviteStatus === "pending") {
+                return (
+                    <Badge variant="warningTint">
+                        {t("owners.invite.statusPending")}
+                    </Badge>
+                );
+            }
+            if (row.inviteStatus === "expired") {
+                return (
+                    <Badge variant="destructiveTint">
+                        {t("owners.invite.statusExpired")}
+                    </Badge>
+                );
+            }
+            return <Badge variant="neutral">{t("owners.notInvited")}</Badge>;
+        },
     },
     {
         header: "",
+        className: "text-right",
         cell: ({ row }) => (
             <OwnerRowActions
                 row={row}

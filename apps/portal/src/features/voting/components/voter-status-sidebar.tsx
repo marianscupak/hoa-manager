@@ -63,6 +63,7 @@ export function VoterStatusSidebar({ vote }: VoterStatusSidebarProps) {
 
     const statusQuery = useVotesControllerGetVoterStatus(voteId, {
         query: {
+            // `vote.id` is always defined here; kept as a defensive guard.
             enabled: !!voteId,
         },
     });

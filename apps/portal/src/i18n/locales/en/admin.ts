@@ -11,6 +11,8 @@ export default {
             linked: "Linked",
             unlinked: "Unlinked",
         },
+        noEmail: "No email address",
+        notInvited: "Not invited",
         create: {
             title: "Add Owner",
             description:
@@ -123,11 +125,7 @@ export default {
             success: "Unit deleted successfully",
             error: "Failed to delete unit",
         },
-        sumOfFractions: {
-            total: "Total sum of fractions",
-            warning:
-                "The sum of fractions is not equal to 1 (Current: {{sum}}). This may lead to incorrect voting results.",
-        },
+        sumBanner: "Shares sum to {{sum}} % — off by {{off}} %.",
     },
     users: {
         title: "User Management",
@@ -155,11 +153,7 @@ export default {
             success: "User role updated successfully",
             error: "Failed to update user role",
         },
-    },
-    nav: {
-        units: "Units",
-        owners: "Owners",
-        users: "Users",
+        lastAdminHint: "The last administrator cannot be demoted.",
     },
     property: {
         title: "Property",

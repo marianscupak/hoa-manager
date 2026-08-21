@@ -20,6 +20,7 @@ export function OwnersPage({
     onCreateOpenChange,
 }: OwnersPageProps) {
     const { t } = useTranslation(["admin"]);
+    const { t: tCommon } = useTranslation("common");
     const [deletingOwner, setDeletingOwner] = useState<OwnerResponseDto | null>(
         null,
     );
@@ -37,6 +38,7 @@ export function OwnersPage({
                 data={owners ?? []}
                 isLoading={isLoading}
                 emptyMessage={t("owners.empty")}
+                loadingMessage={tCommon("loading")}
             />
 
             <CreateOwnerDialog

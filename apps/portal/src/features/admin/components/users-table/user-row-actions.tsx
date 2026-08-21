@@ -8,6 +8,10 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
 } from "@hoa-mngr/ui";
 
 import { showApiError } from "@/api/error-utils";
@@ -52,27 +56,46 @@ export function UserRowActions({
         });
     };
 
+    const isLastAdminGuard = isLastAdmin && member.role === "ADMIN";
+
+    const select = (
+        <Select
+            defaultValue={member.role}
+            onValueChange={handleRoleChange}
+            disabled={updateRole.isPending || isLastAdminGuard}
+        >
+            <SelectTrigger className="h-8 w-[150px]">
+                <SelectValue placeholder={t("users.table.role")} />
+            </SelectTrigger>
+            <SelectContent>
+                {Object.values(MemberResponseDtoRole).map((role) => (
+                    <SelectItem key={role} value={role}>
+                        {t(`users.roles.${role}`)}
+                    </SelectItem>
+                ))}
+            </SelectContent>
+        </Select>
+    );
+
+    if (!isLastAdminGuard) {
+        return (
+            <div className="flex items-center justify-end gap-2">{select}</div>
+        );
+    }
+
     return (
-        <div className="flex items-center gap-2">
-            <Select
-                defaultValue={member.role}
-                onValueChange={handleRoleChange}
-                disabled={
-                    updateRole.isPending ||
-                    (isLastAdmin && member.role === "ADMIN")
-                }
-            >
-                <SelectTrigger className="h-8 w-[150px]">
-                    <SelectValue placeholder={t("users.table.role")} />
-                </SelectTrigger>
-                <SelectContent>
-                    {Object.values(MemberResponseDtoRole).map((role) => (
-                        <SelectItem key={role} value={role}>
-                            {t(`users.roles.${role}`)}
-                        </SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
+        <div className="flex items-center justify-end gap-2">
+            <TooltipProvider>
+                <Tooltip>
+                    {/* Radix tooltips need a focusable/hoverable trigger; a
+                        disabled control doesn't fire pointer events, so wrap
+                        it in a span. */}
+                    <TooltipTrigger asChild>
+                        <span className="inline-flex">{select}</span>
+                    </TooltipTrigger>
+                    <TooltipContent>{t("users.lastAdminHint")}</TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
         </div>
     );
 }

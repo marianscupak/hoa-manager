@@ -36,27 +36,29 @@ export function UnitDetailPage() {
 
     return (
         <div className="space-y-8">
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                    <Button variant="ghost" size="icon" asChild>
-                        <Link to="/admin/units">
-                            <ArrowLeftIcon className="h-4 w-4" />
-                        </Link>
-                    </Button>
-                    <div>
-                        <h1 className="text-foreground text-2xl font-bold tracking-tight">
-                            {t("admin:units.details.title")}
-                        </h1>
-                        <p className="text-muted-foreground text-sm">
-                            {t("admin:units.details.info")}
-                        </p>
-                    </div>
+            <Link
+                to="/admin/units"
+                className="text-muted-foreground hover:text-foreground inline-flex w-fit items-center gap-1.5 text-sm font-medium transition-colors"
+            >
+                <ArrowLeftIcon className="h-3.5 w-3.5" />
+                {t("admin:units.details.backToUnits")}
+            </Link>
+
+            <div className="flex items-center justify-between gap-4">
+                <div>
+                    <h1 className="font-display text-3xl font-black tracking-tight">
+                        {t("admin:units.details.title")}
+                    </h1>
+                    <p className="text-muted-foreground mt-1 text-sm">
+                        {t("admin:units.details.info")}
+                    </p>
                 </div>
                 <Button
                     variant="outline"
+                    size="sm"
                     onClick={() => setIsUnitEditOpen(true)}
                 >
-                    <PencilIcon className="mr-2 h-4 w-4" />
+                    <PencilIcon />
                     {t("admin:units.details.editUnit")}
                 </Button>
             </div>
@@ -70,8 +72,12 @@ export function UnitDetailPage() {
                     <h2 className="text-foreground text-lg font-semibold">
                         {t("admin:units.details.ownership.title")}
                     </h2>
-                    <Button onClick={() => setIsEditOpen(true)} size="sm">
-                        <PencilIcon className="mr-2 h-4 w-4" />
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsEditOpen(true)}
+                    >
+                        <PencilIcon />
                         {t("admin:units.details.ownership.edit")}
                     </Button>
                 </div>

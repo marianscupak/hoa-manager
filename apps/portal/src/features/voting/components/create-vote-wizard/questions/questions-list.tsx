@@ -19,7 +19,7 @@ import {
 } from "@/api/generated/model";
 import { useVotesControllerUpdateVoteQuestion } from "@/api/generated/votes/votes";
 
-import { QuestionModal } from "./question-modal";
+import { QuestionCard } from "./question-card";
 import { mapQuestionToUpdateDto } from "../shared/voting-wizard.utils";
 
 interface QuestionsListProps {
@@ -98,12 +98,13 @@ export function QuestionsList({
                             (autoOpenId === "NEWLY_CREATED_FALLBACK" &&
                                 index === questions.length - 1);
                         return (
-                            <QuestionModal
+                            <QuestionCard
                                 key={question.id}
                                 vote={vote}
                                 question={question}
                                 onRefresh={onRefresh}
                                 autoOpen={isNew}
+                                index={index + 1}
                             />
                         );
                     })}

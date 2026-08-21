@@ -1,6 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -77,7 +76,7 @@ export function UserDelegationList() {
 
     if (!consents || consents.length === 0) {
         return (
-            <div className="rounded-lg border border-dashed p-12 text-center text-slate-500">
+            <div className="text-muted-foreground rounded-lg border border-dashed p-12 text-center">
                 {t("voting:delegations.empty.all")}
             </div>
         );
@@ -135,7 +134,7 @@ export function UserDelegationList() {
                 </div>
             </div>
 
-            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+            <div className="rounded-card shadow-clay-card border-border bg-card overflow-hidden border">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -161,7 +160,7 @@ export function UserDelegationList() {
                             <TableRow>
                                 <TableCell
                                     colSpan={5}
-                                    className="py-12 text-center text-slate-500"
+                                    className="text-muted-foreground py-12 text-center"
                                 >
                                     {t("voting:delegations.empty.filtered")}
                                 </TableCell>
@@ -169,16 +168,16 @@ export function UserDelegationList() {
                         ) : (
                             filteredConsents.map((consent) => (
                                 <TableRow key={consent.id}>
-                                    <TableCell className="font-medium text-slate-900">
+                                    <TableCell className="text-foreground font-medium">
                                         {consent.unitName}
                                     </TableCell>
-                                    <TableCell className="text-slate-600">
+                                    <TableCell className="text-secondary-foreground">
                                         {consent.fromOwnerName}
                                     </TableCell>
-                                    <TableCell className="text-slate-600">
+                                    <TableCell className="text-secondary-foreground">
                                         {consent.toDelegateName}
                                     </TableCell>
-                                    <TableCell className="text-sm text-slate-500">
+                                    <TableCell className="text-muted-foreground text-sm">
                                         {format(
                                             new Date(consent.createdAt),
                                             "dd.MM.yyyy",
@@ -187,14 +186,16 @@ export function UserDelegationList() {
                                     <TableCell className="text-right">
                                         <Button
                                             variant="ghost"
-                                            size="icon"
-                                            className="text-red-500 hover:bg-red-50 hover:text-red-600"
+                                            size="sm"
+                                            className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                                             onClick={() =>
                                                 handleRevoke(consent.id)
                                             }
                                             disabled={isRevoking}
                                         >
-                                            <Trash2 className="h-4 w-4" />
+                                            {t(
+                                                "voting:delegations.table.revoke",
+                                            )}
                                         </Button>
                                     </TableCell>
                                 </TableRow>
@@ -203,6 +204,9 @@ export function UserDelegationList() {
                     </TableBody>
                 </Table>
             </div>
+            <p className="text-muted-foreground text-sm">
+                {t("voting:delegations.footnote")}
+            </p>
         </div>
     );
 }

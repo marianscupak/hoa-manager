@@ -74,6 +74,7 @@ export function UnitOwnershipsTable({
             data={ownerships ?? []}
             isLoading={isLoading}
             emptyMessage={t("units.details.ownership.empty")}
+            loadingMessage={t("loading", { ns: "common" })}
         />
     );
 }

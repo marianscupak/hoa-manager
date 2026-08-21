@@ -11,4 +11,6 @@ export interface VoteTurnoutResponseDto {
     eligibleUnitCount: number;
     participationWeight: number;
     eligibleWeight: number;
+    denominatorUnitCount: number;
+    denominatorWeight: number;
 }

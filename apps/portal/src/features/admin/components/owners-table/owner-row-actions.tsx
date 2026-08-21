@@ -56,74 +56,63 @@ export function OwnerRowActions({
     const isRevoking = revokeInvite.isPending;
 
     return (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-end gap-2">
             {!row.userId && row.email && (
                 <>
                     {row.inviteStatus === "pending" && (
                         <>
-                            <span className="inline-flex h-8 items-center rounded-md bg-amber-50 px-2.5 text-xs leading-none font-medium text-amber-700 ring-1 ring-amber-600/20 ring-inset">
-                                {t("owners.invite.statusPending")}
-                            </span>
                             <Button
-                                variant="outline"
+                                variant="ghost"
                                 size="sm"
-                                className="h-8"
                                 onClick={() =>
                                     sendInvite.mutate({ ownerId: row.id })
                                 }
                                 disabled={isSending}
                             >
-                                <SendIcon className="mr-1.5 h-3.5 w-3.5" />
+                                <SendIcon className="h-3.5 w-3.5" />
                                 {isSending
                                     ? t("owners.invite.sending")
                                     : t("owners.invite.resend")}
                             </Button>
                             <Button
-                                variant="outline"
+                                variant="ghost"
                                 size="sm"
-                                className="text-destructive hover:text-destructive/80 border-destructive/20 h-8"
+                                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                                 onClick={() =>
                                     revokeInvite.mutate({ ownerId: row.id })
                                 }
                                 disabled={isRevoking}
                             >
-                                <XIcon className="mr-1.5 h-3.5 w-3.5" />
+                                <XIcon className="h-3.5 w-3.5" />
                                 {t("owners.invite.revoke")}
                             </Button>
                         </>
                     )}
                     {row.inviteStatus === "expired" && (
-                        <>
-                            <span className="bg-destructive-muted text-destructive ring-destructive/20 inline-flex h-8 items-center rounded-md px-2.5 text-xs leading-none font-medium ring-1 ring-inset">
-                                {t("owners.invite.statusExpired")}
-                            </span>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-8"
-                                onClick={() =>
-                                    sendInvite.mutate({ ownerId: row.id })
-                                }
-                                disabled={isSending}
-                            >
-                                <SendIcon className="mr-1.5 h-3.5 w-3.5" />
-                                {isSending
-                                    ? t("owners.invite.sending")
-                                    : t("owners.invite.resend")}
-                            </Button>
-                        </>
-                    )}
-                    {!row.inviteStatus && (
                         <Button
-                            variant="outline"
+                            variant="ghost"
                             size="sm"
-                            className="h-8"
                             onClick={() =>
                                 sendInvite.mutate({ ownerId: row.id })
                             }
                             disabled={isSending}
                         >
-                            <SendIcon className="mr-1.5 h-3.5 w-3.5" />
+                            <SendIcon className="h-3.5 w-3.5" />
+                            {isSending
+                                ? t("owners.invite.sending")
+                                : t("owners.invite.resend")}
+                        </Button>
+                    )}
+                    {!row.inviteStatus && (
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() =>
+                                sendInvite.mutate({ ownerId: row.id })
+                            }
+                            disabled={isSending}
+                        >
+                            <SendIcon className="h-3.5 w-3.5" />
                             {isSending
                                 ? t("owners.invite.sending")
                                 : t("owners.invite.send")}
@@ -132,12 +121,12 @@ export function OwnerRowActions({
                 </>
             )}
             <Button
-                variant="outline"
+                variant="ghost"
                 size="icon"
-                className="text-destructive hover:bg-destructive/10 h-8 w-8"
+                className="text-destructive hover:bg-destructive/10 hover:text-destructive h-8 w-8"
                 onClick={() => onDelete(row)}
             >
-                <Trash2Icon className="h-4 w-4" />
+                <Trash2Icon />
             </Button>
         </div>
     );

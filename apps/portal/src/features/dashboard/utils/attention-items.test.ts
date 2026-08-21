@@ -47,7 +47,9 @@ describe("deriveAttentionItems", () => {
 
         expect(items).toHaveLength(2);
 
-        const unitsItem = items.find((item) => item.key === "unitsWithoutOwner");
+        const unitsItem = items.find(
+            (item) => item.key === "unitsWithoutOwner",
+        );
         const invitesItem = items.find((item) => item.key === "pendingInvites");
 
         expect(unitsItem?.count).toBe(3);

@@ -438,4 +438,16 @@ export class VoteTurnoutResponseDto {
 
   @ApiProperty()
   eligibleWeight!: number;
+
+  /**
+   * Quorum denominator per the vote's `quorumElectorateBasis` — the same
+   * figure the computed results use, so mid-vote turnout and the results
+   * page never quote different totals. Equals the `eligible*` fields only
+   * when the basis is ELIGIBLE_UNITS_ONLY.
+   */
+  @ApiProperty()
+  denominatorUnitCount!: number;
+
+  @ApiProperty()
+  denominatorWeight!: number;
 }

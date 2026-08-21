@@ -13,12 +13,12 @@ import {
 } from "@/api/generated/model";
 import { useVotesControllerUpdateVoteQuestion } from "@/api/generated/votes/votes";
 
-import { mapQuestionToUpdateDto } from "../../shared/voting-wizard.utils";
 import {
     createVoteRulesetSchema,
     majorityThresholdRefinement,
     rulesetDefaultValues,
-} from "../../steps/ruleset-step";
+} from "../../shared/ruleset-schema";
+import { mapQuestionToUpdateDto } from "../../shared/voting-wizard.utils";
 
 const questionSchema = z
     .object({

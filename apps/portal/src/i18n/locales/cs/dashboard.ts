@@ -2,8 +2,6 @@ export const dashboard = {
     pageTitle: "Přehled",
 
     featuredVote: {
-        open: "Probíhá",
-        scheduled: "Naplánováno",
         closesIn: "Končí {{when}}",
         startsAndCloses: "Začíná {{startWhen}}, končí {{closeWhen}}",
         ctaCast: "Hlasovat",
@@ -18,28 +16,16 @@ export const dashboard = {
 
     buildingOverview: {
         pendingInvites: {
-            none: "Žádné pozvánky čekající na přijetí",
-            countOne: "1 čekající pozvánka",
-            countOther: "Čekajících pozvánek: {{count}}",
-            oldest: "Nejstarší odeslána před {{when}}",
-            action: "Spravovat pozvánky",
             label: "Čekající pozvánky",
         },
         units: {
             total: "Jednotky",
-            withoutOwnersOne: "1 bez vlastníka",
-            withoutOwnersOther: "{{count}} bez vlastníka",
-            allAssigned: "Všechny jednotky mají vlastníka",
-            action: "Přiřadit vlastníky",
         },
         owners: {
             active: "Vlastníci",
         },
         buildingShare: {
             title: "Podíly v domě",
-            ok: "Podíly v součtu dávají 100 %",
-            off: "Odchylka {{drift}} %",
-            action: "Zkontrolovat jednotky",
         },
         errorMessage: "Nepodařilo se načíst přehled.",
         sectionTitle: "Budova",

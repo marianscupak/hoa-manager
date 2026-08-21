@@ -171,7 +171,7 @@ export function VoteDetailPage() {
                         <p className="text-muted-foreground mt-1 text-sm">
                             {t("dashboard:featuredVote.turnoutLine", {
                                 voted: turnoutQuery.data.participationUnitCount,
-                                total: turnoutQuery.data.eligibleUnitCount,
+                                total: turnoutQuery.data.denominatorUnitCount,
                             })}
                         </p>
                     )}

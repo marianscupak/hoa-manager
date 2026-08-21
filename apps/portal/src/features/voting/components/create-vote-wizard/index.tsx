@@ -1,21 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query";
-import {
-    CheckCircle2,
-    Circle,
-    CircleDot,
-    Loader2,
-    Send,
-    Eye,
-} from "lucide-react";
-import { useEffect, useState } from "react";
+import { Loader2, Send } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate, Link } from "react-router";
+import { useNavigate } from "react-router";
 
 import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
     Button,
     Dialog,
     DialogContent,
@@ -23,7 +12,6 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@hoa-mngr/ui";
 
 import { VoteDetailResponseDto } from "@/api/generated/model";
@@ -33,14 +21,33 @@ import {
     useVotesControllerGetVoteDetail,
 } from "@/api/generated/votes/votes";
 
+import { useScheduleVote } from "../../hooks/use-schedule-vote";
 import { DeleteDraftVoteDialog } from "../delete-draft-vote-dialog";
 import { ScheduleValidationModal } from "../schedule-validation-modal";
+import {
+    WizardShell,
+    type WizardSavedState,
+    type WizardShellStep,
+    type WizardStepId,
+} from "./layout/wizard-shell";
 import { CreateVoteBasicInfoStep } from "./steps/basic-info-step";
 import { CreateVoteQuestionsStep } from "./steps/questions-step";
+import { buildReviewChecks, ReviewStep } from "./steps/review-step";
 import { CreateVoteRulesetStep } from "./steps/ruleset-step";
-import { useScheduleVote } from "../../hooks/use-schedule-vote";
 
-export type CreateVoteStepId = "basic-info" | "ruleset" | "questions";
+export type { WizardStepId };
+
+const STEP_ORDER: WizardStepId[] = ["details", "rules", "questions", "review"];
+
+/** Only the active step is mounted, so exactly one form ever carries this id. */
+const STEP_FORM_ID = "wizard-step-form";
+
+const STEP_LABEL_KEYS: Record<WizardStepId, string> = {
+    details: "voting:wizard.steps.details",
+    rules: "voting:wizard.steps.rules",
+    questions: "voting:wizard.steps.questions",
+    review: "voting:wizard.steps.review",
+};
 
 export interface CreateVoteWizardProps {
     voteId?: string;
@@ -53,15 +60,18 @@ export function CreateVoteWizard({
     const { t } = useTranslation(["voting"]);
     const queryClient = useQueryClient();
 
-    const [activeStep, setActiveStep] =
-        useState<CreateVoteStepId>("basic-info");
+    const [activeStep, setActiveStep] = useState<WizardStepId>("details");
     const [createdVoteId, setCreatedVoteId] = useState<string | null>(
         initialVoteId ?? null,
     );
+    const [activeFormDirty, setActiveFormDirty] = useState(false);
+    const [activeSaving, setActiveSaving] = useState(false);
 
-    const voteQuery = useVotesControllerGetVoteDetail(createdVoteId ?? "", {
+    const voteId = createdVoteId ?? initialVoteId ?? null;
+
+    const voteQuery = useVotesControllerGetVoteDetail(voteId ?? "", {
         query: {
-            enabled: !!createdVoteId,
+            enabled: !!voteId,
         },
     });
 
@@ -73,19 +83,15 @@ export function CreateVoteWizard({
         setIsValidationOpen,
         validationErrors,
         isPending,
-    } = useScheduleVote(initialVoteId ?? createdVoteId ?? "", {
+    } = useScheduleVote(voteId ?? "", {
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: getVotesControllerGetVoteDetailQueryKey(
-                    initialVoteId ?? createdVoteId ?? "",
-                ),
+                queryKey: getVotesControllerGetVoteDetailQueryKey(voteId ?? ""),
             });
             queryClient.invalidateQueries({
                 queryKey: getVotesControllerGetVotesQueryKey(),
             });
-            navigate(`/voting/${initialVoteId ?? createdVoteId}`, {
-                replace: true,
-            });
+            navigate(`/voting/${voteId}`, { replace: true });
         },
     });
 
@@ -102,238 +108,206 @@ export function CreateVoteWizard({
         return () => window.removeEventListener("beforeunload", handler);
     }, [createdVoteId]);
 
+    const goToStep = useCallback((step: WizardStepId) => {
+        setActiveFormDirty(false);
+        setActiveSaving(false);
+        setActiveStep(step);
+    }, []);
+
     const handleBasicInfoSuccess = (id: string) => {
         setCreatedVoteId(id);
         queryClient.invalidateQueries({
             queryKey: getVotesControllerGetVoteDetailQueryKey(id),
         });
-        setActiveStep("ruleset");
+        goToStep("rules");
     };
 
     const handleRulesetSuccess = () => {
-        if (createdVoteId) {
+        if (voteId) {
             queryClient.invalidateQueries({
-                queryKey:
-                    getVotesControllerGetVoteDetailQueryKey(createdVoteId),
+                queryKey: getVotesControllerGetVoteDetailQueryKey(voteId),
             });
         }
-        setActiveStep("questions");
+        goToStep("questions");
     };
 
-    return (
-        <div className="mx-auto max-w-3xl space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">
-                    {initialVoteId ? t("create.titleEdit") : t("create.title")}
-                </h1>
-                <p className="text-muted-foreground mt-2">
-                    {t("create.description")}
-                </p>
-            </div>
+    const activeIndex = STEP_ORDER.indexOf(activeStep);
+    const hasDraft = !!voteId;
+    const questionCount = voteData?.questions?.length ?? 0;
 
-            <Accordion
-                type="single"
-                value={activeStep}
-                onValueChange={(value) => {
-                    if (value && createdVoteId) {
-                        setActiveStep(value as CreateVoteStepId);
-                    }
+    // Client-side mirror of the server's INCOMPLETE_VOTE checks — the server
+    // (via useScheduleVote + ScheduleValidationModal) stays authoritative.
+    // Undefined voteData (still loading) is treated as not schedulable.
+    const reviewChecks = voteData ? buildReviewChecks(voteData) : [];
+    const scheduleDisabled =
+        isPending ||
+        !voteData ||
+        reviewChecks.some((check) => check.severity === "error" && !check.ok);
+
+    const steps: WizardShellStep[] = STEP_ORDER.map((id, index) => ({
+        id,
+        labelKey: STEP_LABEL_KEYS[id],
+        state:
+            index < activeIndex
+                ? "done"
+                : index === activeIndex
+                  ? "active"
+                  : "upcoming",
+        enabled: id === "details" || hasDraft,
+        badge: id === "questions" ? questionCount : undefined,
+    }));
+
+    // "saved" is the only state that needs a draft behind it — an untouched new
+    // vote shows nothing, but typing into step 1 still reports "Unsaved changes".
+    const savedState: WizardSavedState | null = activeSaving
+        ? "saving"
+        : activeFormDirty
+          ? "dirty"
+          : hasDraft
+            ? "saved"
+            : null;
+
+    // Controlled by the review step's own "Schedule vote" button (card + footer)
+    // via `setIsConfirmOpen(true)` — no DialogTrigger needed here.
+    const scheduleDialog = (
+        <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>
+                        {t("voting:detail.actions.scheduleConfirmTitle")}
+                    </DialogTitle>
+                    <DialogDescription>
+                        {t("voting:detail.actions.scheduleConfirmDescription")}
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                    <Button
+                        variant="outline"
+                        onClick={() => setIsConfirmOpen(false)}
+                    >
+                        {t("voting:detail.actions.cancel")}
+                    </Button>
+                    <Button onClick={handleSchedule} disabled={isPending}>
+                        {isPending ? (
+                            <Loader2 className="animate-spin" />
+                        ) : null}
+                        {t("voting:detail.actions.confirm")}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+
+    const footer = (
+        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 py-3">
+            <Button
+                variant="secondary"
+                disabled={activeIndex === 0}
+                onClick={() => {
+                    if (activeIndex > 0) goToStep(STEP_ORDER[activeIndex - 1]);
                 }}
-                className="w-full space-y-4"
             >
-                <AccordionItem
-                    value="basic-info"
-                    className="bg-card rounded-lg border px-6 shadow-sm"
+                {t("voting:wizard.back")}
+            </Button>
+            <span className="text-muted-foreground text-sm">
+                {t("voting:wizard.stepOf", {
+                    n: activeIndex + 1,
+                    total: STEP_ORDER.length,
+                })}
+            </span>
+            {activeStep === "questions" ? (
+                <Button onClick={() => goToStep("review")}>
+                    {t("voting:wizard.toReview")}
+                </Button>
+            ) : activeStep === "review" ? (
+                // Mirrors the review card's primary Schedule action — same
+                // disabled logic, same dialog (opened via setIsConfirmOpen).
+                <Button
+                    onClick={() => setIsConfirmOpen(true)}
+                    disabled={scheduleDisabled}
                 >
-                    <AccordionTrigger
-                        hideChevron
-                        className={
-                            createdVoteId
-                                ? "cursor-pointer hover:no-underline"
-                                : "pointer-events-none hover:no-underline"
-                        }
-                    >
-                        <div className="flex items-center space-x-3 text-left">
-                            {!initialVoteId &&
-                                (createdVoteId ? (
-                                    <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" />
-                                ) : activeStep === "basic-info" ? (
-                                    <CircleDot className="text-primary h-5 w-5 shrink-0" />
-                                ) : (
-                                    <Circle className="text-muted-foreground h-5 w-5 shrink-0" />
-                                ))}
-                            <h2 className="text-xl font-semibold">
-                                {t("create.steps.basicInfo.title")}
-                            </h2>
-                        </div>
-                    </AccordionTrigger>
-
-                    <AccordionContent className="mt-2 border-t pt-4 pb-6">
-                        <CreateVoteBasicInfoStep
-                            onSuccess={handleBasicInfoSuccess}
-                            isSaved={!!createdVoteId}
-                            voteId={createdVoteId}
-                            initialData={voteData}
-                        />
-                    </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem
-                    value="ruleset"
-                    className="bg-card rounded-lg border px-6 shadow-sm"
-                    disabled={!createdVoteId}
+                    {isPending ? (
+                        <Loader2 className="animate-spin" />
+                    ) : (
+                        <Send />
+                    )}
+                    {t("voting:wizard.review.scheduleAction")}
+                </Button>
+            ) : (
+                <Button
+                    type="submit"
+                    form={STEP_FORM_ID}
+                    disabled={activeSaving}
                 >
-                    <AccordionTrigger
-                        hideChevron
-                        className={
-                            createdVoteId
-                                ? "cursor-pointer hover:no-underline"
-                                : "pointer-events-none hover:no-underline"
-                        }
-                    >
-                        <div className="flex items-center space-x-3 text-left">
-                            {!initialVoteId &&
-                                (activeStep === "ruleset" ? (
-                                    <CircleDot className="text-primary h-5 w-5 shrink-0" />
-                                ) : activeStep === "basic-info" ? (
-                                    <Circle className="text-muted-foreground h-5 w-5 shrink-0" />
-                                ) : (
-                                    <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" />
-                                ))}
-                            <h2 className="text-xl font-semibold">
-                                {t("create.steps.ruleset.title")}
-                            </h2>
-                        </div>
-                    </AccordionTrigger>
-
-                    <AccordionContent className="mt-2 border-t pt-4 pb-6">
-                        <CreateVoteRulesetStep
-                            voteId={createdVoteId}
-                            onSuccess={handleRulesetSuccess}
-                            initialData={voteData?.ruleset}
-                        />
-                    </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem
-                    value="questions"
-                    className="bg-card rounded-lg border px-6 shadow-sm"
-                    disabled={!createdVoteId && !initialVoteId}
-                >
-                    <AccordionTrigger
-                        hideChevron
-                        className={
-                            createdVoteId
-                                ? "cursor-pointer hover:no-underline"
-                                : "pointer-events-none hover:no-underline"
-                        }
-                    >
-                        <div className="flex items-center space-x-3 text-left">
-                            {!initialVoteId &&
-                                (activeStep === "questions" ? (
-                                    <CircleDot className="text-primary h-5 w-5 shrink-0" />
-                                ) : (
-                                    <Circle className="text-muted-foreground h-5 w-5 shrink-0" />
-                                ))}
-                            <h2 className="text-xl font-semibold">
-                                {t("create.steps.questions.title")}
-                            </h2>
-                        </div>
-                    </AccordionTrigger>
-
-                    <AccordionContent className="mt-2 border-t pt-4 pb-6">
-                        <CreateVoteQuestionsStep voteId={createdVoteId} />
-                    </AccordionContent>
-                </AccordionItem>
-            </Accordion>
-
-            {(initialVoteId || createdVoteId) && (
-                <div className="mt-8 flex items-center justify-between gap-3 border-t pt-8">
-                    <div className="flex items-center gap-3">
-                        <Button variant="ghost" asChild className="h-11 px-6">
-                            <Link to="/voting">{t("create.actions.back")}</Link>
-                        </Button>
-                        {voteData?.status === "DRAFT" && (
-                            <DeleteDraftVoteDialog
-                                voteId={initialVoteId ?? createdVoteId ?? ""}
-                            />
-                        )}
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                        <Button
-                            variant="outline"
-                            asChild
-                            className="text-primary hover:text-primary hover:bg-primary/5 h-11 px-6"
-                        >
-                            <Link
-                                to={`/voting/${initialVoteId ?? createdVoteId}`}
-                            >
-                                <Eye className="mr-2 h-4 w-4" />
-                                {t("create.actions.finish")}
-                            </Link>
-                        </Button>
-
-                        <Dialog
-                            open={isConfirmOpen}
-                            onOpenChange={setIsConfirmOpen}
-                        >
-                            <DialogTrigger asChild>
-                                <Button
-                                    disabled={isPending}
-                                    className="h-11 px-6"
-                                >
-                                    {isPending ? (
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    ) : (
-                                        <Send className="mr-2 h-4 w-4" />
-                                    )}
-                                    {t("detail.actions.schedule")}
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>
-                                        {t(
-                                            "detail.actions.scheduleConfirmTitle",
-                                        )}
-                                    </DialogTitle>
-                                    <DialogDescription>
-                                        {t(
-                                            "detail.actions.scheduleConfirmDescription",
-                                        )}
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <DialogFooter>
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => setIsConfirmOpen(false)}
-                                    >
-                                        {t("detail.actions.cancel")}
-                                    </Button>
-                                    <Button
-                                        onClick={handleSchedule}
-                                        disabled={isPending}
-                                    >
-                                        {isPending ? (
-                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        ) : null}
-                                        {t("detail.actions.confirm")}
-                                    </Button>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
-                    </div>
-                </div>
+                    {t("voting:wizard.continue")}
+                </Button>
             )}
+        </div>
+    );
+
+    return (
+        <>
+            <WizardShell
+                title={voteData?.title ?? ""}
+                isDraft={voteData?.status === "DRAFT"}
+                savedState={savedState}
+                steps={steps}
+                onStepSelect={goToStep}
+                railFooter={
+                    voteData?.status === "DRAFT" && voteId ? (
+                        <DeleteDraftVoteDialog voteId={voteId} />
+                    ) : undefined
+                }
+                footer={footer}
+            >
+                {activeStep === "details" && (
+                    <CreateVoteBasicInfoStep
+                        formId={STEP_FORM_ID}
+                        onSuccess={handleBasicInfoSuccess}
+                        voteId={voteId}
+                        initialData={voteData}
+                        onDirtyChange={setActiveFormDirty}
+                        onSavingChange={setActiveSaving}
+                    />
+                )}
+
+                {activeStep === "rules" && (
+                    <CreateVoteRulesetStep
+                        formId={STEP_FORM_ID}
+                        voteId={voteId}
+                        onSuccess={handleRulesetSuccess}
+                        initialData={voteData?.ruleset}
+                        onDirtyChange={setActiveFormDirty}
+                        onSavingChange={setActiveSaving}
+                    />
+                )}
+
+                {activeStep === "questions" && (
+                    <CreateVoteQuestionsStep
+                        voteId={voteId}
+                        onSavingChange={setActiveSaving}
+                    />
+                )}
+
+                {activeStep === "review" && voteData && (
+                    <ReviewStep
+                        vote={voteData}
+                        onEditStep={goToStep}
+                        onScheduleClick={() => setIsConfirmOpen(true)}
+                        scheduleDisabled={scheduleDisabled}
+                    />
+                )}
+            </WizardShell>
+
+            {scheduleDialog}
 
             <ScheduleValidationModal
                 open={isValidationOpen}
                 onOpenChange={setIsValidationOpen}
                 errors={validationErrors}
-                voteId={initialVoteId ?? createdVoteId ?? ""}
+                voteId={voteId ?? ""}
                 isAlreadyOnEditPage={true}
             />
-        </div>
+        </>
     );
 }

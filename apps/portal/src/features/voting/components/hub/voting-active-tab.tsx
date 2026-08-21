@@ -1,22 +1,44 @@
+import { useAtomValue } from "jotai";
 import { Loader2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
+import { VoteListItemResponseDto } from "@/api/generated/model";
 import { useVotesControllerGetVotes } from "@/api/generated/votes/votes";
+import { tenantContextAtom } from "@/auth/atoms";
+import { isAdminOrBoard } from "@/auth/role-checks";
 
 import { VoteCard } from "../vote-card";
-import { VotingFilter, type FilterType } from "../voting-filter";
+
+function needsAction(vote: VoteListItemResponseDto): boolean {
+    return (
+        (vote.status === "OPEN" &&
+            Boolean(vote.voterSummary?.canVote) &&
+            !vote.voterSummary?.hasVoted) ||
+        (vote.status === "SCHEDULED" &&
+            Boolean(vote.voterSummary?.requiresDelegation))
+    );
+}
 
 export function VotingActiveTab() {
     const { t } = useTranslation(["voting"]);
+    const tenantCtx = useAtomValue(tenantContextAtom);
+    const adminOrBoard = isAdminOrBoard(tenantCtx?.roles);
     const { data: votes, isLoading, error } = useVotesControllerGetVotes();
-    const [filter, setFilter] = useState<FilterType>("ALL");
 
-    const filteredVotes = useMemo(() => {
-        if (!votes) return [];
-        if (filter === "ALL") return votes.filter((v) => v.status !== "CLOSED");
-        return votes.filter((v) => v.status === filter);
-    }, [votes, filter]);
+    const { needsActionVotes, upcomingVotes, draftVotes } = useMemo(() => {
+        const all = votes ?? [];
+        const needsActionVotes = all.filter(needsAction);
+        const upcomingVotes = all.filter(
+            (v) =>
+                (v.status === "OPEN" || v.status === "SCHEDULED") &&
+                !needsAction(v),
+        );
+        const draftVotes = adminOrBoard
+            ? all.filter((v) => v.status === "DRAFT")
+            : [];
+        return { needsActionVotes, upcomingVotes, draftVotes };
+    }, [votes, adminOrBoard]);
 
     if (isLoading) {
         return (
@@ -34,32 +56,56 @@ export function VotingActiveTab() {
         );
     }
 
-    return (
-        <div className="flex flex-col gap-6">
-            <div className="flex flex-wrap items-center justify-end gap-4">
-                <VotingFilter filter={filter} onFilterChange={setFilter} />
-            </div>
+    const isEmpty =
+        needsActionVotes.length === 0 &&
+        upcomingVotes.length === 0 &&
+        draftVotes.length === 0;
 
-            {!filteredVotes || filteredVotes.length === 0 ? (
-                <div className="rounded-lg border border-dashed p-12 text-center text-slate-500">
-                    {filter === "ALL"
-                        ? t("list.empty.all")
-                        : t("list.empty.filtered", {
-                              status: t(
-                                  `list.filters.${filter.toLowerCase()}` as
-                                      | "list.filters.open"
-                                      | "list.filters.scheduled"
-                                      | "list.filters.closed",
-                              ).toLowerCase(),
-                          })}
-                </div>
-            ) : (
-                <div className="flex flex-col gap-4">
-                    {filteredVotes.map((vote) => (
-                        <VoteCard key={vote.id} vote={vote} />
-                    ))}
-                </div>
+    if (isEmpty) {
+        return (
+            <div className="text-muted-foreground rounded-lg border border-dashed p-12 text-center">
+                {t("list.empty.all")}
+            </div>
+        );
+    }
+
+    return (
+        <div className="flex flex-col gap-7">
+            {needsActionVotes.length > 0 && (
+                <VoteGroup
+                    label={t("hub.groups.needsAction")}
+                    votes={needsActionVotes}
+                />
+            )}
+            {upcomingVotes.length > 0 && (
+                <VoteGroup
+                    label={t("hub.groups.upcoming")}
+                    votes={upcomingVotes}
+                />
+            )}
+            {draftVotes.length > 0 && (
+                <VoteGroup label={t("hub.groups.drafts")} votes={draftVotes} />
             )}
         </div>
+    );
+}
+
+interface VoteGroupProps {
+    label: string;
+    votes: VoteListItemResponseDto[];
+}
+
+function VoteGroup({ label, votes }: VoteGroupProps) {
+    return (
+        <section>
+            <h2 className="text-faint mb-2.5 text-[11px] font-bold tracking-wider uppercase">
+                {label}
+            </h2>
+            <div className="flex flex-col gap-3">
+                {votes.map((vote) => (
+                    <VoteCard key={vote.id} vote={vote} />
+                ))}
+            </div>
+        </section>
     );
 }

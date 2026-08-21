@@ -1,10 +1,4 @@
 export const voting = {
-    navigation: {
-        activeVotes: "Probíhající hlasování",
-        results: "Výsledky",
-        createVote: "Vytvořit hlasování",
-        delegations: "Delegace",
-    },
     hub: {
         title: "Hlasování",
         newVote: "Nové hlasování",
@@ -13,6 +7,12 @@ export const voting = {
             results: "Výsledky",
             delegations: "Plné moci",
         },
+        groups: {
+            needsAction: "Vyžaduje vaši akci",
+            upcoming: "Nadcházející a probíhající",
+            drafts: "Rozpracovaná",
+        },
+        continueEditing: "Pokračovat v úpravách",
     },
     common: {
         save: "Uložit",
@@ -31,12 +31,10 @@ export const voting = {
         customRule: "vlastní pravidlo",
     },
     create: {
-        title: "Vytvořit hlasování",
-        titleEdit: "Upravit hlasování",
         description: "Nastavte nové hlasování pro společenství.",
         steps: {
             basicInfo: {
-                title: "Základní informace",
+                title: "Základní údaje",
                 description: "Zadejte hlavní údaje pro toto hlasování.",
             },
             ruleset: {
@@ -98,7 +96,7 @@ export const voting = {
                     remove: "Odstranit vlastní pravidla",
                     badge: "Vlastní pravidla",
                     defaultHint:
-                        "Tato otázka používá výchozí pravidla hlasování. Klikněte pro přizpůsobení.",
+                        "Přepíše pravidla většiny pouze pro tuto otázku. Usnášeníschopnost se vždy posuzuje pro celé hlasování.",
                 },
             },
         },
@@ -136,6 +134,14 @@ export const voting = {
                     UNIT_SHARE: "Podle podílu",
                     ONE_UNIT_ONE_VOTE: "Jedna jednotka = jeden hlas",
                 },
+                cards: {
+                    UNIT_SHARE: {
+                        hint: "Hlasy vážené podle podílu",
+                    },
+                    ONE_UNIT_ONE_VOTE: {
+                        hint: "Každá jednotka má stejnou váhu",
+                    },
+                },
             },
             quorumElectorateBasis: {
                 label: "Základ pro výpočet kvóra",
@@ -167,6 +173,14 @@ export const voting = {
                     SIMPLE_MAJORITY: "Prostá většina (>50 %)",
                     QUALIFIED_MAJORITY: "Kvalifikovaná většina",
                 },
+                cards: {
+                    SIMPLE_MAJORITY: {
+                        hint: "Více než 50 % odevzdaných hlasů",
+                    },
+                    QUALIFIED_MAJORITY: {
+                        hint: "Vámi nastavená vyšší hranice, např. 75 %",
+                    },
+                },
             },
             majorityThreshold: {
                 label: "Požadovaná většina",
@@ -194,15 +208,6 @@ export const voting = {
             },
             time: "Čas",
         },
-        actions: {
-            next: "Další krok",
-            back: "Zpět",
-            submit: "Uložit pravidla a dokončit",
-            saved: "Uloženo",
-            saveNext: "Uložit a pokračovat",
-            finishLater: "Dokončit později",
-            finish: "Přejít na náhled hlasování",
-        },
         toast: {
             createSuccess: "Hlasování bylo úspěšně vytvořeno",
             updateSuccess: "Hlasování bylo úspěšně uloženo",
@@ -217,20 +222,50 @@ export const voting = {
                 "Zvolená nastavení se odchylují od standardních zákonných pravidel (váha podle podílu, kvorum ze všech jednotek). Ujistěte se, že tato pravidla jsou v souladu s vašimi stanovami, jinak může být hlasování právně napadnutelné.",
         },
     },
-    list: {
-        title: "Aktivní a naplánovaná hlasování",
-        description:
-            "Přehled všech nadcházejících hlasování, která vyžadují vaši pozornost nebo brzy začnou.",
-        error: "Nepodařilo se načíst hlasování.",
-        filters: {
-            all: "Vše",
-            open: "Otevřená",
-            scheduled: "Naplánovaná",
-            closed: "Ukončená",
+    wizard: {
+        newVote: "Nové hlasování",
+        exit: "Zavřít",
+        draft: "Koncept",
+        saved: "Všechny změny uloženy",
+        unsaved: "Neuložené změny",
+        saving: "Ukládám…",
+        railTitle: "Nastavení ve 4 krocích",
+        steps: {
+            details: "Základní údaje",
+            rules: "Pravidla hlasování",
+            questions: "Otázky",
+            review: "Kontrola a naplánování",
         },
+        note: "Koncept se ukládá automaticky po dokončení každého kroku. Vlastníci nic nevidí, dokud hlasování nenaplánujete.",
+        back: "Zpět",
+        continue: "Pokračovat",
+        toReview: "Kontrola",
+        stepOf: "Krok {{n}} ze {{total}}",
+        review: {
+            title: "Kontrola a naplánování",
+            edit: "Upravit",
+            scheduleTitle: "Naplánovat hlasování?",
+            scheduleCopy:
+                "Po naplánování budou vlastníci informováni a nastavení už nepůjde upravit.",
+            keepDraft: "Ponechat jako koncept",
+            scheduleAction: "Naplánovat hlasování",
+            checks: {
+                VOTE_SCHEDULE_MISSING_DATES:
+                    "Datum zahájení a ukončení je vyplněno",
+                VOTE_SCHEDULE_IN_PAST: "Zahájení je v budoucnosti",
+                VOTE_SCHEDULE_INVALID_RANGE: "Ukončení následuje po zahájení",
+                VOTE_RULESET_REQUIRED: "Pravidla hlasování jsou nastavena",
+                VOTE_MISSING_QUESTIONS: "Existuje alespoň jedna otázka",
+                VOTE_QUESTION_MISSING_OPTIONS:
+                    "Každá otázka má možnosti odpovědí",
+                SHORT_VOTING_PERIOD: "Hlasování trvá alespoň 15 dní",
+            },
+        },
+    },
+    list: {
+        error: "Nepodařilo se načíst hlasování.",
         empty: {
             all: "Nebyla nalezena žádná hlasování.",
-            filtered: "Nebyla nalezena žádná {{status}} hlasování.",
         },
         status: {
             OPEN: "Otevřené",
@@ -243,41 +278,34 @@ export const voting = {
             startsOn: "Začíná ",
             endedOn: "Ukončeno ",
             noDescription: "Nebyl poskytnut žádný popis.",
-            canVote: "Můžete hlasovat",
             voteRequired: "Váš hlas je vyžadován.",
             voteAction: "Hlasovat",
-            delegationNeeded: "Je potřeba delegace",
             fromCoOwners: "Od spoluvlastníků",
             manageDelegation: "Spravovat delegaci",
-            readyToVote: "Připraveni k hlasování",
             readyToVoteSubtitle: "Jste oprávněni, jakmile hlasování začne.",
             viewDetails: "Zobrazit detail",
-            alreadyDelegated: "Delegováno",
             alreadyDelegatedSubtitle: "Zvolili jste společného zástupce.",
-            scheduledStatus: "Naplánováno",
             scheduledSubtitle: "Toto hlasování ještě nezačalo.",
-            alreadyDelegatedOpen: "Delegováno",
             alreadyDelegatedOpenSubtitle:
                 "Jiní spoluvlastníci zvolili zástupce pro vaše jednotky.",
-            cannotVoteOpen: "Nemůžete hlasovat",
             cannotVoteOpenSubtitle:
                 "Žádná z vašich jednotek není v tomto hlasování oprávněna.",
-            completed: "Hlasování dokončeno",
             viewOutcomes: "Zobrazit konečné výsledky",
             viewResults: "Zobrazit výsledky",
-            voted: "Odhlasováno",
             votedSubtitle: "Váš hlas byl již zaznamenán.",
             alreadyVotedAction: "Již odhlasováno",
-            draftStatus: "Koncept hlasování",
             editDraft: "Konfigurace není kompletní",
-            editAction: "Upravit hlasování",
         },
     },
     resultsOverview: {
-        title: "Výsledky hlasování",
-        description: "Přehled výsledků a záznamů ukončených hlasování.",
         empty: "Nebyly nalezeny žádné ukončené hlasování.",
         error: "Nepodařilo se načíst výsledky hlasování.",
+    },
+    outcomes: {
+        APPROVED: "Schváleno",
+        REJECTED: "Zamítnuto",
+        NOT_DECIDED: "Nerozhodnuto",
+        winner: "Vítězí {{option}}",
     },
     detail: {
         backToVoting: "Hlasování",
@@ -330,20 +358,14 @@ export const voting = {
             },
         },
         documents: {
-            title: "Dokumenty",
-            uploaded: "Nahráno",
+            download: "Stáhnout",
         },
         questions: {
             title: "Položky k hlasování",
-            preview: "Náhled otázek, o kterých budete hlasovat",
-            majorityPrefix: "Vyžaduje",
-            majoritySuffix: "většinu všech podílů.",
-            customRules: "(vlastní pravidla)",
         },
         statusSidebar: {
             title: "Váš status hlasování",
             opensIn: "Hlasování začíná",
-            closesIn: "Hlasování končí",
             owningUnits: "VLASTNĚNÉ JEDNOTKY",
             share: "Podíl:",
             statusReady: "Připraveno",
@@ -362,11 +384,8 @@ export const voting = {
             totalPower: "Celková síla hlasu:",
             voteButton: "Hlasovat",
             alreadyVotedButton: "Již odhlasováno",
-            secureBoothHint:
-                "Kliknutím na „Hlasovat“ vstoupíte do zabezpečené hlasovací místnosti.",
             ballotsFinal: "Odevzdané hlasy jsou konečné a nelze je změnit.",
             help: {
-                title: "Máte dotazy?",
                 description:
                     "Pokud máte dotazy k jednotlivým bodům, kontaktujte předsedu.",
                 contact: "Kontaktovat předsedu",
@@ -429,8 +448,6 @@ export const voting = {
         },
     },
     delegations: {
-        title: "Delegace",
-        description: "Spravujte, kdo může hlasovat vaším jménem.",
         tabs: {
             myDelegations: "Moje delegace",
             recordProxy: "Evidence plné moci (Admin)",
@@ -456,6 +473,7 @@ export const voting = {
             vote: "Filtrovat podle hlasování",
             allVotes: "Všechna naplánovaná hlasování",
         },
+        footnote: "Plnou moc může za vlastníka zaznamenat i výbor.",
         admin: {
             title: "Evidovat plnou moc",
             description:
@@ -465,6 +483,12 @@ export const voting = {
             selectOwner: "Zmocnitel",
             selectDelegate: "Zmocněnec",
             success: "Plná moc byla úspěšně zaevidována",
+            errors: {
+                vote: "Vyberte hlasování",
+                unit: "Vyberte jednotku",
+                owner: "Vyberte vlastníka",
+                delegate: "Vyberte zmocněnce",
+            },
         },
     },
     castVote: {
@@ -513,32 +537,11 @@ export const voting = {
         backToDetail: "Zpět na detail hlasování",
     },
     results: {
-        pageTitle: "Výsledky",
         breadcrumbVoting: "Hlasování",
-        finalizedAt: "Uzavřeno",
-        approved: "Schváleno",
-        rejected: "Zamítnuto",
-        quorum: "Kvorum",
-        inFavor: "Pro",
-        finalResolution: "Výsledek hlasování",
-        majorityThresholdNote:
-            "Kvalifikovaná většina vyžaduje: {{threshold}}% oprávněných hlasů.",
-        quorumValidation: "Ověření kvora",
-        quorumMet:
-            "Práh účasti byl dosažen. Požadované kvorum bylo překročeno.",
-        quorumNotMet:
-            "Práh účasti nebyl dosažen. Požadované kvorum nebylo splněno.",
-        totalEligibleUnits: "Celkem oprávněných jednotek",
-        votesCast: "Odevzdané hlasy",
-        participationWeight: "Váha účasti",
-        resolutionDetails: "Usnesení {{index}} – {{title}}",
         viewResults: "Zobrazit výsledky",
         unitCount_one: "{{count}} jednotka",
         unitCount_few: "{{count}} jednotky",
         unitCount_other: "{{count}} jednotek",
-        weightLabel: "podílu",
-        invalid: "Neplatné",
-        invalidQuorum: "Chybí kvórum",
         downloadAuditReport: "Stáhnout audit report",
         downloadAuditReportError: "Nepodařilo se stáhnout audit report.",
         tabs: {
@@ -551,5 +554,31 @@ export const voting = {
             expandDetails: "Zobrazit detaily",
             collapseDetails: "Skrýt detaily",
         },
+    },
+    resultsV2: {
+        participationLine:
+            "Zúčastnili se vlastníci s {{pct}} % podílů ({{units}} z {{total}} jednotek).",
+        participationLineUnits:
+            "Hlasovalo {{pct}} % jednotek ({{units}} z {{total}} jednotek).",
+        quorumMetLine: "Usnášeníschopnost {{threshold}} % byla splněna.",
+        quorumNotMetLine:
+            "Usnášeníschopnost {{threshold}} % nebyla splněna — usnesení nejsou rozhodnuta.",
+        multipleChoice: "více možností",
+        ranLine:
+            "Hlasování probíhalo {{from}} – {{to}} · výsledky vypočteny {{computed}}",
+        footnote:
+            "Procenta v grafech jsou podíly z celé budovy (u hlasování počítaných po jednotkách podíly ze všech jednotek); každý verdikt uvádí svůj vlastní základ. Pravidla většiny se vyhodnocují pro každou otázku podle jejích pravidel; usnášeníschopnost platí pro celé hlasování.",
+        resolutionLabel: "Usnesení {{index}}",
+        didntVote: "Nehlasovalo",
+        winnerChip: "vítěz",
+        reasonApproved:
+            "Pro hlasovalo {{pct}} % odevzdaných hlasů — více než požadovaná {{majority}}.",
+        reasonRejected:
+            "Pro hlasovalo jen {{pct}} % odevzdaných hlasů — méně než požadovaná {{majority}}.",
+        reasonWinner:
+            "„{{option}}“ získala {{pct}} % odevzdaných hlasů — většinu.",
+        reasonNoQuorum:
+            "Zúčastnilo se jen {{turnout}} % — méně než {{threshold}} % potřebných pro usnášeníschopnost, usnesení proto není rozhodnuto (i když většina odevzdaných hlasů mohla být pro).",
+        reasonNoMajority: "Žádná možnost nedosáhla požadované většiny.",
     },
 };

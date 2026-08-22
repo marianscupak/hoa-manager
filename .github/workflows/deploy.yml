@@ -44,6 +44,9 @@ jobs:
                   tags: |
                       ghcr.io/${{ github.repository }}-api:latest
                       ghcr.io/${{ github.repository }}-api:${{ github.sha }}
+                  # Single-manifest image: attestation manifests confuse the
+                  # GHCR version cleanup and break pulls when pruned.
+                  provenance: false
                   cache-from: type=gha,scope=api
                   cache-to: type=gha,scope=api,mode=max
 
@@ -56,13 +59,16 @@ jobs:
                   tags: |
                       ghcr.io/${{ github.repository }}-web:latest
                       ghcr.io/${{ github.repository }}-web:${{ github.sha }}
+                  provenance: false
                   cache-from: type=gha,scope=web
                   cache-to: type=gha,scope=web,mode=max
 
     cleanup:
         # Private-repo GHCR free storage is 500 MB — prune old image versions.
+        # Runs only after a successful deploy so a pull in flight can never
+        # race against version deletion.
         name: Prune old GHCR versions
-        needs: build
+        needs: deploy
         runs-on: ubuntu-latest
         permissions:
             packages: write

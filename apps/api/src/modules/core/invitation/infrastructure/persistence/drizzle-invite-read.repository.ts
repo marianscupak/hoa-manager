@@ -29,9 +29,7 @@ export class DrizzleInviteReadRepository implements InviteReadRepository {
     const [row] = await this.db
       .select({
         pending: sql<number>`COUNT(*)::int`,
-        oldestPendingCreatedAt: sql<
-          Date | null
-        >`MIN(${ownerInvites.createdAt})`,
+        oldestPendingCreatedAt: sql<Date | null>`MIN(${ownerInvites.createdAt})`,
       })
       .from(ownerInvites)
       .where(

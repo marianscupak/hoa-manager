@@ -1,6 +1,9 @@
 type Lang = 'cs' | 'en';
 
-const STRINGS: Record<Lang, Record<string, (vars: Record<string, string>) => string>> = {
+const STRINGS: Record<
+  Lang,
+  Record<string, (vars: Record<string, string>) => string>
+> = {
   en: {
     'tenant.created.public': (v) => `${v.actor} created the community.`,
     'membership.created.privileged': (v) =>
@@ -12,8 +15,10 @@ const STRINGS: Record<Lang, Record<string, (vars: Record<string, string>) => str
     'unit.created.privileged': (v) => `${v.actor} added unit ${v.unit}.`,
     'unit.updated.privileged': (v) => `${v.actor} updated unit ${v.unit}.`,
     'unit.deleted.privileged': (v) => `${v.actor} removed unit ${v.unit}.`,
-    'owner.created.privileged': (v) => `${v.actor} added owner record ${v.owner}.`,
-    'owner.deleted.privileged': (v) => `${v.actor} removed owner record ${v.owner}.`,
+    'owner.created.privileged': (v) =>
+      `${v.actor} added owner record ${v.owner}.`,
+    'owner.deleted.privileged': (v) =>
+      `${v.actor} removed owner record ${v.owner}.`,
     'unit.ownership.replaced.privileged': (v) =>
       `${v.actor} changed ownership of unit ${v.unit} (now: ${v.owners}).`,
     'owner.user.linked.privileged': (v) =>
@@ -34,8 +39,10 @@ const STRINGS: Record<Lang, Record<string, (vars: Record<string, string>) => str
     'membership.status.updated.privileged': (v) =>
       `${v.actor} změnil/a stav členství ${v.member} z ${v.previousStatus} na ${v.newStatus}.`,
     'unit.created.privileged': (v) => `${v.actor} přidal/a jednotku ${v.unit}.`,
-    'unit.updated.privileged': (v) => `${v.actor} upravil/a jednotku ${v.unit}.`,
-    'unit.deleted.privileged': (v) => `${v.actor} odstranil/a jednotku ${v.unit}.`,
+    'unit.updated.privileged': (v) =>
+      `${v.actor} upravil/a jednotku ${v.unit}.`,
+    'unit.deleted.privileged': (v) =>
+      `${v.actor} odstranil/a jednotku ${v.unit}.`,
     'owner.created.privileged': (v) =>
       `${v.actor} přidal/a vlastníka ${v.owner}.`,
     'owner.deleted.privileged': (v) =>

@@ -137,7 +137,12 @@ export class RegisterFromInviteHandler
 
       // Link owner (Property)
       await this.commandBus.execute(
-        new SetOwnerUserIdCommand(invite.tenantId, invite.ownerId, userId, 'INVITE_REGISTER'),
+        new SetOwnerUserIdCommand(
+          invite.tenantId,
+          invite.ownerId,
+          userId,
+          'INVITE_REGISTER',
+        ),
       );
 
       // Create membership (Tenancy)
@@ -156,7 +161,9 @@ export class RegisterFromInviteHandler
       await this.inviteRepo.markAccepted(invite.id, now);
 
       const actor = this.auditContext.requireActor();
-      const ownerLabel = await this.labelResolver.resolveOwnerLabel(invite.ownerId);
+      const ownerLabel = await this.labelResolver.resolveOwnerLabel(
+        invite.ownerId,
+      );
       const userLabel = await this.labelResolver.resolveUserLabel(userId);
 
       await this.auditService.append(

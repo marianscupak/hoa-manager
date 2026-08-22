@@ -53,8 +53,10 @@ export class AuditService {
     }
 
     const correlationId = this.cls.getId() ?? null;
-    const ipAddress = this.cls.get<string | null>(AUDIT_CLS_KEYS.ipAddress) ?? null;
-    const userAgent = this.cls.get<string | null>(AUDIT_CLS_KEYS.userAgent) ?? null;
+    const ipAddress =
+      this.cls.get<string | null>(AUDIT_CLS_KEYS.ipAddress) ?? null;
+    const userAgent =
+      this.cls.get<string | null>(AUDIT_CLS_KEYS.userAgent) ?? null;
 
     await this.repo.append({ ...event, correlationId, ipAddress, userAgent });
   }

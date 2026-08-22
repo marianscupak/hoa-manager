@@ -10,7 +10,9 @@ export class UnitsOverviewDto {
 }
 
 export class OwnersOverviewDto {
-  @ApiProperty({ description: 'Active owners (excludes pending-invite owners)' })
+  @ApiProperty({
+    description: 'Active owners (excludes pending-invite owners)',
+  })
   active!: number;
 }
 

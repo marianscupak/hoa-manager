@@ -11,4 +11,6 @@ export interface AuditEventWriteRepository {
   appendMany(events: AuditEventWriteRecord[]): Promise<void>;
 }
 
-export const AUDIT_EVENT_WRITE_REPOSITORY = Symbol('AUDIT_EVENT_WRITE_REPOSITORY');
+export const AUDIT_EVENT_WRITE_REPOSITORY = Symbol(
+  'AUDIT_EVENT_WRITE_REPOSITORY',
+);

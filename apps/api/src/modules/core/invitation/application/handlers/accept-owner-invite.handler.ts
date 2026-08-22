@@ -112,7 +112,12 @@ export class AcceptOwnerInviteHandler
 
       if (!owner.userId) {
         await this.commandBus.execute(
-          new SetOwnerUserIdCommand(invite.tenantId, invite.ownerId, user.id, 'INVITE_ACCEPT'),
+          new SetOwnerUserIdCommand(
+            invite.tenantId,
+            invite.ownerId,
+            user.id,
+            'INVITE_ACCEPT',
+          ),
         );
       }
 
@@ -142,7 +147,9 @@ export class AcceptOwnerInviteHandler
       await this.inviteRepo.markAccepted(invite.id, now);
 
       const actor = this.auditContext.requireActor();
-      const ownerLabel = await this.labelResolver.resolveOwnerLabel(invite.ownerId);
+      const ownerLabel = await this.labelResolver.resolveOwnerLabel(
+        invite.ownerId,
+      );
       const userLabel = await this.labelResolver.resolveUserLabel(user.id);
 
       await this.auditService.append(

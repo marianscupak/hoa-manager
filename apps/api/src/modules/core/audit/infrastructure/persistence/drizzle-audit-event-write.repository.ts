@@ -11,7 +11,9 @@ import type {
 import { RESERVED_PAYLOAD_KEY } from './audit-payload.constants';
 
 @Injectable()
-export class DrizzleAuditEventWriteRepository implements AuditEventWriteRepository {
+export class DrizzleAuditEventWriteRepository
+  implements AuditEventWriteRepository
+{
   constructor(private readonly drizzle: DrizzleService) {}
 
   private get db() {
@@ -32,7 +34,10 @@ export class DrizzleAuditEventWriteRepository implements AuditEventWriteReposito
         // the schema has no dedicated column for it. Read adapter strips it.
         const payload =
           e.actor.type === 'SYSTEM'
-            ? { ...e.payload, [RESERVED_PAYLOAD_KEY]: { reason: e.actor.reason } }
+            ? {
+                ...e.payload,
+                [RESERVED_PAYLOAD_KEY]: { reason: e.actor.reason },
+              }
             : e.payload;
 
         return {
@@ -42,7 +47,8 @@ export class DrizzleAuditEventWriteRepository implements AuditEventWriteReposito
           eventType: e.eventType,
           actorType: e.actor.type,
           actorUserId: e.actor.type === 'USER' ? e.actor.userId : null,
-          actorMembershipId: e.actor.type === 'USER' ? e.actor.membershipId : null,
+          actorMembershipId:
+            e.actor.type === 'USER' ? e.actor.membershipId : null,
           aggregateType: e.aggregate?.type ?? null,
           aggregateId: e.aggregate?.id ?? null,
           entityType: e.entity?.type ?? null,

@@ -40,7 +40,10 @@ describe('VisibilityPolicyService', () => {
 
     it('returns PUBLIC + PRIVILEGED if any role is privileged (multi-role)', () => {
       expect(
-        service.fromRoles([TenantMembershipRole.UNIT_OWNER, TenantMembershipRole.AUDITOR]),
+        service.fromRoles([
+          TenantMembershipRole.UNIT_OWNER,
+          TenantMembershipRole.AUDITOR,
+        ]),
       ).toEqual([Visibility.TENANT_PUBLIC, Visibility.TENANT_PRIVILEGED]);
     });
 

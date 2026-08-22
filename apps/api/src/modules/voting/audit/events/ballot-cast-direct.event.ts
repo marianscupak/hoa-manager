@@ -4,7 +4,10 @@ import { defineAuditEvent } from '@/modules/core/audit/application/registry/defi
 import type { AuditActor } from '@/modules/core/audit/domain/actor';
 import { Visibility } from '@/modules/core/audit/domain/visibility';
 
-import { BallotAnswerSchema, LabeledBallotAnswerSchema } from './_shared.schemas';
+import {
+  BallotAnswerSchema,
+  LabeledBallotAnswerSchema,
+} from './_shared.schemas';
 import { VotingEventType } from '../voting-event-types';
 
 const PayloadSchema = z.object({

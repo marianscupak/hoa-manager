@@ -17,4 +17,5 @@ export const VotingEventType = {
   VOTE_RESULTS_COMPUTED: 'VOTING.VOTE_RESULTS_COMPUTED',
 } as const;
 
-export type VotingEventType = (typeof VotingEventType)[keyof typeof VotingEventType];
+export type VotingEventType =
+  (typeof VotingEventType)[keyof typeof VotingEventType];

@@ -5,7 +5,6 @@ import type { VoteAuditExportDto } from '../../../api/dto/vote-audit-export.dto'
 import { VoteAuditExporterService } from '../../../audit/exporter/vote-audit-exporter.service';
 import { VotingAuditLabelResolver } from '../../../audit/label-resolver.service';
 
-
 @QueryHandler(GetVoteAuditExportQuery)
 export class GetVoteAuditExportHandler
   implements IQueryHandler<GetVoteAuditExportQuery, VoteAuditExportDto>

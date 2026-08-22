@@ -52,7 +52,10 @@ export class VoteElectorateSnapshotLookup {
       .innerJoin(units, eq(voteElectorateUnits.unitId, units.id))
       .leftJoin(
         tenantMemberships,
-        eq(tenantMemberships.id, voteElectorateUnits.representativeMembershipId),
+        eq(
+          tenantMemberships.id,
+          voteElectorateUnits.representativeMembershipId,
+        ),
       )
       .leftJoin(users, eq(users.id, tenantMemberships.userId))
       .where(

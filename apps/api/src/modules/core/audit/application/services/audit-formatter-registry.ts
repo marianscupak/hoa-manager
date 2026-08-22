@@ -21,10 +21,7 @@ export class AuditFormatterRegistry {
     this.formatters.set(formatter.module, formatter);
   }
 
-  format(
-    event: AuditEventReadRecord,
-    viewer: ViewerContext,
-  ): TimelineEntry {
+  format(event: AuditEventReadRecord, viewer: ViewerContext): TimelineEntry {
     const formatter = this.formatters.get(event.module);
     if (formatter) {
       return formatter.format(event, viewer);

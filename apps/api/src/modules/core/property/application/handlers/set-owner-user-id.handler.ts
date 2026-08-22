@@ -39,7 +39,9 @@ export class SetOwnerUserIdHandler
 
     const actor = this.auditContext.requireActor();
     const actorLabel = await this.labelResolver.resolveActorLabel(actor);
-    const ownerLabel = await this.labelResolver.resolveOwnerLabel(command.ownerId);
+    const ownerLabel = await this.labelResolver.resolveOwnerLabel(
+      command.ownerId,
+    );
     const userLabel = await this.labelResolver.resolveUserLabel(command.userId);
 
     await this.auditService.append(

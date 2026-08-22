@@ -98,7 +98,10 @@ export class ReplaceUnitOwnershipHandler
         UnitOwnershipReplacedAuditEvent.build({
           tenantId,
           unitId,
-          ownerships: ownerships.map((o) => ({ ownerId: o.ownerId, share: o.share })),
+          ownerships: ownerships.map((o) => ({
+            ownerId: o.ownerId,
+            share: o.share,
+          })),
           actor,
           unitLabel,
           changedByLabel: actorLabel,

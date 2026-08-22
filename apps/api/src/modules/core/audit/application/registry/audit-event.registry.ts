@@ -16,7 +16,10 @@ export interface AuditEventDescriptor {
 
 @Injectable()
 export class AuditEventRegistry {
-  private readonly descriptors = new Map<AuditEventType, AuditEventDescriptor>();
+  private readonly descriptors = new Map<
+    AuditEventType,
+    AuditEventDescriptor
+  >();
 
   register(descriptor: AuditEventDescriptor): void {
     if (this.descriptors.has(descriptor.eventType)) {

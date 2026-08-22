@@ -15,9 +15,7 @@ const VIEWER: ViewerContext = {
   viewerLanguage: 'en',
 };
 
-function event(
-  partial: Partial<AuditEventReadRecord>,
-): AuditEventReadRecord {
+function event(partial: Partial<AuditEventReadRecord>): AuditEventReadRecord {
   return {
     id: 'e-1',
     tenantId: 't-1',
@@ -70,10 +68,7 @@ describe('AuditFormatterRegistry', () => {
   });
 
   it('renders a generic fallback when no formatter is registered for a module', () => {
-    const result = registry.format(
-      event({ module: 'UNKNOWN_MODULE' }),
-      VIEWER,
-    );
+    const result = registry.format(event({ module: 'UNKNOWN_MODULE' }), VIEWER);
 
     expect(result.id).toBe('e-1');
     expect(result.eventType).toBe('VOTING.VOTE_CREATED');
@@ -85,8 +80,7 @@ describe('AuditFormatterRegistry', () => {
   it('formatMany() maps an array of events using the registered formatter', () => {
     const votingFormatter: AuditEventFormatter = {
       module: 'VOTING',
-      format: (e) =>
-        entry({ id: e.id, message: `voting:${e.eventType}` }),
+      format: (e) => entry({ id: e.id, message: `voting:${e.eventType}` }),
     };
     registry.register(votingFormatter);
 
@@ -95,8 +89,7 @@ describe('AuditFormatterRegistry', () => {
         event({ id: 'e-1' }),
         event({
           id: 'e-2',
-          eventType:
-            'VOTING.VOTE_OPENED' as AuditEventReadRecord['eventType'],
+          eventType: 'VOTING.VOTE_OPENED' as AuditEventReadRecord['eventType'],
         }),
       ],
       VIEWER,

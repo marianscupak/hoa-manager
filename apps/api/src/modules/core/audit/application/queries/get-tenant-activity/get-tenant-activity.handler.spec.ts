@@ -83,16 +83,18 @@ describe('GetTenantActivityHandler', () => {
     TenantMembershipRole.ADMIN,
     TenantMembershipRole.BOARD_MEMBER,
     TenantMembershipRole.AUDITOR,
-  ])("%s viewer's allowedVisibilities include TENANT_PRIVILEGED", async (role) => {
-    repo.findRecent.mockResolvedValue([]);
-    await handler.execute(
-      new GetTenantActivityQuery('t-1', 'u-1', [role], 'en', 10),
-    );
-    expect(repo.findRecent.mock.calls[0][0].scope.allowedVisibilities).toEqual([
-      Visibility.TENANT_PUBLIC,
-      Visibility.TENANT_PRIVILEGED,
-    ]);
-  });
+  ])(
+    "%s viewer's allowedVisibilities include TENANT_PRIVILEGED",
+    async (role) => {
+      repo.findRecent.mockResolvedValue([]);
+      await handler.execute(
+        new GetTenantActivityQuery('t-1', 'u-1', [role], 'en', 10),
+      );
+      expect(
+        repo.findRecent.mock.calls[0][0].scope.allowedVisibilities,
+      ).toEqual([Visibility.TENANT_PUBLIC, Visibility.TENANT_PRIVILEGED]);
+    },
+  );
 
   it('maps each event through the registered formatter', async () => {
     repo.findRecent.mockResolvedValue([
@@ -122,7 +124,8 @@ describe('GetTenantActivityHandler', () => {
       event({
         id: 'e-future',
         module: 'CORE',
-        eventType: 'CORE.SOMETHING_HAPPENED' as AuditEventReadRecord['eventType'],
+        eventType:
+          'CORE.SOMETHING_HAPPENED' as AuditEventReadRecord['eventType'],
         aggregate: null,
       }),
     ]);
@@ -164,6 +167,10 @@ describe('GetTenantActivityHandler', () => {
         10,
       ),
     );
-    expect(result.entries.map((e) => e.id)).toEqual(['newest', 'middle', 'oldest']);
+    expect(result.entries.map((e) => e.id)).toEqual([
+      'newest',
+      'middle',
+      'oldest',
+    ]);
   });
 });

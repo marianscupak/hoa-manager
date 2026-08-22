@@ -1,9 +1,13 @@
 type Lang = 'cs' | 'en';
 
-const STRINGS: Record<Lang, Record<string, (vars: Record<string, string>) => string>> = {
+const STRINGS: Record<
+  Lang,
+  Record<string, (vars: Record<string, string>) => string>
+> = {
   en: {
     'vote.created.privileged': (v) => `${v.actor} created vote "${v.title}".`,
-    'vote.rulesetSet.privileged': (v) => `${v.actor} updated the ruleset for "${v.title}".`,
+    'vote.rulesetSet.privileged': (v) =>
+      `${v.actor} updated the ruleset for "${v.title}".`,
     'vote.scheduled.public': (v) => `Vote "${v.title}" was scheduled.`,
     'vote.opened.public': (v) => `Vote "${v.title}" was opened.`,
     'vote.electorateSnapshotted.privileged': (v) =>
@@ -27,15 +31,18 @@ const STRINGS: Record<Lang, Record<string, (vars: Record<string, string>) => str
       `${v.owner} revoked the delegation of unit ${v.unit} to ${v.delegate}.`,
     'vote.consent.revoked.byRecorder': (v) =>
       `${v.recorder} revoked the delegation of unit ${v.unit} from ${v.owner} to ${v.delegate}.`,
-    'ballot.cast.privileged': (v) => `${v.actor} cast ballot for unit ${v.unit}.`,
+    'ballot.cast.privileged': (v) =>
+      `${v.actor} cast ballot for unit ${v.unit}.`,
     'ballot.cast.self': () => `Your ballot was recorded.`,
     'vote.closed.public': (v) => `Vote "${v.title}" was closed.`,
     'vote.resultsComputed.public': (v) => `Results computed for "${v.title}".`,
-    'unknown': (v) => `Activity recorded (${v.eventType}).`,
+    unknown: (v) => `Activity recorded (${v.eventType}).`,
   },
   cs: {
-    'vote.created.privileged': (v) => `${v.actor} vytvořil/a hlasování "${v.title}".`,
-    'vote.rulesetSet.privileged': (v) => `${v.actor} upravil/a pravidla pro "${v.title}".`,
+    'vote.created.privileged': (v) =>
+      `${v.actor} vytvořil/a hlasování "${v.title}".`,
+    'vote.rulesetSet.privileged': (v) =>
+      `${v.actor} upravil/a pravidla pro "${v.title}".`,
     'vote.scheduled.public': (v) => `Hlasování "${v.title}" bylo naplánováno.`,
     'vote.opened.public': (v) => `Hlasování "${v.title}" bylo zahájeno.`,
     'vote.electorateSnapshotted.privileged': (v) =>
@@ -60,11 +67,13 @@ const STRINGS: Record<Lang, Record<string, (vars: Record<string, string>) => str
       `${v.owner} zrušil/a delegaci jednotky ${v.unit} na ${v.delegate}.`,
     'vote.consent.revoked.byRecorder': (v) =>
       `${v.recorder} zrušil/a delegaci jednotky ${v.unit} z ${v.owner} na ${v.delegate}.`,
-    'ballot.cast.privileged': (v) => `${v.actor} hlasoval/a za jednotku ${v.unit}.`,
+    'ballot.cast.privileged': (v) =>
+      `${v.actor} hlasoval/a za jednotku ${v.unit}.`,
     'ballot.cast.self': () => `Váš hlas byl zaznamenán.`,
     'vote.closed.public': (v) => `Hlasování "${v.title}" bylo ukončeno.`,
-    'vote.resultsComputed.public': (v) => `Výsledky hlasování "${v.title}" byly spočítány.`,
-    'unknown': (v) => `Aktivita zaznamenána (${v.eventType}).`,
+    'vote.resultsComputed.public': (v) =>
+      `Výsledky hlasování "${v.title}" byly spočítány.`,
+    unknown: (v) => `Aktivita zaznamenána (${v.eventType}).`,
   },
 };
 

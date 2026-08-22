@@ -94,8 +94,12 @@ export class SendOwnerInviteHandler
 
     const actor = this.auditContext.requireActor();
     const actorLabel = await this.labelResolver.resolveActorLabel(actor);
-    const ownerLabel = await this.labelResolver.resolveOwnerLabel(command.ownerId);
-    const emailHash = createHash('sha256').update(emailNormalized).digest('hex');
+    const ownerLabel = await this.labelResolver.resolveOwnerLabel(
+      command.ownerId,
+    );
+    const emailHash = createHash('sha256')
+      .update(emailNormalized)
+      .digest('hex');
 
     await this.auditService.append(
       OwnerInviteSentAuditEvent.build({

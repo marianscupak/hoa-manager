@@ -68,8 +68,16 @@ const PAYLOADS: Record<CoreEventType, Record<string, unknown>> = {
     labels: { unitLabel: '12', createdBy: 'Alice Admin' },
   },
   [CoreEventType.UNIT_UPDATED]: {
-    previous: { unitNo: '11', buildingShareNumerator: 1, buildingShareDenominator: 10 },
-    next: { unitNo: '12', buildingShareNumerator: 1, buildingShareDenominator: 10 },
+    previous: {
+      unitNo: '11',
+      buildingShareNumerator: 1,
+      buildingShareDenominator: 10,
+    },
+    next: {
+      unitNo: '12',
+      buildingShareNumerator: 1,
+      buildingShareDenominator: 10,
+    },
     labels: { unitLabel: '12', updatedBy: 'Alice Admin' },
   },
   [CoreEventType.UNIT_DELETED]: {
@@ -143,7 +151,9 @@ describe('CoreAuditFormatter', () => {
           { ...VIEWER_ADMIN, viewerLanguage: lang },
         );
         expect(entry.message.length).toBeGreaterThan(0);
-        expect(entry.message).not.toMatch(/Activity recorded|Aktivita zaznamenána/);
+        expect(entry.message).not.toMatch(
+          /Activity recorded|Aktivita zaznamenána/,
+        );
       });
     },
   );

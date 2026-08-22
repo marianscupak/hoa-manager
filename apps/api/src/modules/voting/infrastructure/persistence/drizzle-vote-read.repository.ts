@@ -986,9 +986,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
           eq(tenantMemberships.tenantId, owners.tenantId),
         ),
       )
-      .where(
-        and(eq(owners.tenantId, tenantId), eq(owners.id, ownerId)),
-      )
+      .where(and(eq(owners.tenantId, tenantId), eq(owners.id, ownerId)))
       .limit(1);
 
     return rows.length > 0 ? rows[0].id : null;

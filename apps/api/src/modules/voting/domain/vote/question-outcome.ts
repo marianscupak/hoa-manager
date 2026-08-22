@@ -1,6 +1,10 @@
 import { VoteOptionSemantic, VoteQuestionType } from './vote.types';
 
-export type QuestionOutcome = 'APPROVED' | 'REJECTED' | 'WINNER' | 'NOT_DECIDED';
+export type QuestionOutcome =
+  | 'APPROVED'
+  | 'REJECTED'
+  | 'WINNER'
+  | 'NOT_DECIDED';
 
 /**
  * Display outcome of one question. Quorum is a vote-level property (per
@@ -18,7 +22,8 @@ export function deriveQuestionOutcome(input: {
     return 'NOT_DECIDED';
   }
   if (input.questionType === VoteQuestionType.YES_NO) {
-    return input.majorityMet && input.winningOptionKey === VoteOptionSemantic.YES
+    return input.majorityMet &&
+      input.winningOptionKey === VoteOptionSemantic.YES
       ? 'APPROVED'
       : 'REJECTED';
   }

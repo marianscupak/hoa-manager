@@ -19,7 +19,9 @@ import { RESERVED_PAYLOAD_KEY } from './audit-payload.constants';
 type AuditEventRow = typeof auditEvents.$inferSelect;
 
 @Injectable()
-export class DrizzleAuditEventReadRepository implements AuditEventReadRepository {
+export class DrizzleAuditEventReadRepository
+  implements AuditEventReadRepository
+{
   constructor(private readonly drizzle: DrizzleService) {}
 
   private get db() {
@@ -27,10 +29,15 @@ export class DrizzleAuditEventReadRepository implements AuditEventReadRepository
       this.drizzle.db) as typeof this.drizzle.db;
   }
 
-  async findByAggregate(params: FindByAggregateParams): Promise<AuditEventReadRecord[]> {
+  async findByAggregate(
+    params: FindByAggregateParams,
+  ): Promise<AuditEventReadRecord[]> {
     const { tenantId, aggregateType, aggregateId, scope, limit } = params;
 
-    const visibilityCondition = inArray(auditEvents.visibility, scope.allowedVisibilities);
+    const visibilityCondition = inArray(
+      auditEvents.visibility,
+      scope.allowedVisibilities,
+    );
     const filter = scope.alwaysIncludeForActorUserId
       ? or(
           visibilityCondition,
@@ -51,7 +58,8 @@ export class DrizzleAuditEventReadRepository implements AuditEventReadRepository
       )
       .orderBy(asc(auditEvents.occurredAt));
 
-    const rows = limit !== undefined ? await baseQuery.limit(limit) : await baseQuery;
+    const rows =
+      limit !== undefined ? await baseQuery.limit(limit) : await baseQuery;
 
     return rows.map((r) => this.mapRow(r));
   }

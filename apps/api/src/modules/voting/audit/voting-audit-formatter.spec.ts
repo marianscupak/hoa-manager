@@ -153,7 +153,11 @@ describe('VotingAuditFormatter', () => {
   describe.each([
     [
       VotingEventType.VOTE_CREATED,
-      { title: 'X', description: null, labels: { voteTitle: 'X', createdBy: 'Author' } },
+      {
+        title: 'X',
+        description: null,
+        labels: { voteTitle: 'X', createdBy: 'Author' },
+      },
     ],
     [
       VotingEventType.VOTE_RULESET_SET,
@@ -169,7 +173,11 @@ describe('VotingAuditFormatter', () => {
     ],
     [
       VotingEventType.VOTE_OPENED,
-      { openedAt: '2026-05-13T10:00:00Z', electorateSize: 1, labels: { voteTitle: 'X', openedBy: 'Author' } },
+      {
+        openedAt: '2026-05-13T10:00:00Z',
+        electorateSize: 1,
+        labels: { voteTitle: 'X', openedBy: 'Author' },
+      },
     ],
     [
       VotingEventType.VOTE_ELECTORATE_SNAPSHOTTED,
@@ -192,7 +200,10 @@ describe('VotingAuditFormatter', () => {
     ],
     [
       VotingEventType.VOTE_CLOSED,
-      { closedAt: '2026-05-13T10:00:00Z', labels: { voteTitle: 'X', closedBy: 'Author' } },
+      {
+        closedAt: '2026-05-13T10:00:00Z',
+        labels: { voteTitle: 'X', closedBy: 'Author' },
+      },
     ],
     [
       VotingEventType.VOTE_RESULTS_COMPUTED,
@@ -202,16 +213,19 @@ describe('VotingAuditFormatter', () => {
         labels: { voteTitle: 'X', questions: [] },
       },
     ],
-  ])('every event type renders a non-empty message: %s', (eventType, payload) => {
-    it('renders', () => {
-      const entry = formatter.format(
-        ev({ eventType, payload }),
-        VIEWER_ADMIN,
-      );
-      expect(entry.message.length).toBeGreaterThan(0);
-      expect(entry.message).not.toContain('Activity recorded'); // i.e. it took a typed branch, not the unknown fallback
-    });
-  });
+  ])(
+    'every event type renders a non-empty message: %s',
+    (eventType, payload) => {
+      it('renders', () => {
+        const entry = formatter.format(
+          ev({ eventType, payload }),
+          VIEWER_ADMIN,
+        );
+        expect(entry.message.length).toBeGreaterThan(0);
+        expect(entry.message).not.toContain('Activity recorded'); // i.e. it took a typed branch, not the unknown fallback
+      });
+    },
+  );
 
   describe('VOTE_CONSENT_CREATED', () => {
     const basePayload = {
@@ -298,7 +312,9 @@ describe('VotingAuditFormatter', () => {
         payload: { ...basePayload, revokedByMembershipId: 'owner-m-1' },
       });
       const entry = formatter.format(e, VIEWER_ADMIN);
-      expect(entry.message).toBe('Bob revoked the delegation of unit 12 to Carol.');
+      expect(entry.message).toBe(
+        'Bob revoked the delegation of unit 12 to Carol.',
+      );
     });
 
     it('renders byRecorder variant when admin revoked on behalf (en)', () => {
@@ -335,7 +351,9 @@ describe('VotingAuditFormatter', () => {
         payload: basePayload,
       });
       const entry = formatter.format(e, VIEWER_ADMIN);
-      expect(entry.message).toBe('Alice (board) revoked the delegation for unit 12.');
+      expect(entry.message).toBe(
+        'Alice (board) revoked the delegation for unit 12.',
+      );
     });
   });
 });

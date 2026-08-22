@@ -26,9 +26,7 @@ describe('GetVotesHandler', () => {
       allowCoOwnerIndividualVote: false,
     } as unknown as VoteListItemResponseDto;
     voteReadRepository.findVotes.mockResolvedValue([closedVote]);
-    voteReadRepository.findVoterSummariesForVotes.mockResolvedValue(
-      new Map(),
-    );
+    voteReadRepository.findVoterSummariesForVotes.mockResolvedValue(new Map());
     const outcomes = [
       {
         questionId: 'q1',
@@ -51,10 +49,9 @@ describe('GetVotesHandler', () => {
     );
 
     expect(result[0].questionOutcomes).toEqual(outcomes);
-    expect(voteReadRepository.findQuestionOutcomesForVotes).toHaveBeenCalledWith(
-      'tenant-1',
-      ['v1'],
-    );
+    expect(
+      voteReadRepository.findQuestionOutcomesForVotes,
+    ).toHaveBeenCalledWith('tenant-1', ['v1']);
   });
 
   it('does not call findQuestionOutcomesForVotes when there are no CLOSED votes', async () => {
@@ -65,9 +62,7 @@ describe('GetVotesHandler', () => {
       allowCoOwnerIndividualVote: false,
     } as unknown as VoteListItemResponseDto;
     voteReadRepository.findVotes.mockResolvedValue([openVote]);
-    voteReadRepository.findVoterSummariesForVotes.mockResolvedValue(
-      new Map(),
-    );
+    voteReadRepository.findVoterSummariesForVotes.mockResolvedValue(new Map());
 
     await handler.execute(
       new GetVotesQuery(
@@ -91,9 +86,7 @@ describe('GetVotesHandler', () => {
       allowCoOwnerIndividualVote: false,
     } as unknown as VoteListItemResponseDto;
     voteReadRepository.findVotes.mockResolvedValue([closedVote]);
-    voteReadRepository.findVoterSummariesForVotes.mockResolvedValue(
-      new Map(),
-    );
+    voteReadRepository.findVoterSummariesForVotes.mockResolvedValue(new Map());
     voteReadRepository.findQuestionOutcomesForVotes.mockResolvedValue(
       new Map(),
     );

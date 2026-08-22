@@ -49,7 +49,8 @@ export class ScheduleVoteHandler
       await this.voteRepository.save(vote);
 
       const actor = this.auditContext.requireActor();
-      const scheduledByLabel = await this.labelResolver.resolveActorLabel(actor);
+      const scheduledByLabel =
+        await this.labelResolver.resolveActorLabel(actor);
 
       await this.auditService.append(
         VoteScheduledAuditEvent.build({

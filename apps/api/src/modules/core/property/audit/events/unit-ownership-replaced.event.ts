@@ -6,9 +6,7 @@ import { Visibility } from '@/modules/core/audit/domain/visibility';
 import { CoreEventType } from '@/modules/core/audit-projections/core-event-types';
 
 const PayloadSchema = z.object({
-  ownerships: z.array(
-    z.object({ ownerId: z.uuid(), share: z.string() }),
-  ),
+  ownerships: z.array(z.object({ ownerId: z.uuid(), share: z.string() })),
   labels: z.object({
     unitLabel: z.string(),
     changedBy: z.string(),

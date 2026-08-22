@@ -16,7 +16,6 @@ import {
   type VoteReadRepository,
 } from '../../ports/vote-read.repository.port';
 
-
 @QueryHandler(GetVoteActivityQuery)
 export class GetVoteActivityHandler
   implements IQueryHandler<GetVoteActivityQuery, VoteActivityResponseDto>

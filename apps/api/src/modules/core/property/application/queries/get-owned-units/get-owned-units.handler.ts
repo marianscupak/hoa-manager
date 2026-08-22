@@ -27,9 +27,7 @@ export class GetOwnedUnitsHandler
     private readonly repo: UnitReadRepository,
   ) {}
 
-  async execute(
-    query: GetOwnedUnitsQuery,
-  ): Promise<OwnedUnitResponseDto[]> {
+  async execute(query: GetOwnedUnitsQuery): Promise<OwnedUnitResponseDto[]> {
     const rows = await this.repo.findOwnedByMembership({
       tenantId: query.tenantId,
       membershipId: query.membershipId,

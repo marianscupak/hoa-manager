@@ -91,7 +91,9 @@ describe('AuditService.append', () => {
   it('throws when CLS actor is missing', async () => {
     cls.get = jest.fn((_key: string) => null);
     service = new AuditService(repo, registry, cls as never);
-    await expect(service.append(baseEvent())).rejects.toThrow(/No audit actor in CLS/);
+    await expect(service.append(baseEvent())).rejects.toThrow(
+      /No audit actor in CLS/,
+    );
     expect(repo.append).not.toHaveBeenCalled();
   });
 

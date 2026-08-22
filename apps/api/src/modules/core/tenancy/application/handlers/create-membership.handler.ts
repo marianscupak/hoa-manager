@@ -39,7 +39,9 @@ export class CreateMembershipHandler
     });
 
     const actor = this.auditContext.requireActor();
-    const memberLabel = await this.labelResolver.resolveUserLabel(command.userId);
+    const memberLabel = await this.labelResolver.resolveUserLabel(
+      command.userId,
+    );
     const actorLabel = await this.labelResolver.resolveActorLabel(actor);
 
     await this.auditService.append(

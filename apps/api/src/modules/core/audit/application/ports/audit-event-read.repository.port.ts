@@ -28,8 +28,12 @@ export interface FindRecentParams {
 }
 
 export interface AuditEventReadRepository {
-  findByAggregate(params: FindByAggregateParams): Promise<AuditEventReadRecord[]>;
+  findByAggregate(
+    params: FindByAggregateParams,
+  ): Promise<AuditEventReadRecord[]>;
   findRecent(params: FindRecentParams): Promise<AuditEventReadRecord[]>;
 }
 
-export const AUDIT_EVENT_READ_REPOSITORY = Symbol('AUDIT_EVENT_READ_REPOSITORY');
+export const AUDIT_EVENT_READ_REPOSITORY = Symbol(
+  'AUDIT_EVENT_READ_REPOSITORY',
+);

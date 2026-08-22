@@ -44,7 +44,9 @@ export interface HandleGoogleCallbackResult {
 }
 
 @CommandHandler(HandleGoogleCallbackCommand)
-export class HandleGoogleCallbackHandler implements ICommandHandler<HandleGoogleCallbackCommand> {
+export class HandleGoogleCallbackHandler
+  implements ICommandHandler<HandleGoogleCallbackCommand>
+{
   constructor(
     @Inject(UNIT_OF_WORK) private readonly uow: UnitOfWork,
     @Inject(AUTH_IDENTITY_REPOSITORY)

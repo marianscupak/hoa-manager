@@ -82,7 +82,12 @@ const Repositories = [
     forwardRef(() => InvitationModule),
   ],
   controllers: [OwnerController, PropertyController, UnitController],
-  providers: [...CommandHandlers, ...QueryHandlers, ...Repositories, PropertyAuditRegistration],
+  providers: [
+    ...CommandHandlers,
+    ...QueryHandlers,
+    ...Repositories,
+    PropertyAuditRegistration,
+  ],
   exports: [],
 })
 export class PropertyModule {}

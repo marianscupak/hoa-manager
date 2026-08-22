@@ -37,7 +37,9 @@ export class CoreAuditFormatter implements AuditEventFormatter, OnModuleInit {
         const p = event.payload as { labels: { createdBy: string } };
         return {
           ...base,
-          message: t(lang, 'tenant.created.public', { actor: p.labels.createdBy }),
+          message: t(lang, 'tenant.created.public', {
+            actor: p.labels.createdBy,
+          }),
         };
       }
       case CoreEventType.MEMBERSHIP_CREATED: {
@@ -203,7 +205,9 @@ export class CoreAuditFormatter implements AuditEventFormatter, OnModuleInit {
         };
         return {
           ...base,
-          message: t(lang, 'invite.accepted.public', { user: p.labels.userName }),
+          message: t(lang, 'invite.accepted.public', {
+            user: p.labels.userName,
+          }),
         };
       }
       default:

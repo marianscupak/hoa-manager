@@ -14,9 +14,7 @@ import { t } from './projections/voting-audit-strings';
 import { VotingEventType } from './voting-event-types';
 
 @Injectable()
-export class VotingAuditFormatter
-  implements AuditEventFormatter, OnModuleInit
-{
+export class VotingAuditFormatter implements AuditEventFormatter, OnModuleInit {
   readonly module = 'VOTING';
 
   constructor(
@@ -28,10 +26,7 @@ export class VotingAuditFormatter
     this.registry.register(this);
   }
 
-  format(
-    event: AuditEventReadRecord,
-    viewer: ViewerContext,
-  ): TimelineEntry {
+  format(event: AuditEventReadRecord, viewer: ViewerContext): TimelineEntry {
     return this.renderOne(event, viewer);
   }
 

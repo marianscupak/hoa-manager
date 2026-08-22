@@ -33,7 +33,8 @@ import type { PropertyOverviewResponseDto } from '../../../api/dto/property-over
  */
 @QueryHandler(GetPropertyOverviewQuery)
 export class GetPropertyOverviewHandler
-  implements IQueryHandler<GetPropertyOverviewQuery, PropertyOverviewResponseDto>
+  implements
+    IQueryHandler<GetPropertyOverviewQuery, PropertyOverviewResponseDto>
 {
   constructor(
     @Inject(UNIT_READ_REPOSITORY)

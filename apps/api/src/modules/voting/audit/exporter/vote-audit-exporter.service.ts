@@ -18,7 +18,6 @@ import {
   type VoteReadRepository,
 } from '../../application/ports/vote-read.repository.port';
 
-
 export interface ExportInput {
   tenantId: string;
   voteId: string;
@@ -49,7 +48,10 @@ export class VoteAuditExporterService {
 
     const [tenant, electorate, results, allEvents] = await Promise.all([
       this.tenantLookup.findById(input.tenantId),
-      this.electorateLookup.findSnapshotWithLabels(input.tenantId, input.voteId),
+      this.electorateLookup.findSnapshotWithLabels(
+        input.tenantId,
+        input.voteId,
+      ),
       this.voteReadRepo.findResultsByVoteId(input.tenantId, input.voteId),
       this.auditReadRepo.findByAggregate({
         tenantId: input.tenantId,

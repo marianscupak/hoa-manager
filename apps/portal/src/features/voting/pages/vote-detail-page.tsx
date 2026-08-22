@@ -266,7 +266,11 @@ export function VoteDetailPage() {
                                     {vote.description}
                                 </p>
                             )}
-                            <VoteDocuments />
+                            <VoteDocuments
+                                voteId={vote.id}
+                                documents={vote.documents ?? []}
+                                canManage={isAdmin && vote.status === "DRAFT"}
+                            />
                         </CardContent>
                     </Card>
 

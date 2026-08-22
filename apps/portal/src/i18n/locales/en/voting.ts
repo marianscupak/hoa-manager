@@ -208,6 +208,19 @@ export const voting = {
             },
             time: "Time",
         },
+        documents: {
+            title: "Documents",
+            description:
+                "Attach supporting documents (PDF, Word, Excel, images). Max 50 MB per file.",
+            add: "Add document",
+            uploading: "Uploading…",
+            retry: "Retry",
+            dismiss: "Dismiss",
+            tooLarge: "The file exceeds the 50 MB limit.",
+            typeNotAllowed: "This file type is not allowed.",
+            limitReached: "A vote can have at most 20 documents.",
+            uploadFailed: "Upload failed.",
+        },
         toast: {
             createSuccess: "Vote created successfully",
             updateSuccess: "Vote updated successfully",
@@ -358,6 +371,8 @@ export const voting = {
         },
         documents: {
             download: "Download",
+            delete: "Remove",
+            empty: "No documents attached.",
         },
         questions: {
             title: "Voting Items",

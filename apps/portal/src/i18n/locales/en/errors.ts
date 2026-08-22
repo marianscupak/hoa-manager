@@ -67,4 +67,12 @@ export default {
     VOTE_QUESTION_MISSING_OPTIONS: "Some questions are missing options.",
     VOTE_SCHEDULE_MISSING_DATES:
         "The vote schedule is missing start or end dates.",
+    VOTE_DOCUMENT_NOT_FOUND: "Document not found.",
+    VOTE_DOCUMENT_LIMIT_REACHED:
+        "This vote already has the maximum number of documents (20).",
+    VOTE_DOCUMENT_TYPE_NOT_ALLOWED: "This file type is not allowed.",
+    VOTE_DOCUMENT_TOO_LARGE: "The file exceeds the 50 MB limit.",
+    VOTE_DOCUMENT_UPLOAD_INCOMPLETE:
+        "The upload did not complete. Please try again.",
+    DOCUMENT_STORAGE_NOT_CONFIGURED: "Document storage is not configured.",
 } as const;

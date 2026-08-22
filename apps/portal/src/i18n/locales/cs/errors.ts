@@ -69,4 +69,12 @@ export default {
     VOTE_QUESTION_MISSING_OPTIONS: "Některé otázky nemají vyplněné možnosti.",
     VOTE_SCHEDULE_MISSING_DATES:
         "V harmonogramu hlasování chybí datum zahájení nebo ukončení.",
+    VOTE_DOCUMENT_NOT_FOUND: "Dokument nebyl nalezen.",
+    VOTE_DOCUMENT_LIMIT_REACHED:
+        "Hlasování již obsahuje maximální počet dokumentů (20).",
+    VOTE_DOCUMENT_TYPE_NOT_ALLOWED: "Tento typ souboru není povolen.",
+    VOTE_DOCUMENT_TOO_LARGE: "Soubor přesahuje limit 50 MB.",
+    VOTE_DOCUMENT_UPLOAD_INCOMPLETE:
+        "Nahrávání se nedokončilo. Zkuste to prosím znovu.",
+    DOCUMENT_STORAGE_NOT_CONFIGURED: "Úložiště dokumentů není nakonfigurováno.",
 } as const;

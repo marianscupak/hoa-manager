@@ -208,6 +208,19 @@ export const voting = {
             },
             time: "Čas",
         },
+        documents: {
+            title: "Dokumenty",
+            description:
+                "Přiložte podpůrné dokumenty (PDF, Word, Excel, obrázky). Max. 50 MB na soubor.",
+            add: "Přidat dokument",
+            uploading: "Nahrávání…",
+            retry: "Zkusit znovu",
+            dismiss: "Zavřít",
+            tooLarge: "Soubor přesahuje limit 50 MB.",
+            typeNotAllowed: "Tento typ souboru není povolen.",
+            limitReached: "Hlasování může mít nejvýše 20 dokumentů.",
+            uploadFailed: "Nahrávání se nezdařilo.",
+        },
         toast: {
             createSuccess: "Hlasování bylo úspěšně vytvořeno",
             updateSuccess: "Hlasování bylo úspěšně uloženo",
@@ -359,6 +372,8 @@ export const voting = {
         },
         documents: {
             download: "Stáhnout",
+            delete: "Odebrat",
+            empty: "Žádné přiložené dokumenty.",
         },
         questions: {
             title: "Položky k hlasování",

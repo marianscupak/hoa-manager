@@ -93,6 +93,14 @@ jobs:
         runs-on: ubuntu-latest
         env:
             SSH_DEST: ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}
+            # Non-secret configuration, rendered into the server .env below.
+            # Secrets live in GitHub Actions secrets (gh secret set <NAME>).
+            DOMAIN: hoa.marianscupak.com
+            POSTGRES_USER: hoa_manager
+            POSTGRES_DB: hoa_manager
+            R2_ACCOUNT_ID: 54ebd2c5a7c6e4c79d811f17370de033
+            R2_BUCKET: hoa-manager-backups
+            R2_ENDPOINT: https://54ebd2c5a7c6e4c79d811f17370de033.eu.r2.cloudflarestorage.com
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -105,13 +113,48 @@ jobs:
                   ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
                   echo "IdentityFile ~/.ssh/deploy_key" >> ~/.ssh/config
 
+            - name: Render .env from secrets
+              env:
+                  GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+                  GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+                  JWT_SECRET: ${{ secrets.JWT_SECRET }}
+                  POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+                  GRAFANA_PASSWORD: ${{ secrets.GRAFANA_PASSWORD }}
+                  R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+                  R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+              run: |
+                  cat > server.env <<EOF
+                  # Rendered by deploy.yml from GitHub Actions secrets.
+                  # Do NOT edit on the server — every deploy overwrites this file.
+                  # Change values via: gh secret set <NAME>  (or deploy.yml env)
+                  DOMAIN=${DOMAIN}
+                  GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+                  GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+                  GOOGLE_REDIRECT_URI=https://${DOMAIN}/api/auth/google/callback
+                  FRONTEND_URL=https://${DOMAIN}
+                  CORS_ORIGINS=https://${DOMAIN}
+                  JWT_SECRET=${JWT_SECRET}
+                  POSTGRES_USER=${POSTGRES_USER}
+                  POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+                  POSTGRES_DB=${POSTGRES_DB}
+                  DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+                  GRAFANA_PASSWORD=${GRAFANA_PASSWORD}
+                  R2_ACCOUNT_ID=${R2_ACCOUNT_ID}
+                  R2_ACCESS_KEY_ID=${R2_ACCESS_KEY_ID}
+                  R2_SECRET_ACCESS_KEY=${R2_SECRET_ACCESS_KEY}
+                  R2_BUCKET=${R2_BUCKET}
+                  R2_ENDPOINT=${R2_ENDPOINT}
+                  EOF
+
             - name: Copy configuration to server
               run: |
                   ssh "$SSH_DEST" 'mkdir -p /opt/hoa-manager/docker'
                   scp docker-compose.prod.yml "$SSH_DEST":/opt/hoa-manager/docker-compose.yml
                   scp -r docker/prometheus docker/loki docker/promtail docker/grafana "$SSH_DEST":/opt/hoa-manager/docker/
                   scp docker/backup/backup.sh "$SSH_DEST":/opt/hoa-manager/backup.sh
-                  ssh "$SSH_DEST" 'chmod +x /opt/hoa-manager/backup.sh'
+                  scp server.env "$SSH_DEST":/opt/hoa-manager/.env
+                  rm server.env
+                  ssh "$SSH_DEST" 'chmod +x /opt/hoa-manager/backup.sh && chmod 600 /opt/hoa-manager/.env'
 
             - name: Pull images, migrate, restart
               run: |

@@ -57,3 +57,8 @@ export const voteResultStatusEnum = pgEnum('vote_result_status', [
   'COMPUTED',
   'FAILED',
 ]);
+
+export const voteDocumentStatusEnum = pgEnum('vote_document_status', [
+  'PENDING',
+  'UPLOADED',
+]);

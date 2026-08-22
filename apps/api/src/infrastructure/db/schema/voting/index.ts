@@ -10,3 +10,4 @@ export * from './ballot-answers';
 export * from './vote-results';
 export * from './vote-question-results';
 export * from './vote-option-results';
+export * from './vote-documents';

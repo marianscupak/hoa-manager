@@ -146,3 +146,39 @@ export class NotUnitRepresentativeException extends DomainException {
     super(ErrorCode.NOT_UNIT_REPRESENTATIVE);
   }
 }
+
+export class VoteDocumentNotFoundException extends DomainException {
+  constructor() {
+    super(ErrorCode.VOTE_DOCUMENT_NOT_FOUND);
+  }
+}
+
+export class VoteDocumentLimitReachedException extends DomainException {
+  constructor() {
+    super(ErrorCode.VOTE_DOCUMENT_LIMIT_REACHED);
+  }
+}
+
+export class VoteDocumentTypeNotAllowedException extends DomainException {
+  constructor() {
+    super(ErrorCode.VOTE_DOCUMENT_TYPE_NOT_ALLOWED);
+  }
+}
+
+export class VoteDocumentTooLargeException extends DomainException {
+  constructor() {
+    super(ErrorCode.VOTE_DOCUMENT_TOO_LARGE);
+  }
+}
+
+export class VoteDocumentUploadIncompleteException extends DomainException {
+  constructor() {
+    super(ErrorCode.VOTE_DOCUMENT_UPLOAD_INCOMPLETE);
+  }
+}
+
+export class DocumentStorageNotConfiguredException extends DomainException {
+  constructor() {
+    super(ErrorCode.DOCUMENT_STORAGE_NOT_CONFIGURED);
+  }
+}

@@ -15,6 +15,16 @@ const corsOriginsSchema = z
       .min(1),
   );
 
+const optionalNonEmpty = z.preprocess(
+  (v) => (v === '' ? undefined : v),
+  z.string().min(1).optional(),
+);
+
+const optionalUrl = z.preprocess(
+  (v) => (v === '' ? undefined : v),
+  z.url().optional(),
+);
+
 export const configSchema = z
   .object({
     DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
@@ -26,6 +36,10 @@ export const configSchema = z
     GOOGLE_REDIRECT_URI: z
       .url('GOOGLE_REDIRECT_URI must be a valid URL')
       .optional(),
+    R2_UPLOADS_ENDPOINT: optionalUrl,
+    R2_UPLOADS_BUCKET: optionalNonEmpty,
+    R2_UPLOADS_ACCESS_KEY_ID: optionalNonEmpty,
+    R2_UPLOADS_SECRET_ACCESS_KEY: optionalNonEmpty,
   })
   .refine(
     (c) => {
@@ -39,6 +53,21 @@ export const configSchema = z
     {
       message:
         'GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET and GOOGLE_REDIRECT_URI must all be set together (or all unset).',
+    },
+  )
+  .refine(
+    (c) => {
+      const provided = [
+        c.R2_UPLOADS_ENDPOINT,
+        c.R2_UPLOADS_BUCKET,
+        c.R2_UPLOADS_ACCESS_KEY_ID,
+        c.R2_UPLOADS_SECRET_ACCESS_KEY,
+      ].filter(Boolean).length;
+      return provided === 0 || provided === 4;
+    },
+    {
+      message:
+        'R2_UPLOADS_ENDPOINT, R2_UPLOADS_BUCKET, R2_UPLOADS_ACCESS_KEY_ID and R2_UPLOADS_SECRET_ACCESS_KEY must all be set together (or all unset).',
     },
   );
 

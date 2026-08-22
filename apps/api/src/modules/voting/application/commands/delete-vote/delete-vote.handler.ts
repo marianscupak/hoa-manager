@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
@@ -15,12 +15,22 @@ import { type Clock, CLOCK } from '@/shared/application/ports/clock.port';
 
 import { DeleteVoteCommand } from './delete-vote.command';
 import {
+  DOCUMENT_STORAGE,
+  type DocumentStoragePort,
+} from '../../ports/document-storage.port';
+import {
+  VOTE_DOCUMENT_REPOSITORY,
+  type VoteDocumentRepository,
+} from '../../ports/vote-document.repository.port';
+import {
   VOTE_WRITE_REPOSITORY,
   type VoteWriteRepository,
 } from '../../ports/vote-write.repository.port';
 
 @CommandHandler(DeleteVoteCommand)
 export class DeleteVoteHandler implements ICommandHandler<DeleteVoteCommand> {
+  private readonly logger = new Logger(DeleteVoteHandler.name);
+
   constructor(
     @Inject(VOTE_WRITE_REPOSITORY)
     private readonly voteWriteRepository: VoteWriteRepository,
@@ -30,6 +40,10 @@ export class DeleteVoteHandler implements ICommandHandler<DeleteVoteCommand> {
     private readonly auditService: AuditService,
     private readonly auditContext: AuditContextService,
     private readonly labelResolver: VotingAuditLabelResolver,
+    @Inject(VOTE_DOCUMENT_REPOSITORY)
+    private readonly documentRepository: VoteDocumentRepository,
+    @Inject(DOCUMENT_STORAGE)
+    private readonly storage: DocumentStoragePort,
   ) {}
 
   async execute(command: DeleteVoteCommand): Promise<void> {
@@ -46,6 +60,11 @@ export class DeleteVoteHandler implements ICommandHandler<DeleteVoteCommand> {
     }
 
     const voteTitle = aggregate.title;
+
+    const documents = await this.documentRepository.findByVoteId(
+      tenantId,
+      voteId,
+    );
 
     await this.unitOfWork.execute(async () => {
       await this.voteWriteRepository.delete(tenantId, voteId);
@@ -64,5 +83,19 @@ export class DeleteVoteHandler implements ICommandHandler<DeleteVoteCommand> {
         }),
       );
     });
+
+    if (this.storage.isConfigured()) {
+      for (const document of documents) {
+        try {
+          await this.storage.delete(document.objectKey);
+        } catch (error: unknown) {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          this.logger.warn(
+            `Failed to delete R2 object ${document.objectKey}: ${message}`,
+          );
+        }
+      }
+    }
   }
 }

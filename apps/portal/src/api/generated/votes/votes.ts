@@ -27,6 +27,9 @@ import type {
     CreateVoteQuestionDto,
     CreateVoteResponseDto,
     DelegationCandidateDto,
+    DocumentDownloadUrlResponseDto,
+    RequestDocumentUploadDto,
+    RequestDocumentUploadResponseDto,
     SetVoteRulesetDto,
     SetVoteRulesetResponseDto,
     SubmitBallotDto,
@@ -2591,3 +2594,473 @@ export const useVotesControllerCloseVote = <
         queryClient,
     );
 };
+export const votesControllerRequestDocumentUpload = (
+    id: string,
+    requestDocumentUploadDto: BodyType<RequestDocumentUploadDto>,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<RequestDocumentUploadResponseDto>(
+        {
+            url: `/api/votes/${id}/documents`,
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            data: requestDocumentUploadDto,
+            signal,
+        },
+        options,
+    );
+};
+
+export const getVotesControllerRequestDocumentUploadMutationOptions = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof votesControllerRequestDocumentUpload>>,
+        TError,
+        { id: string; data: BodyType<RequestDocumentUploadDto> },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof votesControllerRequestDocumentUpload>>,
+    TError,
+    { id: string; data: BodyType<RequestDocumentUploadDto> },
+    TContext
+> => {
+    const mutationKey = ["votesControllerRequestDocumentUpload"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof votesControllerRequestDocumentUpload>>,
+        { id: string; data: BodyType<RequestDocumentUploadDto> }
+    > = (props) => {
+        const { id, data } = props ?? {};
+
+        return votesControllerRequestDocumentUpload(id, data, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type VotesControllerRequestDocumentUploadMutationResult = NonNullable<
+    Awaited<ReturnType<typeof votesControllerRequestDocumentUpload>>
+>;
+export type VotesControllerRequestDocumentUploadMutationBody =
+    BodyType<RequestDocumentUploadDto>;
+export type VotesControllerRequestDocumentUploadMutationError =
+    ErrorType<unknown>;
+
+export const useVotesControllerRequestDocumentUpload = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof votesControllerRequestDocumentUpload>>,
+            TError,
+            { id: string; data: BodyType<RequestDocumentUploadDto> },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof votesControllerRequestDocumentUpload>>,
+    TError,
+    { id: string; data: BodyType<RequestDocumentUploadDto> },
+    TContext
+> => {
+    return useMutation(
+        getVotesControllerRequestDocumentUploadMutationOptions(options),
+        queryClient,
+    );
+};
+export const votesControllerConfirmDocumentUpload = (
+    id: string,
+    documentId: string,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<void>(
+        {
+            url: `/api/votes/${id}/documents/${documentId}/confirm`,
+            method: "POST",
+            signal,
+        },
+        options,
+    );
+};
+
+export const getVotesControllerConfirmDocumentUploadMutationOptions = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof votesControllerConfirmDocumentUpload>>,
+        TError,
+        { id: string; documentId: string },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof votesControllerConfirmDocumentUpload>>,
+    TError,
+    { id: string; documentId: string },
+    TContext
+> => {
+    const mutationKey = ["votesControllerConfirmDocumentUpload"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof votesControllerConfirmDocumentUpload>>,
+        { id: string; documentId: string }
+    > = (props) => {
+        const { id, documentId } = props ?? {};
+
+        return votesControllerConfirmDocumentUpload(
+            id,
+            documentId,
+            requestOptions,
+        );
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type VotesControllerConfirmDocumentUploadMutationResult = NonNullable<
+    Awaited<ReturnType<typeof votesControllerConfirmDocumentUpload>>
+>;
+
+export type VotesControllerConfirmDocumentUploadMutationError =
+    ErrorType<unknown>;
+
+export const useVotesControllerConfirmDocumentUpload = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof votesControllerConfirmDocumentUpload>>,
+            TError,
+            { id: string; documentId: string },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof votesControllerConfirmDocumentUpload>>,
+    TError,
+    { id: string; documentId: string },
+    TContext
+> => {
+    return useMutation(
+        getVotesControllerConfirmDocumentUploadMutationOptions(options),
+        queryClient,
+    );
+};
+export const votesControllerDeleteVoteDocument = (
+    id: string,
+    documentId: string,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<void>(
+        {
+            url: `/api/votes/${id}/documents/${documentId}`,
+            method: "DELETE",
+            signal,
+        },
+        options,
+    );
+};
+
+export const getVotesControllerDeleteVoteDocumentMutationOptions = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof votesControllerDeleteVoteDocument>>,
+        TError,
+        { id: string; documentId: string },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof votesControllerDeleteVoteDocument>>,
+    TError,
+    { id: string; documentId: string },
+    TContext
+> => {
+    const mutationKey = ["votesControllerDeleteVoteDocument"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof votesControllerDeleteVoteDocument>>,
+        { id: string; documentId: string }
+    > = (props) => {
+        const { id, documentId } = props ?? {};
+
+        return votesControllerDeleteVoteDocument(
+            id,
+            documentId,
+            requestOptions,
+        );
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type VotesControllerDeleteVoteDocumentMutationResult = NonNullable<
+    Awaited<ReturnType<typeof votesControllerDeleteVoteDocument>>
+>;
+
+export type VotesControllerDeleteVoteDocumentMutationError = ErrorType<unknown>;
+
+export const useVotesControllerDeleteVoteDocument = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof votesControllerDeleteVoteDocument>>,
+            TError,
+            { id: string; documentId: string },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof votesControllerDeleteVoteDocument>>,
+    TError,
+    { id: string; documentId: string },
+    TContext
+> => {
+    return useMutation(
+        getVotesControllerDeleteVoteDocumentMutationOptions(options),
+        queryClient,
+    );
+};
+export const votesControllerGetDocumentDownloadUrl = (
+    id: string,
+    documentId: string,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<DocumentDownloadUrlResponseDto>(
+        {
+            url: `/api/votes/${id}/documents/${documentId}/download-url`,
+            method: "GET",
+            signal,
+        },
+        options,
+    );
+};
+
+export const getVotesControllerGetDocumentDownloadUrlQueryKey = (
+    id: string,
+    documentId: string,
+) => {
+    return [`/api/votes/${id}/documents/${documentId}/download-url`] as const;
+};
+
+export const getVotesControllerGetDocumentDownloadUrlQueryOptions = <
+    TData = Awaited<ReturnType<typeof votesControllerGetDocumentDownloadUrl>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    documentId: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof votesControllerGetDocumentDownloadUrl>
+                >,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getVotesControllerGetDocumentDownloadUrlQueryKey(id, documentId);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof votesControllerGetDocumentDownloadUrl>>
+    > = ({ signal }) =>
+        votesControllerGetDocumentDownloadUrl(
+            id,
+            documentId,
+            requestOptions,
+            signal,
+        );
+
+    return {
+        queryKey,
+        queryFn,
+        enabled: !!(id && documentId),
+        ...queryOptions,
+    } as UseQueryOptions<
+        Awaited<ReturnType<typeof votesControllerGetDocumentDownloadUrl>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type VotesControllerGetDocumentDownloadUrlQueryResult = NonNullable<
+    Awaited<ReturnType<typeof votesControllerGetDocumentDownloadUrl>>
+>;
+export type VotesControllerGetDocumentDownloadUrlQueryError =
+    ErrorType<unknown>;
+
+export function useVotesControllerGetDocumentDownloadUrl<
+    TData = Awaited<ReturnType<typeof votesControllerGetDocumentDownloadUrl>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    documentId: string,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof votesControllerGetDocumentDownloadUrl>
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof votesControllerGetDocumentDownloadUrl>
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<typeof votesControllerGetDocumentDownloadUrl>
+                    >
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useVotesControllerGetDocumentDownloadUrl<
+    TData = Awaited<ReturnType<typeof votesControllerGetDocumentDownloadUrl>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    documentId: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof votesControllerGetDocumentDownloadUrl>
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof votesControllerGetDocumentDownloadUrl>
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<typeof votesControllerGetDocumentDownloadUrl>
+                    >
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useVotesControllerGetDocumentDownloadUrl<
+    TData = Awaited<ReturnType<typeof votesControllerGetDocumentDownloadUrl>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    documentId: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof votesControllerGetDocumentDownloadUrl>
+                >,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useVotesControllerGetDocumentDownloadUrl<
+    TData = Awaited<ReturnType<typeof votesControllerGetDocumentDownloadUrl>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    documentId: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof votesControllerGetDocumentDownloadUrl>
+                >,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
+    const queryOptions = getVotesControllerGetDocumentDownloadUrlQueryOptions(
+        id,
+        documentId,
+        options,
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+        TData,
+        TError
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+    return { ...query, queryKey: queryOptions.queryKey };
+}

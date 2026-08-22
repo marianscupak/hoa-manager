@@ -2668,6 +2668,138 @@
         },
         "tags": ["Votes"]
       }
+    },
+    "/api/votes/{id}/documents": {
+      "post": {
+        "operationId": "VotesController_requestDocumentUpload",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestDocumentUploadDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Returns the document id and a presigned upload URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestDocumentUploadResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Votes"]
+      }
+    },
+    "/api/votes/{id}/documents/{documentId}/confirm": {
+      "post": {
+        "operationId": "VotesController_confirmDocumentUpload",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "documentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Upload confirmed"
+          }
+        },
+        "tags": ["Votes"]
+      }
+    },
+    "/api/votes/{id}/documents/{documentId}": {
+      "delete": {
+        "operationId": "VotesController_deleteVoteDocument",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "documentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Document deleted"
+          }
+        },
+        "tags": ["Votes"]
+      }
+    },
+    "/api/votes/{id}/documents/{documentId}/download-url": {
+      "get": {
+        "operationId": "VotesController_getDocumentDownloadUrl",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "documentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns a short-lived presigned download URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentDownloadUrlResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Votes"]
+      }
     }
   },
   "info": {
@@ -3580,6 +3712,28 @@
         },
         "required": ["id", "title", "type", "sortOrder", "options"]
       },
+      "VoteDocumentResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "contentType": {
+            "type": "string"
+          },
+          "sizeBytes": {
+            "type": "number"
+          },
+          "uploadedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["id", "fileName", "contentType", "sizeBytes", "uploadedAt"]
+      },
       "VoteDetailResponseDto": {
         "type": "object",
         "properties": {
@@ -3619,9 +3773,15 @@
             "items": {
               "$ref": "#/components/schemas/VoteQuestionResponseDto"
             }
+          },
+          "documents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VoteDocumentResponseDto"
+            }
           }
         },
-        "required": ["id", "title", "status", "questions"]
+        "required": ["id", "title", "status", "questions", "documents"]
       },
       "TotalVotingPowerDto": {
         "type": "object",
@@ -4273,6 +4433,47 @@
           }
         },
         "required": ["exportMeta", "vote", "electorateSnapshot", "auditEvents"]
+      },
+      "RequestDocumentUploadDto": {
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "contentType": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sizeBytes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": ["fileName", "contentType", "sizeBytes"]
+      },
+      "RequestDocumentUploadResponseDto": {
+        "type": "object",
+        "properties": {
+          "documentId": {
+            "type": "string"
+          },
+          "uploadUrl": {
+            "type": "string"
+          }
+        },
+        "required": ["documentId", "uploadUrl"]
+      },
+      "DocumentDownloadUrlResponseDto": {
+        "type": "object",
+        "properties": {
+          "downloadUrl": {
+            "type": "string"
+          }
+        },
+        "required": ["downloadUrl"]
       }
     }
   }

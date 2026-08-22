@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ScheduleModule } from '@nestjs/schedule';
 
+import { ConfigModule } from '@/infrastructure/config/config.module';
 import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
 import { AuditModule } from '@/modules/core/audit/audit.module';
 
@@ -13,27 +14,33 @@ import { AuthModule } from '../core/auth/auth.module';
 import { IdentityModule } from '../core/identity/identity.module';
 import { TenancyModule } from '../core/tenancy/tenancy.module';
 import { CloseVoteCommandHandler } from './application/commands/close-vote/close-vote.handler';
+import { ConfirmDocumentUploadHandler } from './application/commands/confirm-document-upload/confirm-document-upload.handler';
 import { CreateVoteHandler } from './application/commands/create-vote/create-vote.handler';
 import { CreateVoteConsentHandler } from './application/commands/create-vote-consent/create-vote-consent.handler';
 import { CreateVoteQuestionHandler } from './application/commands/create-vote-question/create-vote-question.handler';
 import { DeleteVoteHandler } from './application/commands/delete-vote/delete-vote.handler';
+import { DeleteVoteDocumentHandler } from './application/commands/delete-vote-document/delete-vote-document.handler';
 import { DeleteVoteQuestionHandler } from './application/commands/delete-vote-question/delete-vote-question.handler';
 import { OpenVoteCommandHandler } from './application/commands/open-vote/open-vote.handler';
+import { RequestDocumentUploadHandler } from './application/commands/request-document-upload/request-document-upload.handler';
 import { RevokeConsentHandler } from './application/commands/revoke-consent/revoke-consent.handler';
 import { ScheduleVoteHandler } from './application/commands/schedule-vote/schedule-vote.handler';
 import { SetVoteRulesetHandler } from './application/commands/set-vote-ruleset/set-vote-ruleset.handler';
 import { SubmitBallotHandler } from './application/commands/submit-ballot/submit-ballot.handler';
 import { UpdateVoteHandler } from './application/commands/update-vote/update-vote.handler';
 import { UpdateVoteQuestionHandler } from './application/commands/update-vote-question/update-vote-question.handler';
+import { DOCUMENT_STORAGE } from './application/ports/document-storage.port';
 import { ELECTORATE_DATA_REPOSITORY } from './application/ports/electorate-data.repository.port';
 import { ELECTORATE_SERVICE } from './application/ports/electorate-service.port';
 import { RESULT_CALCULATION_DATA_REPOSITORY } from './application/ports/result-calculation-data.repository.port';
 import { RESULT_CALCULATION_SERVICE } from './application/ports/result-calculation.service.port';
 import { VOTE_CONSENT_WRITE_REPOSITORY } from './application/ports/vote-consent-write.repository.port';
+import { VOTE_DOCUMENT_REPOSITORY } from './application/ports/vote-document.repository.port';
 import { VOTE_READ_REPOSITORY } from './application/ports/vote-read.repository.port';
 import { VOTE_WRITE_REPOSITORY } from './application/ports/vote-write.repository.port';
 import { GetConsentsHandler } from './application/queries/get-consents/get-consents.handler';
 import { GetDelegationCandidatesHandler } from './application/queries/get-delegation-candidates/get-delegation-candidates.handler';
+import { GetDocumentDownloadUrlHandler } from './application/queries/get-document-download-url/get-document-download-url.handler';
 import { GetVoteActivityHandler } from './application/queries/get-vote-activity/get-vote-activity.handler';
 import { GetVoteAuditExportHandler } from './application/queries/get-vote-audit-export/get-vote-audit-export.handler';
 import { GetVoteDetailHandler } from './application/queries/get-vote-detail/get-vote-detail.handler';
@@ -49,8 +56,11 @@ import { VoteElectorateSnapshotLookup } from './audit/exporter/vote-electorate-s
 import { DrizzleElectorateDataRepository } from './infrastructure/persistence/drizzle-electorate-data.repository';
 import { DrizzleResultCalculationDataRepository } from './infrastructure/persistence/drizzle-result-calculation-data.repository';
 import { DrizzleVoteConsentWriteRepository } from './infrastructure/persistence/drizzle-vote-consent-write.repository';
+import { DrizzleVoteDocumentRepository } from './infrastructure/persistence/drizzle-vote-document.repository';
 import { DrizzleVoteReadRepository } from './infrastructure/persistence/drizzle-vote-read.repository';
 import { DrizzleVoteWriteRepository } from './infrastructure/persistence/drizzle-vote-write.repository';
+import { R2DocumentStorageService } from './infrastructure/storage/r2-document-storage.service';
+import { VoteDocumentCleanupService } from './infrastructure/vote-document-cleanup.service';
 import { VoteSchedulerService } from './infrastructure/vote-scheduler.service';
 
 const COMMAND_HANDLERS = [
@@ -67,6 +77,9 @@ const COMMAND_HANDLERS = [
   RevokeConsentHandler,
   OpenVoteCommandHandler,
   SubmitBallotHandler,
+  RequestDocumentUploadHandler,
+  ConfirmDocumentUploadHandler,
+  DeleteVoteDocumentHandler,
 ];
 const QUERY_HANDLERS = [
   GetVoteDetailHandler,
@@ -78,6 +91,7 @@ const QUERY_HANDLERS = [
   GetVoteActivityHandler,
   GetVoteAuditExportHandler,
   GetVoteTurnoutHandler,
+  GetDocumentDownloadUrlHandler,
 ];
 const REPOSITORIES = [
   { provide: VOTE_WRITE_REPOSITORY, useClass: DrizzleVoteWriteRepository },
@@ -99,8 +113,14 @@ const REPOSITORIES = [
     provide: RESULT_CALCULATION_SERVICE,
     useClass: ResultCalculationDomainService,
   },
+  {
+    provide: VOTE_DOCUMENT_REPOSITORY,
+    useClass: DrizzleVoteDocumentRepository,
+  },
+  { provide: DOCUMENT_STORAGE, useClass: R2DocumentStorageService },
   DrizzleUnitOfWork,
   VoteSchedulerService,
+  VoteDocumentCleanupService,
 ];
 
 @Module({
@@ -111,6 +131,7 @@ const REPOSITORIES = [
     AuthModule,
     TenancyModule,
     AuditModule,
+    ConfigModule,
   ],
   controllers: [VotesController],
   providers: [

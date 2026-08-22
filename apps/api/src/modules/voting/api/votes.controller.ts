@@ -29,6 +29,9 @@ import {
   CreateVoteDto,
   CreateVoteQuestionDto,
   CreateVoteResponseDto,
+  DocumentDownloadUrlResponseDto,
+  RequestDocumentUploadDto,
+  RequestDocumentUploadResponseDto,
   SetVoteRulesetDto,
   SetVoteRulesetResponseDto,
   UpdateVoteQuestionDto,
@@ -56,11 +59,14 @@ import { type AuthPrincipal } from '../../../shared/domain/auth-principal';
 import { type TenantContext } from '../../../shared/domain/tenant-context';
 import { TenantMembershipRole } from '../../core/tenancy/domain/tenant.entity';
 import { CloseVoteCommand } from '../application/commands/close-vote/close-vote.command';
+import { ConfirmDocumentUploadCommand } from '../application/commands/confirm-document-upload/confirm-document-upload.command';
 import { CreateVoteCommand } from '../application/commands/create-vote/create-vote.command';
 import { CreateVoteConsentCommand } from '../application/commands/create-vote-consent/create-vote-consent.command';
 import { CreateVoteQuestionCommand } from '../application/commands/create-vote-question/create-vote-question.command';
 import { DeleteVoteCommand } from '../application/commands/delete-vote/delete-vote.command';
+import { DeleteVoteDocumentCommand } from '../application/commands/delete-vote-document/delete-vote-document.command';
 import { DeleteVoteQuestionCommand } from '../application/commands/delete-vote-question/delete-vote-question.command';
+import { RequestDocumentUploadCommand } from '../application/commands/request-document-upload/request-document-upload.command';
 import { RevokeConsentCommand } from '../application/commands/revoke-consent/revoke-consent.command';
 import { ScheduleVoteCommand } from '../application/commands/schedule-vote/schedule-vote.command';
 import { SetVoteRulesetCommand } from '../application/commands/set-vote-ruleset/set-vote-ruleset.command';
@@ -69,6 +75,7 @@ import { UpdateVoteCommand } from '../application/commands/update-vote/update-vo
 import { UpdateVoteQuestionCommand } from '../application/commands/update-vote-question/update-vote-question.command';
 import { GetConsentsQuery } from '../application/queries/get-consents/get-consents.query';
 import { GetDelegationCandidatesQuery } from '../application/queries/get-delegation-candidates/get-delegation-candidates.query';
+import { GetDocumentDownloadUrlQuery } from '../application/queries/get-document-download-url/get-document-download-url.query';
 import { GetVoteActivityQuery } from '../application/queries/get-vote-activity/get-vote-activity.query';
 import { GetVoteAuditExportQuery } from '../application/queries/get-vote-audit-export/get-vote-audit-export.query';
 import { GetVoteDetailQuery } from '../application/queries/get-vote-detail/get-vote-detail.query';
@@ -487,6 +494,81 @@ export class VotesController {
   ) {
     return this.commandBus.execute(
       new CloseVoteCommand(tenantCtx.tenantId, id, tenantCtx.membershipId),
+    );
+  }
+
+  @Post(':id/documents')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiCreatedResponse({
+    description: 'Returns the document id and a presigned upload URL',
+    type: RequestDocumentUploadResponseDto,
+  })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  requestDocumentUpload(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() body: RequestDocumentUploadDto,
+    @Tenant() tenantCtx: TenantContext,
+  ) {
+    return this.commandBus.execute(
+      new RequestDocumentUploadCommand(
+        tenantCtx.tenantId,
+        id,
+        tenantCtx.membershipId,
+        body,
+      ),
+    );
+  }
+
+  @Post(':id/documents/:documentId/confirm')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({ description: 'Upload confirmed' })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  confirmDocumentUpload(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('documentId', ParseUUIDPipe) documentId: string,
+    @Tenant() tenantCtx: TenantContext,
+  ) {
+    return this.commandBus.execute(
+      new ConfirmDocumentUploadCommand(tenantCtx.tenantId, id, documentId),
+    );
+  }
+
+  @Delete(':id/documents/:documentId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({ description: 'Document deleted' })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  deleteVoteDocument(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('documentId', ParseUUIDPipe) documentId: string,
+    @Tenant() tenantCtx: TenantContext,
+  ) {
+    return this.commandBus.execute(
+      new DeleteVoteDocumentCommand(tenantCtx.tenantId, id, documentId),
+    );
+  }
+
+  @Get(':id/documents/:documentId/download-url')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Returns a short-lived presigned download URL',
+    type: DocumentDownloadUrlResponseDto,
+  })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard)
+  getDocumentDownloadUrl(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('documentId', ParseUUIDPipe) documentId: string,
+    @Tenant() tenantCtx: TenantContext,
+  ) {
+    return this.queryBus.execute(
+      new GetDocumentDownloadUrlQuery(
+        tenantCtx.tenantId,
+        id,
+        documentId,
+        tenantCtx.roles,
+      ),
     );
   }
 }

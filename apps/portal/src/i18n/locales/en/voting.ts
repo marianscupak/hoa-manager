@@ -298,7 +298,8 @@ export const voting = {
             noDescription: "No description provided.",
             voteRequired: "Your vote is required.",
             voteAction: "Vote",
-            fromCoOwners: "From co-owners",
+            delegationNeededSubtitle:
+                "Consent from your co-owners is required before voting opens.",
             manageDelegation: "Manage Delegation",
             readyToVoteSubtitle: "You are eligible when voting opens.",
             alreadyDelegatedSubtitle: "You have assigned a representative.",

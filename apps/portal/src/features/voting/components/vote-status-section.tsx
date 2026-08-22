@@ -82,7 +82,10 @@ export function resolveVoteStatus(
     if (vote.status === "SCHEDULED") {
         if (summary?.requiresDelegation) {
             return {
-                line: { text: t("list.card.fromCoOwners"), tone: "warning" },
+                line: {
+                    text: t("list.card.delegationNeededSubtitle"),
+                    tone: "warning",
+                },
                 action: {
                     to: `/voting/${vote.id}/delegate`,
                     label: t("list.card.manageDelegation"),

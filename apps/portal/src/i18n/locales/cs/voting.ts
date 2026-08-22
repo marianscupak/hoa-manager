@@ -297,7 +297,8 @@ export const voting = {
             noDescription: "Nebyl poskytnut žádný popis.",
             voteRequired: "Váš hlas je vyžadován.",
             voteAction: "Hlasovat",
-            fromCoOwners: "Od spoluvlastníků",
+            delegationNeededSubtitle:
+                "Před zahájením hlasování je potřeba souhlas spoluvlastníků.",
             manageDelegation: "Spravovat delegaci",
             readyToVoteSubtitle: "Jste oprávněni, jakmile hlasování začne.",
             viewDetails: "Zobrazit detail",

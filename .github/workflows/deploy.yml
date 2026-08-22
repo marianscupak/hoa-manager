@@ -101,6 +101,8 @@ jobs:
             R2_ACCOUNT_ID: 54ebd2c5a7c6e4c79d811f17370de033
             R2_BUCKET: hoa-manager-backups
             R2_ENDPOINT: https://54ebd2c5a7c6e4c79d811f17370de033.eu.r2.cloudflarestorage.com
+            R2_UPLOADS_BUCKET: hoa-manager-uploads
+            R2_UPLOADS_ENDPOINT: https://54ebd2c5a7c6e4c79d811f17370de033.eu.r2.cloudflarestorage.com
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -122,6 +124,8 @@ jobs:
                   GRAFANA_PASSWORD: ${{ secrets.GRAFANA_PASSWORD }}
                   R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
                   R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+                  R2_UPLOADS_ACCESS_KEY_ID: ${{ secrets.R2_UPLOADS_ACCESS_KEY_ID }}
+                  R2_UPLOADS_SECRET_ACCESS_KEY: ${{ secrets.R2_UPLOADS_SECRET_ACCESS_KEY }}
               run: |
                   cat > server.env <<EOF
                   # Rendered by deploy.yml from GitHub Actions secrets.
@@ -144,6 +148,10 @@ jobs:
                   R2_SECRET_ACCESS_KEY=${R2_SECRET_ACCESS_KEY}
                   R2_BUCKET=${R2_BUCKET}
                   R2_ENDPOINT=${R2_ENDPOINT}
+                  R2_UPLOADS_BUCKET=${R2_UPLOADS_ACCESS_KEY_ID:+${R2_UPLOADS_BUCKET}}
+                  R2_UPLOADS_ENDPOINT=${R2_UPLOADS_ACCESS_KEY_ID:+${R2_UPLOADS_ENDPOINT}}
+                  R2_UPLOADS_ACCESS_KEY_ID=${R2_UPLOADS_ACCESS_KEY_ID}
+                  R2_UPLOADS_SECRET_ACCESS_KEY=${R2_UPLOADS_SECRET_ACCESS_KEY}
                   EOF
 
             - name: Copy configuration to server

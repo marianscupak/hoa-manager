@@ -1,4 +1,16 @@
 {$DOMAIN} {
+    # Structured access logs → docker stdout → Promtail → Loki (traffic
+    # panels in Grafana are built from these).
+    log {
+        output stdout
+        format json
+    }
+
+    # Metrics are for the internal Prometheus scraper only.
+    handle /api/metrics {
+        respond "Forbidden" 403
+    }
+
     handle /api/* {
         reverse_proxy api:3000
     }

@@ -1,0 +1,171 @@
+{
+    "uid": "hoa-overview",
+    "title": "HOA Manager — Overview",
+    "timezone": "browser",
+    "schemaVersion": 39,
+    "version": 1,
+    "editable": true,
+    "refresh": "30s",
+    "time": { "from": "now-6h", "to": "now" },
+    "annotations": { "list": [] },
+    "templating": { "list": [] },
+    "panels": [
+        {
+            "id": 1,
+            "type": "stat",
+            "title": "API",
+            "datasource": { "type": "prometheus", "uid": "prometheus" },
+            "gridPos": { "h": 8, "w": 4, "x": 0, "y": 0 },
+            "fieldConfig": {
+                "defaults": {
+                    "mappings": [
+                        {
+                            "type": "value",
+                            "options": {
+                                "0": { "text": "DOWN", "color": "red" },
+                                "1": { "text": "UP", "color": "green" }
+                            }
+                        }
+                    ],
+                    "unit": "none"
+                },
+                "overrides": []
+            },
+            "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "reduceOptions": { "calcs": ["lastNotNull"] }
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "up{job=\"hoa-manager-api\"}",
+                    "datasource": { "type": "prometheus", "uid": "prometheus" }
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "type": "timeseries",
+            "title": "Requests / s by status (app traffic)",
+            "datasource": { "type": "loki", "uid": "loki" },
+            "gridPos": { "h": 8, "w": 10, "x": 4, "y": 0 },
+            "fieldConfig": {
+                "defaults": { "unit": "reqps", "custom": { "fillOpacity": 10 } },
+                "overrides": []
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "sum by (status) (rate({service=\"caddy\"} |= `handled request` | json | request_host !~ `grafana.*` [$__auto]))",
+                    "queryType": "range",
+                    "legendFormat": "{{status}}",
+                    "datasource": { "type": "loki", "uid": "loki" }
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "type": "timeseries",
+            "title": "Request duration p95 (app traffic)",
+            "datasource": { "type": "loki", "uid": "loki" },
+            "gridPos": { "h": 8, "w": 10, "x": 14, "y": 0 },
+            "fieldConfig": {
+                "defaults": { "unit": "s", "custom": { "fillOpacity": 10 } },
+                "overrides": []
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "quantile_over_time(0.95, {service=\"caddy\"} |= `handled request` | json | request_host !~ `grafana.*` | unwrap duration [$__auto]) by ()",
+                    "queryType": "range",
+                    "legendFormat": "p95",
+                    "datasource": { "type": "loki", "uid": "loki" }
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "type": "timeseries",
+            "title": "API CPU",
+            "datasource": { "type": "prometheus", "uid": "prometheus" },
+            "gridPos": { "h": 8, "w": 8, "x": 0, "y": 8 },
+            "fieldConfig": {
+                "defaults": { "unit": "percentunit", "custom": { "fillOpacity": 10 } },
+                "overrides": []
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "rate(process_cpu_seconds_total{job=\"hoa-manager-api\"}[5m])",
+                    "legendFormat": "cpu",
+                    "datasource": { "type": "prometheus", "uid": "prometheus" }
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "type": "timeseries",
+            "title": "API memory",
+            "datasource": { "type": "prometheus", "uid": "prometheus" },
+            "gridPos": { "h": 8, "w": 8, "x": 8, "y": 8 },
+            "fieldConfig": {
+                "defaults": { "unit": "bytes", "custom": { "fillOpacity": 10 } },
+                "overrides": []
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "process_resident_memory_bytes{job=\"hoa-manager-api\"}",
+                    "legendFormat": "resident",
+                    "datasource": { "type": "prometheus", "uid": "prometheus" }
+                },
+                {
+                    "refId": "B",
+                    "expr": "nodejs_heap_size_used_bytes{job=\"hoa-manager-api\"}",
+                    "legendFormat": "heap used",
+                    "datasource": { "type": "prometheus", "uid": "prometheus" }
+                }
+            ]
+        },
+        {
+            "id": 6,
+            "type": "timeseries",
+            "title": "API event loop lag (p99)",
+            "datasource": { "type": "prometheus", "uid": "prometheus" },
+            "gridPos": { "h": 8, "w": 8, "x": 16, "y": 8 },
+            "fieldConfig": {
+                "defaults": { "unit": "s", "custom": { "fillOpacity": 10 } },
+                "overrides": []
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "nodejs_eventloop_lag_p99_seconds{job=\"hoa-manager-api\"}",
+                    "legendFormat": "p99 lag",
+                    "datasource": { "type": "prometheus", "uid": "prometheus" }
+                }
+            ]
+        },
+        {
+            "id": 7,
+            "type": "logs",
+            "title": "API errors (last hits)",
+            "datasource": { "type": "loki", "uid": "loki" },
+            "gridPos": { "h": 9, "w": 24, "x": 0, "y": 16 },
+            "options": {
+                "showTime": true,
+                "wrapLogMessage": true,
+                "sortOrder": "Descending"
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "{service=\"api\"} |~ `(?i)\\berror\\b`",
+                    "queryType": "range",
+                    "datasource": { "type": "loki", "uid": "loki" }
+                }
+            ]
+        }
+    ]
+}

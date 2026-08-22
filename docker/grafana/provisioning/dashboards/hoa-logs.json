@@ -1,0 +1,77 @@
+{
+    "uid": "hoa-logs",
+    "title": "HOA Manager — Logs",
+    "timezone": "browser",
+    "schemaVersion": 39,
+    "version": 1,
+    "editable": true,
+    "refresh": "30s",
+    "time": { "from": "now-3h", "to": "now" },
+    "annotations": { "list": [] },
+    "templating": { "list": [] },
+    "panels": [
+        {
+            "id": 1,
+            "type": "logs",
+            "title": "API",
+            "datasource": { "type": "loki", "uid": "loki" },
+            "gridPos": { "h": 10, "w": 24, "x": 0, "y": 0 },
+            "options": {
+                "showTime": true,
+                "wrapLogMessage": true,
+                "sortOrder": "Descending",
+                "enableLogDetails": true
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "{service=\"api\"}",
+                    "queryType": "range",
+                    "datasource": { "type": "loki", "uid": "loki" }
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "type": "logs",
+            "title": "Caddy access log (app traffic)",
+            "datasource": { "type": "loki", "uid": "loki" },
+            "gridPos": { "h": 10, "w": 24, "x": 0, "y": 10 },
+            "options": {
+                "showTime": true,
+                "wrapLogMessage": true,
+                "sortOrder": "Descending",
+                "enableLogDetails": true
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "{service=\"caddy\"} |= `handled request` | json | request_host !~ `grafana.*` | line_format `{{.status}} {{.request_method}} {{.request_uri}} {{.duration}}s`",
+                    "queryType": "range",
+                    "datasource": { "type": "loki", "uid": "loki" }
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "type": "logs",
+            "title": "All containers",
+            "datasource": { "type": "loki", "uid": "loki" },
+            "gridPos": { "h": 10, "w": 24, "x": 0, "y": 20 },
+            "options": {
+                "showTime": true,
+                "wrapLogMessage": true,
+                "sortOrder": "Descending",
+                "enableLogDetails": true
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "expr": "{service=~\".+\"}",
+                    "queryType": "range",
+                    "datasource": { "type": "loki", "uid": "loki" }
+                }
+            ]
+        }
+    ]
+}

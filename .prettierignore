@@ -1,7 +1,3 @@
-node_modules
-dist
-dist-ssr
-.turbo
-.cache
-pnpm-lock.yaml
-apps/portal/src/paraglide
+# Grafana dashboard JSON is Grafana-shaped (exported/edited via its UI);
+# keep prettier away from it.
+docker/grafana/provisioning/dashboards/*.json

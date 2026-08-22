@@ -120,10 +120,7 @@ export class SendOwnerInviteHandler
     );
     const tenantName = tenant?.name ?? 'Unknown Community';
 
-    const appUrl = this.configService.get<string>(
-      'APP_PUBLIC_URL',
-      'http://localhost:5173',
-    );
+    const appUrl = this.configService.get<string>('FRONTEND_URL');
     const inviteLink = `${appUrl}/invites/owner?token=${rawToken}`;
 
     await this.emailSender.sendOwnerInvite(

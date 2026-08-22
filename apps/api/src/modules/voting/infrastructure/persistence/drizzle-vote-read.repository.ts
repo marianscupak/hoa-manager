@@ -28,6 +28,7 @@ import {
   voteResults,
   voteQuestionResults,
   voteOptionResults,
+  voteDocuments,
 } from '@/infrastructure/db/schema';
 import {
   type VoteDetailResponseDto,
@@ -182,6 +183,18 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       };
     });
 
+    const documentRows = await this.drizzle.db
+      .select()
+      .from(voteDocuments)
+      .where(
+        and(
+          eq(voteDocuments.tenantId, tenantId),
+          eq(voteDocuments.voteId, id),
+          eq(voteDocuments.status, 'UPLOADED'),
+        ),
+      )
+      .orderBy(voteDocuments.createdAt);
+
     return {
       id: vote.id,
       title: vote.title,
@@ -191,6 +204,14 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       status: vote.status as VoteStatus,
       ruleset: mappedDefaultRuleset,
       questions,
+      documents: documentRows.map((d) => ({
+        id: d.id,
+        fileName: d.fileName,
+        contentType: d.contentType,
+        sizeBytes: d.sizeBytes,
+        // updatedAt is the confirm time — nothing updates a row after UPLOADED
+        uploadedAt: d.updatedAt,
+      })),
     };
   }
 

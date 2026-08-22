@@ -174,6 +174,51 @@ export class VoteQuestionResponseDto {
   effectiveRuleset!: SetVoteRulesetResponseDto | null;
 }
 
+export const requestDocumentUploadSchema = z.object({
+  fileName: z.string().min(1).max(255),
+  contentType: z.string().min(1),
+  // .min(1) rather than .positive(): zod v4's native toJSONSchema (used by
+  // nestjs-zod) emits `exclusiveMinimum` as a JSON-Schema-2020-12 number,
+  // which orval rejects against our declared OpenAPI 3.0 spec (which
+  // requires exclusiveMinimum to be boolean). min(1) on an integer is
+  // equivalent to "positive" and only emits an inclusive `minimum`.
+  sizeBytes: z.number().int().min(1),
+});
+
+export class RequestDocumentUploadDto extends createZodDto(
+  requestDocumentUploadSchema,
+) {}
+
+export class RequestDocumentUploadResponseDto {
+  @ApiProperty()
+  documentId!: string;
+
+  @ApiProperty()
+  uploadUrl!: string;
+}
+
+export class VoteDocumentResponseDto {
+  @ApiProperty()
+  id!: string;
+
+  @ApiProperty()
+  fileName!: string;
+
+  @ApiProperty()
+  contentType!: string;
+
+  @ApiProperty()
+  sizeBytes!: number;
+
+  @ApiProperty({ type: 'string', format: 'date-time' })
+  uploadedAt!: Date;
+}
+
+export class DocumentDownloadUrlResponseDto {
+  @ApiProperty()
+  downloadUrl!: string;
+}
+
 export class VoteDetailResponseDto extends CreateVoteResponseDto {
   @ApiProperty({
     type: SetVoteRulesetResponseDto,
@@ -184,6 +229,9 @@ export class VoteDetailResponseDto extends CreateVoteResponseDto {
 
   @ApiProperty({ type: [VoteQuestionResponseDto] })
   questions!: VoteQuestionResponseDto[];
+
+  @ApiProperty({ type: [VoteDocumentResponseDto] })
+  documents!: VoteDocumentResponseDto[];
 }
 
 export class VoterSummaryDto {

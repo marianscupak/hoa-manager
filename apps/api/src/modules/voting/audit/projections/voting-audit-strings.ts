@@ -36,6 +36,10 @@ const STRINGS: Record<
     'ballot.cast.self': () => `Your ballot was recorded.`,
     'vote.closed.public': (v) => `Vote "${v.title}" was closed.`,
     'vote.resultsComputed.public': (v) => `Results computed for "${v.title}".`,
+    'vote.document.added.privileged': (v) =>
+      `${v.actor} attached document "${v.fileName}" to "${v.title}".`,
+    'vote.document.removed.privileged': (v) =>
+      `${v.actor} removed document "${v.fileName}" from "${v.title}".`,
     unknown: (v) => `Activity recorded (${v.eventType}).`,
   },
   cs: {
@@ -73,6 +77,10 @@ const STRINGS: Record<
     'vote.closed.public': (v) => `Hlasování "${v.title}" bylo ukončeno.`,
     'vote.resultsComputed.public': (v) =>
       `Výsledky hlasování "${v.title}" byly spočítány.`,
+    'vote.document.added.privileged': (v) =>
+      `${v.actor} přiložil(a) dokument „${v.fileName}“ k hlasování „${v.title}“.`,
+    'vote.document.removed.privileged': (v) =>
+      `${v.actor} odebral(a) dokument „${v.fileName}“ z hlasování „${v.title}“.`,
     unknown: (v) => `Aktivita zaznamenána (${v.eventType}).`,
   },
 };

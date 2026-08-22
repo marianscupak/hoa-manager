@@ -356,4 +356,26 @@ describe('VotingAuditFormatter', () => {
       );
     });
   });
+
+  it('renders VOTE_DOCUMENT_ADDED for a privileged viewer', () => {
+    const entry = formatter.format(
+      ev({
+        eventType: VotingEventType.VOTE_DOCUMENT_ADDED,
+        visibility: Visibility.TENANT_PRIVILEGED,
+        payload: {
+          documentId: 'doc-1',
+          sizeBytes: 1024,
+          labels: {
+            voteTitle: 'Budget 2026',
+            fileName: 'budget.pdf',
+            actor: 'John Doe',
+          },
+        },
+      }),
+      VIEWER_ADMIN,
+    );
+    expect(entry.message).toBe(
+      'John Doe attached document "budget.pdf" to "Budget 2026".',
+    );
+  });
 });

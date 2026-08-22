@@ -280,6 +280,32 @@ export class VotingAuditFormatter implements AuditEventFormatter, OnModuleInit {
           ),
         };
       }
+      case VotingEventType.VOTE_DOCUMENT_ADDED: {
+        const p = event.payload as {
+          labels: { voteTitle: string; fileName: string; actor: string };
+        };
+        return {
+          ...base,
+          message: t(lang, 'vote.document.added.privileged', {
+            actor: p.labels.actor,
+            fileName: p.labels.fileName,
+            title: p.labels.voteTitle,
+          }),
+        };
+      }
+      case VotingEventType.VOTE_DOCUMENT_REMOVED: {
+        const p = event.payload as {
+          labels: { voteTitle: string; fileName: string; actor: string };
+        };
+        return {
+          ...base,
+          message: t(lang, 'vote.document.removed.privileged', {
+            actor: p.labels.actor,
+            fileName: p.labels.fileName,
+            title: p.labels.voteTitle,
+          }),
+        };
+      }
       default:
         return {
           ...base,

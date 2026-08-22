@@ -1,0 +1,98 @@
+# Production stack. Deployed by .github/workflows/deploy.yml to
+# /opt/hoa-manager/docker-compose.yml on the server, which also holds the
+# .env file this compose project reads (variable substitution + api env_file).
+services:
+    caddy:
+        image: ghcr.io/marianscupak/hoa-manager-web:latest
+        restart: unless-stopped
+        ports:
+            - "80:80"
+            - "443:443"
+        environment:
+            - DOMAIN=${DOMAIN}
+        volumes:
+            # Persist ACME account + certificates across recreates
+            # (avoids Let's Encrypt rate limits).
+            - caddy_data:/data
+            - caddy_config:/config
+        depends_on:
+            - api
+            - grafana
+
+    api:
+        image: ghcr.io/marianscupak/hoa-manager-api:latest
+        restart: unless-stopped
+        env_file:
+            - .env
+        depends_on:
+            postgres:
+                condition: service_healthy
+
+    postgres:
+        image: postgres:17-alpine
+        restart: unless-stopped
+        environment:
+            - POSTGRES_USER=${POSTGRES_USER}
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+            - POSTGRES_DB=${POSTGRES_DB}
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        healthcheck:
+            test:
+                [
+                    "CMD-SHELL",
+                    "pg_isready -U ${POSTGRES_USER:-hoa_manager} -d ${POSTGRES_DB:-hoa_manager}",
+                ]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    prometheus:
+        image: prom/prometheus:v3.3.0
+        restart: unless-stopped
+        volumes:
+            - ./docker/prometheus/prometheus.prod.yml:/etc/prometheus/prometheus.yml:ro
+            - prometheus_data:/prometheus
+        command:
+            - "--config.file=/etc/prometheus/prometheus.yml"
+            - "--storage.tsdb.retention.time=30d"
+
+    loki:
+        image: grafana/loki:3.5.0
+        restart: unless-stopped
+        volumes:
+            - ./docker/loki/loki.yml:/etc/loki/local-config.yaml:ro
+            - loki_data:/loki
+        command: -config.file=/etc/loki/local-config.yaml
+
+    promtail:
+        image: grafana/promtail:3.5.0
+        restart: unless-stopped
+        volumes:
+            - ./docker/promtail/promtail.yml:/etc/promtail/config.yml:ro
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+        command: -config.file=/etc/promtail/config.yml
+        depends_on:
+            - loki
+
+    grafana:
+        image: grafana/grafana:12.0.0
+        restart: unless-stopped
+        volumes:
+            - grafana_data:/var/lib/grafana
+            - ./docker/grafana/provisioning:/etc/grafana/provisioning:ro
+        environment:
+            - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+            - GF_USERS_ALLOW_SIGN_UP=false
+            - GF_SERVER_ROOT_URL=https://grafana.${DOMAIN}
+        depends_on:
+            - prometheus
+            - loki
+
+volumes:
+    postgres_data:
+    caddy_data:
+    caddy_config:
+    prometheus_data:
+    loki_data:
+    grafana_data:

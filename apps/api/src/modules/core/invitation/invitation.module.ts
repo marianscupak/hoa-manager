@@ -1,10 +1,18 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import type { Logger as WinstonLogger } from 'winston';
 
+import { ConfigModule as AppConfigModule } from '@/infrastructure/config/config.module';
+import { ConfigService as AppConfigService } from '@/infrastructure/config/config.service';
 import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
+import { BrevoEmailSender } from '@/infrastructure/email/brevo-email-sender';
 import { ConsoleEmailSender } from '@/infrastructure/email/console-email-sender';
-import { EMAIL_SENDER } from '@/infrastructure/email/email-sender.port';
+import {
+  EMAIL_SENDER,
+  type EmailSender,
+} from '@/infrastructure/email/email-sender.port';
 import { AuditModule } from '@/modules/core/audit/audit.module';
 import { AuditProjectionsModule } from '@/modules/core/audit-projections/audit-projections.module';
 import { AuthModule } from '@/modules/core/auth/auth.module';
@@ -41,6 +49,7 @@ const QueryHandlers = [
   imports: [
     CqrsModule,
     ConfigModule,
+    AppConfigModule,
     IdentityModule,
     TenancyModule,
     forwardRef(() => PropertyModule),
@@ -60,7 +69,17 @@ const QueryHandlers = [
       provide: INVITE_READ_REPOSITORY,
       useClass: DrizzleInviteReadRepository,
     },
-    { provide: EMAIL_SENDER, useClass: ConsoleEmailSender },
+    {
+      provide: EMAIL_SENDER,
+      inject: [AppConfigService, WINSTON_MODULE_PROVIDER],
+      useFactory: (
+        config: AppConfigService,
+        logger: WinstonLogger,
+      ): EmailSender =>
+        config.get('BREVO_API_KEY')
+          ? new BrevoEmailSender(config)
+          : new ConsoleEmailSender(logger),
+    },
     { provide: UNIT_OF_WORK, useClass: DrizzleUnitOfWork },
     InvitationAuditRegistration,
   ],

@@ -25,6 +25,11 @@ const optionalUrl = z.preprocess(
   z.url().optional(),
 );
 
+const optionalEmail = z.preprocess(
+  (v) => (v === '' ? undefined : v),
+  z.email().optional(),
+);
+
 export const configSchema = z
   .object({
     DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
@@ -40,6 +45,9 @@ export const configSchema = z
     R2_UPLOADS_BUCKET: optionalNonEmpty,
     R2_UPLOADS_ACCESS_KEY_ID: optionalNonEmpty,
     R2_UPLOADS_SECRET_ACCESS_KEY: optionalNonEmpty,
+    BREVO_API_KEY: optionalNonEmpty,
+    EMAIL_FROM: optionalEmail,
+    EMAIL_FROM_NAME: optionalNonEmpty,
   })
   .refine(
     (c) => {
@@ -68,6 +76,16 @@ export const configSchema = z
     {
       message:
         'R2_UPLOADS_ENDPOINT, R2_UPLOADS_BUCKET, R2_UPLOADS_ACCESS_KEY_ID and R2_UPLOADS_SECRET_ACCESS_KEY must all be set together (or all unset).',
+    },
+  )
+  .refine(
+    (c) => {
+      const provided = [c.BREVO_API_KEY, c.EMAIL_FROM].filter(Boolean).length;
+      return provided === 0 || provided === 2;
+    },
+    {
+      message:
+        'BREVO_API_KEY and EMAIL_FROM must both be set together (or both unset).',
     },
   );
 

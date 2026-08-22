@@ -19,22 +19,28 @@ import {
     VOTE_DOCUMENT_MAX_COUNT,
     VOTE_DOCUMENT_MAX_SIZE_BYTES,
 } from "../constants/vote-documents";
-import { useUploadVoteDocument } from "../hooks/use-upload-vote-document";
+import { UploadState } from "../hooks/use-upload-vote-document";
 import { formatFileSize } from "../utils/format-file-size";
 
 export interface VoteDocumentsSectionProps {
-    voteId: string;
+    /** Null while the draft vote does not exist yet — files queue instead. */
+    voteId: string | null;
     documents: VoteDocumentResponseDto[];
+    uploads: Record<string, UploadState>;
+    addFile: (file: File) => void;
+    dismiss: (key: string) => void;
 }
 
 export function VoteDocumentsSection({
     voteId,
     documents,
+    uploads,
+    addFile,
+    dismiss,
 }: VoteDocumentsSectionProps) {
     const { t } = useTranslation(["voting"]);
     const queryClient = useQueryClient();
     const inputRef = useRef<HTMLInputElement>(null);
-    const { upload, uploads, dismiss } = useUploadVoteDocument(voteId);
     const deleteMutation = useVotesControllerDeleteVoteDocument();
 
     const handleFiles = (files: FileList | null) => {
@@ -56,12 +62,13 @@ export function VoteDocumentsSection({
                 break;
             }
             projectedCount += 1;
-            void upload(file);
+            addFile(file);
         }
         if (inputRef.current) inputRef.current.value = "";
     };
 
     const handleDelete = (documentId: string) => {
+        if (!voteId) return;
         deleteMutation.mutate(
             { id: voteId, documentId },
             {
@@ -85,6 +92,11 @@ export function VoteDocumentsSection({
                     <p className="text-muted-foreground mt-0.5 text-xs">
                         {t("voting:create.documents.description")}
                     </p>
+                    {!voteId && (
+                        <p className="text-muted-foreground mt-0.5 text-xs">
+                            {t("voting:create.documents.queuedHint")}
+                        </p>
+                    )}
                 </div>
                 <Button
                     type="button"
@@ -143,8 +155,10 @@ export function VoteDocumentsSection({
                             <div className="flex min-w-0 flex-1 items-center gap-3">
                                 {u.status === "uploading" ? (
                                     <Loader2 className="text-muted-foreground h-4 w-4 shrink-0 animate-spin" />
-                                ) : (
+                                ) : u.status === "error" ? (
                                     <File className="text-destructive h-4 w-4 shrink-0" />
+                                ) : (
+                                    <File className="text-muted-foreground h-4 w-4 shrink-0" />
                                 )}
                                 <span className="truncate text-sm font-medium">
                                     {u.file.name}
@@ -161,12 +175,28 @@ export function VoteDocumentsSection({
                                         type="button"
                                         onClick={() => {
                                             dismiss(key);
-                                            void upload(u.file);
+                                            addFile(u.file);
                                         }}
                                         className="cursor-pointer text-xs font-medium underline-offset-2 hover:underline"
                                     >
                                         {t("voting:create.documents.retry")}
                                     </button>
+                                    <button
+                                        type="button"
+                                        aria-label={t(
+                                            "voting:create.documents.dismiss",
+                                        )}
+                                        onClick={() => dismiss(key)}
+                                        className="text-muted-foreground hover:text-foreground cursor-pointer rounded-md p-1 transition-colors"
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </button>
+                                </div>
+                            ) : u.status === "queued" ? (
+                                <div className="flex shrink-0 items-center gap-2">
+                                    <span className="text-muted-foreground text-xs">
+                                        {t("voting:create.documents.queued")}
+                                    </span>
                                     <button
                                         type="button"
                                         aria-label={t(

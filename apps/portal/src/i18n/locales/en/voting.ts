@@ -220,6 +220,11 @@ export const voting = {
             typeNotAllowed: "This file type is not allowed.",
             limitReached: "A vote can have at most 20 documents.",
             uploadFailed: "Upload failed.",
+            queued: "Queued",
+            queuedHint:
+                "Files will be uploaded once the vote details are saved.",
+            uploadsIncomplete:
+                "Some documents failed to upload. Retry or remove them to continue.",
         },
         toast: {
             createSuccess: "Vote created successfully",

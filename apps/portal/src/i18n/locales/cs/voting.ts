@@ -220,6 +220,10 @@ export const voting = {
             typeNotAllowed: "Tento typ souboru není povolen.",
             limitReached: "Hlasování může mít nejvýše 20 dokumentů.",
             uploadFailed: "Nahrávání se nezdařilo.",
+            queued: "Ve frontě",
+            queuedHint: "Soubory se nahrají po uložení údajů hlasování.",
+            uploadsIncomplete:
+                "Některé dokumenty se nepodařilo nahrát. Zkuste to znovu, nebo je odeberte a pokračujte.",
         },
         toast: {
             createSuccess: "Hlasování bylo úspěšně vytvořeno",

@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { showApiError } from "@/api/error-utils";
 import {
@@ -12,32 +12,46 @@ import {
 export interface UploadState {
     file: File;
     progress: number; // 0..100
-    status: "uploading" | "error";
+    status: "queued" | "uploading" | "error";
 }
 
-export function useUploadVoteDocument(voteId: string) {
+export function useUploadVoteDocument(voteId: string | null) {
     const queryClient = useQueryClient();
     const [uploads, setUploads] = useState<Record<string, UploadState>>({});
+    // Synchronous mirror of `uploads`: flushAndSettle must decide whether the
+    // wizard may advance right after the last promise settles, before React
+    // has re-rendered.
+    const uploadsRef = useRef<Record<string, UploadState>>({});
+    // In-flight uploads, so settling also awaits retries started mid-flight.
+    const pendingRef = useRef(new Map<string, Promise<boolean>>());
+
+    const applyUploads = (
+        updater: (
+            current: Record<string, UploadState>,
+        ) => Record<string, UploadState>,
+    ) => {
+        uploadsRef.current = updater(uploadsRef.current);
+        setUploads(uploadsRef.current);
+    };
 
     const setUpload = (key: string, patch: Partial<UploadState>) =>
-        setUploads((u) => ({ ...u, [key]: { ...u[key], ...patch } }));
+        applyUploads((u) => ({ ...u, [key]: { ...u[key], ...patch } }));
 
     const removeUpload = (key: string) =>
-        setUploads((u) => {
+        applyUploads((u) => {
             const next = { ...u };
             delete next[key];
             return next;
         });
 
-    const upload = async (file: File) => {
-        const key = `${file.name}-${Date.now()}-${Math.random()}`;
-        setUploads((u) => ({
-            ...u,
-            [key]: { file, progress: 0, status: "uploading" },
-        }));
+    const startUpload = async (
+        key: string,
+        file: File,
+        targetVoteId: string,
+    ): Promise<boolean> => {
         try {
             const { documentId, uploadUrl } =
-                await votesControllerRequestDocumentUpload(voteId, {
+                await votesControllerRequestDocumentUpload(targetVoteId, {
                     fileName: file.name,
                     contentType: file.type,
                     sizeBytes: file.size,
@@ -55,16 +69,64 @@ export function useUploadVoteDocument(voteId: string) {
                 },
             });
 
-            await votesControllerConfirmDocumentUpload(voteId, documentId);
+            await votesControllerConfirmDocumentUpload(
+                targetVoteId,
+                documentId,
+            );
             await queryClient.invalidateQueries({
-                queryKey: getVotesControllerGetVoteDetailQueryKey(voteId),
+                queryKey: getVotesControllerGetVoteDetailQueryKey(targetVoteId),
             });
             removeUpload(key);
+            return true;
         } catch (error) {
             setUpload(key, { status: "error" });
             showApiError(error);
+            return false;
         }
     };
 
-    return { upload, uploads, dismiss: removeUpload };
+    const track = (key: string, file: File, targetVoteId: string) => {
+        const promise = startUpload(key, file, targetVoteId).finally(() =>
+            pendingRef.current.delete(key),
+        );
+        pendingRef.current.set(key, promise);
+    };
+
+    const addFile = (file: File) => {
+        const key = `${file.name}-${Date.now()}-${Math.random()}`;
+        if (voteId) {
+            applyUploads((u) => ({
+                ...u,
+                [key]: { file, progress: 0, status: "uploading" },
+            }));
+            track(key, file, voteId);
+        } else {
+            // No draft vote yet — hold the file until flushAndSettle runs
+            // after the details step saves.
+            applyUploads((u) => ({
+                ...u,
+                [key]: { file, progress: 0, status: "queued" },
+            }));
+        }
+    };
+
+    /**
+     * Starts every queued upload against the (just created) vote and resolves
+     * once nothing is in flight any more — including retries started while
+     * settling. Resolves true when no rows remain (everything uploaded or was
+     * dismissed), false when error rows are left behind.
+     */
+    const flushAndSettle = async (targetVoteId: string): Promise<boolean> => {
+        for (const [key, u] of Object.entries(uploadsRef.current)) {
+            if (u.status !== "queued") continue;
+            setUpload(key, { status: "uploading", progress: 0 });
+            track(key, u.file, targetVoteId);
+        }
+        while (pendingRef.current.size > 0) {
+            await Promise.all([...pendingRef.current.values()]);
+        }
+        return Object.keys(uploadsRef.current).length === 0;
+    };
+
+    return { addFile, flushAndSettle, uploads, dismiss: removeUpload };
 }

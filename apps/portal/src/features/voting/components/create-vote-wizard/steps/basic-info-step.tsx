@@ -15,7 +15,6 @@ import {
     useVotesControllerCreateVote,
     useVotesControllerUpdateVote,
 } from "@/api/generated/votes/votes";
-import { VoteDocumentsSection } from "@/features/voting/components/vote-documents-section";
 
 const createVoteFormSchema = z.object({
     title: z.string().min(1, "voting:create.fields.title.errors.required"),
@@ -201,14 +200,6 @@ export function CreateVoteBasicInfoStep({
                     {renderShortVotingPeriodWarning()}
                 </div>
             </form>
-            {voteId && (
-                <div className="mt-8">
-                    <VoteDocumentsSection
-                        voteId={voteId}
-                        documents={initialData?.documents ?? []}
-                    />
-                </div>
-            )}
         </FormProvider>
     );
 }

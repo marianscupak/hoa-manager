@@ -3,6 +3,7 @@ import { Loader2, Send } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
+import { toast } from "sonner";
 
 import {
     Button,
@@ -22,7 +23,9 @@ import {
 } from "@/api/generated/votes/votes";
 
 import { useScheduleVote } from "../../hooks/use-schedule-vote";
+import { useUploadVoteDocument } from "../../hooks/use-upload-vote-document";
 import { DeleteDraftVoteDialog } from "../delete-draft-vote-dialog";
+import { VoteDocumentsSection } from "../vote-documents-section";
 import { ScheduleValidationModal } from "../schedule-validation-modal";
 import {
     WizardShell,
@@ -66,8 +69,13 @@ export function CreateVoteWizard({
     );
     const [activeFormDirty, setActiveFormDirty] = useState(false);
     const [activeSaving, setActiveSaving] = useState(false);
+    const [documentsSettling, setDocumentsSettling] = useState(false);
 
     const voteId = createdVoteId ?? initialVoteId ?? null;
+
+    // Lives here (not in the details step) so queued files survive the
+    // auto-advance to the rules step and uploads keep running across steps.
+    const documentsUpload = useUploadVoteDocument(voteId);
 
     const voteQuery = useVotesControllerGetVoteDetail(voteId ?? "", {
         query: {
@@ -114,11 +122,22 @@ export function CreateVoteWizard({
         setActiveStep(step);
     }, []);
 
-    const handleBasicInfoSuccess = (id: string) => {
+    const handleBasicInfoSuccess = async (id: string) => {
         setCreatedVoteId(id);
         queryClient.invalidateQueries({
             queryKey: getVotesControllerGetVoteDetailQueryKey(id),
         });
+
+        // Hold the step until every queued/in-flight document upload has
+        // settled; error rows keep the user here to retry or dismiss them.
+        setDocumentsSettling(true);
+        const allUploaded = await documentsUpload.flushAndSettle(id);
+        setDocumentsSettling(false);
+
+        if (!allUploaded) {
+            toast.error(t("voting:create.documents.uploadsIncomplete"));
+            return;
+        }
         goToStep("rules");
     };
 
@@ -153,19 +172,20 @@ export function CreateVoteWizard({
                 : index === activeIndex
                   ? "active"
                   : "upcoming",
-        enabled: id === "details" || hasDraft,
+        enabled: !documentsSettling && (id === "details" || hasDraft),
         badge: id === "questions" ? questionCount : undefined,
     }));
 
     // "saved" is the only state that needs a draft behind it — an untouched new
     // vote shows nothing, but typing into step 1 still reports "Unsaved changes".
-    const savedState: WizardSavedState | null = activeSaving
-        ? "saving"
-        : activeFormDirty
-          ? "dirty"
-          : hasDraft
-            ? "saved"
-            : null;
+    const savedState: WizardSavedState | null =
+        activeSaving || documentsSettling
+            ? "saving"
+            : activeFormDirty
+              ? "dirty"
+              : hasDraft
+                ? "saved"
+                : null;
 
     // Controlled by the review step's own "Schedule vote" button (card + footer)
     // via `setIsConfirmOpen(true)` — no DialogTrigger needed here.
@@ -237,8 +257,11 @@ export function CreateVoteWizard({
                 <Button
                     type="submit"
                     form={STEP_FORM_ID}
-                    disabled={activeSaving}
+                    disabled={activeSaving || documentsSettling}
                 >
+                    {activeSaving || documentsSettling ? (
+                        <Loader2 className="animate-spin" />
+                    ) : null}
                     {t("voting:wizard.continue")}
                 </Button>
             )}
@@ -261,14 +284,25 @@ export function CreateVoteWizard({
                 footer={footer}
             >
                 {activeStep === "details" && (
-                    <CreateVoteBasicInfoStep
-                        formId={STEP_FORM_ID}
-                        onSuccess={handleBasicInfoSuccess}
-                        voteId={voteId}
-                        initialData={voteData}
-                        onDirtyChange={setActiveFormDirty}
-                        onSavingChange={setActiveSaving}
-                    />
+                    <>
+                        <CreateVoteBasicInfoStep
+                            formId={STEP_FORM_ID}
+                            onSuccess={handleBasicInfoSuccess}
+                            voteId={voteId}
+                            initialData={voteData}
+                            onDirtyChange={setActiveFormDirty}
+                            onSavingChange={setActiveSaving}
+                        />
+                        <div className="mt-8">
+                            <VoteDocumentsSection
+                                voteId={voteId}
+                                documents={voteData?.documents ?? []}
+                                uploads={documentsUpload.uploads}
+                                addFile={documentsUpload.addFile}
+                                dismiss={documentsUpload.dismiss}
+                            />
+                        </div>
+                    </>
                 )}
 
                 {activeStep === "rules" && (

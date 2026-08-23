@@ -98,7 +98,6 @@ export default {
                 title: "Historie vlastnictví",
                 owner: "Vlastník",
                 share: "Podíl",
-                since: "Platné od",
                 active: "Aktivní",
                 edit: "Upravit vlastnictví",
                 empty: "Nenalezeny žádné záznamy o vlastnictví.",

@@ -31,7 +31,7 @@ import {
 } from './ruleset-validation';
 
 /**
- * Statutory minimum per-rollam voting window — NOZ § 1212 gives owners at
+ * Statutory minimum per-rollam voting window — NOZ § 1211 odst. 2 gives owners at
  * least 15 days to return a written ballot.
  */
 const PER_ROLLAM_MIN_WINDOW_MS = 15 * 86_400_000;

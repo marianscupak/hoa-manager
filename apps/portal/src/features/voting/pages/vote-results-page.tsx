@@ -30,9 +30,10 @@ type EnrichedQuestion = VoteResultsResponseDto["questionResults"][number] & {
     type?: string;
     // Threaded through so VerdictCard can read the actual majorityRuleType
     // for its reason sentence instead of inferring simple-vs-qualified from
-    // majorityThresholdValue === null — that field is also null whenever
-    // there's no winner (tie) or a zero denominator, regardless of rule
-    // type, so it can't be trusted alone for a legally meaningful sentence.
+    // majorityThreshold num/den + majorityComparator. These numeric fields are
+    // set to null whenever there's no winner (tie) or a zero denominator,
+    // regardless of rule type, so they can't be trusted alone for a legally
+    // meaningful sentence.
     effectiveRuleset?: SetVoteRulesetResponseDto | null;
 };
 

@@ -98,7 +98,6 @@ export default {
                 title: "Ownership History",
                 owner: "Owner",
                 share: "Share",
-                since: "Valid From",
                 active: "Active",
                 edit: "Edit Ownership",
                 empty: "No ownership records found.",

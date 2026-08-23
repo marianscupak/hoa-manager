@@ -6,14 +6,23 @@ import { AuditService } from '@/modules/core/audit/application/services/audit.se
 import { VoteElectorateSnapshottedAuditEvent } from '@/modules/voting/audit/events/vote-electorate-snapshotted.event';
 import { VoteOpenedAuditEvent } from '@/modules/voting/audit/events/vote-opened.event';
 import { VotingAuditLabelResolver } from '@/modules/voting/audit/label-resolver.service';
-import { VoteNotFoundException } from '@/shared/application/exceptions/vote.exceptions';
+import { VoteWeightBasis } from '@/modules/voting/domain/vote/vote.types';
+import {
+  VoteBuildingSharesIncompleteException,
+  VoteNotFoundException,
+} from '@/shared/application/exceptions/vote.exceptions';
 import { type Clock, CLOCK } from '@/shared/application/ports/clock.port';
 import {
   type UnitOfWork,
   UNIT_OF_WORK,
 } from '@/shared/application/ports/unit-of-work.port';
+import { Rational } from '@/shared/domain/rational';
 
 import { OpenVoteCommand } from './open-vote.command';
+import {
+  ELECTORATE_DATA_REPOSITORY,
+  type ElectorateDataRepository,
+} from '../../ports/electorate-data.repository.port';
 import {
   ELECTORATE_SERVICE,
   type ElectorateService,
@@ -32,6 +41,8 @@ export class OpenVoteCommandHandler
     private readonly voteRepository: VoteWriteRepository,
     @Inject(ELECTORATE_SERVICE)
     private readonly electorateService: ElectorateService,
+    @Inject(ELECTORATE_DATA_REPOSITORY)
+    private readonly electorateDataRepository: ElectorateDataRepository,
     @Inject(UNIT_OF_WORK)
     private readonly uow: UnitOfWork,
     @Inject(CLOCK)
@@ -52,6 +63,24 @@ export class OpenVoteCommandHandler
 
       vote.open(openedByMembershipId, this.clock.now());
 
+      // Share-weighted votes need a complete building-share plan; a partial
+      // plan would silently shrink every denominator (DOM-009).
+      if (vote.ruleset?.weightBasis === VoteWeightBasis.UNIT_SHARE) {
+        const units = await this.electorateDataRepository.findAllUnits(
+          tenantId,
+        );
+        const total = Rational.sum(
+          units.map((u) =>
+            Rational.from(u.buildingShareNumerator, u.buildingShareDenominator),
+          ),
+        );
+        if (!total.eq(Rational.one())) {
+          throw new VoteBuildingSharesIncompleteException(
+            `${total.num}/${total.den}`,
+          );
+        }
+      }
+
       const electorate = await this.electorateService.resolveElectorate(vote);
 
       await this.voteRepository.save(vote);
@@ -65,9 +94,8 @@ export class OpenVoteCommandHandler
       const openedByLabel = await this.labelResolver.resolveActorLabel(actor);
 
       const openedAt = this.clock.now();
-      const totalWeight = electorate.reduce(
-        (sum, u) => sum + u.votingWeight,
-        0,
+      const totalWeight = Rational.sum(
+        electorate.map((u) => Rational.from(u.weightNum, u.weightDen)),
       );
 
       await this.auditService.append(
@@ -89,7 +117,7 @@ export class OpenVoteCommandHandler
           voteTitle: vote.title,
           actor,
           totalUnits: electorate.length,
-          totalWeight,
+          totalWeight: `${totalWeight.num}/${totalWeight.den}`,
           occurredAt: openedAt,
         }),
       );

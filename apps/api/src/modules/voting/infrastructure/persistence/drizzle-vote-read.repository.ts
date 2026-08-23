@@ -1,15 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  and,
-  desc,
-  eq,
-  inArray,
-  isNull,
-  isNotNull,
-  ne,
-  count,
-  or,
-} from 'drizzle-orm';
+import { and, desc, eq, inArray, isNull, isNotNull, ne, or } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
@@ -24,6 +14,7 @@ import {
   unitOwnerships,
   unitOwnershipMembers,
   tenantMemberships,
+  users,
   voteElectorateUnits,
   ballots,
   voteResults,
@@ -32,6 +23,12 @@ import {
   voteDocuments,
 } from '@/infrastructure/db/schema';
 import {
+  OwnerKind,
+  OwnershipPartyType,
+} from '@/modules/core/property/domain/ownership-plan';
+import {
+  toFractionDto,
+  toPercentString,
   type VoteDetailResponseDto,
   type VoteListItemResponseDto,
   type VoteQuestionResponseDto,
@@ -43,20 +40,30 @@ import {
   type QuestionOutcomeDto,
 } from '@/modules/voting/api/dto/vote.dto';
 import { type VoteReadRepository } from '@/modules/voting/application/ports/vote-read.repository.port';
+import {
+  resolveElectorateUnits,
+  type ElectorateConsentInput,
+  type ElectoratePartyInput,
+  type ElectorateUnitInput,
+} from '@/modules/voting/domain/vote/electorate-resolution';
+import { deriveOwningUnitStatus } from '@/modules/voting/domain/vote/owning-unit-status';
 import { deriveQuestionOutcome } from '@/modules/voting/domain/vote/question-outcome';
 import {
-  type MajorityRuleType,
-  type QuorumElectorateBasis,
-  type QuorumMeasure,
+  type ElectorateUnit,
+  type ThresholdComparator,
+  type VoteMode,
   type VoteOptionSemantic,
   type VoteQuestionType,
   type VoteStatus,
-  type VoteWeightBasis,
   OwningUnitStatus,
   VoteUnitConsentStatus,
   ElectorateEligibilityStatus,
   ElectorateIneligibleReason,
+  VoteWeightBasis,
 } from '@/modules/voting/domain/vote/vote.types';
+import { Rational } from '@/shared/domain/rational';
+
+import { mapRulesetRow } from './vote-ruleset.mapper';
 
 @Injectable()
 export class DrizzleVoteReadRepository implements VoteReadRepository {
@@ -121,24 +128,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
         );
     }
 
-    const mappedDefaultRuleset = ruleset
-      ? {
-          weightBasis: ruleset.weightBasis as VoteWeightBasis,
-          quorumMeasure: ruleset.quorumMeasure as QuorumMeasure,
-          quorumElectorateBasis:
-            ruleset.quorumElectorateBasis as QuorumElectorateBasis,
-          quorumThreshold: Number(ruleset.quorumThreshold),
-          majorityRuleType: ruleset.majorityRuleType as MajorityRuleType,
-          majorityThreshold:
-            ruleset.majorityThreshold !== null
-              ? Number(ruleset.majorityThreshold)
-              : null,
-          allowAbstain: ruleset.allowAbstain,
-          abstainExcludedFromMajorityDenominator:
-            ruleset.abstainExcludedFromMajorityDenominator,
-          allowCoOwnerIndividualVote: ruleset.allowCoOwnerIndividualVote,
-        }
-      : null;
+    const mappedDefaultRuleset = ruleset ? mapRulesetRow(ruleset) : null;
 
     const questions: VoteQuestionResponseDto[] = questionRows.map((q) => {
       const qOptions = optionRows
@@ -153,24 +143,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       const qRulesetRow = questionRulesetRows.find(
         (r) => r.questionId === q.id,
       );
-      const qRulesetOverride = qRulesetRow
-        ? {
-            weightBasis: qRulesetRow.weightBasis as VoteWeightBasis,
-            quorumMeasure: qRulesetRow.quorumMeasure as QuorumMeasure,
-            quorumElectorateBasis:
-              qRulesetRow.quorumElectorateBasis as QuorumElectorateBasis,
-            quorumThreshold: Number(qRulesetRow.quorumThreshold),
-            majorityRuleType: qRulesetRow.majorityRuleType as MajorityRuleType,
-            majorityThreshold:
-              qRulesetRow.majorityThreshold !== null
-                ? Number(qRulesetRow.majorityThreshold)
-                : null,
-            allowAbstain: qRulesetRow.allowAbstain,
-            abstainExcludedFromMajorityDenominator:
-              qRulesetRow.abstainExcludedFromMajorityDenominator,
-            allowCoOwnerIndividualVote: qRulesetRow.allowCoOwnerIndividualVote,
-          }
-        : null;
+      const qRulesetOverride = qRulesetRow ? mapRulesetRow(qRulesetRow) : null;
 
       return {
         id: q.id,
@@ -203,6 +176,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       scheduledFrom: vote.scheduledFrom ?? null,
       scheduledTo: vote.scheduledTo ?? null,
       status: vote.status as VoteStatus,
+      mode: vote.mode as VoteMode,
       ruleset: mappedDefaultRuleset,
       questions,
       documents: documentRows.map((d) => ({
@@ -234,13 +208,9 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
         scheduledFrom: votes.scheduledFrom,
         scheduledTo: votes.scheduledTo,
         createdAt: votes.createdAt,
-        allowCoOwnerIndividualVote: voteRulesets.allowCoOwnerIndividualVote,
+        mode: votes.mode,
       })
       .from(votes)
-      .leftJoin(
-        voteRulesets,
-        and(eq(votes.id, voteRulesets.voteId), isNull(voteRulesets.questionId)),
-      )
       .where(whereClause)
       .orderBy((votes) => [desc(votes.createdAt)]);
 
@@ -249,9 +219,9 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       title: row.title,
       description: row.description ?? null,
       status: row.status as VoteStatus,
+      mode: row.mode as VoteMode,
       scheduledFrom: row.scheduledFrom ?? null,
       scheduledTo: row.scheduledTo ?? null,
-      allowCoOwnerIndividualVote: row.allowCoOwnerIndividualVote ?? false,
     }));
   }
 
@@ -316,32 +286,50 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
   }
 
   /**
-   * Counts the total number of active owners per unit.
-   *
-   * Counts rows in `unit_ownership_members`, not `unit_ownerships`
-   * rows (parties) — an SJM party is one ownership row but two
-   * individual owners, and the unanimity-consensus math below
-   * (`isSoleOwner`, `consents >= ownerCount - 1`) is keyed to
-   * individual owners, matching `ElectorateDomainService`'s
-   * `findOwnershipRecords`-derived candidate list (one entry per
-   * member). This full-weight-per-owner behavior is intentionally
-   * preserved until Task 8.
+   * Loads the units and their active ownership parties in the shape the
+   * `resolveElectorateUnits` domain function consumes.
    */
-  private async getCoOwnerCounts(
+  private async loadOwnershipPlan(
     tenantId: string,
     unitIds: string[],
-  ): Promise<Map<string, number>> {
-    if (unitIds.length === 0) return new Map();
+  ): Promise<{
+    units: ElectorateUnitInput[];
+    parties: ElectoratePartyInput[];
+  }> {
+    if (unitIds.length === 0) return { units: [], parties: [] };
 
-    const rows = await this.drizzle.db
+    const unitRows = await this.drizzle.db
       .select({
+        id: units.id,
+        buildingShareNumerator: units.buildingShareNumerator,
+        buildingShareDenominator: units.buildingShareDenominator,
+      })
+      .from(units)
+      .where(and(eq(units.tenantId, tenantId), inArray(units.id, unitIds)));
+
+    const memberRows = await this.drizzle.db
+      .select({
+        ownershipId: unitOwnerships.id,
         unitId: unitOwnerships.unitId,
-        ownerCount: count(unitOwnershipMembers.id),
+        partyType: unitOwnerships.partyType,
+        shareNumerator: unitOwnerships.shareNumerator,
+        shareDenominator: unitOwnerships.shareDenominator,
+        ownerId: unitOwnershipMembers.ownerId,
+        ownerKind: owners.kind,
+        membershipId: tenantMemberships.id,
       })
       .from(unitOwnerships)
       .innerJoin(
         unitOwnershipMembers,
         eq(unitOwnershipMembers.ownershipId, unitOwnerships.id),
+      )
+      .innerJoin(owners, eq(unitOwnershipMembers.ownerId, owners.id))
+      .leftJoin(
+        tenantMemberships,
+        and(
+          eq(owners.userId, tenantMemberships.userId),
+          eq(owners.tenantId, tenantMemberships.tenantId),
+        ),
       )
       .where(
         and(
@@ -349,23 +337,60 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
           inArray(unitOwnerships.unitId, unitIds),
           isNull(unitOwnerships.validTo),
         ),
-      )
-      .groupBy(unitOwnerships.unitId);
+      );
 
-    return new Map(rows.map((r) => [r.unitId, Number(r.ownerCount)]));
+    const partiesById = new Map<string, ElectoratePartyInput>();
+    for (const row of memberRows) {
+      const party = partiesById.get(row.ownershipId) ?? {
+        unitId: row.unitId,
+        partyType: row.partyType as OwnershipPartyType,
+        shareNumerator: row.shareNumerator,
+        shareDenominator: row.shareDenominator,
+        members: [],
+      };
+      party.members.push({
+        ownerId: row.ownerId,
+        ownerKind: row.ownerKind as OwnerKind,
+        membershipId: row.membershipId,
+      });
+      partiesById.set(row.ownershipId, party);
+    }
+
+    return { units: unitRows, parties: [...partiesById.values()] };
   }
 
-  /**
-   * Returns the `allowCoOwnerIndividualVote` flag from the vote-level ruleset.
-   */
-  private async getAllowCoOwnerIndividualVote(
+  /** Valid consents recorded for one vote, limited to the given units. */
+  private async loadValidConsents(
     tenantId: string,
     voteId: string,
-  ): Promise<boolean> {
-    const rows = await this.drizzle.db
+    unitIds: string[],
+  ): Promise<ElectorateConsentInput[]> {
+    if (unitIds.length === 0) return [];
+
+    return this.drizzle.db
       .select({
-        allowCoOwnerIndividualVote: voteRulesets.allowCoOwnerIndividualVote,
+        unitId: voteUnitConsents.unitId,
+        fromOwnerId: voteUnitConsents.fromOwnerId,
+        toMembershipId: voteUnitConsents.toMembershipId,
       })
+      .from(voteUnitConsents)
+      .where(
+        and(
+          eq(voteUnitConsents.tenantId, tenantId),
+          eq(voteUnitConsents.voteId, voteId),
+          inArray(voteUnitConsents.unitId, unitIds),
+          eq(voteUnitConsents.status, VoteUnitConsentStatus.VALID),
+        ),
+      );
+  }
+
+  /** Vote-level weight basis; defaults exactly as `ElectorateDomainService` does. */
+  private async getWeightBasis(
+    tenantId: string,
+    voteId: string,
+  ): Promise<VoteWeightBasis> {
+    const rows = await this.drizzle.db
+      .select({ weightBasis: voteRulesets.weightBasis })
       .from(voteRulesets)
       .where(
         and(
@@ -376,136 +401,54 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       )
       .limit(1);
 
-    return rows.length > 0 ? rows[0].allowCoOwnerIndividualVote : false;
+    return (
+      (rows[0]?.weightBasis as VoteWeightBasis) ?? VoteWeightBasis.UNIT_SHARE
+    );
   }
 
   /**
-   * Counts valid consents per unit pointing to a specific membership.
+   * Live electorate preview for a vote that has not opened yet, produced by
+   * the same domain function that builds the open-time snapshot — so what an
+   * owner is shown in DRAFT/SCHEDULED is what they will get at open.
    */
-  private async getConsentCounts(
+  private async previewElectorate(
     tenantId: string,
     voteId: string,
     unitIds: string[],
-    membershipId: string,
-  ): Promise<Map<string, number>> {
-    if (unitIds.length === 0) return new Map();
+    plan?: { units: ElectorateUnitInput[]; parties: ElectoratePartyInput[] },
+  ): Promise<ElectorateUnit[]> {
+    const ownershipPlan =
+      plan ?? (await this.loadOwnershipPlan(tenantId, unitIds));
+    const [consents, weightBasis] = await Promise.all([
+      this.loadValidConsents(tenantId, voteId, unitIds),
+      this.getWeightBasis(tenantId, voteId),
+    ]);
 
-    const rows = await this.drizzle.db
-      .select({
-        unitId: voteUnitConsents.unitId,
-        consentCount: count(voteUnitConsents.id),
-      })
-      .from(voteUnitConsents)
-      .where(
-        and(
-          eq(voteUnitConsents.tenantId, tenantId),
-          eq(voteUnitConsents.voteId, voteId),
-          inArray(voteUnitConsents.unitId, unitIds),
-          eq(voteUnitConsents.toMembershipId, membershipId),
-          eq(voteUnitConsents.status, 'VALID'),
-        ),
-      )
-      .groupBy(voteUnitConsents.unitId);
-
-    return new Map(rows.map((r) => [r.unitId, Number(r.consentCount)]));
-  }
-
-  /**
-   * Returns unit IDs for which the current membership (via their owner) has given consent.
-   */
-  private async getGivenConsentUnits(
-    tenantId: string,
-    voteId: string,
-    ownerId: string,
-    unitIds: string[],
-  ): Promise<Set<string>> {
-    if (unitIds.length === 0) return new Set();
-
-    const rows = await this.drizzle.db
-      .select({ unitId: voteUnitConsents.unitId })
-      .from(voteUnitConsents)
-      .where(
-        and(
-          eq(voteUnitConsents.tenantId, tenantId),
-          eq(voteUnitConsents.voteId, voteId),
-          inArray(voteUnitConsents.unitId, unitIds),
-          eq(voteUnitConsents.fromOwnerId, ownerId),
-          eq(voteUnitConsents.status, 'VALID'),
-        ),
-      );
-
-    return new Set(rows.map((r) => r.unitId));
-  }
-
-  /**
-   * Determines per-unit delegation status given co-owner counts, consents,
-   * and the `allowCoOwnerIndividualVote` flag.
-   *
-   * Returns `{ hasReady, hasRequiresDelegation, hasDelegated }`.
-   */
-  private computeUnitDelegationStatus(
-    unitIds: string[],
-    ownerCountMap: Map<string, number>,
-    consentCountMap: Map<string, number>,
-    givenConsentUnits: Set<string>,
-    allowIndividualVote: boolean,
-  ): {
-    hasReady: boolean;
-    hasRequiresDelegation: boolean;
-    hasDelegated: boolean;
-  } {
-    let hasReady = false;
-    let hasRequiresDelegation = false;
-    let hasDelegated = false;
-
-    for (const unitId of unitIds) {
-      if (givenConsentUnits.has(unitId)) {
-        hasDelegated = true;
-        continue;
-      }
-
-      const ownerCount = ownerCountMap.get(unitId) ?? 1;
-      const isSoleOwner = ownerCount === 1;
-
-      if (isSoleOwner || allowIndividualVote) {
-        hasReady = true;
-      } else {
-        const consents = consentCountMap.get(unitId) ?? 0;
-        // A representative is ready if they have consents from all OTHER co-owners.
-        if (consents >= ownerCount - 1) {
-          hasReady = true;
-        } else {
-          hasRequiresDelegation = true;
-        }
-      }
-    }
-
-    return { hasReady, hasRequiresDelegation, hasDelegated };
+    return resolveElectorateUnits(
+      ownershipPlan.units,
+      ownershipPlan.parties,
+      consents,
+      weightBasis,
+    );
   }
 
   private async getVotedUnits(
     tenantId: string,
     voteId: string,
     unitIds: string[],
-    membershipId: string,
-    allowIndividualVote: boolean,
   ): Promise<Set<string>> {
     if (unitIds.length === 0) return new Set();
-
-    const conditions = [
-      eq(ballots.tenantId, tenantId),
-      eq(ballots.voteId, voteId),
-      inArray(ballots.unitId, unitIds),
-    ];
-
-    if (allowIndividualVote) {
-      conditions.push(eq(ballots.castByMembershipId, membershipId));
-    }
 
     const rows = await this.drizzle.db
       .select({ unitId: ballots.unitId })
       .from(ballots)
-      .where(and(...conditions));
+      .where(
+        and(
+          eq(ballots.tenantId, tenantId),
+          eq(ballots.voteId, voteId),
+          inArray(ballots.unitId, unitIds),
+        ),
+      );
 
     return new Set(rows.map((r) => r.unitId));
   }
@@ -519,7 +462,10 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
   ): Promise<VoterStatusResponseDto> {
     const emptyResult: VoterStatusResponseDto = {
       canVote: false,
-      totalVotingPower: { value: 0, maximum: 0 },
+      totalVotingPower: {
+        value: Rational.zero().toDecimalString(4),
+        maximum: Rational.zero().toDecimalString(4),
+      },
       owningUnits: [],
     };
 
@@ -570,7 +516,8 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
             voteElectorateUnits.representativeMembershipId,
           eligibilityStatus: voteElectorateUnits.eligibilityStatus,
           ineligibleReason: voteElectorateUnits.ineligibleReason,
-          votingWeight: voteElectorateUnits.votingWeight,
+          weightNumerator: voteElectorateUnits.weightNumerator,
+          weightDenominator: voteElectorateUnits.weightDenominator,
           unitNo: units.unitNo,
           buildingShareNumerator: units.buildingShareNumerator,
           buildingShareDenominator: units.buildingShareDenominator,
@@ -585,34 +532,15 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
           ),
         );
 
-      const allowIndividualVote = await this.getAllowCoOwnerIndividualVote(
-        tenantId,
-        voteId,
-      );
       const votedUnits = await this.getVotedUnits(
         tenantId,
         voteId,
         uniqueUnitIds,
-        membershipId,
-        allowIndividualVote,
       );
 
-      // Compute total voting power from fractions
-      const allUnits = await this.drizzle.db
-        .select({
-          buildingShareNumerator: units.buildingShareNumerator,
-          buildingShareDenominator: units.buildingShareDenominator,
-        })
-        .from(units)
-        .where(eq(units.tenantId, tenantId));
+      const totalMaximum = await this.getTenantTotalShare(tenantId);
 
-      const totalMaximum = allUnits.reduce(
-        (sum, u) => sum + u.buildingShareNumerator / u.buildingShareDenominator,
-        0,
-      );
-
-      let totalValue = 0;
-      let hasReady = false;
+      const readyWeights: Rational[] = [];
 
       const owningUnits = uniqueUnitIds.map((unitId) => {
         const snapshot = snapshotRows.find((s) => s.unitId === unitId);
@@ -628,19 +556,23 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
           };
         }
 
-        let status: OwningUnitStatus;
-        if (
-          snapshot.eligibilityStatus === ElectorateEligibilityStatus.INELIGIBLE
-        ) {
-          status = OwningUnitStatus.INELIGIBLE;
-        } else if (votedUnits.has(unitId)) {
-          status = OwningUnitStatus.VOTED;
-        } else if (snapshot.representativeMembershipId === membershipId) {
-          status = OwningUnitStatus.READY;
-          totalValue += Number(snapshot.votingWeight);
-          hasReady = true;
-        } else {
-          status = OwningUnitStatus.DELEGATED;
+        const status = deriveOwningUnitStatus({
+          resolved: {
+            representativeMembershipId: snapshot.representativeMembershipId,
+            eligibilityStatus:
+              snapshot.eligibilityStatus as ElectorateEligibilityStatus,
+            ineligibleReason:
+              snapshot.ineligibleReason as ElectorateIneligibleReason | null,
+          },
+          membershipId,
+          hasVoted: votedUnits.has(unitId),
+          phase: 'SNAPSHOT',
+        });
+
+        if (status === OwningUnitStatus.READY) {
+          readyWeights.push(
+            Rational.from(snapshot.weightNumerator, snapshot.weightDenominator),
+          );
         }
 
         return {
@@ -654,36 +586,72 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       });
 
       return {
-        canVote: hasReady,
-        totalVotingPower: { value: totalValue, maximum: totalMaximum },
+        canVote: readyWeights.length > 0,
+        totalVotingPower: {
+          value: Rational.sum(readyWeights).toDecimalString(4),
+          maximum: totalMaximum.toDecimalString(4),
+        },
         owningUnits,
       };
     }
 
-    const allowIndividualVote = await this.getAllowCoOwnerIndividualVote(
-      tenantId,
-      voteId,
-    );
-
-    const [
-      ownerCountMap,
-      receivedConsentCountMap,
-      givenConsentUnits,
-      votedUnits,
-    ] = await Promise.all([
-      this.getCoOwnerCounts(tenantId, uniqueUnitIds),
-      this.getConsentCounts(tenantId, voteId, uniqueUnitIds, membershipId),
-      this.getGivenConsentUnits(tenantId, voteId, ownerId, uniqueUnitIds),
-      this.getVotedUnits(
-        tenantId,
-        voteId,
-        uniqueUnitIds,
-        membershipId,
-        allowIndividualVote,
-      ),
+    // Not opened yet: preview the electorate with the same domain function
+    // that will snapshot it at open, so the two never disagree.
+    const [preview, votedUnits, totalMaximum] = await Promise.all([
+      this.previewElectorate(tenantId, voteId, uniqueUnitIds),
+      this.getVotedUnits(tenantId, voteId, uniqueUnitIds),
+      this.getTenantTotalShare(tenantId),
     ]);
 
-    // Compute total voting power from fractions
+    const readyWeights: Rational[] = [];
+
+    const owningUnits = uniqueUnitIds.map((unitId) => {
+      const ownership = ownershipRows.find((o) => o.unitId === unitId)!;
+      const resolved = preview.find((r) => r.unitId === unitId);
+
+      if (!resolved) {
+        return {
+          id: unitId,
+          name: ownership.unitNo,
+          share: `${ownership.buildingShareNumerator}/${ownership.buildingShareDenominator}`,
+          status: OwningUnitStatus.INELIGIBLE,
+        };
+      }
+
+      const status = deriveOwningUnitStatus({
+        resolved,
+        membershipId,
+        hasVoted: votedUnits.has(unitId),
+        phase: 'PREVIEW',
+      });
+
+      if (status === OwningUnitStatus.READY) {
+        readyWeights.push(
+          Rational.from(resolved.weightNum, resolved.weightDen),
+        );
+      }
+
+      return {
+        id: unitId,
+        name: ownership.unitNo,
+        share: `${ownership.buildingShareNumerator}/${ownership.buildingShareDenominator}`,
+        status,
+        ineligibleReason: resolved.ineligibleReason,
+      };
+    });
+
+    return {
+      canVote: readyWeights.length > 0,
+      totalVotingPower: {
+        value: Rational.sum(readyWeights).toDecimalString(4),
+        maximum: totalMaximum.toDecimalString(4),
+      },
+      owningUnits,
+    };
+  }
+
+  /** Exact sum of every unit's building share in the tenant. */
+  private async getTenantTotalShare(tenantId: string): Promise<Rational> {
     const allUnits = await this.drizzle.db
       .select({
         buildingShareNumerator: units.buildingShareNumerator,
@@ -692,56 +660,11 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       .from(units)
       .where(eq(units.tenantId, tenantId));
 
-    const totalMaximum = allUnits.reduce(
-      (sum, u) => sum + u.buildingShareNumerator / u.buildingShareDenominator,
-      0,
+    return Rational.sum(
+      allUnits.map((u) =>
+        Rational.from(u.buildingShareNumerator, u.buildingShareDenominator),
+      ),
     );
-
-    // Build unit statuses
-    let totalValue = 0;
-    let hasReady = false;
-
-    const owningUnits = uniqueUnitIds.map((unitId) => {
-      const ownership = ownershipRows.find((o) => o.unitId === unitId)!;
-      const ownerCount = ownerCountMap.get(unitId) ?? 1;
-      const isSoleOwner = ownerCount === 1;
-      const share =
-        ownership.buildingShareNumerator / ownership.buildingShareDenominator;
-
-      let status: OwningUnitStatus;
-
-      const receivedConsents = receivedConsentCountMap.get(unitId) ?? 0;
-      const isGiven = givenConsentUnits.has(unitId);
-
-      if (isGiven) {
-        status = OwningUnitStatus.DELEGATED;
-      } else if (votedUnits.has(unitId)) {
-        status = OwningUnitStatus.VOTED;
-      } else if (
-        isSoleOwner ||
-        allowIndividualVote ||
-        receivedConsents >= ownerCount - 1
-      ) {
-        status = OwningUnitStatus.READY;
-        totalValue += share;
-        hasReady = true;
-      } else {
-        status = OwningUnitStatus.REQUIRES_DELEGATION;
-      }
-
-      return {
-        id: unitId,
-        name: ownership.unitNo,
-        share: `${ownership.buildingShareNumerator}/${ownership.buildingShareDenominator}`,
-        status,
-      };
-    });
-
-    return {
-      canVote: hasReady,
-      totalVotingPower: { value: totalValue, maximum: totalMaximum },
-      owningUnits,
-    };
   }
 
   async findVoterSummariesForVotes(
@@ -771,14 +694,18 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       return result;
     }
 
-    const ownerCountMap = await this.getCoOwnerCounts(tenantId, unitIds);
-
     const voteStatuses = await this.drizzle.db
       .select({ id: votes.id, status: votes.status })
       .from(votes)
       .where(inArray(votes.id, voteIds));
 
     const voteStatusMap = new Map(voteStatuses.map((v) => [v.id, v.status]));
+
+    // Units and their ownership parties do not vary per vote — load once,
+    // and only if at least one vote still needs a live preview.
+    let ownershipPlan:
+      | { units: ElectorateUnitInput[]; parties: ElectoratePartyInput[] }
+      | undefined;
 
     for (const voteId of voteIds) {
       const status = voteStatusMap.get(voteId);
@@ -811,17 +738,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
           }
         }
 
-        const allowIndividualVote = await this.getAllowCoOwnerIndividualVote(
-          tenantId,
-          voteId,
-        );
-        const votedUnits = await this.getVotedUnits(
-          tenantId,
-          voteId,
-          unitIds,
-          membershipId,
-          allowIndividualVote,
-        );
+        const votedUnits = await this.getVotedUnits(tenantId, voteId, unitIds);
 
         result.set(voteId, {
           canVote,
@@ -831,32 +748,40 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
         continue;
       }
 
-      const allowIndividualVote = await this.getAllowCoOwnerIndividualVote(
-        tenantId,
-        voteId,
-      );
+      ownershipPlan ??= await this.loadOwnershipPlan(tenantId, unitIds);
+      const [preview, votedUnits] = await Promise.all([
+        this.previewElectorate(tenantId, voteId, unitIds, ownershipPlan),
+        this.getVotedUnits(tenantId, voteId, unitIds),
+      ]);
 
-      const [consentCountMap, givenConsentUnits, votedUnits] =
-        await Promise.all([
-          this.getConsentCounts(tenantId, voteId, unitIds, membershipId),
-          this.getGivenConsentUnits(tenantId, voteId, ownerId, unitIds),
-          this.getVotedUnits(
-            tenantId,
-            voteId,
-            unitIds,
+      let hasReady = false;
+      let hasRequiresDelegation = false;
+      let hasDelegated = false;
+
+      for (const resolved of preview) {
+        // `hasVoted` is reported separately, so a cast ballot must not hide
+        // that this membership represents the unit.
+        switch (
+          deriveOwningUnitStatus({
+            resolved,
             membershipId,
-            allowIndividualVote,
-          ),
-        ]);
-
-      const { hasReady, hasRequiresDelegation, hasDelegated } =
-        this.computeUnitDelegationStatus(
-          unitIds,
-          ownerCountMap,
-          consentCountMap,
-          givenConsentUnits,
-          allowIndividualVote,
-        );
+            hasVoted: false,
+            phase: 'PREVIEW',
+          })
+        ) {
+          case OwningUnitStatus.READY:
+            hasReady = true;
+            break;
+          case OwningUnitStatus.REQUIRES_DELEGATION:
+            hasRequiresDelegation = true;
+            break;
+          case OwningUnitStatus.DELEGATED:
+            hasDelegated = true;
+            break;
+          default:
+            break;
+        }
+      }
 
       result.set(voteId, {
         canVote: hasReady,
@@ -876,21 +801,31 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
     forMembershipId: string | undefined,
     requesterMembershipId: string,
   ): Promise<DelegationCandidateDto[]> {
+    // Any active member of the association may be designated — a consent is
+    // a power of attorney, not a co-ownership matter (DOM-012). Co-owners of
+    // the unit are surfaced first via `isUnitOwner`.
     const records = await this.drizzle.db
       .select({
         membershipId: tenantMemberships.id,
-        name: owners.displayName,
+        name: users.fullName,
         delegateMembershipId: voteUnitConsents.toMembershipId,
         hasConsent: isNotNull(voteUnitConsents.id),
         isUnitOwner: isNotNull(unitOwnerships.id),
       })
       .from(tenantMemberships)
-      .innerJoin(owners, eq(owners.userId, tenantMemberships.userId))
-      .innerJoin(
+      .innerJoin(users, eq(users.id, tenantMemberships.userId))
+      .leftJoin(
+        owners,
+        and(
+          eq(owners.userId, tenantMemberships.userId),
+          eq(owners.tenantId, tenantMemberships.tenantId),
+        ),
+      )
+      .leftJoin(
         unitOwnershipMembers,
         eq(unitOwnershipMembers.ownerId, owners.id),
       )
-      .innerJoin(
+      .leftJoin(
         unitOwnerships,
         and(
           eq(unitOwnerships.id, unitOwnershipMembers.ownershipId),
@@ -916,15 +851,28 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
             : undefined,
         ),
       )
-      .orderBy(owners.displayName);
+      .orderBy(users.fullName);
 
-    return records.map((r) => ({
-      membershipId: r.membershipId,
-      name: r.name,
-      hasDelegatedToRequester: r.delegateMembershipId === requesterMembershipId,
-      isEligible: !r.hasConsent,
-      isUnitOwner: !!r.isUnitOwner,
-    }));
+    // A membership can produce several rows (one per ownership party it
+    // belongs to); collapse them, keeping any positive signal.
+    const byMembership = new Map<string, DelegationCandidateDto>();
+    for (const r of records) {
+      const existing = byMembership.get(r.membershipId);
+      const candidate: DelegationCandidateDto = {
+        membershipId: r.membershipId,
+        name: r.name,
+        hasDelegatedToRequester:
+          (existing?.hasDelegatedToRequester ?? false) ||
+          r.delegateMembershipId === requesterMembershipId,
+        isEligible: (existing?.isEligible ?? true) && !r.hasConsent,
+        isUnitOwner: (existing?.isUnitOwner ?? false) || !!r.isUnitOwner,
+      };
+      byMembership.set(r.membershipId, candidate);
+    }
+
+    return [...byMembership.values()].sort(
+      (a, b) => Number(b.isUnitOwner) - Number(a.isUnitOwner),
+    );
   }
 
   async findConsents(
@@ -1039,38 +987,6 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
     return rows.length > 0 ? rows[0].id : null;
   }
 
-  async hasMutualDelegation(
-    tenantId: string,
-    unitId: string,
-    voteId: string,
-    delegatorMembershipId: string,
-    delegateMembershipId: string,
-  ): Promise<boolean> {
-    const mutualConsent = await this.drizzle.db
-      .select({ id: voteUnitConsents.id })
-      .from(voteUnitConsents)
-      .where(
-        and(
-          eq(voteUnitConsents.unitId, unitId),
-          eq(voteUnitConsents.voteId, voteId),
-          eq(voteUnitConsents.status, VoteUnitConsentStatus.VALID),
-          eq(voteUnitConsents.tenantId, tenantId),
-          eq(voteUnitConsents.toMembershipId, delegatorMembershipId),
-          eq(
-            voteUnitConsents.fromOwnerId,
-            this.drizzle.db
-              .select({ id: owners.id })
-              .from(tenantMemberships)
-              .innerJoin(owners, eq(owners.userId, tenantMemberships.userId))
-              .where(eq(tenantMemberships.id, delegateMembershipId)),
-          ),
-        ),
-      )
-      .limit(1);
-
-    return mutualConsent.length > 0;
-  }
-
   async isOwnerOfConsent(
     tenantId: string,
     consentId: string,
@@ -1126,31 +1042,55 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
             )
         : [];
 
-    const questionResults = questionResultRows.map((qr) => ({
-      questionId: qr.questionId,
-      majorityMet: qr.majorityMet,
-      winningOptionId: qr.winningOptionId ?? null,
-      majorityThresholdValue:
-        qr.majorityThresholdValue !== null
-          ? Number(qr.majorityThresholdValue)
-          : null,
-      majorityDenominatorValue: Number(qr.majorityDenominatorValue),
-      optionResults: optionResultRows
-        .filter((or) => or.questionResultId === qr.id)
-        .map((or) => ({
-          optionId: or.optionId,
-          voteWeight: Number(or.voteWeight),
-          voteUnitCount: or.voteUnitCount,
-        })),
-    }));
+    const questionResults = questionResultRows.map((qr) => {
+      const denominator = Rational.from(
+        qr.majorityDenominatorNum,
+        qr.majorityDenominatorDen,
+      );
+      return {
+        questionId: qr.questionId,
+        majorityMet: qr.majorityMet,
+        winningOptionId: qr.winningOptionId ?? null,
+        majorityThreshold: {
+          num: qr.majorityThresholdNum,
+          den: qr.majorityThresholdDen,
+        },
+        majorityComparator: qr.majorityComparator as ThresholdComparator,
+        majorityDenominator: toFractionDto(denominator),
+        optionResults: optionResultRows
+          .filter((or) => or.questionResultId === qr.id)
+          .map((or) => {
+            const weight = Rational.from(or.voteWeightNum, or.voteWeightDen);
+            return {
+              optionId: or.optionId,
+              voteWeight: toFractionDto(weight),
+              percent: toPercentString(weight, denominator),
+              voteUnitCount: or.voteUnitCount,
+            };
+          }),
+      };
+    });
+
+    const participationWeight = Rational.from(
+      result.participationWeightNum,
+      result.participationWeightDen,
+    );
+    const totalVotesWeight = Rational.from(
+      result.totalVotesWeightNum,
+      result.totalVotesWeightDen,
+    );
 
     return {
       resultStatus: result.resultStatus as 'COMPUTED' | 'FAILED',
       quorumMet: result.quorumMet,
-      participationWeight: Number(result.participationWeight),
+      participationWeight: toFractionDto(participationWeight),
+      participationPercent: toPercentString(
+        participationWeight,
+        totalVotesWeight,
+      ),
       participationUnitCount: result.participationUnitCount,
-      denominatorWeight: Number(result.denominatorWeight ?? 0),
-      denominatorUnitCount: result.denominatorUnitCount ?? 0,
+      totalVotesWeight: toFractionDto(totalVotesWeight),
+      totalVotesUnitCount: result.totalVotesUnitCount,
       computedAt: result.computedAt,
       questionResults,
     };

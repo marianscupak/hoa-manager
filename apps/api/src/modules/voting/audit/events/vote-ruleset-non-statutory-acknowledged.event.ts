@@ -7,16 +7,15 @@ import { Visibility } from '@/modules/core/audit/domain/visibility';
 import { VotingEventType } from '../voting-event-types';
 
 const PayloadSchema = z.object({
-  totalUnits: z.number().int().nonnegative(),
-  /** Exact `"num/den"` fraction — weights are rationals, never floats. */
-  totalWeight: z.string(),
+  deviations: z.array(z.enum(['ONE_UNIT_ONE_VOTE', 'UNIT_COUNT_QUORUM'])),
   labels: z.object({
     voteTitle: z.string(),
+    acknowledgedBy: z.string(),
   }),
 });
 
-export const VoteElectorateSnapshottedAuditEvent = defineAuditEvent({
-  eventType: VotingEventType.VOTE_ELECTORATE_SNAPSHOTTED,
+export const VoteRulesetNonStatutoryAcknowledgedAuditEvent = defineAuditEvent({
+  eventType: VotingEventType.VOTE_RULESET_NON_STATUTORY_ACKNOWLEDGED,
   module: 'VOTING',
   payloadSchema: PayloadSchema,
   visibility: Visibility.TENANT_PRIVILEGED,
@@ -27,9 +26,9 @@ export const VoteElectorateSnapshottedAuditEvent = defineAuditEvent({
     voteId: string;
     tenantId: string;
     voteTitle: string;
+    deviations: ('ONE_UNIT_ONE_VOTE' | 'UNIT_COUNT_QUORUM')[];
     actor: AuditActor;
-    totalUnits: number;
-    totalWeight: string;
+    acknowledgedByLabel: string;
     occurredAt: Date;
   }) {
     return {
@@ -39,10 +38,10 @@ export const VoteElectorateSnapshottedAuditEvent = defineAuditEvent({
       aggregateId: input.voteId,
       entityId: null,
       payload: {
-        totalUnits: input.totalUnits,
-        totalWeight: input.totalWeight,
+        deviations: input.deviations,
         labels: {
           voteTitle: input.voteTitle,
+          acknowledgedBy: input.acknowledgedByLabel,
         },
       },
     };

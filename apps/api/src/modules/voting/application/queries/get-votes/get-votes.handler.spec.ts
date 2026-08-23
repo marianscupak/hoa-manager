@@ -23,7 +23,7 @@ describe('GetVotesHandler', () => {
       id: 'v1',
       title: 't',
       status: 'CLOSED',
-      allowCoOwnerIndividualVote: false,
+      mode: 'PER_ROLLAM',
     } as unknown as VoteListItemResponseDto;
     voteReadRepository.findVotes.mockResolvedValue([closedVote]);
     voteReadRepository.findVoterSummariesForVotes.mockResolvedValue(new Map());
@@ -59,7 +59,7 @@ describe('GetVotesHandler', () => {
       id: 'v2',
       title: 't2',
       status: 'OPEN',
-      allowCoOwnerIndividualVote: false,
+      mode: 'PER_ROLLAM',
     } as unknown as VoteListItemResponseDto;
     voteReadRepository.findVotes.mockResolvedValue([openVote]);
     voteReadRepository.findVoterSummariesForVotes.mockResolvedValue(new Map());
@@ -83,7 +83,7 @@ describe('GetVotesHandler', () => {
       id: 'v3',
       title: 't3',
       status: 'CLOSED',
-      allowCoOwnerIndividualVote: false,
+      mode: 'PER_ROLLAM',
     } as unknown as VoteListItemResponseDto;
     voteReadRepository.findVotes.mockResolvedValue([closedVote]);
     voteReadRepository.findVoterSummariesForVotes.mockResolvedValue(new Map());

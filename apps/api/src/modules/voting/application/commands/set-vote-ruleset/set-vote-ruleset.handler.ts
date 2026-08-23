@@ -4,8 +4,13 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
 import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
 import { AuditService } from '@/modules/core/audit/application/services/audit.service';
+import { VoteRulesetNonStatutoryAcknowledgedAuditEvent } from '@/modules/voting/audit/events/vote-ruleset-non-statutory-acknowledged.event';
 import { VoteRulesetSetAuditEvent } from '@/modules/voting/audit/events/vote-ruleset-set.event';
 import { VotingAuditLabelResolver } from '@/modules/voting/audit/label-resolver.service';
+import {
+  materializeRuleset,
+  validateRuleset,
+} from '@/modules/voting/domain/vote/ruleset-validation';
 import { VoteNotFoundException } from '@/shared/application/exceptions/vote.exceptions';
 import { type Clock, CLOCK } from '@/shared/application/ports/clock.port';
 
@@ -40,25 +45,42 @@ export class SetVoteRulesetHandler
       throw new VoteNotFoundException();
     }
 
-    aggregate.setRuleset(data);
+    const ruleset = materializeRuleset({ ...data, quorum: data.quorum });
+    aggregate.setRuleset(ruleset);
 
     await this.unitOfWork.execute(async () => {
       await this.voteWriteRepository.save(aggregate);
 
       const actor = this.auditContext.requireActor();
       const setByLabel = await this.labelResolver.resolveActorLabel(actor);
+      const occurredAt = this.clock.now();
 
       await this.auditService.append(
         VoteRulesetSetAuditEvent.build({
           voteId: aggregate.id,
           tenantId: aggregate.tenantId,
           voteTitle: aggregate.title,
-          ruleset: aggregate.ruleset!,
+          ruleset,
           actor,
           setByLabel,
-          occurredAt: this.clock.now(),
+          occurredAt,
         }),
       );
+
+      const { tier3 } = validateRuleset(aggregate.mode, ruleset);
+      if (tier3.length > 0) {
+        await this.auditService.append(
+          VoteRulesetNonStatutoryAcknowledgedAuditEvent.build({
+            voteId: aggregate.id,
+            tenantId: aggregate.tenantId,
+            voteTitle: aggregate.title,
+            deviations: tier3,
+            actor,
+            acknowledgedByLabel: setByLabel,
+            occurredAt,
+          }),
+        );
+      }
     });
 
     return aggregate.ruleset!;

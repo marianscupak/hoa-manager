@@ -6,6 +6,7 @@ import { AuditContextService } from '@/modules/core/audit/application/services/a
 import { AuditService } from '@/modules/core/audit/application/services/audit.service';
 import { VoteQuestionUpdatedAuditEvent } from '@/modules/voting/audit/events/vote-question-updated.event';
 import { VotingAuditLabelResolver } from '@/modules/voting/audit/label-resolver.service';
+import { materializeRuleset } from '@/modules/voting/domain/vote/ruleset-validation';
 import { VoteNotFoundException } from '@/shared/application/exceptions/vote.exceptions';
 import { type Clock, CLOCK } from '@/shared/application/ports/clock.port';
 
@@ -43,7 +44,9 @@ export class UpdateVoteQuestionHandler
       type: data.type,
       sortOrder: data.sortOrder,
       options: data.options,
-      rulesetOverride: data.rulesetOverride,
+      rulesetOverride: data.rulesetOverride
+        ? materializeRuleset(data.rulesetOverride)
+        : undefined,
     });
 
     const updatedQuestion = aggregate.questions.find(

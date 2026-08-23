@@ -1,4 +1,4 @@
-import { pgTable, timestamp, uuid, numeric, unique } from 'drizzle-orm/pg-core';
+import { pgTable, timestamp, uuid, integer, unique } from 'drizzle-orm/pg-core';
 
 import { tenantMemberships } from '@/infrastructure/db/schema/core/tenant-memberships';
 import { tenants } from '@/infrastructure/db/schema/core/tenants';
@@ -29,18 +29,16 @@ export const voteElectorateUnits = pgTable(
     eligibilityStatus:
       electorateEligibilityStatusEnum('eligibility_status').notNull(),
     ineligibleReason: electorateIneligibleReasonEnum('ineligible_reason'),
-    votingWeight: numeric('voting_weight', {
-      precision: 19,
-      scale: 4,
-    }).notNull(),
+    weightNumerator: integer('weight_numerator').notNull(),
+    weightDenominator: integer('weight_denominator').notNull(),
     snapshottedAt: timestamp('snapshotted_at', {
       withTimezone: true,
       mode: 'date',
     }).notNull(),
   },
   (table) => ({
-    unqVoteElectorateUnitsVoteIdUnitIdRepId: unique(
-      'unq_vote_electorate_units_vote_id_unit_id_rep_id',
-    ).on(table.voteId, table.unitId, table.representativeMembershipId),
+    unqVoteElectorateUnitsVoteIdUnitId: unique(
+      'unq_vote_electorate_units_vote_id_unit_id',
+    ).on(table.voteId, table.unitId),
   }),
 );

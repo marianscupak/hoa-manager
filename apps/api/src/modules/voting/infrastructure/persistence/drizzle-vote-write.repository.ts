@@ -17,6 +17,7 @@ import {
 } from '@/infrastructure/db/schema';
 import { BallotAlreadyCastException } from '@/shared/application/exceptions/vote.exceptions';
 
+import { mapRulesetColumns, mapRulesetRow } from './vote-ruleset.mapper';
 import {
   VoteWriteRepository,
   type BallotInput,
@@ -24,14 +25,10 @@ import {
 import { VoteResultSnapshot } from '../../domain/vote/vote-result.types';
 import { VoteAggregate } from '../../domain/vote/vote.aggregate';
 import {
-  type MajorityRuleType,
-  type QuorumElectorateBasis,
-  type QuorumMeasure,
   VoteOptionSemantic,
   VoteQuestionType,
   VoteStatus,
-  type VoteRuleset,
-  type VoteWeightBasis,
+  type VoteMode,
   type VoteQuestion,
   type VoteOption,
   ElectorateUnit,
@@ -121,15 +118,16 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
         type: q.questionType as VoteQuestionType,
         sortOrder: q.sortOrder,
         options: qOptions,
-        rulesetOverride: qRuleset ? this.mapRulesetRow(qRuleset) : undefined,
+        rulesetOverride: qRuleset ? mapRulesetRow(qRuleset) : undefined,
       };
     });
 
     return VoteAggregate.rehydrate({
       ...vote,
       status: vote.status as VoteStatus,
+      mode: vote.mode as VoteMode,
       description: vote.description ?? '',
-      ruleset: ruleset ? this.mapRulesetRow(ruleset) : null,
+      ruleset: ruleset ? mapRulesetRow(ruleset) : null,
       questions,
     });
   }
@@ -188,20 +186,7 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
 
         if (q.rulesetOverride) {
           const overrideValues = {
-            weightBasis: q.rulesetOverride.weightBasis,
-            quorumMeasure: q.rulesetOverride.quorumMeasure,
-            quorumElectorateBasis: q.rulesetOverride.quorumElectorateBasis,
-            quorumThreshold: q.rulesetOverride.quorumThreshold.toString(),
-            majorityRuleType: q.rulesetOverride.majorityRuleType,
-            majorityThreshold:
-              q.rulesetOverride.majorityThreshold !== null
-                ? q.rulesetOverride.majorityThreshold.toString()
-                : null,
-            allowAbstain: q.rulesetOverride.allowAbstain,
-            abstainExcludedFromMajorityDenominator:
-              q.rulesetOverride.abstainExcludedFromMajorityDenominator,
-            allowCoOwnerIndividualVote:
-              q.rulesetOverride.allowCoOwnerIndividualVote,
+            ...mapRulesetColumns(q.rulesetOverride),
             updatedAt: new Date(),
           };
 
@@ -323,6 +308,7 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
       title: vote.title,
       description: vote.description,
       status: vote.status,
+      mode: vote.mode,
       scheduledFrom: vote.scheduledFrom,
       scheduledTo: vote.scheduledTo,
       createdAt: vote.createdAt,
@@ -344,28 +330,13 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
       title: vote.title,
       description: vote.description,
       status: vote.status,
+      mode: vote.mode,
       scheduledFrom: vote.scheduledFrom,
       scheduledTo: vote.scheduledTo,
       openedAt: vote.openedAt,
       openedByMembershipId: vote.openedByMembershipId,
       closedAt: vote.closedAt,
       closedByMembershipId: vote.closedByMembershipId,
-    };
-  }
-
-  private mapRulesetRow(row: typeof voteRulesets.$inferSelect): VoteRuleset {
-    return {
-      weightBasis: row.weightBasis as VoteWeightBasis,
-      quorumMeasure: row.quorumMeasure as QuorumMeasure,
-      quorumElectorateBasis: row.quorumElectorateBasis as QuorumElectorateBasis,
-      quorumThreshold: Number(row.quorumThreshold),
-      majorityRuleType: row.majorityRuleType as MajorityRuleType,
-      majorityThreshold:
-        row.majorityThreshold !== null ? Number(row.majorityThreshold) : null,
-      allowAbstain: row.allowAbstain,
-      abstainExcludedFromMajorityDenominator:
-        row.abstainExcludedFromMajorityDenominator,
-      allowCoOwnerIndividualVote: row.allowCoOwnerIndividualVote,
     };
   }
 
@@ -379,19 +350,7 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
     return {
       tenantId: vote.tenantId,
       voteId: vote.id,
-      weightBasis: vote.ruleset.weightBasis,
-      quorumMeasure: vote.ruleset.quorumMeasure,
-      quorumElectorateBasis: vote.ruleset.quorumElectorateBasis,
-      quorumThreshold: vote.ruleset.quorumThreshold.toString(),
-      majorityRuleType: vote.ruleset.majorityRuleType,
-      majorityThreshold:
-        vote.ruleset.majorityThreshold !== null
-          ? vote.ruleset.majorityThreshold.toString()
-          : null,
-      allowAbstain: vote.ruleset.allowAbstain,
-      abstainExcludedFromMajorityDenominator:
-        vote.ruleset.abstainExcludedFromMajorityDenominator,
-      allowCoOwnerIndividualVote: vote.ruleset.allowCoOwnerIndividualVote,
+      ...mapRulesetColumns(vote.ruleset),
     };
   }
 
@@ -402,21 +361,7 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
       throw new Error('Cannot map ruleset update when vote.ruleset is null');
     }
 
-    return {
-      weightBasis: vote.ruleset.weightBasis,
-      quorumMeasure: vote.ruleset.quorumMeasure,
-      quorumElectorateBasis: vote.ruleset.quorumElectorateBasis,
-      quorumThreshold: vote.ruleset.quorumThreshold.toString(),
-      majorityRuleType: vote.ruleset.majorityRuleType,
-      majorityThreshold:
-        vote.ruleset.majorityThreshold !== null
-          ? vote.ruleset.majorityThreshold.toString()
-          : null,
-      allowAbstain: vote.ruleset.allowAbstain,
-      abstainExcludedFromMajorityDenominator:
-        vote.ruleset.abstainExcludedFromMajorityDenominator,
-      allowCoOwnerIndividualVote: vote.ruleset.allowCoOwnerIndividualVote,
-    };
+    return mapRulesetColumns(vote.ruleset);
   }
 
   private mapQuestionInsert(
@@ -464,24 +409,11 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
     question: VoteQuestion,
     vote: VoteAggregate,
   ): typeof voteRulesets.$inferInsert {
-    const override = question.rulesetOverride!;
     return {
       tenantId: vote.tenantId,
       voteId: vote.id,
       questionId: question.id,
-      weightBasis: override.weightBasis,
-      quorumMeasure: override.quorumMeasure,
-      quorumElectorateBasis: override.quorumElectorateBasis,
-      quorumThreshold: override.quorumThreshold.toString(),
-      majorityRuleType: override.majorityRuleType,
-      majorityThreshold:
-        override.majorityThreshold !== null
-          ? override.majorityThreshold.toString()
-          : null,
-      allowAbstain: override.allowAbstain,
-      abstainExcludedFromMajorityDenominator:
-        override.abstainExcludedFromMajorityDenominator,
-      allowCoOwnerIndividualVote: override.allowCoOwnerIndividualVote,
+      ...mapRulesetColumns(question.rulesetOverride!),
     };
   }
 
@@ -506,7 +438,8 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
         representativeMembershipId: u.representativeMembershipId,
         eligibilityStatus: u.eligibilityStatus,
         ineligibleReason: u.ineligibleReason,
-        votingWeight: u.votingWeight.toString(),
+        weightNumerator: u.weightNum,
+        weightDenominator: u.weightDen,
         snapshottedAt: new Date(),
       })),
     );
@@ -611,24 +544,19 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
     tenantId: string,
     voteId: string,
     unitIds: string[],
-    castByMembershipId?: string,
   ): Promise<Set<string>> {
     if (unitIds.length === 0) return new Set();
-
-    const conditions = [
-      eq(ballots.tenantId, tenantId),
-      eq(ballots.voteId, voteId),
-      inArray(ballots.unitId, unitIds),
-    ];
-
-    if (castByMembershipId) {
-      conditions.push(eq(ballots.castByMembershipId, castByMembershipId));
-    }
 
     const rows = await this.db
       .select({ unitId: ballots.unitId })
       .from(ballots)
-      .where(and(...conditions));
+      .where(
+        and(
+          eq(ballots.tenantId, tenantId),
+          eq(ballots.voteId, voteId),
+          inArray(ballots.unitId, unitIds),
+        ),
+      );
 
     return new Set(rows.map((r) => r.unitId));
   }
@@ -662,10 +590,12 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
         voteId,
         resultStatus: 'COMPUTED',
         quorumMet: snapshot.quorumMet,
-        participationWeight: snapshot.participationWeight.toString(),
+        participationWeightNum: snapshot.participationWeight.num,
+        participationWeightDen: snapshot.participationWeight.den,
         participationUnitCount: snapshot.participationUnitCount,
-        denominatorWeight: snapshot.denominatorWeight.toString(),
-        denominatorUnitCount: snapshot.denominatorUnitCount,
+        totalVotesWeightNum: snapshot.totalVotesWeight.num,
+        totalVotesWeightDen: snapshot.totalVotesWeight.den,
+        totalVotesUnitCount: snapshot.totalVotesUnitCount,
         computedAt: new Date(),
       })
       .returning({ id: voteResults.id });
@@ -679,11 +609,11 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
           questionId: qr.questionId,
           majorityMet: qr.majorityMet,
           winningOptionId: qr.winningOptionId,
-          majorityThresholdValue:
-            qr.majorityThresholdValue !== null
-              ? qr.majorityThresholdValue.toString()
-              : null,
-          majorityDenominatorValue: qr.majorityDenominatorValue.toString(),
+          majorityThresholdNum: qr.majorityThreshold.num,
+          majorityThresholdDen: qr.majorityThreshold.den,
+          majorityComparator: qr.majorityComparator,
+          majorityDenominatorNum: qr.majorityDenominator.num,
+          majorityDenominatorDen: qr.majorityDenominator.den,
         })
         .returning({ id: voteQuestionResults.id });
 
@@ -693,7 +623,8 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
             tenantId,
             questionResultId: insertedQr.id,
             optionId: or.optionId,
-            voteWeight: or.voteWeight.toString(),
+            voteWeightNum: or.voteWeight.num,
+            voteWeightDen: or.voteWeight.den,
             voteUnitCount: or.voteUnitCount,
           })),
         );

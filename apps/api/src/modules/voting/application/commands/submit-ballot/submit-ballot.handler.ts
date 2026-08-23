@@ -84,16 +84,12 @@ export class SubmitBallotHandler
         }
       }
 
-      // 3. Check for existing ballots (accounts for allowCoOwnerIndividualVote)
-      const allowCoOwnerIndividualVote =
-        vote.ruleset?.allowCoOwnerIndividualVote ?? false;
-
+      // 3. One ballot per unit — the unit's representative casts it (DOM-004)
       const existingBallotUnitIds =
         await this.voteWriteRepository.hasExistingBallots(
           tenantId,
           voteId,
           unitIds,
-          allowCoOwnerIndividualVote ? membershipId : undefined,
         );
 
       if (existingBallotUnitIds.size > 0) {

@@ -13,6 +13,7 @@ import { VoteQuestionCreatedAuditEvent } from './events/vote-question-created.ev
 import { VoteQuestionDeletedAuditEvent } from './events/vote-question-deleted.event';
 import { VoteQuestionUpdatedAuditEvent } from './events/vote-question-updated.event';
 import { VoteResultsComputedAuditEvent } from './events/vote-results-computed.event';
+import { VoteRulesetNonStatutoryAcknowledgedAuditEvent } from './events/vote-ruleset-non-statutory-acknowledged.event';
 import { VoteRulesetSetAuditEvent } from './events/vote-ruleset-set.event';
 import { VoteScheduledAuditEvent } from './events/vote-scheduled.event';
 import { VoteUpdatedAuditEvent } from './events/vote-updated.event';
@@ -22,6 +23,7 @@ export const VOTING_AUDIT_EVENTS = [
   VoteUpdatedAuditEvent,
   VoteDeletedAuditEvent,
   VoteRulesetSetAuditEvent,
+  VoteRulesetNonStatutoryAcknowledgedAuditEvent,
   VoteScheduledAuditEvent,
   VoteOpenedAuditEvent,
   VoteElectorateSnapshottedAuditEvent,

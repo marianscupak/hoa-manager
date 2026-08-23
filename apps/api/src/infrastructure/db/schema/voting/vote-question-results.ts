@@ -1,6 +1,7 @@
-import { pgTable, uuid, numeric, boolean } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, bigint, boolean, integer } from 'drizzle-orm/pg-core';
 
 import { tenants } from '@/infrastructure/db/schema/core/tenants';
+import { thresholdComparatorEnum } from '@/infrastructure/db/schema/voting/enums';
 import { voteOptions } from '@/infrastructure/db/schema/voting/vote-options';
 import { voteQuestions } from '@/infrastructure/db/schema/voting/vote-questions';
 import { voteResults } from '@/infrastructure/db/schema/voting/vote-results';
@@ -20,12 +21,13 @@ export const voteQuestionResults = pgTable('vote_question_results', {
   winningOptionId: uuid('winning_option_id').references(() => voteOptions.id, {
     onDelete: 'cascade',
   }),
-  majorityThresholdValue: numeric('majority_threshold_value', {
-    precision: 19,
-    scale: 4,
-  }),
-  majorityDenominatorValue: numeric('majority_denominator_value', {
-    precision: 19,
-    scale: 4,
+  majorityThresholdNum: integer('majority_threshold_num').notNull(),
+  majorityThresholdDen: integer('majority_threshold_den').notNull(),
+  majorityComparator: thresholdComparatorEnum('majority_comparator').notNull(),
+  majorityDenominatorNum: bigint('majority_denominator_num', {
+    mode: 'bigint',
+  }).notNull(),
+  majorityDenominatorDen: bigint('majority_denominator_den', {
+    mode: 'bigint',
   }).notNull(),
 });

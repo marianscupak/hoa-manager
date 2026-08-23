@@ -1,7 +1,9 @@
 export interface ResultCalculationElectorateData {
   unitId: string;
   eligibilityStatus: string;
-  votingWeight: string;
+  ineligibleReason: string | null;
+  weightNum: number;
+  weightDen: number;
 }
 
 export interface ResultCalculationBallotData {

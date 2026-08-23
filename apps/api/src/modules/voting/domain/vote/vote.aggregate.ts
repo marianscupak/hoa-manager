@@ -1,4 +1,5 @@
 import {
+  VoteMode,
   VoteOption,
   VoteOptionSemantic,
   VoteQuestion,
@@ -8,7 +9,10 @@ import {
 } from '@/modules/voting/domain/vote/vote.types';
 import {
   InvalidVoteQuestionException,
-  InvalidQuestionRulesetOverrideException,
+  RulesetAcknowledgementRequiredException,
+  RulesetOverrideNotStricterException,
+  SubLegalRulesetException,
+  VoteWindowTooShortPerRollamException,
   VoteNotDraftException,
   VoteQuestionNotFoundException,
   VoteRulesetRequiredException,
@@ -21,9 +25,21 @@ import {
 } from '@/shared/application/exceptions/vote.exceptions';
 import { ErrorCode } from '@/shared/errors/error-codes';
 
+import {
+  validateQuestionOverride,
+  validateRuleset,
+} from './ruleset-validation';
+
+/**
+ * Statutory minimum per-rollam voting window — NOZ § 1212 gives owners at
+ * least 15 days to return a written ballot.
+ */
+const PER_ROLLAM_MIN_WINDOW_MS = 15 * 86_400_000;
+
 export type CreateVoteInput = {
   title: string;
   description: string | null;
+  mode: VoteMode;
   scheduledFrom?: Date;
   scheduledTo?: Date;
 };
@@ -48,6 +64,7 @@ export class VoteAggregate {
     public readonly title: string,
     public readonly description: string | null,
     public readonly status: VoteStatus,
+    public readonly mode: VoteMode,
     public readonly createdAt: Date,
     public readonly createdByMembershipId: string,
     public readonly scheduledFrom?: Date,
@@ -79,6 +96,7 @@ export class VoteAggregate {
       data.title,
       data.description,
       VoteStatus.DRAFT,
+      data.mode,
       now,
       createdByMembershipId,
       data.scheduledFrom,
@@ -89,6 +107,15 @@ export class VoteAggregate {
   update(data: CreateVoteInput, now: Date): void {
     this.assertEditable();
     VoteAggregate.validateSchedule(data.scheduledFrom, data.scheduledTo, now);
+    if (
+      this.mode === VoteMode.PER_ROLLAM &&
+      data.scheduledFrom &&
+      data.scheduledTo &&
+      data.scheduledTo.getTime() - data.scheduledFrom.getTime() <
+        PER_ROLLAM_MIN_WINDOW_MS
+    ) {
+      throw new VoteWindowTooShortPerRollamException();
+    }
 
     Object.assign(this, {
       title: data.title,
@@ -119,6 +146,13 @@ export class VoteAggregate {
       }
       if (this.scheduledFrom >= this.scheduledTo) {
         errors.push({ code: ErrorCode.VOTE_SCHEDULE_INVALID_RANGE });
+      }
+      if (this.mode === VoteMode.PER_ROLLAM) {
+        const windowMs =
+          this.scheduledTo.getTime() - this.scheduledFrom.getTime();
+        if (windowMs < PER_ROLLAM_MIN_WINDOW_MS) {
+          errors.push({ code: ErrorCode.VOTE_WINDOW_TOO_SHORT_PER_ROLLAM });
+        }
       }
     }
 
@@ -205,6 +239,7 @@ export class VoteAggregate {
     title: string;
     description: string;
     status: VoteStatus;
+    mode: VoteMode;
     createdAt: Date;
     createdByMembershipId: string;
     scheduledFrom?: Date | null;
@@ -223,6 +258,7 @@ export class VoteAggregate {
       props.title,
       props.description,
       props.status,
+      props.mode,
       props.createdAt,
       props.createdByMembershipId,
       props.scheduledFrom ?? undefined,
@@ -239,13 +275,33 @@ export class VoteAggregate {
 
   setRuleset(ruleset: VoteRuleset): void {
     this.assertEditable();
+    const { tier1, tier3 } = validateRuleset(this.mode, ruleset);
+    if (tier1.length > 0) {
+      throw new SubLegalRulesetException(
+        tier1.map((v) => ({
+          code: ErrorCode.VOTE_RULESET_SUBLEGAL,
+          param: `${v.code} (${v.citation})`,
+        })),
+      );
+    }
+    if (tier3.length > 0 && !ruleset.acknowledgedNonStatutory) {
+      throw new RulesetAcknowledgementRequiredException(
+        tier3.map((d) => ({
+          code: ErrorCode.VOTE_RULESET_ACK_REQUIRED,
+          param: d,
+        })),
+      );
+    }
     this.ruleset = ruleset;
   }
 
   addQuestion(input: AddVoteQuestionInput): void {
     this.assertEditable();
-    const defaultRuleset = this.assertRulesetPresent();
-    const effectiveRuleset = input.rulesetOverride ?? defaultRuleset;
+    // A question override may only tighten the majority bar — `allowAbstain`
+    // is one of the dimensions it may not diverge on (see
+    // `validateQuestionOverride`), so the option set always follows the
+    // vote-level ruleset.
+    const ruleset = this.assertRulesetPresent();
 
     if (!input.title || input.title.trim() === '') {
       throw new InvalidVoteQuestionException();
@@ -253,11 +309,11 @@ export class VoteAggregate {
 
     const options = this.buildOptionsForQuestion(
       input.type,
-      effectiveRuleset.allowAbstain,
+      ruleset.allowAbstain,
       input.options,
     );
 
-    this.validateQuestionRulesetOverride(input.rulesetOverride);
+    this.assertQuestionOverrideStricter(input.rulesetOverride);
 
     const question: VoteQuestion = {
       id: crypto.randomUUID(),
@@ -281,8 +337,11 @@ export class VoteAggregate {
 
   updateQuestion(questionId: string, input: UpdateVoteQuestionInput): void {
     this.assertEditable();
-    const defaultRuleset = this.assertRulesetPresent();
-    const effectiveRuleset = input.rulesetOverride ?? defaultRuleset;
+    // A question override may only tighten the majority bar — `allowAbstain`
+    // is one of the dimensions it may not diverge on (see
+    // `validateQuestionOverride`), so the option set always follows the
+    // vote-level ruleset.
+    const ruleset = this.assertRulesetPresent();
 
     const currentIndex = this.questions.findIndex((q) => q.id === questionId);
     if (currentIndex === -1) {
@@ -295,11 +354,11 @@ export class VoteAggregate {
 
     const options = this.buildOptionsForQuestion(
       input.type,
-      effectiveRuleset.allowAbstain,
+      ruleset.allowAbstain,
       input.options,
     );
 
-    this.validateQuestionRulesetOverride(input.rulesetOverride);
+    this.assertQuestionOverrideStricter(input.rulesetOverride);
 
     const updatedQuestion: VoteQuestion = {
       id: questionId,
@@ -356,11 +415,20 @@ export class VoteAggregate {
     return this.ruleset;
   }
 
-  private validateQuestionRulesetOverride(
+  private assertQuestionOverrideStricter(
     override: VoteRuleset | undefined,
   ): void {
-    if (override && override.allowCoOwnerIndividualVote) {
-      throw new InvalidQuestionRulesetOverrideException();
+    if (!override) return;
+    const base = this.assertRulesetPresent();
+    const check = validateQuestionOverride(this.mode, base, override);
+    if (check.notStricter) throw new RulesetOverrideNotStricterException();
+    if (check.tier1.length > 0) {
+      throw new SubLegalRulesetException(
+        check.tier1.map((v) => ({
+          code: ErrorCode.VOTE_RULESET_SUBLEGAL,
+          param: `${v.code} (${v.citation})`,
+        })),
+      );
     }
   }
 

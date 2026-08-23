@@ -18,15 +18,26 @@ export const quorumMeasureEnum = pgEnum('quorum_measure', [
   'UNIT_COUNT',
 ]);
 
-export const quorumElectorateBasisEnum = pgEnum('quorum_electorate_basis', [
-  'ALL_UNITS',
-  'ELIGIBLE_UNITS_ONLY',
-]);
-
 export const majorityRuleTypeEnum = pgEnum('majority_rule_type', [
   'SIMPLE_MAJORITY',
   'QUALIFIED_MAJORITY',
+  'UNANIMITY',
 ]);
+
+export const voteModeEnum = pgEnum('vote_mode', [
+  'PER_ROLLAM',
+  'ASSEMBLY_RECORD',
+]);
+
+export const thresholdComparatorEnum = pgEnum('threshold_comparator', [
+  'STRICT_GREATER',
+  'AT_LEAST',
+]);
+
+export const majorityDenominatorBasisEnum = pgEnum(
+  'majority_denominator_basis',
+  ['VOTES_CAST', 'ALL_VOTES'],
+);
 
 export const questionTypeEnum = pgEnum('question_type', [
   'YES_NO',
@@ -45,7 +56,7 @@ export const electorateEligibilityStatusEnum = pgEnum(
 
 export const electorateIneligibleReasonEnum = pgEnum(
   'electorate_ineligible_reason',
-  ['NO_REPRESENTATIVE', 'MISSING_OWNERSHIP'],
+  ['NO_REPRESENTATIVE', 'MISSING_OWNERSHIP', 'ASSOCIATION_OWNED'],
 );
 
 export const ballotCastMethodEnum = pgEnum('ballot_cast_method', [

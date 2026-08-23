@@ -6,6 +6,7 @@ import { AuditContextService } from '@/modules/core/audit/application/services/a
 import { AuditService } from '@/modules/core/audit/application/services/audit.service';
 import { VoteQuestionCreatedAuditEvent } from '@/modules/voting/audit/events/vote-question-created.event';
 import { VotingAuditLabelResolver } from '@/modules/voting/audit/label-resolver.service';
+import { materializeRuleset } from '@/modules/voting/domain/vote/ruleset-validation';
 import { VoteNotFoundException } from '@/shared/application/exceptions/vote.exceptions';
 import { type Clock, CLOCK } from '@/shared/application/ports/clock.port';
 
@@ -45,7 +46,9 @@ export class CreateVoteQuestionHandler
       type: data.type,
       sortOrder: data.sortOrder,
       options: data.options,
-      rulesetOverride: data.rulesetOverride,
+      rulesetOverride: data.rulesetOverride
+        ? materializeRuleset(data.rulesetOverride)
+        : undefined,
     });
 
     const addedQuestion = aggregate.questions.find((q) => !idsBefore.has(q.id));

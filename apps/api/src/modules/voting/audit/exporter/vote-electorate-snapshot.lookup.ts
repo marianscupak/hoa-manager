@@ -7,6 +7,7 @@ import { tenantMemberships } from '@/infrastructure/db/schema/core/tenant-member
 import { units } from '@/infrastructure/db/schema/core/units';
 import { users } from '@/infrastructure/db/schema/core/users';
 import { voteElectorateUnits } from '@/infrastructure/db/schema/voting/vote-electorate-units';
+import { Rational } from '@/shared/domain/rational';
 
 export interface ElectorateUnitSnapshot {
   unitId: string;
@@ -15,13 +16,17 @@ export interface ElectorateUnitSnapshot {
   representativeLabel: string | null;
   eligibilityStatus: string;
   ineligibleReason: string | null;
-  weight: number;
+  /** Exact `"num/den"` fraction. */
+  weight: string;
+  weightDecimal: string;
 }
 
 export interface ElectorateSnapshotWithLabels {
   units: ElectorateUnitSnapshot[];
   totalUnits: number;
-  totalWeight: number;
+  /** Exact `"num/den"` fraction. */
+  totalWeight: string;
+  totalWeightDecimal: string;
 }
 
 @Injectable()
@@ -46,7 +51,8 @@ export class VoteElectorateSnapshotLookup {
         representativeFullName: users.fullName,
         eligibilityStatus: voteElectorateUnits.eligibilityStatus,
         ineligibleReason: voteElectorateUnits.ineligibleReason,
-        votingWeight: voteElectorateUnits.votingWeight,
+        weightNumerator: voteElectorateUnits.weightNumerator,
+        weightDenominator: voteElectorateUnits.weightDenominator,
       })
       .from(voteElectorateUnits)
       .innerJoin(units, eq(voteElectorateUnits.unitId, units.id))
@@ -65,22 +71,28 @@ export class VoteElectorateSnapshotLookup {
         ),
       );
 
-    const unitsMapped: ElectorateUnitSnapshot[] = rows.map((r) => ({
+    const weights = rows.map((r) =>
+      Rational.from(r.weightNumerator, r.weightDenominator),
+    );
+
+    const unitsMapped: ElectorateUnitSnapshot[] = rows.map((r, i) => ({
       unitId: r.unitId,
       unitLabel: r.unitNo,
       representativeMembershipId: r.representativeMembershipId,
       representativeLabel: r.representativeFullName ?? null,
       eligibilityStatus: r.eligibilityStatus,
       ineligibleReason: r.ineligibleReason,
-      weight: Number(r.votingWeight),
+      weight: `${weights[i].num}/${weights[i].den}`,
+      weightDecimal: weights[i].toDecimalString(4),
     }));
 
-    const totalWeight = unitsMapped.reduce((sum, u) => sum + u.weight, 0);
+    const totalWeight = Rational.sum(weights);
 
     return {
       units: unitsMapped,
       totalUnits: unitsMapped.length,
-      totalWeight,
+      totalWeight: `${totalWeight.num}/${totalWeight.den}`,
+      totalWeightDecimal: totalWeight.toDecimalString(4),
     };
   }
 }

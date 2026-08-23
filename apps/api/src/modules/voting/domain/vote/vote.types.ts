@@ -16,26 +16,47 @@ export enum QuorumMeasure {
   UNIT_COUNT = 'UNIT_COUNT',
 }
 
-export enum QuorumElectorateBasis {
-  ALL_UNITS = 'ALL_UNITS',
-  ELIGIBLE_UNITS_ONLY = 'ELIGIBLE_UNITS_ONLY',
-}
-
 export enum MajorityRuleType {
   SIMPLE_MAJORITY = 'SIMPLE_MAJORITY',
   QUALIFIED_MAJORITY = 'QUALIFIED_MAJORITY',
+  UNANIMITY = 'UNANIMITY',
+}
+
+export enum VoteMode {
+  PER_ROLLAM = 'PER_ROLLAM',
+  ASSEMBLY_RECORD = 'ASSEMBLY_RECORD',
+}
+
+export enum ThresholdComparator {
+  STRICT_GREATER = 'STRICT_GREATER',
+  AT_LEAST = 'AT_LEAST',
+}
+
+export enum MajorityDenominatorBasis {
+  VOTES_CAST = 'VOTES_CAST',
+  ALL_VOTES = 'ALL_VOTES',
+}
+
+export interface FractionValue {
+  num: number;
+  den: number;
+}
+
+export interface QuorumRule {
+  measure: QuorumMeasure;
+  threshold: FractionValue;
+  comparator: ThresholdComparator;
 }
 
 export interface VoteRuleset {
   weightBasis: VoteWeightBasis;
-  quorumMeasure: QuorumMeasure;
-  quorumElectorateBasis: QuorumElectorateBasis;
-  quorumThreshold: number;
+  quorum: QuorumRule | null;
   majorityRuleType: MajorityRuleType;
-  majorityThreshold: number | null;
+  majorityDenominatorBasis: MajorityDenominatorBasis;
+  majorityThreshold: FractionValue;
+  majorityComparator: ThresholdComparator;
   allowAbstain: boolean;
-  abstainExcludedFromMajorityDenominator: boolean;
-  allowCoOwnerIndividualVote: boolean;
+  acknowledgedNonStatutory: boolean;
 }
 
 export enum VoteQuestionType {
@@ -88,6 +109,7 @@ export enum ElectorateEligibilityStatus {
 export enum ElectorateIneligibleReason {
   NO_REPRESENTATIVE = 'NO_REPRESENTATIVE',
   MISSING_OWNERSHIP = 'MISSING_OWNERSHIP',
+  ASSOCIATION_OWNED = 'ASSOCIATION_OWNED',
 }
 
 export interface ElectorateUnit {
@@ -95,5 +117,6 @@ export interface ElectorateUnit {
   representativeMembershipId: string | null;
   eligibilityStatus: ElectorateEligibilityStatus;
   ineligibleReason: ElectorateIneligibleReason | null;
-  votingWeight: number;
+  weightNum: number;
+  weightDen: number;
 }

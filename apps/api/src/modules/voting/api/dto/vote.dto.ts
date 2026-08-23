@@ -4,9 +4,11 @@ import { z } from 'zod';
 
 import { type QuestionOutcome } from '@/modules/voting/domain/vote/question-outcome';
 import {
+  MajorityDenominatorBasis,
   MajorityRuleType,
-  QuorumElectorateBasis,
   QuorumMeasure,
+  ThresholdComparator,
+  VoteMode,
   VoteOptionSemantic,
   VoteQuestionType,
   VoteStatus,
@@ -14,8 +16,9 @@ import {
   OwningUnitStatus,
   ElectorateIneligibleReason,
 } from '@/modules/voting/domain/vote/vote.types';
+import { Rational } from '@/shared/domain/rational';
 
-export const createVoteSchema = z.object({
+const voteBaseSchema = z.object({
   title: z.string(),
   description: z
     .string()
@@ -33,8 +36,18 @@ export const createVoteSchema = z.object({
     .transform((v) => (v ? new Date(v) : undefined)),
 });
 
+export const createVoteSchema = voteBaseSchema.extend({
+  mode: z.enum(VoteMode).default(VoteMode.PER_ROLLAM),
+});
+
+// `mode` is immutable after create — optional here, and the handler rejects a
+// value that differs from the stored one.
+export const updateVoteSchema = voteBaseSchema.extend({
+  mode: z.enum(VoteMode).optional(),
+});
+
 export class CreateVoteDto extends createZodDto(createVoteSchema) {}
-export class UpdateVoteDto extends createZodDto(createVoteSchema) {}
+export class UpdateVoteDto extends createZodDto(updateVoteSchema) {}
 
 export class CreateVoteResponseDto {
   @ApiProperty()
@@ -64,28 +77,121 @@ export class CreateVoteResponseDto {
 
   @ApiProperty()
   status!: VoteStatus;
+
+  @ApiProperty({ enum: VoteMode })
+  mode!: VoteMode;
 }
 
-export const setVoteRulesetSchema = z.object({
-  weightBasis: z.nativeEnum(VoteWeightBasis),
-  quorumMeasure: z.nativeEnum(QuorumMeasure),
-  quorumElectorateBasis: z.nativeEnum(QuorumElectorateBasis),
-  quorumThreshold: z.number().min(0).max(100),
-  majorityRuleType: z.nativeEnum(MajorityRuleType),
-  majorityThreshold: z
-    .number()
-    .min(0)
-    .max(100)
-    .optional()
-    .transform((v) => v ?? null),
-  allowAbstain: z.boolean(),
-  abstainExcludedFromMajorityDenominator: z.boolean(),
-  allowCoOwnerIndividualVote: z.boolean(),
+const fractionDtoSchema = z.object({
+  num: z.number().int().min(1),
+  den: z.number().int().min(1),
 });
+
+export const setVoteRulesetSchema = z
+  .object({
+    weightBasis: z.enum(VoteWeightBasis),
+    quorum: z
+      .object({
+        measure: z.enum(QuorumMeasure),
+        threshold: fractionDtoSchema,
+        comparator: z.enum(ThresholdComparator),
+      })
+      .nullable(),
+    majorityRuleType: z.enum(MajorityRuleType),
+    majorityDenominatorBasis: z.enum(MajorityDenominatorBasis),
+    // Derived for SIMPLE_MAJORITY (>1/2) and UNANIMITY (>=1/1); only a
+    // QUALIFIED_MAJORITY has to state its own bar.
+    majorityThreshold: fractionDtoSchema.optional(),
+    majorityComparator: z.enum(ThresholdComparator).optional(),
+    allowAbstain: z.boolean(),
+    acknowledgedNonStatutory: z.boolean().default(false),
+  })
+  .refine(
+    (data) =>
+      data.majorityRuleType !== MajorityRuleType.QUALIFIED_MAJORITY ||
+      (!!data.majorityThreshold && !!data.majorityComparator),
+    {
+      message:
+        'QUALIFIED_MAJORITY requires majorityThreshold and majorityComparator.',
+      path: ['majorityThreshold'],
+    },
+  );
 
 export class SetVoteRulesetDto extends createZodDto(setVoteRulesetSchema) {}
 
-export class SetVoteRulesetResponseDto extends SetVoteRulesetDto {}
+export class FractionDto {
+  @ApiProperty()
+  num!: string;
+
+  @ApiProperty()
+  den!: string;
+
+  @ApiProperty()
+  decimal!: string;
+}
+
+/** Exact fraction plus a rounded decimal for display. */
+export const toFractionDto = (value: Rational): FractionDto => ({
+  num: value.num.toString(),
+  den: value.den.toString(),
+  decimal: value.toDecimalString(4),
+});
+
+/**
+ * `part / total` as a percentage string with 2 decimals. Cross-multiplies
+ * rather than dividing, so no precision is lost before the final rounding.
+ */
+export const toPercentString = (part: Rational, total: Rational): string =>
+  total.isZero()
+    ? '0.00'
+    : Rational.from(part.num * total.den, part.den * total.num)
+        .mul(Rational.from(100, 1))
+        .toDecimalString(2);
+
+export class RulesetFractionDto {
+  @ApiProperty()
+  num!: number;
+
+  @ApiProperty()
+  den!: number;
+}
+
+export class QuorumRuleResponseDto {
+  @ApiProperty({ enum: QuorumMeasure })
+  measure!: QuorumMeasure;
+
+  @ApiProperty({ type: RulesetFractionDto })
+  threshold!: RulesetFractionDto;
+
+  @ApiProperty({ enum: ThresholdComparator })
+  comparator!: ThresholdComparator;
+}
+
+export class SetVoteRulesetResponseDto {
+  @ApiProperty({ enum: VoteWeightBasis })
+  weightBasis!: VoteWeightBasis;
+
+  @ApiProperty({ type: QuorumRuleResponseDto, nullable: true })
+  quorum!: QuorumRuleResponseDto | null;
+
+  @ApiProperty({ enum: MajorityRuleType })
+  majorityRuleType!: MajorityRuleType;
+
+  @ApiProperty({ enum: MajorityDenominatorBasis })
+  majorityDenominatorBasis!: MajorityDenominatorBasis;
+
+  @ApiProperty({ type: RulesetFractionDto })
+  majorityThreshold!: RulesetFractionDto;
+
+  @ApiProperty({ enum: ThresholdComparator })
+  majorityComparator!: ThresholdComparator;
+
+  @ApiProperty()
+  allowAbstain!: boolean;
+
+  @ApiProperty()
+  acknowledgedNonStatutory!: boolean;
+}
 
 export const createVoteQuestionOptionSchema = z.object({
   label: z.string().min(1),
@@ -266,9 +372,6 @@ export class VoteListItemResponseDto extends CreateVoteResponseDto {
   @ApiProperty({ type: VoterSummaryDto, required: false, nullable: true })
   voterSummary?: VoterSummaryDto | null;
 
-  @ApiProperty()
-  allowCoOwnerIndividualVote!: boolean;
-
   @ApiProperty({ type: [QuestionOutcomeDto], required: false })
   questionOutcomes?: QuestionOutcomeDto[];
 }
@@ -294,12 +397,17 @@ export class OwningUnitStatusDto {
   ineligibleReason?: ElectorateIneligibleReason | null;
 }
 
+/**
+ * Voting power this member can currently cast, against the association's
+ * total. Both are exact rational sums rendered to 4 decimals — never float
+ * arithmetic.
+ */
 export class TotalVotingPowerDto {
-  @ApiProperty()
-  value!: number;
+  @ApiProperty({ description: 'Decimal string, 4 places' })
+  value!: string;
 
-  @ApiProperty()
-  maximum!: number;
+  @ApiProperty({ description: 'Decimal string, 4 places' })
+  maximum!: string;
 }
 
 export class VoterStatusResponseDto {
@@ -421,8 +529,11 @@ export class VoteOptionResultDto {
   @ApiProperty()
   optionId!: string;
 
+  @ApiProperty({ type: FractionDto })
+  voteWeight!: FractionDto;
+
   @ApiProperty()
-  voteWeight!: number;
+  percent!: string;
 
   @ApiProperty()
   voteUnitCount!: number;
@@ -438,11 +549,14 @@ export class VoteQuestionResultDto {
   @ApiProperty({ type: 'string', nullable: true })
   winningOptionId!: string | null;
 
-  @ApiProperty({ type: 'number', nullable: true })
-  majorityThresholdValue!: number | null;
+  @ApiProperty({ type: RulesetFractionDto })
+  majorityThreshold!: RulesetFractionDto;
 
-  @ApiProperty()
-  majorityDenominatorValue!: number;
+  @ApiProperty({ enum: ThresholdComparator })
+  majorityComparator!: ThresholdComparator;
+
+  @ApiProperty({ type: FractionDto })
+  majorityDenominator!: FractionDto;
 
   @ApiProperty({ type: [VoteOptionResultDto] })
   optionResults!: VoteOptionResultDto[];
@@ -452,20 +566,29 @@ export class VoteResultsResponseDto {
   @ApiProperty({ enum: ['COMPUTED', 'FAILED'] })
   resultStatus!: 'COMPUTED' | 'FAILED';
 
-  @ApiProperty()
-  quorumMet!: boolean;
+  /** `null` for per-rollam votes, which have no quorum by law. */
+  @ApiProperty({ type: 'boolean', nullable: true })
+  quorumMet!: boolean | null;
+
+  @ApiProperty({ type: FractionDto })
+  participationWeight!: FractionDto;
 
   @ApiProperty()
-  participationWeight!: number;
+  participationPercent!: string;
 
   @ApiProperty()
   participationUnitCount!: number;
 
-  @ApiProperty()
-  denominatorWeight!: number;
+  /**
+   * Total weight of the countable electorate (every unit except
+   * association-owned ones) — the statutory "all votes" denominator, not
+   * the weight of the votes actually cast.
+   */
+  @ApiProperty({ type: FractionDto })
+  totalVotesWeight!: FractionDto;
 
   @ApiProperty()
-  denominatorUnitCount!: number;
+  totalVotesUnitCount!: number;
 
   @ApiProperty({ type: 'string', format: 'date-time' })
   computedAt!: Date;
@@ -481,21 +604,23 @@ export class VoteTurnoutResponseDto {
   @ApiProperty()
   eligibleUnitCount!: number;
 
-  @ApiProperty()
-  participationWeight!: number;
+  @ApiProperty({ type: FractionDto })
+  participationWeight!: FractionDto;
 
-  @ApiProperty()
-  eligibleWeight!: number;
+  @ApiProperty({ type: FractionDto })
+  eligibleWeight!: FractionDto;
 
   /**
-   * Quorum denominator per the vote's `quorumElectorateBasis` — the same
-   * figure the computed results use, so mid-vote turnout and the results
-   * page never quote different totals. Equals the `eligible*` fields only
-   * when the basis is ELIGIBLE_UNITS_ONLY.
+   * The statutory "all votes" denominator — every unit in the snapshot
+   * except association-owned ones, matching `computeVoteResults`, so
+   * mid-vote turnout and the results page never quote different totals.
    */
   @ApiProperty()
-  denominatorUnitCount!: number;
+  totalVotesUnitCount!: number;
+
+  @ApiProperty({ type: FractionDto })
+  totalVotesWeight!: FractionDto;
 
   @ApiProperty()
-  denominatorWeight!: number;
+  participationPercent!: string;
 }

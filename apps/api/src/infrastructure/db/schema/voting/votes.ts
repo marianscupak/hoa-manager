@@ -2,7 +2,10 @@ import { pgTable, timestamp, uuid, text, index } from 'drizzle-orm/pg-core';
 
 import { tenantMemberships } from '@/infrastructure/db/schema/core/tenant-memberships';
 import { tenants } from '@/infrastructure/db/schema/core/tenants';
-import { voteStatusEnum } from '@/infrastructure/db/schema/voting/enums';
+import {
+  voteModeEnum,
+  voteStatusEnum,
+} from '@/infrastructure/db/schema/voting/enums';
 
 export const votes = pgTable(
   'votes',
@@ -23,6 +26,7 @@ export const votes = pgTable(
     title: text('title').notNull(),
     description: text('description'),
     status: voteStatusEnum('status').notNull().default('DRAFT'),
+    mode: voteModeEnum('mode').notNull().default('PER_ROLLAM'),
     scheduledFrom: timestamp('scheduled_from', {
       withTimezone: true,
       mode: 'date',

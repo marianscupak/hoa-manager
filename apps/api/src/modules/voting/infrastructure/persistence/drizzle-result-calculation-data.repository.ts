@@ -35,7 +35,9 @@ export class DrizzleResultCalculationDataRepository
       .select({
         unitId: voteElectorateUnits.unitId,
         eligibilityStatus: voteElectorateUnits.eligibilityStatus,
-        votingWeight: voteElectorateUnits.votingWeight,
+        ineligibleReason: voteElectorateUnits.ineligibleReason,
+        weightNum: voteElectorateUnits.weightNumerator,
+        weightDen: voteElectorateUnits.weightDenominator,
       })
       .from(voteElectorateUnits)
       .where(

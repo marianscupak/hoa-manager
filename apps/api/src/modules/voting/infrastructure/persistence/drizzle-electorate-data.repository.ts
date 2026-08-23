@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, eq, inArray, isNull } from 'drizzle-orm';
 
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
 import {
@@ -10,11 +10,15 @@ import {
   units,
   voteUnitConsents,
 } from '@/infrastructure/db/schema';
+import {
+  type OwnerKind,
+  type OwnershipPartyType,
+} from '@/modules/core/property/domain/ownership-plan';
 
 import {
   ElectorateConsentData,
   ElectorateDataRepository,
-  ElectorateOwnershipData,
+  ElectorateOwnershipPartyData,
   ElectorateUnitData,
 } from '../../application/ports/electorate-data.repository.port';
 
@@ -35,20 +39,35 @@ export class DrizzleElectorateDataRepository
       .where(eq(units.tenantId, tenantId));
   }
 
-  async findOwnershipRecords(
+  async findOwnershipParties(
     tenantId: string,
-  ): Promise<ElectorateOwnershipData[]> {
-    return await this.drizzle.db
+  ): Promise<ElectorateOwnershipPartyData[]> {
+    const partyRows = await this.drizzle.db
       .select({
+        ownershipId: unitOwnerships.id,
         unitId: unitOwnerships.unitId,
-        ownerId: unitOwnershipMembers.ownerId,
-        membershipId: tenantMemberships.id,
+        partyType: unitOwnerships.partyType,
+        shareNumerator: unitOwnerships.shareNumerator,
+        shareDenominator: unitOwnerships.shareDenominator,
       })
       .from(unitOwnerships)
-      .innerJoin(
-        unitOwnershipMembers,
-        eq(unitOwnershipMembers.ownershipId, unitOwnerships.id),
-      )
+      .where(
+        and(
+          eq(unitOwnerships.tenantId, tenantId),
+          isNull(unitOwnerships.validTo),
+        ),
+      );
+
+    if (partyRows.length === 0) return [];
+
+    const memberRows = await this.drizzle.db
+      .select({
+        ownershipId: unitOwnershipMembers.ownershipId,
+        ownerId: unitOwnershipMembers.ownerId,
+        ownerKind: owners.kind,
+        membershipId: tenantMemberships.id,
+      })
+      .from(unitOwnershipMembers)
       .innerJoin(owners, eq(unitOwnershipMembers.ownerId, owners.id))
       .leftJoin(
         tenantMemberships,
@@ -58,11 +77,34 @@ export class DrizzleElectorateDataRepository
         ),
       )
       .where(
-        and(
-          eq(unitOwnerships.tenantId, tenantId),
-          isNull(unitOwnerships.validTo),
+        inArray(
+          unitOwnershipMembers.ownershipId,
+          partyRows.map((p) => p.ownershipId),
         ),
       );
+
+    const membersByOwnership = new Map<
+      string,
+      ElectorateOwnershipPartyData['members']
+    >();
+    for (const row of memberRows) {
+      const list = membersByOwnership.get(row.ownershipId) ?? [];
+      list.push({
+        ownerId: row.ownerId,
+        ownerKind: row.ownerKind as OwnerKind,
+        membershipId: row.membershipId,
+      });
+      membersByOwnership.set(row.ownershipId, list);
+    }
+
+    return partyRows.map((p) => ({
+      ownershipId: p.ownershipId,
+      unitId: p.unitId,
+      partyType: p.partyType as OwnershipPartyType,
+      shareNumerator: p.shareNumerator,
+      shareDenominator: p.shareDenominator,
+      members: membersByOwnership.get(p.ownershipId) ?? [],
+    }));
   }
 
   async findValidConsents(

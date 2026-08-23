@@ -61,7 +61,8 @@ describe('VoteAuditExporterService', () => {
     electorateLookup.findSnapshotWithLabels.mockResolvedValue({
       units: [],
       totalUnits: 0,
-      totalWeight: 0,
+      totalWeight: '0/1',
+      totalWeightDecimal: '0.0000',
     });
     tenantLookup.findById.mockResolvedValue({ id: 't-1', name: 'HOA-1' });
     auditRepo.findByAggregate.mockResolvedValue([
@@ -100,7 +101,8 @@ describe('VoteAuditExporterService', () => {
     expect(result.electorateSnapshot).toEqual({
       units: [],
       totalUnits: 0,
-      totalWeight: 0,
+      totalWeight: '0/1',
+      totalWeightDecimal: '0.0000',
     });
     expect(result.results).toEqual({ quorumMet: true });
     expect(result.auditEvents).toHaveLength(1);
@@ -123,7 +125,8 @@ describe('VoteAuditExporterService', () => {
     electorateLookup.findSnapshotWithLabels.mockResolvedValue({
       units: [],
       totalUnits: 0,
-      totalWeight: 0,
+      totalWeight: '0/1',
+      totalWeightDecimal: '0.0000',
     });
     tenantLookup.findById.mockResolvedValue({ id: 't-1', name: 'HOA-1' });
     auditRepo.findByAggregate.mockResolvedValue([]);
@@ -151,7 +154,8 @@ describe('VoteAuditExporterService', () => {
     electorateLookup.findSnapshotWithLabels.mockResolvedValue({
       units: [],
       totalUnits: 0,
-      totalWeight: 0,
+      totalWeight: '0/1',
+      totalWeightDecimal: '0.0000',
     });
     tenantLookup.findById.mockResolvedValue({ id: 't-1', name: 'HOA-1' });
     auditRepo.findByAggregate.mockResolvedValue([]);

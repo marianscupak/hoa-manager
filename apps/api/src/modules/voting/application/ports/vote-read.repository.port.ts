@@ -24,13 +24,6 @@ export interface VoteReadRepository {
     tenantId: string,
     ownerId: string,
   ): Promise<string | null>;
-  hasMutualDelegation(
-    tenantId: string,
-    unitId: string,
-    voteId: string,
-    delegatorMembershipId: string,
-    delegateMembershipId: string,
-  ): Promise<boolean>;
   isOwnerOfConsent(
     tenantId: string,
     consentId: string,

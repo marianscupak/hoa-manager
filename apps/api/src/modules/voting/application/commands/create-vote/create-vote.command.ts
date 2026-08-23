@@ -1,5 +1,5 @@
 import { type CreateVoteDto } from '@/modules/voting/api/dto/vote.dto';
-import { VoteStatus } from '@/modules/voting/domain/vote/vote.types';
+import { VoteMode, VoteStatus } from '@/modules/voting/domain/vote/vote.types';
 
 export class CreateVoteCommand {
   constructor(
@@ -16,4 +16,5 @@ export type CreateVoteResult = {
   scheduledFrom?: Date;
   scheduledTo?: Date;
   status: VoteStatus;
+  mode: VoteMode;
 };

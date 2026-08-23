@@ -9,30 +9,31 @@ describe('GetVoteTurnoutHandler', () => {
     findBallots: jest.fn(),
     findBallotAnswers: jest.fn(),
   };
-  const voteReadRepo = {
-    findDetailById: jest.fn(),
-  };
   let handler: GetVoteTurnoutHandler;
 
-  const withBasis = (quorumElectorateBasis: string | null) =>
-    quorumElectorateBasis === null
-      ? { ruleset: null }
-      : { ruleset: { quorumElectorateBasis } };
+  const row = (
+    unitId: string,
+    eligibilityStatus: string,
+    weightNum: number,
+    ineligibleReason: string | null = null,
+  ) => ({
+    unitId,
+    eligibilityStatus,
+    ineligibleReason,
+    weightNum,
+    weightDen: 100,
+  });
 
   beforeEach(() => {
     jest.clearAllMocks();
-    voteReadRepo.findDetailById.mockResolvedValue(withBasis('ALL_UNITS'));
-    handler = new GetVoteTurnoutHandler(
-      dataRepo as never,
-      voteReadRepo as never,
-    );
+    handler = new GetVoteTurnoutHandler(dataRepo as never);
   });
 
   it('computes participation and eligible totals from snapshot and ballots', async () => {
     dataRepo.findElectorateSnapshot.mockResolvedValue([
-      { unitId: 'u1', eligibilityStatus: 'ELIGIBLE', votingWeight: '0.4' },
-      { unitId: 'u2', eligibilityStatus: 'ELIGIBLE', votingWeight: '0.35' },
-      { unitId: 'u3', eligibilityStatus: 'INELIGIBLE', votingWeight: '0.25' },
+      row('u1', 'ELIGIBLE', 40),
+      row('u2', 'ELIGIBLE', 35),
+      row('u3', 'INELIGIBLE', 25, 'NO_REPRESENTATIVE'),
     ]);
     dataRepo.findBallots.mockResolvedValue([{ ballotId: 'b1', unitId: 'u1' }]);
 
@@ -43,17 +44,18 @@ describe('GetVoteTurnoutHandler', () => {
     expect(result).toEqual({
       participationUnitCount: 1,
       eligibleUnitCount: 2,
-      participationWeight: 0.4,
-      eligibleWeight: 0.75,
-      denominatorUnitCount: 3,
-      denominatorWeight: 1,
+      participationWeight: { num: '2', den: '5', decimal: '0.4000' },
+      eligibleWeight: { num: '3', den: '4', decimal: '0.7500' },
+      totalVotesUnitCount: 3,
+      totalVotesWeight: { num: '1', den: '1', decimal: '1.0000' },
+      participationPercent: '40.00',
     });
   });
 
   it('counts ineligible units that cast a ballot in participation', async () => {
     dataRepo.findElectorateSnapshot.mockResolvedValue([
-      { unitId: 'u1', eligibilityStatus: 'ELIGIBLE', votingWeight: '0.6' },
-      { unitId: 'u2', eligibilityStatus: 'INELIGIBLE', votingWeight: '0.4' },
+      row('u1', 'ELIGIBLE', 60),
+      row('u2', 'INELIGIBLE', 40, 'NO_REPRESENTATIVE'),
     ]);
     dataRepo.findBallots.mockResolvedValue([
       { ballotId: 'b1', unitId: 'u1' },
@@ -65,7 +67,8 @@ describe('GetVoteTurnoutHandler', () => {
     );
 
     expect(result.participationUnitCount).toBe(2);
-    expect(result.participationWeight).toBe(1);
+    expect(result.participationWeight.decimal).toBe('1.0000');
+    expect(result.participationPercent).toBe('100.00');
   });
 
   it('throws VoteNotFoundException when no electorate snapshot exists', async () => {
@@ -76,65 +79,51 @@ describe('GetVoteTurnoutHandler', () => {
     ).rejects.toThrow(VoteNotFoundException);
   });
 
-  describe('quorum denominator', () => {
-    beforeEach(() => {
+  describe('statutory denominator', () => {
+    it('keeps units without a representative in the total, matching the tally', async () => {
       dataRepo.findElectorateSnapshot.mockResolvedValue([
-        { unitId: 'u1', eligibilityStatus: 'ELIGIBLE', votingWeight: '0.4' },
-        { unitId: 'u2', eligibilityStatus: 'ELIGIBLE', votingWeight: '0.35' },
-        { unitId: 'u3', eligibilityStatus: 'INELIGIBLE', votingWeight: '0.25' },
+        row('u1', 'ELIGIBLE', 40),
+        row('u2', 'ELIGIBLE', 35),
+        row('u3', 'INELIGIBLE', 25, 'NO_REPRESENTATIVE'),
       ]);
       dataRepo.findBallots.mockResolvedValue([
         { ballotId: 'b1', unitId: 'u1' },
       ]);
-    });
-
-    it('counts every unit, including ineligible ones, on an ALL_UNITS basis', async () => {
-      voteReadRepo.findDetailById.mockResolvedValue(withBasis('ALL_UNITS'));
 
       const result = await handler.execute(
         new GetVoteTurnoutQuery('tenant-1', 'vote-1'),
       );
 
-      expect(result.denominatorUnitCount).toBe(3);
-      expect(result.denominatorWeight).toBe(1);
+      expect(result.totalVotesUnitCount).toBe(3);
+      expect(result.totalVotesWeight.decimal).toBe('1.0000');
       expect(result.eligibleUnitCount).toBe(2);
     });
 
-    it('counts only eligible units on an ELIGIBLE_UNITS_ONLY basis', async () => {
-      voteReadRepo.findDetailById.mockResolvedValue(
-        withBasis('ELIGIBLE_UNITS_ONLY'),
-      );
+    it('excludes association-owned units from every total', async () => {
+      dataRepo.findElectorateSnapshot.mockResolvedValue([
+        row('u1', 'ELIGIBLE', 40),
+        row('u2', 'ELIGIBLE', 35),
+        row('u3', 'INELIGIBLE', 25, 'ASSOCIATION_OWNED'),
+      ]);
+      dataRepo.findBallots.mockResolvedValue([
+        { ballotId: 'b1', unitId: 'u1' },
+        // A ballot for an association-owned unit cannot exist, but even if
+        // one did it must not count.
+        { ballotId: 'b2', unitId: 'u3' },
+      ]);
 
       const result = await handler.execute(
         new GetVoteTurnoutQuery('tenant-1', 'vote-1'),
       );
 
-      expect(result.denominatorUnitCount).toBe(result.eligibleUnitCount);
-      expect(result.denominatorWeight).toBe(result.eligibleWeight);
-      expect(result.denominatorUnitCount).toBe(2);
-      expect(result.denominatorWeight).toBe(0.75);
-    });
-
-    it('falls back to ALL_UNITS when the vote has no ruleset', async () => {
-      voteReadRepo.findDetailById.mockResolvedValue(withBasis(null));
-
-      const result = await handler.execute(
-        new GetVoteTurnoutQuery('tenant-1', 'vote-1'),
-      );
-
-      expect(result.denominatorUnitCount).toBe(3);
-      expect(result.denominatorWeight).toBe(1);
-    });
-
-    it('falls back to ALL_UNITS when the vote detail cannot be read', async () => {
-      voteReadRepo.findDetailById.mockResolvedValue(null);
-
-      const result = await handler.execute(
-        new GetVoteTurnoutQuery('tenant-1', 'vote-1'),
-      );
-
-      expect(result.denominatorUnitCount).toBe(3);
-      expect(result.denominatorWeight).toBe(1);
+      expect(result.totalVotesUnitCount).toBe(2);
+      expect(result.totalVotesWeight).toEqual({
+        num: '3',
+        den: '4',
+        decimal: '0.7500',
+      });
+      expect(result.participationUnitCount).toBe(1);
+      expect(result.participationPercent).toBe('53.33');
     });
   });
 });

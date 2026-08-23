@@ -72,6 +72,19 @@ export class VotingAuditFormatter implements AuditEventFormatter, OnModuleInit {
           }),
         };
       }
+      case VotingEventType.VOTE_RULESET_NON_STATUTORY_ACKNOWLEDGED: {
+        const p = event.payload as {
+          deviations: string[];
+          labels: { voteTitle: string; acknowledgedBy: string };
+        };
+        return {
+          ...base,
+          message: t(lang, 'vote.rulesetNonStatutoryAcknowledged.privileged', {
+            voteTitle: p.labels.voteTitle,
+            deviations: p.deviations.join(', '),
+          }),
+        };
+      }
       case VotingEventType.VOTE_SCHEDULED: {
         const p = event.payload as { labels: { voteTitle: string } };
         return {

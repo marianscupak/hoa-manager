@@ -42,7 +42,13 @@ export class UpdateVoteHandler implements ICommandHandler<UpdateVoteCommand> {
       throw new DomainException(ErrorCode.VOTE_NOT_FOUND);
     }
 
-    vote.update(command.data, this.clock.now());
+    // `mode` is immutable after create — it decides which statutory ruleset
+    // is legal, so switching it would invalidate the stored one.
+    if (command.data.mode && command.data.mode !== vote.mode) {
+      throw new DomainException(ErrorCode.RULESET_CHANGE_BLOCKED);
+    }
+
+    vote.update({ ...command.data, mode: vote.mode }, this.clock.now());
 
     await this.unitOfWork.execute(async () => {
       await this.voteRepository.save(vote);

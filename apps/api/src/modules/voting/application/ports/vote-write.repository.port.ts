@@ -34,7 +34,6 @@ export interface VoteWriteRepository {
     tenantId: string,
     voteId: string,
     unitIds: string[],
-    castByMembershipId?: string,
   ): Promise<Set<string>>;
   findScheduledToClose(now: Date): Promise<VoteAggregate[]>;
   saveResults(

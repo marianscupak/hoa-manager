@@ -18,7 +18,8 @@ const LabeledQuestionSchema = z.object({
 });
 
 const PayloadSchema = z.object({
-  quorumReached: z.boolean(),
+  /** `null` for per-rollam votes, which have no quorum by law. */
+  quorumReached: z.boolean().nullable(),
   questions: z.array(QuestionOutcomeSchema),
   labels: z.object({
     voteTitle: z.string(),
@@ -39,7 +40,7 @@ export const VoteResultsComputedAuditEvent = defineAuditEvent({
     tenantId: string;
     voteTitle: string;
     actor: AuditActor;
-    quorumReached: boolean;
+    quorumReached: boolean | null;
     questions: {
       questionId: string;
       majorityMet: boolean;

@@ -181,7 +181,14 @@ describe('VotingAuditFormatter', () => {
     ],
     [
       VotingEventType.VOTE_ELECTORATE_SNAPSHOTTED,
-      { totalUnits: 1, totalWeight: 1, labels: { voteTitle: 'X' } },
+      { totalUnits: 1, totalWeight: '1/1', labels: { voteTitle: 'X' } },
+    ],
+    [
+      VotingEventType.VOTE_RULESET_NON_STATUTORY_ACKNOWLEDGED,
+      {
+        deviations: ['ONE_UNIT_ONE_VOTE'],
+        labels: { voteTitle: 'X', acknowledgedBy: 'Author' },
+      },
     ],
     [
       VotingEventType.BALLOT_CAST_PROXY,
@@ -208,7 +215,8 @@ describe('VotingAuditFormatter', () => {
     [
       VotingEventType.VOTE_RESULTS_COMPUTED,
       {
-        quorumReached: true,
+        // `null` for per-rollam votes, which have no quorum by law.
+        quorumReached: null,
         questions: [],
         labels: { voteTitle: 'X', questions: [] },
       },
@@ -226,6 +234,23 @@ describe('VotingAuditFormatter', () => {
       });
     },
   );
+
+  describe('VOTE_RULESET_NON_STATUTORY_ACKNOWLEDGED', () => {
+    const e = ev({
+      eventType: VotingEventType.VOTE_RULESET_NON_STATUTORY_ACKNOWLEDGED,
+      visibility: Visibility.TENANT_PRIVILEGED,
+      payload: {
+        deviations: ['ONE_UNIT_ONE_VOTE', 'UNIT_COUNT_QUORUM'],
+        labels: { voteTitle: 'Bylaws', acknowledgedBy: 'Alice' },
+      },
+    });
+
+    it('lists every acknowledged deviation (en)', () => {
+      expect(formatter.format(e, VIEWER_ADMIN).message).toBe(
+        'Admin acknowledged a non-statutory voting rule deviation (ONE_UNIT_ONE_VOTE, UNIT_COUNT_QUORUM) — Bylaws',
+      );
+    });
+  });
 
   describe('VOTE_CONSENT_CREATED', () => {
     const basePayload = {

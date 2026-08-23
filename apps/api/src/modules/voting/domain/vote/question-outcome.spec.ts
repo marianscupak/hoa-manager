@@ -13,6 +13,33 @@ describe('deriveQuestionOutcome', () => {
     ).toBe('NOT_DECIDED');
   });
 
+  it('passes a null quorum (per rollam) through to the majority logic', () => {
+    expect(
+      deriveQuestionOutcome({
+        questionType: VoteQuestionType.YES_NO,
+        quorumMet: null,
+        majorityMet: true,
+        winningOptionKey: VoteOptionSemantic.YES,
+      }),
+    ).toBe('APPROVED');
+    expect(
+      deriveQuestionOutcome({
+        questionType: VoteQuestionType.YES_NO,
+        quorumMet: null,
+        majorityMet: false,
+        winningOptionKey: null,
+      }),
+    ).toBe('REJECTED');
+    expect(
+      deriveQuestionOutcome({
+        questionType: VoteQuestionType.SINGLE_CHOICE,
+        quorumMet: null,
+        majorityMet: true,
+        winningOptionKey: VoteOptionSemantic.CUSTOM,
+      }),
+    ).toBe('WINNER');
+  });
+
   it('returns APPROVED for a yes/no question when YES wins the majority', () => {
     expect(
       deriveQuestionOutcome({

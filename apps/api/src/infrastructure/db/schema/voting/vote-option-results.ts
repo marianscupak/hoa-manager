@@ -1,4 +1,4 @@
-import { pgTable, uuid, numeric, integer } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, bigint, integer } from 'drizzle-orm/pg-core';
 
 import { tenants } from '@/infrastructure/db/schema/core/tenants';
 import { voteOptions } from '@/infrastructure/db/schema/voting/vote-options';
@@ -15,6 +15,7 @@ export const voteOptionResults = pgTable('vote_option_results', {
   optionId: uuid('option_id')
     .notNull()
     .references(() => voteOptions.id, { onDelete: 'cascade' }),
-  voteWeight: numeric('vote_weight', { precision: 19, scale: 4 }).notNull(),
+  voteWeightNum: bigint('vote_weight_num', { mode: 'bigint' }).notNull(),
+  voteWeightDen: bigint('vote_weight_den', { mode: 'bigint' }).notNull(),
   voteUnitCount: integer('vote_unit_count').notNull(),
 });

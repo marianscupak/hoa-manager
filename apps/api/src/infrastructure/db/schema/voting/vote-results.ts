@@ -2,7 +2,7 @@ import {
   pgTable,
   timestamp,
   uuid,
-  numeric,
+  bigint,
   boolean,
   integer,
   unique,
@@ -23,17 +23,21 @@ export const voteResults = pgTable(
       .notNull()
       .references(() => votes.id, { onDelete: 'cascade' }),
     resultStatus: voteResultStatusEnum('result_status').notNull(),
-    quorumMet: boolean('quorum_met').notNull(),
-    participationWeight: numeric('participation_weight', {
-      precision: 19,
-      scale: 4,
+    quorumMet: boolean('quorum_met'),
+    participationWeightNum: bigint('participation_weight_num', {
+      mode: 'bigint',
+    }).notNull(),
+    participationWeightDen: bigint('participation_weight_den', {
+      mode: 'bigint',
     }).notNull(),
     participationUnitCount: integer('participation_unit_count').notNull(),
-    denominatorWeight: numeric('denominator_weight', {
-      precision: 19,
-      scale: 4,
-    }),
-    denominatorUnitCount: integer('denominator_unit_count'),
+    totalVotesWeightNum: bigint('total_votes_weight_num', {
+      mode: 'bigint',
+    }).notNull(),
+    totalVotesWeightDen: bigint('total_votes_weight_den', {
+      mode: 'bigint',
+    }).notNull(),
+    totalVotesUnitCount: integer('total_votes_unit_count').notNull(),
     computedAt: timestamp('computed_at', { withTimezone: true, mode: 'date' })
       .defaultNow()
       .notNull(),

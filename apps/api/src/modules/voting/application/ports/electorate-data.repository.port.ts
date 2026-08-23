@@ -1,13 +1,25 @@
+import {
+  type OwnerKind,
+  type OwnershipPartyType,
+} from '@/modules/core/property/domain/ownership-plan';
+
 export interface ElectorateUnitData {
   id: string;
   buildingShareNumerator: number;
   buildingShareDenominator: number;
 }
 
-export interface ElectorateOwnershipData {
+export interface ElectorateOwnershipPartyData {
+  ownershipId: string;
   unitId: string;
-  ownerId: string;
-  membershipId: string | null;
+  partyType: OwnershipPartyType;
+  shareNumerator: number;
+  shareDenominator: number;
+  members: {
+    ownerId: string;
+    ownerKind: OwnerKind;
+    membershipId: string | null;
+  }[];
 }
 
 export interface ElectorateConsentData {
@@ -18,7 +30,9 @@ export interface ElectorateConsentData {
 
 export interface ElectorateDataRepository {
   findAllUnits(tenantId: string): Promise<ElectorateUnitData[]>;
-  findOwnershipRecords(tenantId: string): Promise<ElectorateOwnershipData[]>;
+  findOwnershipParties(
+    tenantId: string,
+  ): Promise<ElectorateOwnershipPartyData[]>;
   findValidConsents(
     tenantId: string,
     voteId: string,

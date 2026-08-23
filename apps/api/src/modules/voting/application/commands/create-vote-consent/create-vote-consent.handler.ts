@@ -26,7 +26,6 @@ import { ForbiddenException } from '@/shared/application/exceptions/auth.excepti
 import {
   InvalidVoteStatusForDelegationException,
   MembershipHasNoAssociatedOwnerException,
-  MutualDelegationNotAllowedException,
   NotAUnitOwnerException,
   VoteNotFoundException,
 } from '@/shared/application/exceptions/vote.exceptions';
@@ -98,18 +97,6 @@ export class CreateVoteConsentHandler
 
     if (!ownerId) {
       throw new MembershipHasNoAssociatedOwnerException();
-    }
-
-    const hasMutual = await this.voteReadRepo.hasMutualDelegation(
-      command.tenantId,
-      command.unitId,
-      command.voteId,
-      effectiveMembershipId,
-      command.delegateMembershipId,
-    );
-
-    if (hasMutual) {
-      throw new MutualDelegationNotAllowedException();
     }
 
     await this.unitOfWork.execute(async () => {

@@ -4,25 +4,33 @@ import { defineAuditEvent } from '@/modules/core/audit/application/registry/defi
 import type { AuditActor } from '@/modules/core/audit/domain/actor';
 import { Visibility } from '@/modules/core/audit/domain/visibility';
 import {
+  MajorityDenominatorBasis,
   MajorityRuleType,
-  QuorumElectorateBasis,
   QuorumMeasure,
+  ThresholdComparator,
   type VoteRuleset,
   VoteWeightBasis,
 } from '@/modules/voting/domain/vote/vote.types';
 
 import { VotingEventType } from '../voting-event-types';
 
+const FractionSchema = z.object({ num: z.number(), den: z.number() });
+
 const VoteRulesetSchema = z.object({
   weightBasis: z.enum(VoteWeightBasis),
-  quorumMeasure: z.enum(QuorumMeasure),
-  quorumElectorateBasis: z.enum(QuorumElectorateBasis),
-  quorumThreshold: z.number(),
+  quorum: z
+    .object({
+      measure: z.enum(QuorumMeasure),
+      threshold: FractionSchema,
+      comparator: z.enum(ThresholdComparator),
+    })
+    .nullable(),
   majorityRuleType: z.enum(MajorityRuleType),
-  majorityThreshold: z.number().nullable(),
+  majorityDenominatorBasis: z.enum(MajorityDenominatorBasis),
+  majorityThreshold: FractionSchema,
+  majorityComparator: z.enum(ThresholdComparator),
   allowAbstain: z.boolean(),
-  abstainExcludedFromMajorityDenominator: z.boolean(),
-  allowCoOwnerIndividualVote: z.boolean(),
+  acknowledgedNonStatutory: z.boolean(),
 });
 
 const PayloadSchema = z.object({

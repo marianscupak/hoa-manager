@@ -36,6 +36,7 @@ export class CreateVoteHandler implements ICommandHandler<CreateVoteCommand> {
       {
         title: command.data.title,
         description: command.data.description ?? null,
+        mode: command.data.mode,
         scheduledFrom: command.data.scheduledFrom,
         scheduledTo: command.data.scheduledTo,
       },

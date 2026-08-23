@@ -8,6 +8,8 @@ const STRINGS: Record<
     'vote.created.privileged': (v) => `${v.actor} created vote "${v.title}".`,
     'vote.rulesetSet.privileged': (v) =>
       `${v.actor} updated the ruleset for "${v.title}".`,
+    'vote.rulesetNonStatutoryAcknowledged.privileged': (v) =>
+      `Admin acknowledged a non-statutory voting rule deviation (${v.deviations}) — ${v.voteTitle}`,
     'vote.scheduled.public': (v) => `Vote "${v.title}" was scheduled.`,
     'vote.opened.public': (v) => `Vote "${v.title}" was opened.`,
     'vote.electorateSnapshotted.privileged': (v) =>
@@ -47,6 +49,8 @@ const STRINGS: Record<
       `${v.actor} vytvořil/a hlasování "${v.title}".`,
     'vote.rulesetSet.privileged': (v) =>
       `${v.actor} upravil/a pravidla pro "${v.title}".`,
+    'vote.rulesetNonStatutoryAcknowledged.privileged': (v) =>
+      `Správce potvrdil odchylku od zákonných pravidel hlasování (${v.deviations}) — ${v.voteTitle}`,
     'vote.scheduled.public': (v) => `Hlasování "${v.title}" bylo naplánováno.`,
     'vote.opened.public': (v) => `Hlasování "${v.title}" bylo zahájeno.`,
     'vote.electorateSnapshotted.privileged': (v) =>

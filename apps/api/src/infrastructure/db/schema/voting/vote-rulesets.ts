@@ -2,16 +2,17 @@ import {
   pgTable,
   timestamp,
   uuid,
-  numeric,
+  integer,
   boolean,
   unique,
 } from 'drizzle-orm/pg-core';
 
 import { tenants } from '@/infrastructure/db/schema/core/tenants';
 import {
+  majorityDenominatorBasisEnum,
   majorityRuleTypeEnum,
-  quorumElectorateBasisEnum,
   quorumMeasureEnum,
+  thresholdComparatorEnum,
   voteWeightBasisEnum,
 } from '@/infrastructure/db/schema/voting/enums';
 import { voteQuestions } from '@/infrastructure/db/schema/voting/vote-questions';
@@ -31,24 +32,21 @@ export const voteRulesets = pgTable(
       onDelete: 'cascade',
     }),
     weightBasis: voteWeightBasisEnum('weight_basis').notNull(),
-    quorumMeasure: quorumMeasureEnum('quorum_measure').notNull(),
-    quorumElectorateBasis: quorumElectorateBasisEnum(
-      'quorum_electorate_basis',
-    ).notNull(),
-    quorumThreshold: numeric('quorum_threshold', {
-      precision: 19,
-      scale: 4,
-    }).notNull(),
+    quorumMeasure: quorumMeasureEnum('quorum_measure'),
+    quorumThresholdNum: integer('quorum_threshold_num'),
+    quorumThresholdDen: integer('quorum_threshold_den'),
+    quorumComparator: thresholdComparatorEnum('quorum_comparator'),
     majorityRuleType: majorityRuleTypeEnum('majority_rule_type').notNull(),
-    majorityThreshold: numeric('majority_threshold', {
-      precision: 19,
-      scale: 4,
-    }),
-    allowAbstain: boolean('allow_abstain').notNull(),
-    abstainExcludedFromMajorityDenominator: boolean(
-      'abstain_excluded_from_majority_denominator',
+    majorityDenominatorBasis: majorityDenominatorBasisEnum(
+      'majority_denominator_basis',
     ).notNull(),
-    allowCoOwnerIndividualVote: boolean('allow_co_owner_individual_vote')
+    majorityThresholdNum: integer('majority_threshold_num').notNull(),
+    majorityThresholdDen: integer('majority_threshold_den').notNull(),
+    majorityComparator: thresholdComparatorEnum(
+      'majority_comparator',
+    ).notNull(),
+    allowAbstain: boolean('allow_abstain').notNull(),
+    acknowledgedNonStatutory: boolean('acknowledged_non_statutory')
       .notNull()
       .default(false),
     createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' })

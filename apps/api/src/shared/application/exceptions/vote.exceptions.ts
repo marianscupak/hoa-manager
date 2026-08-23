@@ -75,9 +75,35 @@ export class VoteQuestionMissingOptionsException extends DomainException {
   }
 }
 
-export class InvalidQuestionRulesetOverrideException extends DomainException {
+export class SubLegalRulesetException extends DomainException {
+  constructor(details: { code: ErrorCode; param?: string }[]) {
+    super(ErrorCode.VOTE_RULESET_SUBLEGAL, details);
+  }
+}
+
+export class RulesetAcknowledgementRequiredException extends DomainException {
+  constructor(details: { code: ErrorCode; param?: string }[]) {
+    super(ErrorCode.VOTE_RULESET_ACK_REQUIRED, details);
+  }
+}
+
+export class RulesetOverrideNotStricterException extends DomainException {
   constructor() {
-    super(ErrorCode.INVALID_QUESTION_RULESET_OVERRIDE);
+    super(ErrorCode.VOTE_RULESET_OVERRIDE_NOT_STRICTER);
+  }
+}
+
+export class VoteWindowTooShortPerRollamException extends DomainException {
+  constructor() {
+    super(ErrorCode.VOTE_WINDOW_TOO_SHORT_PER_ROLLAM);
+  }
+}
+
+export class VoteBuildingSharesIncompleteException extends DomainException {
+  constructor(deficit: string) {
+    super(ErrorCode.VOTE_BUILDING_SHARES_INCOMPLETE, [
+      { code: ErrorCode.VOTE_BUILDING_SHARES_INCOMPLETE, param: deficit },
+    ]);
   }
 }
 
@@ -96,12 +122,6 @@ export class NotAUnitOwnerException extends DomainException {
 export class MembershipHasNoAssociatedOwnerException extends DomainException {
   constructor() {
     super(ErrorCode.MEMBERSHIP_HAS_NO_ASSOCIATED_OWNER);
-  }
-}
-
-export class MutualDelegationNotAllowedException extends DomainException {
-  constructor() {
-    super(ErrorCode.MUTUAL_DELEGATION_NOT_ALLOWED);
   }
 }
 

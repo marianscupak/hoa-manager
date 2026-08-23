@@ -3845,6 +3845,13 @@
           "status": {
             "type": "string"
           },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "PER_ROLLAM",
+              "ASSEMBLY_RECORD"
+            ]
+          },
           "voterSummary": {
             "nullable": true,
             "allOf": [
@@ -3852,9 +3859,6 @@
                 "$ref": "#/components/schemas/VoterSummaryDto"
               }
             ]
-          },
-          "allowCoOwnerIndividualVote": {
-            "type": "boolean"
           },
           "questionOutcomes": {
             "type": "array",
@@ -3867,7 +3871,7 @@
           "id",
           "title",
           "status",
-          "allowCoOwnerIndividualVote"
+          "mode"
         ]
       },
       "VoteConsentResponseDto": {
@@ -3931,6 +3935,48 @@
           "createdAt"
         ]
       },
+      "RulesetFractionDto": {
+        "type": "object",
+        "properties": {
+          "num": {
+            "type": "number"
+          },
+          "den": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "num",
+          "den"
+        ]
+      },
+      "QuorumRuleResponseDto": {
+        "type": "object",
+        "properties": {
+          "measure": {
+            "type": "string",
+            "enum": [
+              "UNIT_SHARE",
+              "UNIT_COUNT"
+            ]
+          },
+          "threshold": {
+            "$ref": "#/components/schemas/RulesetFractionDto"
+          },
+          "comparator": {
+            "type": "string",
+            "enum": [
+              "STRICT_GREATER",
+              "AT_LEAST"
+            ]
+          }
+        },
+        "required": [
+          "measure",
+          "threshold",
+          "comparator"
+        ]
+      },
       "SetVoteRulesetResponseDto": {
         "type": "object",
         "properties": {
@@ -3941,56 +3987,55 @@
               "ONE_UNIT_ONE_VOTE"
             ]
           },
-          "quorumMeasure": {
-            "type": "string",
-            "enum": [
-              "UNIT_SHARE",
-              "UNIT_COUNT"
+          "quorum": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/QuorumRuleResponseDto"
+              }
             ]
-          },
-          "quorumElectorateBasis": {
-            "type": "string",
-            "enum": [
-              "ALL_UNITS",
-              "ELIGIBLE_UNITS_ONLY"
-            ]
-          },
-          "quorumThreshold": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 100
           },
           "majorityRuleType": {
             "type": "string",
             "enum": [
               "SIMPLE_MAJORITY",
-              "QUALIFIED_MAJORITY"
+              "QUALIFIED_MAJORITY",
+              "UNANIMITY"
+            ]
+          },
+          "majorityDenominatorBasis": {
+            "type": "string",
+            "enum": [
+              "VOTES_CAST",
+              "ALL_VOTES"
             ]
           },
           "majorityThreshold": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 100
+            "$ref": "#/components/schemas/RulesetFractionDto"
+          },
+          "majorityComparator": {
+            "type": "string",
+            "enum": [
+              "STRICT_GREATER",
+              "AT_LEAST"
+            ]
           },
           "allowAbstain": {
             "type": "boolean"
           },
-          "abstainExcludedFromMajorityDenominator": {
-            "type": "boolean"
-          },
-          "allowCoOwnerIndividualVote": {
+          "acknowledgedNonStatutory": {
             "type": "boolean"
           }
         },
         "required": [
           "weightBasis",
-          "quorumMeasure",
-          "quorumElectorateBasis",
-          "quorumThreshold",
+          "quorum",
           "majorityRuleType",
+          "majorityDenominatorBasis",
+          "majorityThreshold",
+          "majorityComparator",
           "allowAbstain",
-          "abstainExcludedFromMajorityDenominator",
-          "allowCoOwnerIndividualVote"
+          "acknowledgedNonStatutory"
         ]
       },
       "VoteOptionResponseDto": {
@@ -4130,6 +4175,13 @@
           "status": {
             "type": "string"
           },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "PER_ROLLAM",
+              "ASSEMBLY_RECORD"
+            ]
+          },
           "ruleset": {
             "nullable": true,
             "allOf": [
@@ -4155,6 +4207,7 @@
           "id",
           "title",
           "status",
+          "mode",
           "questions",
           "documents"
         ]
@@ -4163,10 +4216,12 @@
         "type": "object",
         "properties": {
           "value": {
-            "type": "number"
+            "type": "string",
+            "description": "Decimal string, 4 places"
           },
           "maximum": {
-            "type": "number"
+            "type": "string",
+            "description": "Decimal string, 4 places"
           }
         },
         "required": [
@@ -4200,7 +4255,8 @@
             "type": "string",
             "enum": [
               "NO_REPRESENTATIVE",
-              "MISSING_OWNERSHIP"
+              "MISSING_OWNERSHIP",
+              "ASSOCIATION_OWNED"
             ],
             "nullable": true
           }
@@ -4252,6 +4308,14 @@
             "type": "string",
             "format": "date-time",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          },
+          "mode": {
+            "default": "PER_ROLLAM",
+            "type": "string",
+            "enum": [
+              "PER_ROLLAM",
+              "ASSEMBLY_RECORD"
+            ]
           }
         },
         "required": [
@@ -4283,12 +4347,20 @@
           },
           "status": {
             "type": "string"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "PER_ROLLAM",
+              "ASSEMBLY_RECORD"
+            ]
           }
         },
         "required": [
           "id",
           "title",
-          "status"
+          "status",
+          "mode"
         ]
       },
       "SetVoteRulesetDto": {
@@ -4299,58 +4371,123 @@
             "enum": [
               "UNIT_SHARE",
               "ONE_UNIT_ONE_VOTE"
-            ]
+            ],
+            "x-nestjs_zod-has-null": true
           },
-          "quorumMeasure": {
-            "type": "string",
-            "enum": [
-              "UNIT_SHARE",
-              "UNIT_COUNT"
-            ]
-          },
-          "quorumElectorateBasis": {
-            "type": "string",
-            "enum": [
-              "ALL_UNITS",
-              "ELIGIBLE_UNITS_ONLY"
-            ]
-          },
-          "quorumThreshold": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 100
+          "quorum": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "measure": {
+                    "type": "string",
+                    "enum": [
+                      "UNIT_SHARE",
+                      "UNIT_COUNT"
+                    ]
+                  },
+                  "threshold": {
+                    "type": "object",
+                    "properties": {
+                      "num": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 9007199254740991
+                      },
+                      "den": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 9007199254740991
+                      }
+                    },
+                    "required": [
+                      "num",
+                      "den"
+                    ]
+                  },
+                  "comparator": {
+                    "type": "string",
+                    "enum": [
+                      "STRICT_GREATER",
+                      "AT_LEAST"
+                    ]
+                  }
+                },
+                "required": [
+                  "measure",
+                  "threshold",
+                  "comparator"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-empty-type": true
           },
           "majorityRuleType": {
             "type": "string",
             "enum": [
               "SIMPLE_MAJORITY",
-              "QUALIFIED_MAJORITY"
-            ]
+              "QUALIFIED_MAJORITY",
+              "UNANIMITY"
+            ],
+            "x-nestjs_zod-has-null": true
+          },
+          "majorityDenominatorBasis": {
+            "type": "string",
+            "enum": [
+              "VOTES_CAST",
+              "ALL_VOTES"
+            ],
+            "x-nestjs_zod-has-null": true
           },
           "majorityThreshold": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 100
+            "type": "object",
+            "properties": {
+              "num": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "den": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "num",
+              "den"
+            ],
+            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-self-required": false
+          },
+          "majorityComparator": {
+            "type": "string",
+            "enum": [
+              "STRICT_GREATER",
+              "AT_LEAST"
+            ],
+            "x-nestjs_zod-has-null": true
           },
           "allowAbstain": {
-            "type": "boolean"
+            "type": "boolean",
+            "x-nestjs_zod-has-null": true
           },
-          "abstainExcludedFromMajorityDenominator": {
-            "type": "boolean"
-          },
-          "allowCoOwnerIndividualVote": {
-            "type": "boolean"
+          "acknowledgedNonStatutory": {
+            "default": false,
+            "type": "boolean",
+            "x-nestjs_zod-has-null": true
           }
         },
         "required": [
           "weightBasis",
-          "quorumMeasure",
-          "quorumElectorateBasis",
-          "quorumThreshold",
+          "quorum",
           "majorityRuleType",
-          "allowAbstain",
-          "abstainExcludedFromMajorityDenominator",
-          "allowCoOwnerIndividualVote"
+          "majorityDenominatorBasis",
+          "allowAbstain"
         ]
       },
       "CreateVoteQuestionDto": {
@@ -4358,22 +4495,26 @@
         "properties": {
           "title": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "x-nestjs_zod-has-null": true
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "x-nestjs_zod-has-null": true
           },
           "type": {
             "type": "string",
             "enum": [
               "YES_NO",
               "SINGLE_CHOICE"
-            ]
+            ],
+            "x-nestjs_zod-has-null": true
           },
           "sortOrder": {
             "type": "integer",
             "minimum": -9007199254740991,
-            "maximum": 9007199254740991
+            "maximum": 9007199254740991,
+            "x-nestjs_zod-has-null": true
           },
           "options": {
             "type": "array",
@@ -4393,7 +4534,8 @@
               "required": [
                 "label"
               ]
-            }
+            },
+            "x-nestjs_zod-has-null": true
           },
           "rulesetOverride": {
             "type": "object",
@@ -4405,57 +4547,113 @@
                   "ONE_UNIT_ONE_VOTE"
                 ]
               },
-              "quorumMeasure": {
-                "type": "string",
-                "enum": [
-                  "UNIT_SHARE",
-                  "UNIT_COUNT"
+              "quorum": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "measure": {
+                        "type": "string",
+                        "enum": [
+                          "UNIT_SHARE",
+                          "UNIT_COUNT"
+                        ]
+                      },
+                      "threshold": {
+                        "type": "object",
+                        "properties": {
+                          "num": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 9007199254740991
+                          },
+                          "den": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 9007199254740991
+                          }
+                        },
+                        "required": [
+                          "num",
+                          "den"
+                        ]
+                      },
+                      "comparator": {
+                        "type": "string",
+                        "enum": [
+                          "STRICT_GREATER",
+                          "AT_LEAST"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "measure",
+                      "threshold",
+                      "comparator"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
                 ]
-              },
-              "quorumElectorateBasis": {
-                "type": "string",
-                "enum": [
-                  "ALL_UNITS",
-                  "ELIGIBLE_UNITS_ONLY"
-                ]
-              },
-              "quorumThreshold": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 100
               },
               "majorityRuleType": {
                 "type": "string",
                 "enum": [
                   "SIMPLE_MAJORITY",
-                  "QUALIFIED_MAJORITY"
+                  "QUALIFIED_MAJORITY",
+                  "UNANIMITY"
+                ]
+              },
+              "majorityDenominatorBasis": {
+                "type": "string",
+                "enum": [
+                  "VOTES_CAST",
+                  "ALL_VOTES"
                 ]
               },
               "majorityThreshold": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 100
+                "type": "object",
+                "properties": {
+                  "num": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "den": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "num",
+                  "den"
+                ]
+              },
+              "majorityComparator": {
+                "type": "string",
+                "enum": [
+                  "STRICT_GREATER",
+                  "AT_LEAST"
+                ]
               },
               "allowAbstain": {
                 "type": "boolean"
               },
-              "abstainExcludedFromMajorityDenominator": {
-                "type": "boolean"
-              },
-              "allowCoOwnerIndividualVote": {
+              "acknowledgedNonStatutory": {
+                "default": false,
                 "type": "boolean"
               }
             },
             "required": [
               "weightBasis",
-              "quorumMeasure",
-              "quorumElectorateBasis",
-              "quorumThreshold",
+              "quorum",
               "majorityRuleType",
-              "allowAbstain",
-              "abstainExcludedFromMajorityDenominator",
-              "allowCoOwnerIndividualVote"
+              "majorityDenominatorBasis",
+              "allowAbstain"
             ],
+            "x-nestjs_zod-has-null": true,
             "x-nestjs_zod-self-required": false
           }
         },
@@ -4469,22 +4667,26 @@
         "properties": {
           "title": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "x-nestjs_zod-has-null": true
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "x-nestjs_zod-has-null": true
           },
           "type": {
             "type": "string",
             "enum": [
               "YES_NO",
               "SINGLE_CHOICE"
-            ]
+            ],
+            "x-nestjs_zod-has-null": true
           },
           "sortOrder": {
             "type": "integer",
             "minimum": -9007199254740991,
-            "maximum": 9007199254740991
+            "maximum": 9007199254740991,
+            "x-nestjs_zod-has-null": true
           },
           "options": {
             "type": "array",
@@ -4504,7 +4706,8 @@
               "required": [
                 "label"
               ]
-            }
+            },
+            "x-nestjs_zod-has-null": true
           },
           "rulesetOverride": {
             "type": "object",
@@ -4516,57 +4719,113 @@
                   "ONE_UNIT_ONE_VOTE"
                 ]
               },
-              "quorumMeasure": {
-                "type": "string",
-                "enum": [
-                  "UNIT_SHARE",
-                  "UNIT_COUNT"
+              "quorum": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "measure": {
+                        "type": "string",
+                        "enum": [
+                          "UNIT_SHARE",
+                          "UNIT_COUNT"
+                        ]
+                      },
+                      "threshold": {
+                        "type": "object",
+                        "properties": {
+                          "num": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 9007199254740991
+                          },
+                          "den": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 9007199254740991
+                          }
+                        },
+                        "required": [
+                          "num",
+                          "den"
+                        ]
+                      },
+                      "comparator": {
+                        "type": "string",
+                        "enum": [
+                          "STRICT_GREATER",
+                          "AT_LEAST"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "measure",
+                      "threshold",
+                      "comparator"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
                 ]
-              },
-              "quorumElectorateBasis": {
-                "type": "string",
-                "enum": [
-                  "ALL_UNITS",
-                  "ELIGIBLE_UNITS_ONLY"
-                ]
-              },
-              "quorumThreshold": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 100
               },
               "majorityRuleType": {
                 "type": "string",
                 "enum": [
                   "SIMPLE_MAJORITY",
-                  "QUALIFIED_MAJORITY"
+                  "QUALIFIED_MAJORITY",
+                  "UNANIMITY"
+                ]
+              },
+              "majorityDenominatorBasis": {
+                "type": "string",
+                "enum": [
+                  "VOTES_CAST",
+                  "ALL_VOTES"
                 ]
               },
               "majorityThreshold": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 100
+                "type": "object",
+                "properties": {
+                  "num": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "den": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "num",
+                  "den"
+                ]
+              },
+              "majorityComparator": {
+                "type": "string",
+                "enum": [
+                  "STRICT_GREATER",
+                  "AT_LEAST"
+                ]
               },
               "allowAbstain": {
                 "type": "boolean"
               },
-              "abstainExcludedFromMajorityDenominator": {
-                "type": "boolean"
-              },
-              "allowCoOwnerIndividualVote": {
+              "acknowledgedNonStatutory": {
+                "default": false,
                 "type": "boolean"
               }
             },
             "required": [
               "weightBasis",
-              "quorumMeasure",
-              "quorumElectorateBasis",
-              "quorumThreshold",
+              "quorum",
               "majorityRuleType",
-              "allowAbstain",
-              "abstainExcludedFromMajorityDenominator",
-              "allowCoOwnerIndividualVote"
+              "majorityDenominatorBasis",
+              "allowAbstain"
             ],
+            "x-nestjs_zod-has-null": true,
             "x-nestjs_zod-self-required": false
           }
         },
@@ -4593,6 +4852,13 @@
             "type": "string",
             "format": "date-time",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "PER_ROLLAM",
+              "ASSEMBLY_RECORD"
+            ]
           }
         },
         "required": [
@@ -4711,6 +4977,25 @@
           "submittedAt"
         ]
       },
+      "FractionDto": {
+        "type": "object",
+        "properties": {
+          "num": {
+            "type": "string"
+          },
+          "den": {
+            "type": "string"
+          },
+          "decimal": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "num",
+          "den",
+          "decimal"
+        ]
+      },
       "VoteOptionResultDto": {
         "type": "object",
         "properties": {
@@ -4718,7 +5003,10 @@
             "type": "string"
           },
           "voteWeight": {
-            "type": "number"
+            "$ref": "#/components/schemas/FractionDto"
+          },
+          "percent": {
+            "type": "string"
           },
           "voteUnitCount": {
             "type": "number"
@@ -4727,6 +5015,7 @@
         "required": [
           "optionId",
           "voteWeight",
+          "percent",
           "voteUnitCount"
         ]
       },
@@ -4743,12 +5032,18 @@
             "type": "string",
             "nullable": true
           },
-          "majorityThresholdValue": {
-            "type": "number",
-            "nullable": true
+          "majorityThreshold": {
+            "$ref": "#/components/schemas/RulesetFractionDto"
           },
-          "majorityDenominatorValue": {
-            "type": "number"
+          "majorityComparator": {
+            "type": "string",
+            "enum": [
+              "STRICT_GREATER",
+              "AT_LEAST"
+            ]
+          },
+          "majorityDenominator": {
+            "$ref": "#/components/schemas/FractionDto"
           },
           "optionResults": {
             "type": "array",
@@ -4761,8 +5056,9 @@
           "questionId",
           "majorityMet",
           "winningOptionId",
-          "majorityThresholdValue",
-          "majorityDenominatorValue",
+          "majorityThreshold",
+          "majorityComparator",
+          "majorityDenominator",
           "optionResults"
         ]
       },
@@ -4777,18 +5073,22 @@
             ]
           },
           "quorumMet": {
-            "type": "boolean"
+            "type": "boolean",
+            "nullable": true
           },
           "participationWeight": {
-            "type": "number"
+            "$ref": "#/components/schemas/FractionDto"
+          },
+          "participationPercent": {
+            "type": "string"
           },
           "participationUnitCount": {
             "type": "number"
           },
-          "denominatorWeight": {
-            "type": "number"
+          "totalVotesWeight": {
+            "$ref": "#/components/schemas/FractionDto"
           },
-          "denominatorUnitCount": {
+          "totalVotesUnitCount": {
             "type": "number"
           },
           "computedAt": {
@@ -4806,9 +5106,10 @@
           "resultStatus",
           "quorumMet",
           "participationWeight",
+          "participationPercent",
           "participationUnitCount",
-          "denominatorWeight",
-          "denominatorUnitCount",
+          "totalVotesWeight",
+          "totalVotesUnitCount",
           "computedAt",
           "questionResults"
         ]
@@ -4823,16 +5124,19 @@
             "type": "number"
           },
           "participationWeight": {
-            "type": "number"
+            "$ref": "#/components/schemas/FractionDto"
           },
           "eligibleWeight": {
+            "$ref": "#/components/schemas/FractionDto"
+          },
+          "totalVotesUnitCount": {
             "type": "number"
           },
-          "denominatorUnitCount": {
-            "type": "number"
+          "totalVotesWeight": {
+            "$ref": "#/components/schemas/FractionDto"
           },
-          "denominatorWeight": {
-            "type": "number"
+          "participationPercent": {
+            "type": "string"
           }
         },
         "required": [
@@ -4840,8 +5144,9 @@
           "eligibleUnitCount",
           "participationWeight",
           "eligibleWeight",
-          "denominatorUnitCount",
-          "denominatorWeight"
+          "totalVotesUnitCount",
+          "totalVotesWeight",
+          "participationPercent"
         ]
       },
       "TimelineEntryDto": {

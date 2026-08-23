@@ -1,3 +1,8 @@
+import type {
+  OwnerKind,
+  OwnershipPartyType,
+} from '@/modules/core/property/domain/ownership-plan';
+
 export interface Unit {
   id: string;
   tenantId: string;
@@ -14,17 +19,19 @@ export interface Owner {
   displayName: string;
   email: string | null;
   userId: string | null;
+  kind: OwnerKind;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export interface UnitOwnership {
+export interface UnitOwnershipParty {
   id: string;
   tenantId: string;
   unitId: string;
-  ownerId: string;
-  share: string;
+  partyType: OwnershipPartyType;
+  shareNumerator: number;
+  shareDenominator: number;
   validFrom: Date;
   validTo: Date | null;
-  createdAt: Date;
+  memberOwnerIds: string[];
 }

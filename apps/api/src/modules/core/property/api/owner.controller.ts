@@ -27,6 +27,7 @@ import {
 import { CreateOwnerCommand } from '@/modules/core/property/application/commands/create-owner.command';
 import { DeleteOwnerCommand } from '@/modules/core/property/application/commands/delete-owner.command';
 import { ListOwnersQuery } from '@/modules/core/property/application/queries/list-owners.query';
+import type { OwnerKind } from '@/modules/core/property/domain/ownership-plan';
 import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
 import {
   Roles,
@@ -84,6 +85,7 @@ export class OwnerController {
         dto.userId ?? null,
         dto.email ?? null,
         user.userId,
+        dto.kind as OwnerKind,
       ),
     );
   }

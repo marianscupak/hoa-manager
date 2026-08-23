@@ -26,7 +26,9 @@
                       },
                       "additionalProperties": {
                         "type": "object",
-                        "required": ["status"],
+                        "required": [
+                          "status"
+                        ],
                         "properties": {
                           "status": {
                             "type": "string"
@@ -41,7 +43,9 @@
                       "example": {},
                       "additionalProperties": {
                         "type": "object",
-                        "required": ["status"],
+                        "required": [
+                          "status"
+                        ],
                         "properties": {
                           "status": {
                             "type": "string"
@@ -60,7 +64,9 @@
                       },
                       "additionalProperties": {
                         "type": "object",
-                        "required": ["status"],
+                        "required": [
+                          "status"
+                        ],
                         "properties": {
                           "status": {
                             "type": "string"
@@ -94,7 +100,9 @@
                       },
                       "additionalProperties": {
                         "type": "object",
-                        "required": ["status"],
+                        "required": [
+                          "status"
+                        ],
                         "properties": {
                           "status": {
                             "type": "string"
@@ -114,7 +122,9 @@
                       },
                       "additionalProperties": {
                         "type": "object",
-                        "required": ["status"],
+                        "required": [
+                          "status"
+                        ],
                         "properties": {
                           "status": {
                             "type": "string"
@@ -137,7 +147,9 @@
                       },
                       "additionalProperties": {
                         "type": "object",
-                        "required": ["status"],
+                        "required": [
+                          "status"
+                        ],
                         "properties": {
                           "status": {
                             "type": "string"
@@ -152,7 +164,9 @@
             }
           }
         },
-        "tags": ["Health"]
+        "tags": [
+          "Health"
+        ]
       }
     },
     "/api/metrics": {
@@ -164,7 +178,9 @@
             "description": ""
           }
         },
-        "tags": ["Prometheus"]
+        "tags": [
+          "Prometheus"
+        ]
       }
     },
     "/api/tenants": {
@@ -226,7 +242,9 @@
             }
           }
         },
-        "tags": ["Tenants"]
+        "tags": [
+          "Tenants"
+        ]
       },
       "post": {
         "operationId": "TenancyController_createTenant",
@@ -293,7 +311,9 @@
             }
           }
         },
-        "tags": ["Tenants"]
+        "tags": [
+          "Tenants"
+        ]
       }
     },
     "/api/members": {
@@ -355,7 +375,9 @@
             }
           }
         },
-        "tags": ["Tenant Members"]
+        "tags": [
+          "Tenant Members"
+        ]
       }
     },
     "/api/members/{id}/role": {
@@ -426,7 +448,9 @@
             }
           }
         },
-        "tags": ["Tenant Members"]
+        "tags": [
+          "Tenant Members"
+        ]
       }
     },
     "/api/identity/users/me/language": {
@@ -488,7 +512,9 @@
             }
           }
         },
-        "tags": ["Identity"]
+        "tags": [
+          "Identity"
+        ]
       }
     },
     "/api/auth/login": {
@@ -557,7 +583,9 @@
             }
           }
         },
-        "tags": ["Auth"]
+        "tags": [
+          "Auth"
+        ]
       }
     },
     "/api/auth/google/start": {
@@ -609,7 +637,9 @@
             }
           }
         },
-        "tags": ["Auth"]
+        "tags": [
+          "Auth"
+        ]
       }
     },
     "/api/auth/google/callback": {
@@ -706,7 +736,9 @@
             }
           }
         },
-        "tags": ["Auth"]
+        "tags": [
+          "Auth"
+        ]
       }
     },
     "/api/auth/google/exchange": {
@@ -775,7 +807,9 @@
             }
           }
         },
-        "tags": ["Auth"]
+        "tags": [
+          "Auth"
+        ]
       }
     },
     "/api/auth/refresh": {
@@ -834,7 +868,9 @@
             }
           }
         },
-        "tags": ["Auth"]
+        "tags": [
+          "Auth"
+        ]
       }
     },
     "/api/auth/switch-tenant": {
@@ -903,7 +939,9 @@
             }
           }
         },
-        "tags": ["Auth"]
+        "tags": [
+          "Auth"
+        ]
       }
     },
     "/api/auth/logout": {
@@ -962,7 +1000,9 @@
             }
           }
         },
-        "tags": ["Auth"]
+        "tags": [
+          "Auth"
+        ]
       }
     },
     "/api/audit/activity": {
@@ -998,7 +1038,9 @@
             }
           }
         },
-        "tags": ["audit"]
+        "tags": [
+          "audit"
+        ]
       }
     },
     "/api/owners": {
@@ -1060,7 +1102,9 @@
             }
           }
         },
-        "tags": ["Property Owners"]
+        "tags": [
+          "Property Owners"
+        ]
       },
       "post": {
         "operationId": "OwnerController_createOwner",
@@ -1127,7 +1171,9 @@
             }
           }
         },
-        "tags": ["Property Owners"]
+        "tags": [
+          "Property Owners"
+        ]
       }
     },
     "/api/owners/{ownerId}/invite": {
@@ -1188,7 +1234,9 @@
             }
           }
         },
-        "tags": ["Property Owners"]
+        "tags": [
+          "Property Owners"
+        ]
       },
       "delete": {
         "operationId": "OwnerController_revokeInvite",
@@ -1247,7 +1295,9 @@
             }
           }
         },
-        "tags": ["Property Owners"]
+        "tags": [
+          "Property Owners"
+        ]
       }
     },
     "/api/owners/{ownerId}": {
@@ -1308,7 +1358,9 @@
             }
           }
         },
-        "tags": ["Property Owners"]
+        "tags": [
+          "Property Owners"
+        ]
       }
     },
     "/api/property/overview": {
@@ -1367,7 +1419,9 @@
             }
           }
         },
-        "tags": ["Property"]
+        "tags": [
+          "Property"
+        ]
       }
     },
     "/api/units/mine": {
@@ -1429,7 +1483,9 @@
             }
           }
         },
-        "tags": ["Property Units"]
+        "tags": [
+          "Property Units"
+        ]
       }
     },
     "/api/units": {
@@ -1491,7 +1547,9 @@
             }
           }
         },
-        "tags": ["Property Units"]
+        "tags": [
+          "Property Units"
+        ]
       },
       "post": {
         "operationId": "UnitController_createUnit",
@@ -1558,7 +1616,9 @@
             }
           }
         },
-        "tags": ["Property Units"]
+        "tags": [
+          "Property Units"
+        ]
       }
     },
     "/api/units/{id}": {
@@ -1626,7 +1686,9 @@
             }
           }
         },
-        "tags": ["Property Units"]
+        "tags": [
+          "Property Units"
+        ]
       },
       "patch": {
         "operationId": "UnitController_updateUnit",
@@ -1695,7 +1757,9 @@
             }
           }
         },
-        "tags": ["Property Units"]
+        "tags": [
+          "Property Units"
+        ]
       },
       "delete": {
         "operationId": "UnitController_deleteUnit",
@@ -1754,7 +1818,9 @@
             }
           }
         },
-        "tags": ["Property Units"]
+        "tags": [
+          "Property Units"
+        ]
       }
     },
     "/api/units/{id}/ownership": {
@@ -1825,7 +1891,9 @@
             }
           }
         },
-        "tags": ["Property Units"]
+        "tags": [
+          "Property Units"
+        ]
       }
     },
     "/api/invites/owner/status": {
@@ -1893,7 +1961,9 @@
             }
           }
         },
-        "tags": ["Owner Invitations"]
+        "tags": [
+          "Owner Invitations"
+        ]
       }
     },
     "/api/invites/owner/accept": {
@@ -1962,7 +2032,9 @@
             }
           }
         },
-        "tags": ["Owner Invitations"]
+        "tags": [
+          "Owner Invitations"
+        ]
       }
     },
     "/api/auth/register-from-invite": {
@@ -2031,7 +2103,9 @@
             }
           }
         },
-        "tags": ["Owner Invitations"]
+        "tags": [
+          "Owner Invitations"
+        ]
       }
     },
     "/api/votes": {
@@ -2065,7 +2139,9 @@
             }
           }
         },
-        "tags": ["Votes"]
+        "tags": [
+          "Votes"
+        ]
       },
       "post": {
         "operationId": "VotesController_createVote",
@@ -2092,7 +2168,9 @@
             }
           }
         },
-        "tags": ["Votes"]
+        "tags": [
+          "Votes"
+        ]
       }
     },
     "/api/votes/consents": {
@@ -2114,7 +2192,9 @@
             }
           }
         },
-        "tags": ["Votes"]
+        "tags": [
+          "Votes"
+        ]
       }
     },
     "/api/votes/consents/{id}/revoke": {
@@ -2135,7 +2215,9 @@
             "description": "Consent revoked"
           }
         },
-        "tags": ["Votes"]
+        "tags": [
+          "Votes"
+        ]
       }
     },
     "/api/votes/{id}": {
@@ -2163,7 +2245,9 @@
             }
           }
         },
-        "tags": ["Votes"]
+        "tags": [
+          "Votes"
+        ]
       },
       "patch": {
         "operationId": "VotesController_updateVote",
@@ -2199,7 +2283,9 @@
             }
           }
         },
-        "tags": ["Votes"]
+        "tags": [
+          "Votes"
+        ]
       },
       "delete": {
         "operationId": "VotesController_deleteVote",
@@ -2218,7 +2304,9 @@
             "description": "Draft vote deleted"
           }
         },
-        "tags": ["Votes"]
+        "tags": [
+          "Votes"
+        ]
       }
     },
     "/api/votes/{id}/voter-status": {
@@ -2246,7 +2334,9 @@
             }
           }
         },
-        "tags": ["Votes"]
+        "tags": [
+          "Votes"
+        ]
       }
     },
     "/api/votes/{id}/ruleset": {
@@ -2284,7 +2374,9 @@
             }
           }
         },
-        "tags": ["Votes"]
+        "tags": [
+          "Votes"
+        ]
       }
     },
     "/api/votes/{id}/questions": {
@@ -2315,7 +2407,9 @@
             "description": "Question created"
           }
         },
-        "tags": ["Votes"]
+        "tags": [
+          "Votes"
+        ]
       }
     },
     "/api/votes/{id}/questions/{questionId}": {
@@ -2354,7 +2448,9 @@
             "description": "Question updated"
           }
         },
-        "tags": ["Votes"]
+        "tags": [
+          "Votes"
+        ]
       },
       "delete": {
         "operationId": "VotesController_deleteVoteQuestion",
@@ -2381,7 +2477,9 @@
             "description": "Question deleted"
           }
         },
-        "tags": ["Votes"]
+        "tags": [
+          "Votes"
+        ]
       }
     },
     "/api/votes/{id}/schedule": {
@@ -2409,7 +2507,9 @@
             }
           }
         },
-        "tags": ["Votes"]
+        "tags": [
+          "Votes"
+        ]
       }
     },
     "/api/votes/{id}/delegation-candidates": {
@@ -2456,7 +2556,9 @@
             }
           }
         },
-        "tags": ["Votes"]
+        "tags": [
+          "Votes"
+        ]
       }
     },
     "/api/votes/{id}/consents": {
@@ -2487,7 +2589,9 @@
             "description": "Records a delegation consent for a specific unit"
           }
         },
-        "tags": ["Votes"]
+        "tags": [
+          "Votes"
+        ]
       }
     },
     "/api/votes/{id}/ballots": {
@@ -2525,7 +2629,9 @@
             }
           }
         },
-        "tags": ["Votes"]
+        "tags": [
+          "Votes"
+        ]
       }
     },
     "/api/votes/{id}/results": {
@@ -2553,7 +2659,9 @@
             }
           }
         },
-        "tags": ["Votes"]
+        "tags": [
+          "Votes"
+        ]
       }
     },
     "/api/votes/{id}/turnout": {
@@ -2581,7 +2689,9 @@
             }
           }
         },
-        "tags": ["Votes"]
+        "tags": [
+          "Votes"
+        ]
       }
     },
     "/api/votes/{id}/activity": {
@@ -2617,7 +2727,9 @@
             }
           }
         },
-        "tags": ["Votes"]
+        "tags": [
+          "Votes"
+        ]
       }
     },
     "/api/votes/{id}/audit-export": {
@@ -2645,7 +2757,9 @@
             }
           }
         },
-        "tags": ["Votes"]
+        "tags": [
+          "Votes"
+        ]
       }
     },
     "/api/votes/{id}/close": {
@@ -2666,7 +2780,9 @@
             "description": "Vote closed manually"
           }
         },
-        "tags": ["Votes"]
+        "tags": [
+          "Votes"
+        ]
       }
     },
     "/api/votes/{id}/documents": {
@@ -2704,7 +2820,9 @@
             }
           }
         },
-        "tags": ["Votes"]
+        "tags": [
+          "Votes"
+        ]
       }
     },
     "/api/votes/{id}/documents/{documentId}/confirm": {
@@ -2733,7 +2851,9 @@
             "description": "Upload confirmed"
           }
         },
-        "tags": ["Votes"]
+        "tags": [
+          "Votes"
+        ]
       }
     },
     "/api/votes/{id}/documents/{documentId}": {
@@ -2762,7 +2882,9 @@
             "description": "Document deleted"
           }
         },
-        "tags": ["Votes"]
+        "tags": [
+          "Votes"
+        ]
       }
     },
     "/api/votes/{id}/documents/{documentId}/download-url": {
@@ -2798,7 +2920,9 @@
             }
           }
         },
-        "tags": ["Votes"]
+        "tags": [
+          "Votes"
+        ]
       }
     }
   },
@@ -2822,7 +2946,9 @@
             "type": "object"
           }
         },
-        "required": ["code"]
+        "required": [
+          "code"
+        ]
       },
       "TenantResponseDto": {
         "type": "object",
@@ -2837,14 +2963,28 @@
           },
           "role": {
             "type": "string",
-            "enum": ["ADMIN", "BOARD_MEMBER", "AUDITOR", "UNIT_OWNER"]
+            "enum": [
+              "ADMIN",
+              "BOARD_MEMBER",
+              "AUDITOR",
+              "UNIT_OWNER"
+            ]
           },
           "status": {
             "type": "string",
-            "enum": ["ACTIVE", "SUSPENDED", "INVITED"]
+            "enum": [
+              "ACTIVE",
+              "SUSPENDED",
+              "INVITED"
+            ]
           }
         },
-        "required": ["id", "name", "role", "status"]
+        "required": [
+          "id",
+          "name",
+          "role",
+          "status"
+        ]
       },
       "CreateTenantDto": {
         "type": "object",
@@ -2855,7 +2995,9 @@
             "maxLength": 255
           }
         },
-        "required": ["name"]
+        "required": [
+          "name"
+        ]
       },
       "CreateTenantResponseDto": {
         "type": "object",
@@ -2866,7 +3008,9 @@
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
           }
         },
-        "required": ["tenantId"]
+        "required": [
+          "tenantId"
+        ]
       },
       "MemberResponseDto": {
         "type": "object",
@@ -2879,11 +3023,20 @@
           },
           "role": {
             "type": "string",
-            "enum": ["ADMIN", "BOARD_MEMBER", "AUDITOR", "UNIT_OWNER"]
+            "enum": [
+              "ADMIN",
+              "BOARD_MEMBER",
+              "AUDITOR",
+              "UNIT_OWNER"
+            ]
           },
           "status": {
             "type": "string",
-            "enum": ["ACTIVE", "SUSPENDED", "INVITED"]
+            "enum": [
+              "ACTIVE",
+              "SUSPENDED",
+              "INVITED"
+            ]
           },
           "user": {
             "type": "object",
@@ -2898,24 +3051,42 @@
                 "type": "string"
               }
             },
-            "required": ["id", "email", "fullName"],
+            "required": [
+              "id",
+              "email",
+              "fullName"
+            ],
             "x-nestjs_zod-self-required": true
           },
           "createdAt": {
             "type": "string"
           }
         },
-        "required": ["id", "userId", "role", "status", "user", "createdAt"]
+        "required": [
+          "id",
+          "userId",
+          "role",
+          "status",
+          "user",
+          "createdAt"
+        ]
       },
       "UpdateMemberRoleDto": {
         "type": "object",
         "properties": {
           "role": {
             "type": "string",
-            "enum": ["ADMIN", "BOARD_MEMBER", "AUDITOR", "UNIT_OWNER"]
+            "enum": [
+              "ADMIN",
+              "BOARD_MEMBER",
+              "AUDITOR",
+              "UNIT_OWNER"
+            ]
           }
         },
-        "required": ["role"]
+        "required": [
+          "role"
+        ]
       },
       "UpdateUserLanguageDto": {
         "type": "object",
@@ -2926,7 +3097,9 @@
             "maxLength": 5
           }
         },
-        "required": ["language"]
+        "required": [
+          "language"
+        ]
       },
       "LoginDto": {
         "type": "object",
@@ -2941,7 +3114,10 @@
             "minLength": 1
           }
         },
-        "required": ["email", "password"]
+        "required": [
+          "email",
+          "password"
+        ]
       },
       "AuthResponseDto": {
         "type": "object",
@@ -2950,7 +3126,9 @@
             "type": "string"
           }
         },
-        "required": ["accessToken"]
+        "required": [
+          "accessToken"
+        ]
       },
       "ExchangeCodeDto": {
         "type": "object",
@@ -2960,7 +3138,9 @@
             "minLength": 1
           }
         },
-        "required": ["code"]
+        "required": [
+          "code"
+        ]
       },
       "SwitchTenantDto": {
         "type": "object",
@@ -2971,7 +3151,9 @@
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
           }
         },
-        "required": ["tenantId"]
+        "required": [
+          "tenantId"
+        ]
       },
       "SuccessResponseDto": {
         "type": "object",
@@ -2980,7 +3162,9 @@
             "type": "boolean"
           }
         },
-        "required": ["success"]
+        "required": [
+          "success"
+        ]
       },
       "TenantActivityEntryDto": {
         "type": "object",
@@ -3003,7 +3187,13 @@
             "nullable": true
           }
         },
-        "required": ["id", "occurredAt", "eventType", "message", "navigateTo"]
+        "required": [
+          "id",
+          "occurredAt",
+          "eventType",
+          "message",
+          "navigateTo"
+        ]
       },
       "TenantActivityResponseDto": {
         "type": "object",
@@ -3015,7 +3205,9 @@
             }
           }
         },
-        "required": ["entries"]
+        "required": [
+          "entries"
+        ]
       },
       "OwnerResponseDto": {
         "type": "object",
@@ -3037,10 +3229,21 @@
             "type": "string",
             "nullable": true
           },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "PERSON",
+              "LEGAL_ENTITY",
+              "ASSOCIATION"
+            ]
+          },
           "inviteStatus": {
             "type": "string",
             "nullable": true,
-            "enum": ["pending", "expired"],
+            "enum": [
+              "pending",
+              "expired"
+            ],
             "description": "Status of the invite for this owner, null if no pending invite"
           },
           "createdAt": {
@@ -3058,6 +3261,7 @@
           "displayName",
           "email",
           "userId",
+          "kind",
           "inviteStatus",
           "createdAt",
           "updatedAt"
@@ -3083,9 +3287,21 @@
             "type": "string",
             "format": "uuid",
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "kind": {
+            "default": "PERSON",
+            "description": "The legal kind of the owner",
+            "type": "string",
+            "enum": [
+              "PERSON",
+              "LEGAL_ENTITY",
+              "ASSOCIATION"
+            ]
           }
         },
-        "required": ["displayName"]
+        "required": [
+          "displayName"
+        ]
       },
       "CreateOwnerResponseDto": {
         "type": "object",
@@ -3096,7 +3312,9 @@
             "example": "123e4567-e89b-12d3-a456-426614174000"
           }
         },
-        "required": ["ownerId"]
+        "required": [
+          "ownerId"
+        ]
       },
       "UnitsOverviewDto": {
         "type": "object",
@@ -3112,7 +3330,11 @@
             "description": "Sum of unit buildingShare values as a percentage"
           }
         },
-        "required": ["total", "withoutOwnersCount", "buildingShareSum"]
+        "required": [
+          "total",
+          "withoutOwnersCount",
+          "buildingShareSum"
+        ]
       },
       "OwnersOverviewDto": {
         "type": "object",
@@ -3122,7 +3344,9 @@
             "description": "Active owners (excludes pending-invite owners)"
           }
         },
-        "required": ["active"]
+        "required": [
+          "active"
+        ]
       },
       "InvitesOverviewDto": {
         "type": "object",
@@ -3136,7 +3360,10 @@
             "nullable": true
           }
         },
-        "required": ["pending", "oldestPendingCreatedAt"]
+        "required": [
+          "pending",
+          "oldestPendingCreatedAt"
+        ]
       },
       "PropertyOverviewResponseDto": {
         "type": "object",
@@ -3151,7 +3378,11 @@
             "$ref": "#/components/schemas/InvitesOverviewDto"
           }
         },
-        "required": ["units", "owners", "invites"]
+        "required": [
+          "units",
+          "owners",
+          "invites"
+        ]
       },
       "OwnedUnitResponseDto": {
         "type": "object",
@@ -3166,12 +3397,26 @@
             "type": "number",
             "description": "Caller's share of the unit, as a percentage"
           },
+          "partyType": {
+            "type": "string",
+            "enum": [
+              "SOLE",
+              "SJM"
+            ],
+            "description": "The party type through which the caller holds the unit"
+          },
           "buildingSharePct": {
             "type": "number",
             "description": "Unit's share of the building, as a percentage"
           }
         },
-        "required": ["id", "unitNo", "ownerSharePct", "buildingSharePct"]
+        "required": [
+          "id",
+          "unitNo",
+          "ownerSharePct",
+          "partyType",
+          "buildingSharePct"
+        ]
       },
       "UnitResponseDto": {
         "type": "object",
@@ -3249,7 +3494,33 @@
             "example": "123e4567-e89b-12d3-a456-426614174000"
           }
         },
-        "required": ["unitId"]
+        "required": [
+          "unitId"
+        ]
+      },
+      "UnitOwnershipMemberResponseDto": {
+        "type": "object",
+        "properties": {
+          "ownerId": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "PERSON",
+              "LEGAL_ENTITY",
+              "ASSOCIATION"
+            ]
+          }
+        },
+        "required": [
+          "ownerId",
+          "displayName",
+          "kind"
+        ]
       },
       "UnitOwnershipResponseDto": {
         "type": "object",
@@ -3257,36 +3528,37 @@
           "id": {
             "type": "string"
           },
-          "tenantId": {
-            "type": "string"
-          },
-          "unitId": {
-            "type": "string"
-          },
-          "ownerId": {
-            "type": "string"
-          },
-          "share": {
-            "type": "string"
-          },
-          "validFrom": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "validTo": {
-            "format": "date-time",
+          "partyType": {
             "type": "string",
-            "nullable": true
+            "enum": [
+              "SOLE",
+              "SJM"
+            ]
+          },
+          "shareNumerator": {
+            "type": "number"
+          },
+          "shareDenominator": {
+            "type": "number"
+          },
+          "shareDecimal": {
+            "type": "string",
+            "description": "Decimal representation of the share, 4dp"
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnitOwnershipMemberResponseDto"
+            }
           }
         },
         "required": [
           "id",
-          "tenantId",
-          "unitId",
-          "ownerId",
-          "share",
-          "validFrom",
-          "validTo"
+          "partyType",
+          "shareNumerator",
+          "shareDenominator",
+          "shareDecimal",
+          "members"
         ]
       },
       "UnitDetailResponseDto": {
@@ -3372,29 +3644,59 @@
             "items": {
               "type": "object",
               "properties": {
-                "ownerId": {
+                "partyType": {
                   "type": "string",
-                  "format": "uuid",
-                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  "enum": [
+                    "SOLE",
+                    "SJM"
+                  ]
                 },
-                "share": {
-                  "type": "string",
-                  "pattern": "^\\d+(\\.\\d+)?$"
+                "shareNumerator": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "shareDenominator": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "memberOwnerIds": {
+                  "minItems": 1,
+                  "maxItems": 2,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  }
                 }
               },
-              "required": ["ownerId", "share"]
+              "required": [
+                "partyType",
+                "shareNumerator",
+                "shareDenominator",
+                "memberOwnerIds"
+              ]
             },
             "description": "List of ownerships to replace the current active ones"
           }
         },
-        "required": ["ownerships"]
+        "required": [
+          "ownerships"
+        ]
       },
       "InviteStatusResponseDto": {
         "type": "object",
         "properties": {
           "status": {
             "type": "string",
-            "enum": ["valid", "expired", "accepted", "not_found"]
+            "enum": [
+              "valid",
+              "expired",
+              "accepted",
+              "not_found"
+            ]
           },
           "emailMasked": {
             "type": "string",
@@ -3406,7 +3708,9 @@
             "nullable": true
           }
         },
-        "required": ["status"]
+        "required": [
+          "status"
+        ]
       },
       "AcceptInviteDto": {
         "type": "object",
@@ -3416,7 +3720,9 @@
             "minLength": 1
           }
         },
-        "required": ["token"]
+        "required": [
+          "token"
+        ]
       },
       "AcceptInviteResponseDto": {
         "type": "object",
@@ -3425,7 +3731,9 @@
             "type": "string"
           }
         },
-        "required": ["tenantId"]
+        "required": [
+          "tenantId"
+        ]
       },
       "RegisterFromInviteDto": {
         "type": "object",
@@ -3439,7 +3747,10 @@
             "minLength": 8
           }
         },
-        "required": ["token", "password"]
+        "required": [
+          "token",
+          "password"
+        ]
       },
       "RegisterFromInviteResponseDto": {
         "type": "object",
@@ -3451,7 +3762,10 @@
             "type": "string"
           }
         },
-        "required": ["accessToken", "tenantId"]
+        "required": [
+          "accessToken",
+          "tenantId"
+        ]
       },
       "VoterSummaryDto": {
         "type": "object",
@@ -3469,7 +3783,11 @@
             "type": "boolean"
           }
         },
-        "required": ["canVote", "isDelegated", "hasVoted"]
+        "required": [
+          "canVote",
+          "isDelegated",
+          "hasVoted"
+        ]
       },
       "QuestionOutcomeDto": {
         "type": "object",
@@ -3482,14 +3800,24 @@
           },
           "outcome": {
             "type": "string",
-            "enum": ["APPROVED", "REJECTED", "WINNER", "NOT_DECIDED"]
+            "enum": [
+              "APPROVED",
+              "REJECTED",
+              "WINNER",
+              "NOT_DECIDED"
+            ]
           },
           "winningOptionLabel": {
             "type": "string",
             "nullable": true
           }
         },
-        "required": ["questionId", "title", "outcome", "winningOptionLabel"]
+        "required": [
+          "questionId",
+          "title",
+          "outcome",
+          "winningOptionLabel"
+        ]
       },
       "VoteListItemResponseDto": {
         "type": "object",
@@ -3535,7 +3863,12 @@
             }
           }
         },
-        "required": ["id", "title", "status", "allowCoOwnerIndividualVote"]
+        "required": [
+          "id",
+          "title",
+          "status",
+          "allowCoOwnerIndividualVote"
+        ]
       },
       "VoteConsentResponseDto": {
         "type": "object",
@@ -3603,15 +3936,24 @@
         "properties": {
           "weightBasis": {
             "type": "string",
-            "enum": ["UNIT_SHARE", "ONE_UNIT_ONE_VOTE"]
+            "enum": [
+              "UNIT_SHARE",
+              "ONE_UNIT_ONE_VOTE"
+            ]
           },
           "quorumMeasure": {
             "type": "string",
-            "enum": ["UNIT_SHARE", "UNIT_COUNT"]
+            "enum": [
+              "UNIT_SHARE",
+              "UNIT_COUNT"
+            ]
           },
           "quorumElectorateBasis": {
             "type": "string",
-            "enum": ["ALL_UNITS", "ELIGIBLE_UNITS_ONLY"]
+            "enum": [
+              "ALL_UNITS",
+              "ELIGIBLE_UNITS_ONLY"
+            ]
           },
           "quorumThreshold": {
             "type": "number",
@@ -3620,7 +3962,10 @@
           },
           "majorityRuleType": {
             "type": "string",
-            "enum": ["SIMPLE_MAJORITY", "QUALIFIED_MAJORITY"]
+            "enum": [
+              "SIMPLE_MAJORITY",
+              "QUALIFIED_MAJORITY"
+            ]
           },
           "majorityThreshold": {
             "type": "number",
@@ -3662,10 +4007,20 @@
           },
           "optionKey": {
             "type": "string",
-            "enum": ["YES", "NO", "ABSTAIN", "CUSTOM"]
+            "enum": [
+              "YES",
+              "NO",
+              "ABSTAIN",
+              "CUSTOM"
+            ]
           }
         },
-        "required": ["id", "label", "sortOrder", "optionKey"]
+        "required": [
+          "id",
+          "label",
+          "sortOrder",
+          "optionKey"
+        ]
       },
       "VoteQuestionResponseDto": {
         "type": "object",
@@ -3682,7 +4037,10 @@
           },
           "type": {
             "type": "string",
-            "enum": ["YES_NO", "SINGLE_CHOICE"]
+            "enum": [
+              "YES_NO",
+              "SINGLE_CHOICE"
+            ]
           },
           "sortOrder": {
             "type": "number"
@@ -3710,7 +4068,13 @@
             ]
           }
         },
-        "required": ["id", "title", "type", "sortOrder", "options"]
+        "required": [
+          "id",
+          "title",
+          "type",
+          "sortOrder",
+          "options"
+        ]
       },
       "VoteDocumentResponseDto": {
         "type": "object",
@@ -3732,7 +4096,13 @@
             "format": "date-time"
           }
         },
-        "required": ["id", "fileName", "contentType", "sizeBytes", "uploadedAt"]
+        "required": [
+          "id",
+          "fileName",
+          "contentType",
+          "sizeBytes",
+          "uploadedAt"
+        ]
       },
       "VoteDetailResponseDto": {
         "type": "object",
@@ -3781,7 +4151,13 @@
             }
           }
         },
-        "required": ["id", "title", "status", "questions", "documents"]
+        "required": [
+          "id",
+          "title",
+          "status",
+          "questions",
+          "documents"
+        ]
       },
       "TotalVotingPowerDto": {
         "type": "object",
@@ -3793,7 +4169,10 @@
             "type": "number"
           }
         },
-        "required": ["value", "maximum"]
+        "required": [
+          "value",
+          "maximum"
+        ]
       },
       "OwningUnitStatusDto": {
         "type": "object",
@@ -3819,11 +4198,19 @@
           },
           "ineligibleReason": {
             "type": "string",
-            "enum": ["NO_REPRESENTATIVE", "MISSING_OWNERSHIP"],
+            "enum": [
+              "NO_REPRESENTATIVE",
+              "MISSING_OWNERSHIP"
+            ],
             "nullable": true
           }
         },
-        "required": ["id", "name", "share", "status"]
+        "required": [
+          "id",
+          "name",
+          "share",
+          "status"
+        ]
       },
       "VoterStatusResponseDto": {
         "type": "object",
@@ -3841,7 +4228,11 @@
             }
           }
         },
-        "required": ["canVote", "totalVotingPower", "owningUnits"]
+        "required": [
+          "canVote",
+          "totalVotingPower",
+          "owningUnits"
+        ]
       },
       "CreateVoteDto": {
         "type": "object",
@@ -3863,7 +4254,9 @@
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
           }
         },
-        "required": ["title"]
+        "required": [
+          "title"
+        ]
       },
       "CreateVoteResponseDto": {
         "type": "object",
@@ -3892,22 +4285,35 @@
             "type": "string"
           }
         },
-        "required": ["id", "title", "status"]
+        "required": [
+          "id",
+          "title",
+          "status"
+        ]
       },
       "SetVoteRulesetDto": {
         "type": "object",
         "properties": {
           "weightBasis": {
             "type": "string",
-            "enum": ["UNIT_SHARE", "ONE_UNIT_ONE_VOTE"]
+            "enum": [
+              "UNIT_SHARE",
+              "ONE_UNIT_ONE_VOTE"
+            ]
           },
           "quorumMeasure": {
             "type": "string",
-            "enum": ["UNIT_SHARE", "UNIT_COUNT"]
+            "enum": [
+              "UNIT_SHARE",
+              "UNIT_COUNT"
+            ]
           },
           "quorumElectorateBasis": {
             "type": "string",
-            "enum": ["ALL_UNITS", "ELIGIBLE_UNITS_ONLY"]
+            "enum": [
+              "ALL_UNITS",
+              "ELIGIBLE_UNITS_ONLY"
+            ]
           },
           "quorumThreshold": {
             "type": "number",
@@ -3916,7 +4322,10 @@
           },
           "majorityRuleType": {
             "type": "string",
-            "enum": ["SIMPLE_MAJORITY", "QUALIFIED_MAJORITY"]
+            "enum": [
+              "SIMPLE_MAJORITY",
+              "QUALIFIED_MAJORITY"
+            ]
           },
           "majorityThreshold": {
             "type": "number",
@@ -3956,7 +4365,10 @@
           },
           "type": {
             "type": "string",
-            "enum": ["YES_NO", "SINGLE_CHOICE"]
+            "enum": [
+              "YES_NO",
+              "SINGLE_CHOICE"
+            ]
           },
           "sortOrder": {
             "type": "integer",
@@ -3978,7 +4390,9 @@
                   "maximum": 9007199254740991
                 }
               },
-              "required": ["label"]
+              "required": [
+                "label"
+              ]
             }
           },
           "rulesetOverride": {
@@ -3986,15 +4400,24 @@
             "properties": {
               "weightBasis": {
                 "type": "string",
-                "enum": ["UNIT_SHARE", "ONE_UNIT_ONE_VOTE"]
+                "enum": [
+                  "UNIT_SHARE",
+                  "ONE_UNIT_ONE_VOTE"
+                ]
               },
               "quorumMeasure": {
                 "type": "string",
-                "enum": ["UNIT_SHARE", "UNIT_COUNT"]
+                "enum": [
+                  "UNIT_SHARE",
+                  "UNIT_COUNT"
+                ]
               },
               "quorumElectorateBasis": {
                 "type": "string",
-                "enum": ["ALL_UNITS", "ELIGIBLE_UNITS_ONLY"]
+                "enum": [
+                  "ALL_UNITS",
+                  "ELIGIBLE_UNITS_ONLY"
+                ]
               },
               "quorumThreshold": {
                 "type": "number",
@@ -4003,7 +4426,10 @@
               },
               "majorityRuleType": {
                 "type": "string",
-                "enum": ["SIMPLE_MAJORITY", "QUALIFIED_MAJORITY"]
+                "enum": [
+                  "SIMPLE_MAJORITY",
+                  "QUALIFIED_MAJORITY"
+                ]
               },
               "majorityThreshold": {
                 "type": "number",
@@ -4033,7 +4459,10 @@
             "x-nestjs_zod-self-required": false
           }
         },
-        "required": ["title", "type"]
+        "required": [
+          "title",
+          "type"
+        ]
       },
       "UpdateVoteQuestionDto": {
         "type": "object",
@@ -4047,7 +4476,10 @@
           },
           "type": {
             "type": "string",
-            "enum": ["YES_NO", "SINGLE_CHOICE"]
+            "enum": [
+              "YES_NO",
+              "SINGLE_CHOICE"
+            ]
           },
           "sortOrder": {
             "type": "integer",
@@ -4069,7 +4501,9 @@
                   "maximum": 9007199254740991
                 }
               },
-              "required": ["label"]
+              "required": [
+                "label"
+              ]
             }
           },
           "rulesetOverride": {
@@ -4077,15 +4511,24 @@
             "properties": {
               "weightBasis": {
                 "type": "string",
-                "enum": ["UNIT_SHARE", "ONE_UNIT_ONE_VOTE"]
+                "enum": [
+                  "UNIT_SHARE",
+                  "ONE_UNIT_ONE_VOTE"
+                ]
               },
               "quorumMeasure": {
                 "type": "string",
-                "enum": ["UNIT_SHARE", "UNIT_COUNT"]
+                "enum": [
+                  "UNIT_SHARE",
+                  "UNIT_COUNT"
+                ]
               },
               "quorumElectorateBasis": {
                 "type": "string",
-                "enum": ["ALL_UNITS", "ELIGIBLE_UNITS_ONLY"]
+                "enum": [
+                  "ALL_UNITS",
+                  "ELIGIBLE_UNITS_ONLY"
+                ]
               },
               "quorumThreshold": {
                 "type": "number",
@@ -4094,7 +4537,10 @@
               },
               "majorityRuleType": {
                 "type": "string",
-                "enum": ["SIMPLE_MAJORITY", "QUALIFIED_MAJORITY"]
+                "enum": [
+                  "SIMPLE_MAJORITY",
+                  "QUALIFIED_MAJORITY"
+                ]
               },
               "majorityThreshold": {
                 "type": "number",
@@ -4124,7 +4570,10 @@
             "x-nestjs_zod-self-required": false
           }
         },
-        "required": ["title", "type"]
+        "required": [
+          "title",
+          "type"
+        ]
       },
       "UpdateVoteDto": {
         "type": "object",
@@ -4146,7 +4595,9 @@
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
           }
         },
-        "required": ["title"]
+        "required": [
+          "title"
+        ]
       },
       "DelegationCandidateDto": {
         "type": "object",
@@ -4194,7 +4645,10 @@
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
           }
         },
-        "required": ["unitId", "delegateMembershipId"]
+        "required": [
+          "unitId",
+          "delegateMembershipId"
+        ]
       },
       "SubmitBallotDto": {
         "type": "object",
@@ -4227,15 +4681,23 @@
                         "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                       }
                     },
-                    "required": ["questionId", "optionId"]
+                    "required": [
+                      "questionId",
+                      "optionId"
+                    ]
                   }
                 }
               },
-              "required": ["unitId", "answers"]
+              "required": [
+                "unitId",
+                "answers"
+              ]
             }
           }
         },
-        "required": ["ballots"]
+        "required": [
+          "ballots"
+        ]
       },
       "SubmitBallotResponseDto": {
         "type": "object",
@@ -4245,7 +4707,9 @@
             "format": "date-time"
           }
         },
-        "required": ["submittedAt"]
+        "required": [
+          "submittedAt"
+        ]
       },
       "VoteOptionResultDto": {
         "type": "object",
@@ -4260,7 +4724,11 @@
             "type": "number"
           }
         },
-        "required": ["optionId", "voteWeight", "voteUnitCount"]
+        "required": [
+          "optionId",
+          "voteWeight",
+          "voteUnitCount"
+        ]
       },
       "VoteQuestionResultDto": {
         "type": "object",
@@ -4303,7 +4771,10 @@
         "properties": {
           "resultStatus": {
             "type": "string",
-            "enum": ["COMPUTED", "FAILED"]
+            "enum": [
+              "COMPUTED",
+              "FAILED"
+            ]
           },
           "quorumMet": {
             "type": "boolean"
@@ -4396,7 +4867,13 @@
             "type": "object"
           }
         },
-        "required": ["id", "occurredAt", "eventType", "message", "navigateTo"]
+        "required": [
+          "id",
+          "occurredAt",
+          "eventType",
+          "message",
+          "navigateTo"
+        ]
       },
       "VoteActivityResponseDto": {
         "type": "object",
@@ -4408,7 +4885,9 @@
             }
           }
         },
-        "required": ["entries"]
+        "required": [
+          "entries"
+        ]
       },
       "VoteAuditExportDto": {
         "type": "object",
@@ -4432,7 +4911,12 @@
             }
           }
         },
-        "required": ["exportMeta", "vote", "electorateSnapshot", "auditEvents"]
+        "required": [
+          "exportMeta",
+          "vote",
+          "electorateSnapshot",
+          "auditEvents"
+        ]
       },
       "RequestDocumentUploadDto": {
         "type": "object",
@@ -4452,7 +4936,11 @@
             "maximum": 9007199254740991
           }
         },
-        "required": ["fileName", "contentType", "sizeBytes"]
+        "required": [
+          "fileName",
+          "contentType",
+          "sizeBytes"
+        ]
       },
       "RequestDocumentUploadResponseDto": {
         "type": "object",
@@ -4464,7 +4952,10 @@
             "type": "string"
           }
         },
-        "required": ["documentId", "uploadUrl"]
+        "required": [
+          "documentId",
+          "uploadUrl"
+        ]
       },
       "DocumentDownloadUrlResponseDto": {
         "type": "object",
@@ -4473,7 +4964,9 @@
             "type": "string"
           }
         },
-        "required": ["downloadUrl"]
+        "required": [
+          "downloadUrl"
+        ]
       }
     }
   }

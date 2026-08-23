@@ -14,10 +14,15 @@ import {
     DialogHeader,
     DialogTitle,
     Form,
+    formatFraction,
+    fractionEqualsOne,
+    sumFractions,
     toast,
+    type Fraction,
 } from "@hoa-mngr/ui";
 
 import { showApiError } from "@/api/error-utils";
+import type { UnitOwnershipResponseDto } from "@/api/generated/model";
 import { useOwnerControllerGetOwners } from "@/api/generated/property-owners/property-owners";
 import {
     getUnitControllerGetUnitDetailQueryKey,
@@ -32,9 +37,15 @@ interface ReplaceOwnershipDialogProps {
     unitId: string;
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    currentOwnerships?: { ownerId: string; share: string }[];
+    currentOwnerships?: UnitOwnershipResponseDto[];
     onSuccess?: () => void;
 }
+
+const emptyRow = (): ReplaceOwnershipValues["ownerships"][number] => ({
+    partyType: "SOLE",
+    share: null,
+    memberOwnerIds: [""],
+});
 
 export function ReplaceOwnershipDialog({
     unitId,
@@ -53,7 +64,7 @@ export function ReplaceOwnershipDialog({
     const form = useForm<ReplaceOwnershipValues>({
         resolver: zodResolver(schema),
         defaultValues: {
-            ownerships: [{ ownerId: "", share: "1.0" }],
+            ownerships: [emptyRow()],
         },
     });
 
@@ -66,13 +77,14 @@ export function ReplaceOwnershipDialog({
         if (open && currentOwnerships && currentOwnerships.length > 0) {
             form.reset({
                 ownerships: currentOwnerships.map((o) => ({
-                    ownerId: o.ownerId,
-                    share: o.share,
+                    partyType: o.partyType,
+                    share: { num: o.shareNumerator, den: o.shareDenominator },
+                    memberOwnerIds: o.members.map((m) => m.ownerId),
                 })),
             });
         } else if (open) {
             form.reset({
-                ownerships: [{ ownerId: "", share: "1.0" }],
+                ownerships: [emptyRow()],
             });
         }
     }, [open, currentOwnerships, form]);
@@ -83,8 +95,10 @@ export function ReplaceOwnershipDialog({
                 id: unitId,
                 data: {
                     ownerships: values.ownerships.map((o) => ({
-                        ownerId: o.ownerId,
-                        share: o.share,
+                        partyType: o.partyType,
+                        shareNumerator: (o.share as Fraction).num,
+                        shareDenominator: (o.share as Fraction).den,
+                        memberOwnerIds: o.memberOwnerIds,
                     })),
                 },
             },
@@ -106,24 +120,21 @@ export function ReplaceOwnershipDialog({
         );
     };
 
-    const ownerOptions = useMemo(
+    const watchedOwnerships = form.watch("ownerships");
+    const sum = useMemo(
         () =>
-            owners?.map((owner) => ({
-                label: owner.displayName,
-                value: owner.id,
-            })) ?? [],
-        [owners],
+            sumFractions(
+                watchedOwnerships
+                    .map((o) => o.share)
+                    .filter((s): s is Fraction => s !== null),
+            ),
+        [watchedOwnerships],
     );
-
-    const totalShare = fields.reduce(
-        (acc, _, i) =>
-            acc + parseFloat(form.getValues(`ownerships.${i}.share`) || "0"),
-        0,
-    );
+    const sumIsExact = fractionEqualsOne(sum);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="max-w-3xl">
                 <DialogHeader>
                     <DialogTitle>
                         {t("units.ownershipEditor.title")}
@@ -143,7 +154,7 @@ export function ReplaceOwnershipDialog({
                                 <ReplaceOwnershipFieldItem
                                     key={field.id}
                                     index={index}
-                                    ownerOptions={ownerOptions}
+                                    owners={owners ?? []}
                                     onRemove={remove}
                                     canRemove={fields.length > 1}
                                 />
@@ -161,26 +172,28 @@ export function ReplaceOwnershipDialog({
                                 type="button"
                                 variant="outline"
                                 size="sm"
-                                onClick={() =>
-                                    append({ ownerId: "", share: "0" })
-                                }
+                                onClick={() => append(emptyRow())}
                             >
                                 <PlusIcon className="mr-2 h-4 w-4" />
                                 {t("units.ownershipEditor.addOwner")}
                             </Button>
 
-                            <div className="text-sm font-medium">
+                            <div className="text-right text-sm font-medium">
                                 <span className="text-muted-foreground">
                                     {t("units.ownershipEditor.totalShare")}:{" "}
                                 </span>
                                 <span
                                     className={
-                                        Math.abs(totalShare - 1.0) < 0.0001
+                                        sumIsExact
                                             ? "text-success"
-                                            : "text-destructive"
+                                            : "text-warning"
                                     }
                                 >
-                                    {totalShare.toFixed(4)}
+                                    {sumIsExact
+                                        ? `Σ = ${formatFraction(sum)}`
+                                        : t("units.ownershipEditor.sumHint", {
+                                              sum: formatFraction(sum),
+                                          })}
                                 </span>
                             </div>
                         </div>

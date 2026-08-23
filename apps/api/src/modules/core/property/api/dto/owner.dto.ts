@@ -13,6 +13,11 @@ export const createOwnerSchema = z.object({
     .uuid()
     .optional()
     .describe('Optional user ID if linking to an existing user account'),
+  kind: z
+    .enum(['PERSON', 'LEGAL_ENTITY', 'ASSOCIATION'])
+    .optional()
+    .default('PERSON')
+    .describe('The legal kind of the owner'),
 });
 
 export class CreateOwnerDto extends createZodDto(createOwnerSchema) {}
@@ -40,6 +45,9 @@ export class OwnerResponseDto {
 
   @ApiProperty({ nullable: true, type: String })
   userId!: string | null;
+
+  @ApiProperty({ enum: ['PERSON', 'LEGAL_ENTITY', 'ASSOCIATION'] })
+  kind!: 'PERSON' | 'LEGAL_ENTITY' | 'ASSOCIATION';
 
   @ApiProperty({
     nullable: true,

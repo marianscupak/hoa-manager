@@ -1,44 +1,32 @@
 import { TFunction } from "i18next";
 
-import { DataTable, ColumnDef } from "@hoa-mngr/ui";
+import { Badge, ColumnDef, DataTable } from "@hoa-mngr/ui";
 
-import type {
-    OwnerResponseDto,
-    UnitOwnershipResponseDto,
-} from "@/api/generated/model";
+import type { UnitOwnershipResponseDto } from "@/api/generated/model";
 
 export function getUnitOwnershipColumns(
     t: TFunction<"admin" | "common">,
-    owners: OwnerResponseDto[] | undefined,
 ): ColumnDef<UnitOwnershipResponseDto>[] {
-    const getOwnerName = (ownerId: string) => {
-        return owners?.find((o) => o.id === ownerId)?.displayName ?? ownerId;
-    };
-
     return [
         {
             header: t("units.details.ownership.owner"),
             cell: ({ row }) => (
-                <span className="text-foreground font-medium">
-                    {getOwnerName(row.ownerId)}
+                <span className="text-foreground inline-flex items-center gap-2 font-medium">
+                    {row.members.map((member) => member.displayName).join(", ")}
+                    {row.partyType === "SJM" && (
+                        <Badge variant="primaryTint">SJM</Badge>
+                    )}
                 </span>
             ),
         },
         {
             header: t("units.details.ownership.share"),
-            accessorKey: "share",
             cell: ({ row }) => (
-                <span className="text-muted-foreground">
-                    {(parseFloat(row.share) * 100).toFixed(2)}%
-                </span>
-            ),
-        },
-        {
-            header: t("units.details.ownership.since"),
-            accessorKey: "validFrom",
-            cell: ({ row }) => (
-                <span className="text-muted-foreground">
-                    {new Date(row.validFrom).toLocaleDateString()}
+                <span className="text-foreground">
+                    {row.shareNumerator}/{row.shareDenominator}
+                    <span className="text-muted-foreground ml-2 text-xs">
+                        {row.shareDecimal}
+                    </span>
                 </span>
             ),
         },
@@ -55,18 +43,16 @@ export function getUnitOwnershipColumns(
 
 interface UnitOwnershipsTableProps {
     ownerships: UnitOwnershipResponseDto[] | undefined;
-    owners: OwnerResponseDto[] | undefined;
     isLoading: boolean;
     t: TFunction<"admin" | "common">;
 }
 
 export function UnitOwnershipsTable({
     ownerships,
-    owners,
     isLoading,
     t,
 }: UnitOwnershipsTableProps) {
-    const columns = getUnitOwnershipColumns(t, owners);
+    const columns = getUnitOwnershipColumns(t);
 
     return (
         <DataTable

@@ -32,7 +32,36 @@ export class InvalidOwnershipShareException extends DomainException {
 }
 
 export class InvalidOwnershipSumException extends DomainException {
+  constructor(actualSum?: string) {
+    super(
+      ErrorCode.INVALID_OWNERSHIP_SUM,
+      actualSum
+        ? [{ code: ErrorCode.INVALID_OWNERSHIP_SUM, param: actualSum }]
+        : undefined,
+    );
+  }
+}
+
+export class OwnershipSjmMembersInvalidException extends DomainException {
   constructor() {
-    super(ErrorCode.INVALID_OWNERSHIP_SUM);
+    super(ErrorCode.OWNERSHIP_SJM_MEMBERS_INVALID);
+  }
+}
+
+export class OwnershipMixedAssociationUnsupportedException extends DomainException {
+  constructor() {
+    super(ErrorCode.OWNERSHIP_MIXED_ASSOCIATION_UNSUPPORTED);
+  }
+}
+
+export class OwnershipDuplicateOwnerException extends DomainException {
+  constructor() {
+    super(ErrorCode.OWNERSHIP_DUPLICATE_OWNER);
+  }
+}
+
+export class OwnerAssociationAlreadyExistsException extends DomainException {
+  constructor() {
+    super(ErrorCode.OWNER_ASSOCIATION_ALREADY_EXISTS);
   }
 }

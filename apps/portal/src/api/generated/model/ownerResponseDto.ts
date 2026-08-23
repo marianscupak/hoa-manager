@@ -6,6 +6,7 @@
  * OpenAPI spec version: 1.0
  */
 import type { OwnerResponseDtoInviteStatus } from "./ownerResponseDtoInviteStatus";
+import type { OwnerResponseDtoKind } from "./ownerResponseDtoKind";
 
 export interface OwnerResponseDto {
     id: string;
@@ -15,6 +16,7 @@ export interface OwnerResponseDto {
     email: string | null;
     /** @nullable */
     userId: string | null;
+    kind: OwnerResponseDtoKind;
     /**
      * Status of the invite for this owner, null if no pending invite
      * @nullable

@@ -1,7 +1,11 @@
+import type {
+  OwnerKind,
+  OwnershipPartyInput,
+} from '@/modules/core/property/domain/ownership-plan';
 import {
   Owner,
   Unit,
-  UnitOwnership,
+  UnitOwnershipParty,
 } from '@/modules/core/property/domain/property.entity';
 
 export interface UnitRepository {
@@ -31,10 +35,12 @@ export interface OwnerRepository {
     displayName: string,
     userId: string | null,
     email: string | null,
+    kind: OwnerKind,
   ): Promise<Owner>;
   findById(tenantId: string, ownerId: string): Promise<Owner | null>;
   findByEmail(tenantId: string, email: string): Promise<Owner | null>;
   existsById(tenantId: string, ownerId: string): Promise<boolean>;
+  existsAssociationOwner(tenantId: string): Promise<boolean>;
   listByTenant(tenantId: string): Promise<Owner[]>;
   setUserId(tenantId: string, ownerId: string, userId: string): Promise<void>;
   delete(tenantId: string, ownerId: string): Promise<void>;
@@ -43,14 +49,17 @@ export interface OwnerRepository {
 export const OWNER_REPOSITORY = Symbol('OWNER_REPOSITORY');
 
 export interface UnitOwnershipRepository {
-  listActiveByUnit(tenantId: string, unitId: string): Promise<UnitOwnership[]>;
+  listActiveByUnit(
+    tenantId: string,
+    unitId: string,
+  ): Promise<UnitOwnershipParty[]>;
   closeActiveByUnit(tenantId: string, unitId: string, now: Date): Promise<void>;
   createMany(
     tenantId: string,
     unitId: string,
-    rows: Array<{ ownerId: string; share: string }>,
+    parties: OwnershipPartyInput[],
     now: Date,
-  ): Promise<UnitOwnership[]>;
+  ): Promise<void>;
 }
 
 export const UNIT_OWNERSHIP_REPOSITORY = Symbol('UNIT_OWNERSHIP_REPOSITORY');

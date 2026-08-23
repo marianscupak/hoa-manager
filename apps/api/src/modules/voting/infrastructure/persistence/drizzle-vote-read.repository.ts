@@ -22,6 +22,7 @@ import {
   owners,
   units,
   unitOwnerships,
+  unitOwnershipMembers,
   tenantMemberships,
   voteElectorateUnits,
   ballots,
@@ -299,10 +300,14 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
     const rows = await this.drizzle.db
       .select({ unitId: unitOwnerships.unitId })
       .from(unitOwnerships)
+      .innerJoin(
+        unitOwnershipMembers,
+        eq(unitOwnershipMembers.ownershipId, unitOwnerships.id),
+      )
       .where(
         and(
           eq(unitOwnerships.tenantId, tenantId),
-          eq(unitOwnerships.ownerId, ownerId),
+          eq(unitOwnershipMembers.ownerId, ownerId),
           isNull(unitOwnerships.validTo),
         ),
       );
@@ -312,6 +317,15 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
 
   /**
    * Counts the total number of active owners per unit.
+   *
+   * Counts rows in `unit_ownership_members`, not `unit_ownerships`
+   * rows (parties) — an SJM party is one ownership row but two
+   * individual owners, and the unanimity-consensus math below
+   * (`isSoleOwner`, `consents >= ownerCount - 1`) is keyed to
+   * individual owners, matching `ElectorateDomainService`'s
+   * `findOwnershipRecords`-derived candidate list (one entry per
+   * member). This full-weight-per-owner behavior is intentionally
+   * preserved until Task 8.
    */
   private async getCoOwnerCounts(
     tenantId: string,
@@ -322,9 +336,13 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
     const rows = await this.drizzle.db
       .select({
         unitId: unitOwnerships.unitId,
-        ownerCount: count(unitOwnerships.id),
+        ownerCount: count(unitOwnershipMembers.id),
       })
       .from(unitOwnerships)
+      .innerJoin(
+        unitOwnershipMembers,
+        eq(unitOwnershipMembers.ownershipId, unitOwnerships.id),
+      )
       .where(
         and(
           eq(unitOwnerships.tenantId, tenantId),
@@ -517,11 +535,15 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
         buildingShareDenominator: units.buildingShareDenominator,
       })
       .from(unitOwnerships)
+      .innerJoin(
+        unitOwnershipMembers,
+        eq(unitOwnershipMembers.ownershipId, unitOwnerships.id),
+      )
       .innerJoin(units, eq(unitOwnerships.unitId, units.id))
       .where(
         and(
           eq(unitOwnerships.tenantId, tenantId),
-          eq(unitOwnerships.ownerId, ownerId),
+          eq(unitOwnershipMembers.ownerId, ownerId),
           isNull(unitOwnerships.validTo),
         ),
       );
@@ -865,9 +887,13 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       .from(tenantMemberships)
       .innerJoin(owners, eq(owners.userId, tenantMemberships.userId))
       .innerJoin(
+        unitOwnershipMembers,
+        eq(unitOwnershipMembers.ownerId, owners.id),
+      )
+      .innerJoin(
         unitOwnerships,
         and(
-          eq(unitOwnerships.ownerId, owners.id),
+          eq(unitOwnerships.id, unitOwnershipMembers.ownershipId),
           eq(unitOwnerships.unitId, unitId),
           isNull(unitOwnerships.validTo),
         ),

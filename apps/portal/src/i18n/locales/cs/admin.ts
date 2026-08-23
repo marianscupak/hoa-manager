@@ -13,6 +13,12 @@ export default {
         },
         noEmail: "Bez e-mailu",
         notInvited: "Nepozván",
+        kind: {
+            label: "Typ vlastníka",
+            person: "Fyzická osoba",
+            legalEntity: "Právnická osoba",
+            association: "Společenství vlastníků",
+        },
         create: {
             title: "Přidat vlastníka",
             description:
@@ -101,10 +107,18 @@ export default {
         ownershipEditor: {
             title: "Upravit vlastnictví",
             description:
-                "Přiřaďte vlastníky a jejich podíly pro tuto jednotku. Celkový podíl musí být přesně 1.0.",
+                "Přiřaďte vlastníky a jejich podíly pro tuto jednotku. Celkový podíl musí být přesně 1/1.",
             addOwner: "Přidat vlastníka",
+            partyType: {
+                label: "Typ vlastnictví",
+                sole: "Výhradní vlastnictví",
+                sjm: "SJM (společné jmění manželů)",
+            },
             ownerLabel: "Vlastník",
             ownerPlaceholder: "Vyberte vlastníka",
+            ownerRequiredError: "Vyberte vlastníka",
+            spouseOne: "První manžel/manželka",
+            spouseTwo: "Druhý manžel/manželka",
             shareLabel: "Podíl",
             sharePlaceholder: "Např. 0.5",
             totalShare: "Celkový podíl",
@@ -112,9 +126,12 @@ export default {
             saving: "Ukládání...",
             success: "Vlastnictví bylo úspěšně aktualizováno",
             error: "Nepodařilo se aktualizovat vlastnictví",
-            sumError: "Celkový podíl musí být přesně 1.0",
+            sumError: "Celkový podíl musí být přesně 1/1",
+            sumHint: "Součet podílů je {{sum}}, musí být přesně 1/1",
             duplicateError: "Vlastník je vybrán vícekrát",
-            invalidShareError: "Podíl musí být kladné číslo",
+            membersError:
+                "Neplatný počet nebo výběr vlastníků pro tento typ vlastnictví.",
+            invalidShareError: "Zadejte podíl jako zlomek, např. 1/2",
         },
         delete: {
             title: "Odstranit jednotku",

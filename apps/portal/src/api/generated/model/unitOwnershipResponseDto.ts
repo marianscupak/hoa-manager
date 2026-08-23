@@ -5,14 +5,15 @@
  * The HOA Manager API description
  * OpenAPI spec version: 1.0
  */
+import type { UnitOwnershipMemberResponseDto } from "./unitOwnershipMemberResponseDto";
+import type { UnitOwnershipResponseDtoPartyType } from "./unitOwnershipResponseDtoPartyType";
 
 export interface UnitOwnershipResponseDto {
     id: string;
-    tenantId: string;
-    unitId: string;
-    ownerId: string;
-    share: string;
-    validFrom: string;
-    /** @nullable */
-    validTo: string | null;
+    partyType: UnitOwnershipResponseDtoPartyType;
+    shareNumerator: number;
+    shareDenominator: number;
+    /** Decimal representation of the share, 4dp */
+    shareDecimal: string;
+    members: UnitOwnershipMemberResponseDto[];
 }

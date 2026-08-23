@@ -5,7 +5,6 @@ import { Link, useParams } from "react-router";
 
 import { Button } from "@hoa-mngr/ui";
 
-import { useOwnerControllerGetOwners } from "@/api/generated/property-owners/property-owners";
 import { useUnitControllerGetUnitDetail } from "@/api/generated/property-units/property-units";
 
 import { ReplaceOwnershipDialog } from "../components/replace-ownership-dialog/dialog";
@@ -28,7 +27,6 @@ export function UnitDetailPage() {
         isLoading,
         refetch,
     } = useUnitControllerGetUnitDetail(id);
-    const { data: owners } = useOwnerControllerGetOwners();
 
     if (isLoading) {
         return <div className="p-8 text-center">{t("common:loading")}</div>;
@@ -84,7 +82,6 @@ export function UnitDetailPage() {
 
                 <UnitOwnershipsTable
                     ownerships={unit?.ownerships}
-                    owners={owners}
                     isLoading={isLoading}
                     t={t}
                 />

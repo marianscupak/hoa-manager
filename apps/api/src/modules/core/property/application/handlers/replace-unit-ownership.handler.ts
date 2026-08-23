@@ -15,10 +15,15 @@ import {
   type UnitRepository,
 } from '@/modules/core/property/application/ports/property.repository.port';
 import { UnitOwnershipReplacedAuditEvent } from '@/modules/core/property/audit/events/unit-ownership-replaced.event';
+import { validateOwnershipPlan } from '@/modules/core/property/domain/ownership-plan';
+import type { OwnerRef } from '@/modules/core/property/domain/ownership-plan';
 import {
   InvalidOwnershipShareException,
   InvalidOwnershipSumException,
   OwnerNotFoundException,
+  OwnershipDuplicateOwnerException,
+  OwnershipMixedAssociationUnsupportedException,
+  OwnershipSjmMembersInvalidException,
   UnitNotFoundException,
 } from '@/shared/application/exceptions/property.exceptions';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
@@ -45,62 +50,59 @@ export class ReplaceUnitOwnershipHandler
   async execute(command: ReplaceUnitOwnershipCommand): Promise<void> {
     const { tenantId, unitId, ownerships } = command;
 
-    // 1. Verify unit exists in tenant
     const unit = await this.unitRepo.findById(tenantId, unitId);
-    if (!unit) {
-      throw new UnitNotFoundException();
-    }
+    if (!unit) throw new UnitNotFoundException();
 
-    // 2. Verify all ownerIds exist in tenant
-    for (const ownership of ownerships) {
-      const ownerExists = await this.ownerRepo.existsById(
-        tenantId,
-        ownership.ownerId,
-      );
-      if (!ownerExists) {
-        throw new OwnerNotFoundException();
+    const tenantOwners = await this.ownerRepo.listByTenant(tenantId);
+    const ownerMap = new Map<string, OwnerRef>(
+      tenantOwners.map((o) => [o.id, { id: o.id, kind: o.kind }]),
+    );
+
+    const errors = validateOwnershipPlan(ownerships, ownerMap);
+    if (errors.length > 0) {
+      const first = errors[0];
+      switch (first.code) {
+        case 'UNKNOWN_OWNER':
+          throw new OwnerNotFoundException();
+        case 'INVALID_SHARE':
+          throw new InvalidOwnershipShareException();
+        case 'SUM_NOT_ONE':
+          throw new InvalidOwnershipSumException(
+            `${first.actual.num}/${first.actual.den}`,
+          );
+        case 'SOLE_MEMBER_COUNT':
+        case 'SJM_MEMBER_RULES':
+          throw new OwnershipSjmMembersInvalidException();
+        case 'DUPLICATE_OWNER':
+          throw new OwnershipDuplicateOwnerException();
+        case 'MIXED_ASSOCIATION':
+          throw new OwnershipMixedAssociationUnsupportedException();
       }
     }
 
-    // 3. Validate shares
-    let totalShare = 0;
-    for (const ownership of ownerships) {
-      const shareNum = parseFloat(ownership.share);
-      if (isNaN(shareNum) || shareNum <= 0) {
-        throw new InvalidOwnershipShareException();
-      }
-      totalShare += shareNum;
-    }
-
-    // Check sum(shares) == 1 with tolerance
-    if (Math.abs(totalShare - 1.0) > 0.000001) {
-      throw new InvalidOwnershipSumException();
-    }
-
-    // 4. Transaction: close active rows and insert new ones
     await this.unitOfWork.execute(async () => {
       const now = this.clock.now();
 
-      // Close existing active rows
       await this.ownershipRepo.closeActiveByUnit(tenantId, unitId, now);
-
-      // Insert new rows
       await this.ownershipRepo.createMany(tenantId, unitId, ownerships, now);
 
       const actor = this.auditContext.requireActor();
       const actorLabel = await this.labelResolver.resolveActorLabel(actor);
       const unitLabel = await this.labelResolver.resolveUnitLabel(unitId);
       const ownerLabels = await Promise.all(
-        ownerships.map((o) => this.labelResolver.resolveOwnerLabel(o.ownerId)),
+        ownerships
+          .flatMap((p) => p.memberOwnerIds)
+          .map((ownerId) => this.labelResolver.resolveOwnerLabel(ownerId)),
       );
 
       await this.auditService.append(
         UnitOwnershipReplacedAuditEvent.build({
           tenantId,
           unitId,
-          ownerships: ownerships.map((o) => ({
-            ownerId: o.ownerId,
-            share: o.share,
+          ownerships: ownerships.map((p) => ({
+            partyType: p.partyType,
+            share: `${p.shareNumerator}/${p.shareDenominator}`,
+            memberOwnerIds: p.memberOwnerIds,
           })),
           actor,
           unitLabel,

@@ -35,6 +35,7 @@ import { UpdateUnitCommand } from '@/modules/core/property/application/commands/
 import { GetOwnedUnitsQuery } from '@/modules/core/property/application/queries/get-owned-units/get-owned-units.query';
 import { GetUnitDetailQuery } from '@/modules/core/property/application/queries/get-unit-detail.query';
 import { ListUnitsQuery } from '@/modules/core/property/application/queries/list-units.query';
+import type { OwnershipPartyType } from '@/modules/core/property/domain/ownership-plan';
 import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
 import { Roles, Tenant } from '@/shared/api/decorators/auth.decorators';
 import { ApiErrorResponses } from '@/shared/api/decorators/error.decorators';
@@ -158,7 +159,10 @@ export class UnitController {
       new ReplaceUnitOwnershipCommand(
         tenantCtx.tenantId,
         unitId,
-        dto.ownerships,
+        dto.ownerships.map((o) => ({
+          ...o,
+          partyType: o.partyType as OwnershipPartyType,
+        })),
       ),
     );
   }

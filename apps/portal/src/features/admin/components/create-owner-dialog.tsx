@@ -14,6 +14,7 @@ import {
     DialogTitle,
     Form,
     FormInput,
+    FormSelect,
     toast,
 } from "@hoa-mngr/ui";
 
@@ -26,6 +27,7 @@ import {
 const ownerSchema = z.object({
     displayName: z.string().min(1, "admin:owners.create.required"),
     email: z.string().email().or(z.literal("")).optional(),
+    kind: z.enum(["PERSON", "LEGAL_ENTITY", "ASSOCIATION"]),
 });
 
 type CreateOwnerValues = z.infer<typeof ownerSchema>;
@@ -64,6 +66,7 @@ export function CreateOwnerDialog({
         defaultValues: {
             displayName: "",
             email: "",
+            kind: "PERSON",
         },
     });
 
@@ -71,6 +74,7 @@ export function CreateOwnerDialog({
         createOwner.mutate({
             data: {
                 displayName: values.displayName,
+                kind: values.kind,
                 ...(values.email ? { email: values.email } : {}),
             },
         });
@@ -97,6 +101,24 @@ export function CreateOwnerDialog({
                             placeholder={t(
                                 "owners.create.displayNamePlaceholder",
                             )}
+                        />
+                        <FormSelect
+                            name="kind"
+                            label={t("owners.kind.label")}
+                            options={[
+                                {
+                                    label: t("owners.kind.person"),
+                                    value: "PERSON",
+                                },
+                                {
+                                    label: t("owners.kind.legalEntity"),
+                                    value: "LEGAL_ENTITY",
+                                },
+                                {
+                                    label: t("owners.kind.association"),
+                                    value: "ASSOCIATION",
+                                },
+                            ]}
                         />
                         <FormInput
                             name="email"

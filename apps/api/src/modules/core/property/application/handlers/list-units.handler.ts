@@ -9,6 +9,7 @@ import {
 } from '@/modules/core/property/application/ports/property.repository.port';
 import { ListUnitsQuery } from '@/modules/core/property/application/queries/list-units.query';
 import { Unit } from '@/modules/core/property/domain/property.entity';
+import { Rational } from '@/shared/domain/rational';
 
 export interface UnitWithStatus extends Unit {
   isOwnershipComplete: boolean;
@@ -38,11 +39,12 @@ export class ListUnitsHandler
         unit.id,
       );
 
-      const sum = ownerships.reduce(
-        (acc, curr) => acc + parseFloat(curr.share),
-        0,
+      const sum = Rational.sum(
+        ownerships.map((o) =>
+          Rational.from(o.shareNumerator, o.shareDenominator),
+        ),
       );
-      const isComplete = Math.abs(sum - 1.0) <= 0.000001;
+      const isComplete = sum.eq(Rational.one());
 
       result.push({
         ...unit,

@@ -27,7 +27,15 @@ export default {
         "An owner with this email already exists in this association.",
     INVALID_OWNERSHIP_SHARE: "Ownership share must be a positive number.",
     INVALID_OWNERSHIP_SUM:
-        "Total ownership shares must sum exactly to 1.0 (100%).",
+        "Total ownership shares must sum exactly to 1/1 (100%).",
+    OWNERSHIP_SJM_MEMBERS_INVALID:
+        "An SJM party must have exactly two distinct owners, both persons.",
+    OWNERSHIP_MIXED_ASSOCIATION_UNSUPPORTED:
+        "Ownership by the association cannot be combined with other owners.",
+    OWNERSHIP_DUPLICATE_OWNER:
+        "An owner appears more than once in the ownership split.",
+    OWNER_ASSOCIATION_ALREADY_EXISTS:
+        "An association owner already exists in this association.",
     UNKNOWN: "An unexpected error occurred. Please try again later.",
     VOTE_NOT_FOUND: "Vote not found.",
     VOTE_NOT_DRAFT:

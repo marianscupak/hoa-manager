@@ -7,6 +7,7 @@ import {
   type OwnerRepository,
 } from '@/modules/core/property/application/ports/property.repository.port';
 import { ListOwnersQuery } from '@/modules/core/property/application/queries/list-owners.query';
+import type { OwnerKind } from '@/modules/core/property/domain/ownership-plan';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 
 export interface OwnerWithInviteStatus {
@@ -15,6 +16,7 @@ export interface OwnerWithInviteStatus {
   displayName: string;
   email: string | null;
   userId: string | null;
+  kind: OwnerKind;
   inviteStatus: 'pending' | 'expired' | null;
   createdAt: Date;
   updatedAt: Date;

@@ -5,7 +5,8 @@
     "exports": {
         ".": "./index.ts",
         "./globals.css": "./globals.css",
-        "./lib/utils": "./lib/utils.ts"
+        "./lib/utils": "./lib/utils.ts",
+        "./lib/fraction": "./lib/fraction.ts"
     },
     "license": "MIT",
     "scripts": {

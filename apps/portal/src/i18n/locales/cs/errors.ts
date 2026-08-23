@@ -30,7 +30,14 @@ export default {
         "Vlastník s tímto e-mailem v tomto společenství již existuje.",
     INVALID_OWNERSHIP_SHARE: "Vlastnický podíl musí být kladné číslo.",
     INVALID_OWNERSHIP_SUM:
-        "Součet vlastnických podílů musí být přesně 1.0 (100 %).",
+        "Součet vlastnických podílů musí být přesně 1/1 (100 %).",
+    OWNERSHIP_SJM_MEMBERS_INVALID:
+        "SJM musí mít přesně dva různé vlastníky, oba fyzické osoby.",
+    OWNERSHIP_MIXED_ASSOCIATION_UNSUPPORTED:
+        "Vlastnictví jednotky společenstvím nelze kombinovat s dalšími vlastníky.",
+    OWNERSHIP_DUPLICATE_OWNER: "Vlastník se v rozdělení podílů opakuje.",
+    OWNER_ASSOCIATION_ALREADY_EXISTS:
+        "Vlastník typu společenství v tomto společenství již existuje.",
     UNKNOWN: "Došlo k neočekávané chybě. Zkuste to prosím později.",
     VOTE_NOT_FOUND: "Hlasování nebylo nalezeno.",
     VOTE_NOT_DRAFT: "Hlasování již není v režimu konceptu a nelze jej měnit.",

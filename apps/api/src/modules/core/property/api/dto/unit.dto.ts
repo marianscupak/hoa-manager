@@ -50,16 +50,16 @@ export class CreateUnitResponseDto {
   unitId!: string;
 }
 
+const ownershipPartySchema = z.object({
+  partyType: z.enum(['SOLE', 'SJM']),
+  shareNumerator: z.number().int().min(1),
+  shareDenominator: z.number().int().min(1),
+  memberOwnerIds: z.array(z.string().uuid()).min(1).max(2),
+});
+
 export const replaceOwnershipsSchema = z.object({
   ownerships: z
-    .array(
-      z.object({
-        ownerId: z.uuid(),
-        share: z
-          .string()
-          .regex(/^\d+(\.\d+)?$/, 'Must be a valid decimal number'),
-      }),
-    )
+    .array(ownershipPartySchema)
     .min(1, 'At least one ownership is required')
     .describe('List of ownerships to replace the current active ones'),
 });
@@ -91,21 +91,28 @@ export class UnitResponseDto {
   updatedAt!: Date;
 }
 
-export class UnitOwnershipResponseDto {
-  @ApiProperty()
-  id!: string;
-  @ApiProperty()
-  tenantId!: string;
-  @ApiProperty()
-  unitId!: string;
+export class UnitOwnershipMemberResponseDto {
   @ApiProperty()
   ownerId!: string;
   @ApiProperty()
-  share!: string;
+  displayName!: string;
+  @ApiProperty({ enum: ['PERSON', 'LEGAL_ENTITY', 'ASSOCIATION'] })
+  kind!: 'PERSON' | 'LEGAL_ENTITY' | 'ASSOCIATION';
+}
+
+export class UnitOwnershipResponseDto {
   @ApiProperty()
-  validFrom!: Date;
-  @ApiProperty({ nullable: true, type: Date })
-  validTo!: Date | null;
+  id!: string;
+  @ApiProperty({ enum: ['SOLE', 'SJM'] })
+  partyType!: 'SOLE' | 'SJM';
+  @ApiProperty()
+  shareNumerator!: number;
+  @ApiProperty()
+  shareDenominator!: number;
+  @ApiProperty({ description: 'Decimal representation of the share, 4dp' })
+  shareDecimal!: string;
+  @ApiProperty({ type: [UnitOwnershipMemberResponseDto] })
+  members!: UnitOwnershipMemberResponseDto[];
 }
 
 export class UnitDetailResponseDto extends UnitResponseDto {

@@ -6,6 +6,7 @@ import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
 import {
   owners,
   tenantMemberships,
+  unitOwnershipMembers,
   unitOwnerships,
   units,
 } from '@/infrastructure/db/schema';
@@ -64,30 +65,36 @@ export class DrizzleUnitReadRepository implements UnitReadRepository {
     tenantId: string;
     membershipId: string;
   }): Promise<OwnedUnitRow[]> {
-    // `unit_ownerships` has no `membership_id` column — it points at
-    // `owner_id`, and owners link to a user via `owners.user_id`. The
-    // owner -> membership join therefore mirrors the pattern used by
-    // `DrizzleElectorateDataRepository.findOwnershipRecords`: match the
-    // owner to the membership row sharing the same `(tenant_id, user_id)`
-    // pair.
+    // `unit_ownerships` no longer has an `owner_id` column — a party's
+    // members live in `unit_ownership_members`, and owners link to a
+    // user via `owners.user_id`. The owner -> membership join therefore
+    // mirrors the pattern used by
+    // `DrizzleElectorateDataRepository.findOwnershipRecords`: bridge
+    // through `unit_ownership_members` to the owner, then match the
+    // owner to the membership row sharing the same `(tenant_id,
+    // user_id)` pair.
     //
-    // `share` is stored on a 0..1 scale (per `list-units.handler`'s
-    // `Math.abs(sum - 1.0)` completeness check), so multiplying by 100
-    // converts it to a percentage. `buildingShareNumerator /
-    // buildingShareDenominator * 100` matches the formula used by
-    // `getOverview`'s `buildingShareSum`. Both are rounded to two
-    // decimal places for consistency.
-    //
-    // GROUP BY unit guarantees one row per unit even in the (data-bug)
-    // case where a membership owns the same unit through two active
-    // ownership rows — the percentages are summed rather than
-    // duplicated.
+    // `owners_tenant_user_unique` guarantees at most one owner per
+    // (tenant, user), and `closeActiveByUnit` + `createMany` +
+    // `validateOwnershipPlan`'s DUPLICATE_OWNER check guarantee an owner
+    // is a member of at most one active party per unit at a time — so
+    // this join yields at most one row per unit per membership and no
+    // aggregation is needed. `shareNumerator / shareDenominator` is the
+    // party's full undivided share (an SJM party isn't split between its
+    // two member-owners), converted to a percentage the same way
+    // `buildingShareNumerator / buildingShareDenominator * 100` is in
+    // `getOverview`'s `buildingShareSum` — both rounded to two decimal
+    // places for consistency.
     const rows = await this.db
       .select({
         id: units.id,
         unitNo: units.unitNo,
+        partyType: unitOwnerships.partyType,
         ownerSharePct: sql<number>`ROUND(
-          (SUM(${unitOwnerships.share}) * 100)::numeric,
+          (
+            ${unitOwnerships.shareNumerator}::numeric
+            / NULLIF(${unitOwnerships.shareDenominator}, 0)::numeric
+          ) * 100,
           2
         )::float8`,
         buildingSharePct: sql<number>`ROUND(
@@ -107,7 +114,11 @@ export class DrizzleUnitReadRepository implements UnitReadRepository {
           isNull(unitOwnerships.validTo),
         ),
       )
-      .innerJoin(owners, eq(unitOwnerships.ownerId, owners.id))
+      .innerJoin(
+        unitOwnershipMembers,
+        eq(unitOwnershipMembers.ownershipId, unitOwnerships.id),
+      )
+      .innerJoin(owners, eq(unitOwnershipMembers.ownerId, owners.id))
       .innerJoin(
         tenantMemberships,
         and(
@@ -120,23 +131,19 @@ export class DrizzleUnitReadRepository implements UnitReadRepository {
           eq(units.tenantId, params.tenantId),
           eq(tenantMemberships.id, params.membershipId),
         ),
-      )
-      .groupBy(
-        units.id,
-        units.unitNo,
-        units.buildingShareNumerator,
-        units.buildingShareDenominator,
       );
 
     return rows.map(
       (r: {
         id: string;
         unitNo: string;
+        partyType: 'SOLE' | 'SJM';
         ownerSharePct: number | null;
         buildingSharePct: number | null;
       }) => ({
         id: r.id,
         unitNo: r.unitNo,
+        partyType: r.partyType,
         ownerSharePct: Number(r.ownerSharePct ?? 0),
         buildingSharePct: Number(r.buildingSharePct ?? 0),
       }),

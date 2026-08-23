@@ -5,12 +5,15 @@
  * The HOA Manager API description
  * OpenAPI spec version: 1.0
  */
+import type { OwnedUnitResponseDtoPartyType } from "./ownedUnitResponseDtoPartyType";
 
 export interface OwnedUnitResponseDto {
     id: string;
     unitNo: string;
     /** Caller's share of the unit, as a percentage */
     ownerSharePct: number;
+    /** The party type through which the caller holds the unit */
+    partyType: OwnedUnitResponseDtoPartyType;
     /** Unit's share of the building, as a percentage */
     buildingSharePct: number;
 }

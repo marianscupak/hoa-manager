@@ -25,6 +25,7 @@ export interface OwnedUnitRow {
   unitNo: string;
   ownerSharePct: number;
   buildingSharePct: number;
+  partyType: 'SOLE' | 'SJM';
 }
 
 export interface UnitReadRepository {

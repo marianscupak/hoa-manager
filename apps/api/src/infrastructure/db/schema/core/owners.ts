@@ -1,7 +1,20 @@
-import { pgTable, text, timestamp, uuid, unique } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  pgEnum,
+  text,
+  timestamp,
+  uuid,
+  unique,
+} from 'drizzle-orm/pg-core';
 
 import { tenants } from '@/infrastructure/db/schema/core/tenants';
 import { users } from '@/infrastructure/db/schema/core/users';
+
+export const ownerKindEnum = pgEnum('owner_kind', [
+  'PERSON',
+  'LEGAL_ENTITY',
+  'ASSOCIATION',
+]);
 
 export const owners = pgTable(
   'owners',
@@ -11,6 +24,7 @@ export const owners = pgTable(
       .notNull()
       .references(() => tenants.id, { onDelete: 'cascade' }),
     displayName: text('display_name').notNull(),
+    kind: ownerKindEnum('kind').notNull().default('PERSON'),
     email: text('email'),
     userId: uuid('user_id').references(() => users.id, {
       onDelete: 'set null',

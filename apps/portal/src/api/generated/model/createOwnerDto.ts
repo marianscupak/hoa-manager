@@ -5,6 +5,7 @@
  * The HOA Manager API description
  * OpenAPI spec version: 1.0
  */
+import type { CreateOwnerDtoKind } from "./createOwnerDtoKind";
 
 export interface CreateOwnerDto {
     /**
@@ -23,4 +24,6 @@ export interface CreateOwnerDto {
      * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
      */
     userId?: string;
+    /** The legal kind of the owner */
+    kind?: CreateOwnerDtoKind;
 }

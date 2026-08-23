@@ -13,6 +13,12 @@ export default {
         },
         noEmail: "No email address",
         notInvited: "Not invited",
+        kind: {
+            label: "Owner Type",
+            person: "Person",
+            legalEntity: "Legal Entity",
+            association: "Owners' Association",
+        },
         create: {
             title: "Add Owner",
             description:
@@ -101,10 +107,18 @@ export default {
         ownershipEditor: {
             title: "Edit Ownership",
             description:
-                "Assign owners and their shares for this unit. The total share must equal 1.0.",
+                "Assign owners and their shares for this unit. The total share must equal 1/1.",
             addOwner: "Add Owner",
+            partyType: {
+                label: "Ownership Type",
+                sole: "Sole Ownership",
+                sjm: "SJM (Joint Marital Property)",
+            },
             ownerLabel: "Owner",
             ownerPlaceholder: "Select an owner",
+            ownerRequiredError: "Select an owner",
+            spouseOne: "Spouse One",
+            spouseTwo: "Spouse Two",
             shareLabel: "Share",
             sharePlaceholder: "E.g. 0.5",
             totalShare: "Total Share",
@@ -112,9 +126,12 @@ export default {
             saving: "Saving...",
             success: "Ownership updated successfully",
             error: "Failed to update ownership",
-            sumError: "Total share must be exactly 1.0",
+            sumError: "Total share must be exactly 1/1",
+            sumHint: "Shares sum to {{sum}}, must be exactly 1/1",
             duplicateError: "Duplicate owner selected",
-            invalidShareError: "Share must be a positive number",
+            membersError:
+                "Invalid number or selection of owners for this ownership type.",
+            invalidShareError: "Enter the share as a fraction, e.g. 1/2",
         },
         delete: {
             title: "Delete Unit",

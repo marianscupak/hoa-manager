@@ -6,7 +6,13 @@ import { Visibility } from '@/modules/core/audit/domain/visibility';
 import { CoreEventType } from '@/modules/core/audit-projections/core-event-types';
 
 const PayloadSchema = z.object({
-  ownerships: z.array(z.object({ ownerId: z.uuid(), share: z.string() })),
+  ownerships: z.array(
+    z.object({
+      partyType: z.enum(['SOLE', 'SJM']),
+      share: z.string(),
+      memberOwnerIds: z.array(z.string()),
+    }),
+  ),
   labels: z.object({
     unitLabel: z.string(),
     changedBy: z.string(),
@@ -25,7 +31,11 @@ export const UnitOwnershipReplacedAuditEvent = defineAuditEvent({
   build(input: {
     tenantId: string;
     unitId: string;
-    ownerships: { ownerId: string; share: string }[];
+    ownerships: {
+      partyType: 'SOLE' | 'SJM';
+      share: string;
+      memberOwnerIds: string[];
+    }[];
     actor: AuditActor;
     unitLabel: string;
     changedByLabel: string;

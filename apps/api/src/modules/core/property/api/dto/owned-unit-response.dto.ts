@@ -13,6 +13,12 @@ export class OwnedUnitResponseDto {
   ownerSharePct!: number;
 
   @ApiProperty({
+    enum: ['SOLE', 'SJM'],
+    description: 'The party type through which the caller holds the unit',
+  })
+  partyType!: 'SOLE' | 'SJM';
+
+  @ApiProperty({
     description: "Unit's share of the building, as a percentage",
   })
   buildingSharePct!: number;

@@ -5,6 +5,7 @@ import { DrizzleService } from '@/infrastructure/db/drizzle.service';
 import {
   owners,
   tenantMemberships,
+  unitOwnershipMembers,
   unitOwnerships,
   units,
   voteUnitConsents,
@@ -40,11 +41,15 @@ export class DrizzleElectorateDataRepository
     return await this.drizzle.db
       .select({
         unitId: unitOwnerships.unitId,
-        ownerId: unitOwnerships.ownerId,
+        ownerId: unitOwnershipMembers.ownerId,
         membershipId: tenantMemberships.id,
       })
       .from(unitOwnerships)
-      .innerJoin(owners, eq(unitOwnerships.ownerId, owners.id))
+      .innerJoin(
+        unitOwnershipMembers,
+        eq(unitOwnershipMembers.ownershipId, unitOwnerships.id),
+      )
+      .innerJoin(owners, eq(unitOwnershipMembers.ownerId, owners.id))
       .leftJoin(
         tenantMemberships,
         and(

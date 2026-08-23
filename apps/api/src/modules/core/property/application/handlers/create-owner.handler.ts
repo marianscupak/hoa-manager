@@ -12,7 +12,11 @@ import {
   type OwnerRepository,
 } from '@/modules/core/property/application/ports/property.repository.port';
 import { OwnerCreatedAuditEvent } from '@/modules/core/property/audit/events/owner-created.event';
-import { DuplicateOwnerEmailException } from '@/shared/application/exceptions/property.exceptions';
+import { OwnerKind } from '@/modules/core/property/domain/ownership-plan';
+import {
+  DuplicateOwnerEmailException,
+  OwnerAssociationAlreadyExistsException,
+} from '@/shared/application/exceptions/property.exceptions';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 import { normalizeEmail } from '@/shared/application/utils/normalize-email';
 
@@ -60,12 +64,20 @@ export class CreateOwnerHandler
       }
     }
 
+    if (command.kind === OwnerKind.ASSOCIATION) {
+      const exists = await this.ownerRepo.existsAssociationOwner(
+        command.tenantId,
+      );
+      if (exists) throw new OwnerAssociationAlreadyExistsException();
+    }
+
     return this.uow.execute(async () => {
       const newOwner = await this.ownerRepo.create(
         command.tenantId,
         command.displayName,
         resolvedUserId,
         email,
+        command.kind,
       );
 
       const actor = this.auditContext.requireActor();

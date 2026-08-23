@@ -1,18 +1,28 @@
 import { Injectable } from '@nestjs/common';
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, eq, inArray, isNull } from 'drizzle-orm';
 
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
 import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
-import { owners, unitOwnerships, units } from '@/infrastructure/db/schema';
+import {
+  owners,
+  unitOwnershipMembers,
+  unitOwnerships,
+  units,
+} from '@/infrastructure/db/schema';
 import {
   OwnerRepository,
   UnitOwnershipRepository,
   UnitRepository,
 } from '@/modules/core/property/application/ports/property.repository.port';
 import {
+  OwnershipPartyInput,
+  type OwnerKind,
+  type OwnershipPartyType,
+} from '@/modules/core/property/domain/ownership-plan';
+import {
   Owner,
   Unit,
-  UnitOwnership,
+  UnitOwnershipParty,
 } from '@/modules/core/property/domain/property.entity';
 
 @Injectable()
@@ -94,6 +104,7 @@ export class DrizzleOwnerRepository implements OwnerRepository {
     displayName: string,
     userId: string | null,
     email: string | null,
+    kind: OwnerKind,
   ): Promise<Owner> {
     const [inserted] = await this.db
       .insert(owners)
@@ -102,6 +113,7 @@ export class DrizzleOwnerRepository implements OwnerRepository {
         displayName,
         userId,
         email,
+        kind,
       })
       .returning();
     return inserted;
@@ -127,6 +139,15 @@ export class DrizzleOwnerRepository implements OwnerRepository {
       columns: { id: true },
     });
     return !!row;
+  }
+
+  async existsAssociationOwner(tenantId: string): Promise<boolean> {
+    const rows = await this.db
+      .select({ id: owners.id })
+      .from(owners)
+      .where(and(eq(owners.tenantId, tenantId), eq(owners.kind, 'ASSOCIATION')))
+      .limit(1);
+    return rows.length > 0;
   }
 
   async listByTenant(tenantId: string): Promise<Owner[]> {
@@ -167,14 +188,45 @@ export class DrizzleUnitOwnershipRepository implements UnitOwnershipRepository {
   async listActiveByUnit(
     tenantId: string,
     unitId: string,
-  ): Promise<UnitOwnership[]> {
-    return this.db.query.unitOwnerships.findMany({
+  ): Promise<UnitOwnershipParty[]> {
+    const parties = await this.db.query.unitOwnerships.findMany({
       where: and(
         eq(unitOwnerships.tenantId, tenantId),
         eq(unitOwnerships.unitId, unitId),
         isNull(unitOwnerships.validTo),
       ),
     });
+    if (parties.length === 0) return [];
+
+    const partyIds = parties.map(
+      (p: typeof unitOwnerships.$inferSelect) => p.id,
+    );
+    const memberRows = await this.db
+      .select({
+        ownershipId: unitOwnershipMembers.ownershipId,
+        ownerId: unitOwnershipMembers.ownerId,
+      })
+      .from(unitOwnershipMembers)
+      .where(inArray(unitOwnershipMembers.ownershipId, partyIds));
+
+    const membersByParty = new Map<string, string[]>();
+    for (const row of memberRows) {
+      const existing = membersByParty.get(row.ownershipId) ?? [];
+      existing.push(row.ownerId);
+      membersByParty.set(row.ownershipId, existing);
+    }
+
+    return parties.map((party: typeof unitOwnerships.$inferSelect) => ({
+      id: party.id,
+      tenantId: party.tenantId,
+      unitId: party.unitId,
+      partyType: party.partyType as OwnershipPartyType,
+      shareNumerator: party.shareNumerator,
+      shareDenominator: party.shareDenominator,
+      validFrom: party.validFrom,
+      validTo: party.validTo,
+      memberOwnerIds: membersByParty.get(party.id) ?? [],
+    }));
   }
 
   async closeActiveByUnit(
@@ -197,19 +249,28 @@ export class DrizzleUnitOwnershipRepository implements UnitOwnershipRepository {
   async createMany(
     tenantId: string,
     unitId: string,
-    rows: Array<{ ownerId: string; share: string }>,
+    parties: OwnershipPartyInput[],
     now: Date,
-  ): Promise<UnitOwnership[]> {
-    if (rows.length === 0) return [];
-
-    const values = rows.map((row) => ({
-      tenantId,
-      unitId,
-      ownerId: row.ownerId,
-      share: row.share,
-      validFrom: now,
-    }));
-
-    return this.db.insert(unitOwnerships).values(values).returning();
+  ): Promise<void> {
+    for (const party of parties) {
+      const [row] = await this.db
+        .insert(unitOwnerships)
+        .values({
+          tenantId,
+          unitId,
+          partyType: party.partyType,
+          shareNumerator: party.shareNumerator,
+          shareDenominator: party.shareDenominator,
+          validFrom: now,
+        })
+        .returning({ id: unitOwnerships.id });
+      await this.db.insert(unitOwnershipMembers).values(
+        party.memberOwnerIds.map((ownerId) => ({
+          tenantId,
+          ownershipId: row.id,
+          ownerId,
+        })),
+      );
+    }
   }
 }

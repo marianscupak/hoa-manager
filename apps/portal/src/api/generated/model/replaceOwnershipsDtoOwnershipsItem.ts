@@ -5,10 +5,23 @@
  * The HOA Manager API description
  * OpenAPI spec version: 1.0
  */
+import type { ReplaceOwnershipsDtoOwnershipsItemPartyType } from "./replaceOwnershipsDtoOwnershipsItemPartyType";
 
 export type ReplaceOwnershipsDtoOwnershipsItem = {
-    /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
-    ownerId: string;
-    /** @pattern ^\d+(\.\d+)?$ */
-    share: string;
+    partyType: ReplaceOwnershipsDtoOwnershipsItemPartyType;
+    /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+    shareNumerator: number;
+    /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+    shareDenominator: number;
+    /**
+     * @minItems 1
+     * @maxItems 2
+     */
+    memberOwnerIds: string[];
 };

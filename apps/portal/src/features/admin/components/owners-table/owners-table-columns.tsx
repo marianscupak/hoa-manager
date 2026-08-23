@@ -14,8 +14,18 @@ export const getOwnerColumns = (
 ): ColumnDef<OwnerResponseDto>[] => [
     {
         header: t("owners.table.displayName"),
-        accessorKey: "displayName",
-        className: "font-semibold",
+        cell: ({ row }) => (
+            <span className="inline-flex items-center gap-2 font-semibold">
+                {row.displayName}
+                {row.kind !== "PERSON" && (
+                    <Badge variant="neutral">
+                        {row.kind === "LEGAL_ENTITY"
+                            ? t("owners.kind.legalEntity")
+                            : t("owners.kind.association")}
+                    </Badge>
+                )}
+            </span>
+        ),
     },
     {
         header: t("owners.table.email"),

@@ -34,18 +34,26 @@ import {
     type WizardStepId,
 } from "./layout/wizard-shell";
 import { CreateVoteBasicInfoStep } from "./steps/basic-info-step";
+import { ModeStep } from "./steps/mode-step";
 import { CreateVoteQuestionsStep } from "./steps/questions-step";
 import { buildReviewChecks, ReviewStep } from "./steps/review-step";
 import { CreateVoteRulesetStep } from "./steps/ruleset-step";
 
 export type { WizardStepId };
 
-const STEP_ORDER: WizardStepId[] = ["details", "rules", "questions", "review"];
+const STEP_ORDER: WizardStepId[] = [
+    "mode",
+    "details",
+    "rules",
+    "questions",
+    "review",
+];
 
 /** Only the active step is mounted, so exactly one form ever carries this id. */
 const STEP_FORM_ID = "wizard-step-form";
 
 const STEP_LABEL_KEYS: Record<WizardStepId, string> = {
+    mode: "voting:wizard.steps.mode",
     details: "voting:wizard.steps.details",
     rules: "voting:wizard.steps.rules",
     questions: "voting:wizard.steps.questions",
@@ -63,13 +71,21 @@ export function CreateVoteWizard({
     const { t } = useTranslation(["voting"]);
     const queryClient = useQueryClient();
 
-    const [activeStep, setActiveStep] = useState<WizardStepId>("details");
+    const [activeStep, setActiveStep] = useState<WizardStepId>("mode");
     const [createdVoteId, setCreatedVoteId] = useState<string | null>(
         initialVoteId ?? null,
     );
     const [activeFormDirty, setActiveFormDirty] = useState(false);
     const [activeSaving, setActiveSaving] = useState(false);
     const [documentsSettling, setDocumentsSettling] = useState(false);
+    // True while the rules step's draft has a blocking (tier1) legal-validity
+    // issue — see CreateVoteRulesetStep's onBlockedChange.
+    const [rulesetBlocked, setRulesetBlocked] = useState(false);
+    // Free choice before a draft exists; once the vote is created, mode is
+    // immutable, so voteData.mode (server truth) always wins once it loads.
+    const [selectedMode, setSelectedMode] = useState<
+        "PER_ROLLAM" | "ASSEMBLY_RECORD"
+    >("PER_ROLLAM");
 
     const voteId = createdVoteId ?? initialVoteId ?? null;
 
@@ -105,6 +121,20 @@ export function CreateVoteWizard({
 
     const voteData = voteQuery.data as VoteDetailResponseDto | undefined;
 
+    // Mode is immutable once the vote exists, so voteData.mode (server
+    // truth) always wins over the local pre-creation selection.
+    const mode = voteData?.mode ?? selectedMode;
+
+    const handleModeChange = useCallback(
+        (nextMode: "PER_ROLLAM" | "ASSEMBLY_RECORD") => {
+            if (nextMode === mode) return;
+            if (window.confirm(t("voting:create.mode.switchResets"))) {
+                setSelectedMode(nextMode);
+            }
+        },
+        [mode, t],
+    );
+
     useEffect(() => {
         if (!createdVoteId) return;
 
@@ -119,6 +149,7 @@ export function CreateVoteWizard({
     const goToStep = useCallback((step: WizardStepId) => {
         setActiveFormDirty(false);
         setActiveSaving(false);
+        setRulesetBlocked(false);
         setActiveStep(step);
     }, []);
 
@@ -172,7 +203,9 @@ export function CreateVoteWizard({
                 : index === activeIndex
                   ? "active"
                   : "upcoming",
-        enabled: !documentsSettling && (id === "details" || hasDraft),
+        enabled:
+            !documentsSettling &&
+            (id === "mode" || id === "details" || hasDraft),
         badge: id === "questions" ? questionCount : undefined,
     }));
 
@@ -235,7 +268,11 @@ export function CreateVoteWizard({
                     total: STEP_ORDER.length,
                 })}
             </span>
-            {activeStep === "questions" ? (
+            {activeStep === "mode" ? (
+                <Button onClick={() => goToStep("details")}>
+                    {t("voting:wizard.continue")}
+                </Button>
+            ) : activeStep === "questions" ? (
                 <Button onClick={() => goToStep("review")}>
                     {t("voting:wizard.toReview")}
                 </Button>
@@ -257,7 +294,11 @@ export function CreateVoteWizard({
                 <Button
                     type="submit"
                     form={STEP_FORM_ID}
-                    disabled={activeSaving || documentsSettling}
+                    disabled={
+                        activeSaving ||
+                        documentsSettling ||
+                        (activeStep === "rules" && rulesetBlocked)
+                    }
                 >
                     {activeSaving || documentsSettling ? (
                         <Loader2 className="animate-spin" />
@@ -283,12 +324,27 @@ export function CreateVoteWizard({
                 }
                 footer={footer}
             >
+                {activeStep === "mode" && (
+                    <div className="space-y-6">
+                        <div>
+                            <h1 className="font-display text-2xl font-extrabold tracking-tight">
+                                {t("voting:create.steps.mode.title")}
+                            </h1>
+                            <p className="text-muted-foreground mt-1.5 text-sm">
+                                {t("voting:create.steps.mode.description")}
+                            </p>
+                        </div>
+                        <ModeStep value={mode} onChange={handleModeChange} />
+                    </div>
+                )}
+
                 {activeStep === "details" && (
                     <>
                         <CreateVoteBasicInfoStep
                             formId={STEP_FORM_ID}
                             onSuccess={handleBasicInfoSuccess}
                             voteId={voteId}
+                            mode={mode}
                             initialData={voteData}
                             onDirtyChange={setActiveFormDirty}
                             onSavingChange={setActiveSaving}
@@ -309,10 +365,12 @@ export function CreateVoteWizard({
                     <CreateVoteRulesetStep
                         formId={STEP_FORM_ID}
                         voteId={voteId}
+                        mode={mode}
                         onSuccess={handleRulesetSuccess}
                         initialData={voteData?.ruleset}
                         onDirtyChange={setActiveFormDirty}
                         onSavingChange={setActiveSaving}
+                        onBlockedChange={setRulesetBlocked}
                     />
                 )}
 

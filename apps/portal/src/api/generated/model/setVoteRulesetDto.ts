@@ -5,27 +5,21 @@
  * The HOA Manager API description
  * OpenAPI spec version: 1.0
  */
+import type { SetVoteRulesetDtoMajorityComparator } from "./setVoteRulesetDtoMajorityComparator";
+import type { SetVoteRulesetDtoMajorityDenominatorBasis } from "./setVoteRulesetDtoMajorityDenominatorBasis";
 import type { SetVoteRulesetDtoMajorityRuleType } from "./setVoteRulesetDtoMajorityRuleType";
-import type { SetVoteRulesetDtoQuorumElectorateBasis } from "./setVoteRulesetDtoQuorumElectorateBasis";
-import type { SetVoteRulesetDtoQuorumMeasure } from "./setVoteRulesetDtoQuorumMeasure";
+import type { SetVoteRulesetDtoMajorityThreshold } from "./setVoteRulesetDtoMajorityThreshold";
+import type { SetVoteRulesetDtoQuorum } from "./setVoteRulesetDtoQuorum";
 import type { SetVoteRulesetDtoWeightBasis } from "./setVoteRulesetDtoWeightBasis";
 
 export interface SetVoteRulesetDto {
     weightBasis: SetVoteRulesetDtoWeightBasis;
-    quorumMeasure: SetVoteRulesetDtoQuorumMeasure;
-    quorumElectorateBasis: SetVoteRulesetDtoQuorumElectorateBasis;
-    /**
-     * @minimum 0
-     * @maximum 100
-     */
-    quorumThreshold: number;
+    /** @nullable */
+    quorum: SetVoteRulesetDtoQuorum;
     majorityRuleType: SetVoteRulesetDtoMajorityRuleType;
-    /**
-     * @minimum 0
-     * @maximum 100
-     */
-    majorityThreshold?: number;
+    majorityDenominatorBasis: SetVoteRulesetDtoMajorityDenominatorBasis;
+    majorityThreshold?: SetVoteRulesetDtoMajorityThreshold;
+    majorityComparator?: SetVoteRulesetDtoMajorityComparator;
     allowAbstain: boolean;
-    abstainExcludedFromMajorityDenominator: boolean;
-    allowCoOwnerIndividualVote: boolean;
+    acknowledgedNonStatutory?: boolean;
 }

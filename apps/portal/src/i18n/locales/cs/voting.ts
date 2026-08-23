@@ -18,12 +18,24 @@ export const voting = {
         save: "Uložit",
         cancel: "Zrušit",
     },
+    mode: {
+        PER_ROLLAM: {
+            label: "Per rollam",
+            citation: "§ 1210–1214 OZ",
+        },
+        ASSEMBLY_RECORD: {
+            label: "Záznam shromáždění",
+            citation: "§ 1206 OZ",
+        },
+    },
     rules: {
         sentence:
             "Ke schválení je potřeba {{majority}} {{denominator}}, {{weighting}}.",
         majoritySimple: "prostá většina (více než 50 %)",
         majorityQualified: "kvalifikovaná většina (alespoň {{threshold}} %)",
+        majorityUnanimity: "jednomyslný souhlas (100 %)",
         ofVotesCast: "z odevzdaných hlasů",
+        ofAllVotes: "ze všech hlasů",
         ofVotesCastExclAbstain: "z odevzdaných hlasů (bez zdržení se)",
         weightedByShares: "vážených podle vlastnických podílů",
         onePerUnit: "jeden hlas za jednotku",
@@ -32,7 +44,28 @@ export const voting = {
     },
     create: {
         description: "Nastavte nové hlasování pro společenství.",
+        mode: {
+            PER_ROLLAM: {
+                title: "Hlasování per rollam",
+                description:
+                    "Písemné hlasování mimo zasedání. Rozhoduje většina hlasů **všech** vlastníků; lhůta min. 15 dnů.",
+                citation: "§ 1210–1214 OZ",
+            },
+            ASSEMBLY_RECORD: {
+                title: "Záznam shromáždění",
+                description:
+                    "Zápis výsledků prezenčního shromáždění. Kvórum nadpoloviční většiny všech hlasů; rozhoduje většina přítomných.",
+                citation: "§ 1206 OZ",
+            },
+            switchResets:
+                "Změna typu hlasování obnoví pravidla hlasování na zákonné výchozí nastavení pro zvolený typ. Pokračovat?",
+        },
         steps: {
+            mode: {
+                title: "Typ hlasování",
+                description:
+                    "Vyberte, zda se jedná o hlasování per rollam, nebo o záznam shromáždění. Po vytvoření hlasování už typ nelze změnit.",
+            },
             basicInfo: {
                 title: "Základní údaje",
                 description: "Zadejte hlavní údaje pro toto hlasování.",
@@ -143,27 +176,15 @@ export const voting = {
                     },
                 },
             },
-            quorumElectorateBasis: {
-                label: "Základ pro výpočet kvóra",
-                placeholder: "Vyberte základ",
-                options: {
-                    ALL_UNITS: "Všechny jednotky",
-                    ELIGIBLE_UNITS_ONLY: "Pouze oprávněné jednotky",
-                },
+            quorum: {
+                label: "Kvórum",
+                perRollamNone:
+                    "Hlasování per rollam nemá kvórum — rozhoduje většina hlasů všech vlastníků (§ 1214 OZ).",
             },
             quorumMeasure: {
-                label: "Způsob výpočtu kvóra",
-                placeholder: "Vyberte způsob výpočtu",
                 options: {
                     UNIT_SHARE: "Podle podílu",
                     UNIT_COUNT: "Podle počtu jednotek",
-                },
-            },
-            quorumThreshold: {
-                label: "Požadované kvórum",
-                errors: {
-                    positiveNumber: "Musí být kladné číslo",
-                    max: "Nesmí být více než 100 %",
                 },
             },
             majorityRuleType: {
@@ -172,21 +193,19 @@ export const voting = {
                 options: {
                     SIMPLE_MAJORITY: "Prostá většina (>50 %)",
                     QUALIFIED_MAJORITY: "Kvalifikovaná většina",
+                    UNANIMITY: "Jednomyslnost (100 %)",
                 },
-                cards: {
-                    SIMPLE_MAJORITY: {
-                        hint: "Více než 50 % odevzdaných hlasů",
-                    },
-                    QUALIFIED_MAJORITY: {
-                        hint: "Vámi nastavená vyšší hranice, např. 75 %",
-                    },
+            },
+            majorityDenominatorBasis: {
+                label: "Základ pro výpočet většiny",
+                options: {
+                    VOTES_CAST: "Z odevzdaných hlasů",
+                    ALL_VOTES: "Ze všech hlasů",
                 },
             },
             majorityThreshold: {
                 label: "Požadovaná většina",
                 errors: {
-                    positiveNumber: "Musí být kladné číslo",
-                    max: "Nesmí být více než 100 %",
                     requiredForQualified:
                         "Při kvalifikované většině je nutné vyplnit",
                 },
@@ -196,17 +215,38 @@ export const voting = {
                 description:
                     "Umožní hlasujícím se výslovně zdržet hlasování v otázkách.",
             },
-            abstainExcluded: {
-                label: "Vyloučit 'Zdržuji se' z většiny?",
-                description:
-                    "Pokud je zaškrtnuto, hlasy 'Zdržuji se' nebudou započítány do základu pro výpočet většiny.",
-            },
-            allowCoOwnerIndividualVote: {
-                label: "Povolit spoluvlastníkům hlasovat samostatně?",
-                description:
-                    "Pokud je povoleno, každý spoluvlastník jednotky může hlasovat samostatně, místo aby museli zvolit jednoho společného zástupce.",
-            },
             time: "Čas",
+        },
+        thresholdPicker: {
+            customLabel: "Vlastní zlomek",
+            percentLabel: "Procenta",
+            comparatorLabel: "Podmínka",
+            comparator: {
+                AT_LEAST: "alespoň",
+                STRICT_GREATER: "více než",
+            },
+        },
+        legal: {
+            tier1: {
+                MAJORITY_BELOW_FLOOR:
+                    "Požadovaná většina je nižší než zákonné minimum nadpoloviční většiny.",
+                PER_ROLLAM_QUORUM_PRESENT:
+                    "Hlasování per rollam nesmí mít nastaveno kvórum.",
+                PER_ROLLAM_BASIS_NOT_ALL_VOTES:
+                    "Hlasování per rollam musí počítat většinu ze všech hlasů, nikoli jen z odevzdaných.",
+                ASSEMBLY_QUORUM_MISSING:
+                    "Záznam shromáždění musí mít nastaveno kvórum.",
+                ASSEMBLY_QUORUM_BELOW_FLOOR:
+                    "Kvórum je nižší než zákonné minimum nadpoloviční většiny.",
+            },
+            tier3: {
+                ONE_UNIT_ONE_VOTE: "hlasování jedna jednotka = jeden hlas",
+                UNIT_COUNT_QUORUM: "kvórum podle počtu jednotek",
+            },
+            ackLabel:
+                "Potvrzuji, že stanovy našeho SVJ výslovně umožňují: {{deviations}}",
+            overrideStricterOnly:
+                "Přepsání může pravidla většiny pouze zpřísnit, nikdy zmírnit.",
         },
         documents: {
             title: "Dokumenty",
@@ -246,8 +286,9 @@ export const voting = {
         saved: "Všechny změny uloženy",
         unsaved: "Neuložené změny",
         saving: "Ukládám…",
-        railTitle: "Nastavení ve 4 krocích",
+        railTitle: "Nastavení v 5 krocích",
         steps: {
+            mode: "Typ hlasování",
             details: "Základní údaje",
             rules: "Pravidla hlasování",
             questions: "Otázky",
@@ -266,6 +307,8 @@ export const voting = {
                 "Po naplánování budou vlastníci informováni a nastavení už nepůjde upravit.",
             keepDraft: "Ponechat jako koncept",
             scheduleAction: "Naplánovat hlasování",
+            quorumLine: "Kvórum: {{comparator}} {{threshold}}.",
+            majorityLine: "Většina: {{comparator}} {{threshold}}.",
             checks: {
                 VOTE_SCHEDULE_MISSING_DATES:
                     "Datum zahájení a ukončení je vyplněno",
@@ -297,8 +340,6 @@ export const voting = {
             noDescription: "Nebyl poskytnut žádný popis.",
             voteRequired: "Váš hlas je vyžadován.",
             voteAction: "Hlasovat",
-            delegationNeededSubtitle:
-                "Před zahájením hlasování je potřeba souhlas spoluvlastníků.",
             manageDelegation: "Spravovat delegaci",
             readyToVoteSubtitle: "Jste oprávněni, jakmile hlasování začne.",
             viewDetails: "Zobrazit detail",
@@ -324,6 +365,12 @@ export const voting = {
         REJECTED: "Zamítnuto",
         NOT_DECIDED: "Nerozhodnuto",
         winner: "Vítězí {{option}}",
+    },
+    status: {
+        requiresDelegation:
+            "Jednotka potřebuje společného zástupce — souhlas spoluvlastníků s nadpoloviční většinou podílů (§ 1185 odst. 2 OZ).",
+        requiresDelegationSjm:
+            "U jednotky ve společném jmění manželů musí zástupce potvrdit i druhý z manželů.",
     },
     detail: {
         backToVoting: "Hlasování",
@@ -373,6 +420,8 @@ export const voting = {
                 VOTE_QUESTION_MISSING_OPTIONS:
                     "Otázka „{{param}}“ musí mít alespoň dvě možnosti odpovědi.",
                 VOTE_RULESET_REQUIRED: "Musí být nastaven výchozí ruleset.",
+                VOTE_WINDOW_TOO_SHORT_PER_ROLLAM:
+                    "Hlasovací okno per rollam musí trvat alespoň 15 dnů (§ 1211 odst. 2 OZ).",
             },
         },
         documents: {
@@ -397,11 +446,14 @@ export const voting = {
                 NO_REPRESENTATIVE: "Nebyl zvolen společný zástupce.",
                 MISSING_OWNERSHIP:
                     "Chybí informace o vlastnictví v době zahájení.",
+                ASSOCIATION_OWNED:
+                    "Jednotka je ve vlastnictví společenství a nemá hlasovací právo.",
             },
-            delegationWarning:
-                "{{unitName}} je v podílovém spoluvlastnictví. Musí být zvolen společný zástupce.",
             manageDelegation: "Spravovat delegaci",
             totalPower: "Celková síla hlasu:",
+            totalPowerVotes_one: "{{count}} hlas",
+            totalPowerVotes_few: "{{count}} hlasy",
+            totalPowerVotes_other: "{{count}} hlasů",
             voteButton: "Hlasovat",
             alreadyVotedButton: "Již odhlasováno",
             ballotsFinal: "Odevzdané hlasy jsou konečné a nelze je změnit.",
@@ -423,8 +475,8 @@ export const voting = {
         cancelExisting: "Zrušit delegaci",
         selectUnit: "Vyberte jednotku",
         whoWillRepresent: "Kdo vás bude zastupovat?",
-        searchByCoOwner: "Hledat spoluvlastníky podle jména",
-        noCandidatesFound: "Nebyli nalezeni žádní způsobilí spoluvlastníci.",
+        searchByCoOwner: "Hledat zástupce podle jména",
+        noCandidatesFound: "Nebyli nalezeni žádní způsobilí zástupci.",
         noSelectableUnits:
             "Všechny vaše jednotky jsou již v tomto hlasování delegovány.",
         assignedToYou: "Pověřil(a) vás",
@@ -435,7 +487,7 @@ export const voting = {
         notice: {
             title: "Důležité upozornění",
             description:
-                "Jakmile delegujete svůj hlas pro tuto jednotku, nemůžete v tomto konkrétním hlasování hlasovat osobně, dokud delegaci nezrušíte před začátkem hlasování.",
+                "Společný zástupce se volí souhlasem spoluvlastníků s nadpoloviční většinou podílů (§ 1185 odst. 2 OZ). Jakmile delegujete svůj hlas pro tuto jednotku, nemůžete v tomto konkrétním hlasování hlasovat osobně, dokud delegaci nezrušíte před začátkem hlasování.",
         },
         summary: {
             title: "Přehled delegace",
@@ -466,6 +518,9 @@ export const voting = {
             terms: "Pokračováním potvrzujete, že tato delegace je v souladu se stanovami SVJ. Tato akce uděluje plnou hlasovací moc pro tento konkrétní bod programu určenému zástupci uvedenému výše.",
             allowAction: "Povolit osobě hlasovat mým jménem",
         },
+    },
+    delegation: {
+        coOwner: "Spoluvlastník",
     },
     delegations: {
         tabs: {
@@ -574,15 +629,23 @@ export const voting = {
             expandDetails: "Zobrazit detaily",
             collapseDetails: "Skrýt detaily",
         },
+        perRollamDenominator:
+            "Většina se počítá ze všech hlasů v domě (§ 1214 OZ).",
     },
     resultsV2: {
         participationLine:
             "Zúčastnili se vlastníci s {{pct}} % podílů ({{units}} z {{total}} jednotek).",
         participationLineUnits:
             "Hlasovalo {{pct}} % jednotek ({{units}} z {{total}} jednotek).",
+        participationExactTitle:
+            "Přesně: {{participationNum}}/{{participationDen}} z {{totalNum}}/{{totalDen}}",
         quorumMetLine: "Usnášeníschopnost {{threshold}} % byla splněna.",
         quorumNotMetLine:
             "Usnášeníschopnost {{threshold}} % nebyla splněna — usnesení nejsou rozhodnuta.",
+        thresholdCaption:
+            "Práh: {{comparator}} {{fraction}} (základ {{denominator}})",
+        thresholdDenominatorShare: "{{percent}} % podílů",
+        thresholdExactTitle: "Přesný základ: {{num}}/{{den}}",
         multipleChoice: "více možností",
         ranLine:
             "Hlasování probíhalo {{from}} – {{to}} · výsledky vypočteny {{computed}}",

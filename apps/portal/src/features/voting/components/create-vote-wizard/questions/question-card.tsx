@@ -184,6 +184,7 @@ export function QuestionCard({
                             <OptionsList />
 
                             <QuestionRulesetOverride
+                                mode={vote.mode}
                                 hasOverride={form.watch("useCustomRuleset")}
                                 isOverrideVisible={isOverrideVisible}
                                 onToggleVisibility={() => {

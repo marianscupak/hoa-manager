@@ -12,4 +12,5 @@ export type UpdateVoteQuestionDtoRulesetOverrideMajorityRuleType =
 export const UpdateVoteQuestionDtoRulesetOverrideMajorityRuleType = {
     SIMPLE_MAJORITY: "SIMPLE_MAJORITY",
     QUALIFIED_MAJORITY: "QUALIFIED_MAJORITY",
+    UNANIMITY: "UNANIMITY",
 } as const;

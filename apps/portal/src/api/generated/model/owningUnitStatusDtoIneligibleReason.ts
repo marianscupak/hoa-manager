@@ -16,4 +16,5 @@ export type OwningUnitStatusDtoIneligibleReason =
 export const OwningUnitStatusDtoIneligibleReason = {
     NO_REPRESENTATIVE: "NO_REPRESENTATIVE",
     MISSING_OWNERSHIP: "MISSING_OWNERSHIP",
+    ASSOCIATION_OWNED: "ASSOCIATION_OWNED",
 } as const;

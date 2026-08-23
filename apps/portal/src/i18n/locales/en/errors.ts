@@ -54,8 +54,6 @@ export default {
     NOT_A_UNIT_OWNER: "You are not an owner of this unit.",
     MEMBERSHIP_HAS_NO_ASSOCIATED_OWNER:
         "Your membership is not correctly linked to an owner profile.",
-    MUTUAL_DELEGATION_NOT_ALLOWED:
-        "Mutual delegation is not allowed. This person has already delegated their vote to you.",
     LAST_ADMIN_CANNOT_BE_REMOVED:
         "The last administrator cannot be removed or assigned a different role.",
     BALLOT_ALREADY_CAST: "You have already cast a ballot for this vote.",
@@ -63,8 +61,16 @@ export default {
     FORBIDDEN: "You do not have permission to perform this action.",
     INCOMPLETE_VOTE: "The vote configuration is incomplete.",
     INVALID_BALLOT_ANSWERS: "The submitted ballot answers are invalid.",
-    INVALID_QUESTION_RULESET_OVERRIDE:
-        "The question ruleset override is invalid.",
+    VOTE_RULESET_SUBLEGAL:
+        "The selected voting rules violate the statutory floor and cannot be saved.",
+    VOTE_RULESET_ACK_REQUIRED:
+        "You must confirm that the bylaws permit the selected deviation from the statutory rules.",
+    VOTE_RULESET_OVERRIDE_NOT_STRICTER:
+        "The question's rule override must be stricter than the vote's default rules.",
+    VOTE_WINDOW_TOO_SHORT_PER_ROLLAM:
+        "The per-rollam voting window must last at least 15 days (§ 1211(2) OZ).",
+    VOTE_BUILDING_SHARES_INCOMPLETE:
+        "Building unit shares don't add up to 1/1 — current total {{param}}. Complete the units before opening the vote.",
     MEMBERSHIP_NOT_FOUND: "User membership not found in this association.",
     NOT_UNIT_REPRESENTATIVE:
         "You are not the designated representative for this unit.",

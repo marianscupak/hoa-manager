@@ -13,11 +13,7 @@ import {
 } from "@/api/generated/model";
 import { useVotesControllerUpdateVoteQuestion } from "@/api/generated/votes/votes";
 
-import {
-    createVoteRulesetSchema,
-    majorityThresholdRefinement,
-    rulesetDefaultValues,
-} from "../../shared/ruleset-schema";
+import { rulesetFieldSchemas } from "../../shared/ruleset-schema";
 import { mapQuestionToUpdateDto } from "../../shared/voting-wizard.utils";
 
 const questionSchema = z
@@ -26,19 +22,10 @@ const questionSchema = z
         description: z.string().optional(),
         type: z.nativeEnum(CreateVoteQuestionDtoType),
         useCustomRuleset: z.boolean(),
-        weightBasis: createVoteRulesetSchema.shape.weightBasis,
-        quorumMeasure: createVoteRulesetSchema.shape.quorumMeasure,
-        quorumElectorateBasis:
-            createVoteRulesetSchema.shape.quorumElectorateBasis,
-        quorumThreshold: createVoteRulesetSchema.shape.quorumThreshold,
-        majorityRuleType: createVoteRulesetSchema.shape.majorityRuleType,
-        majorityThreshold: createVoteRulesetSchema.shape.majorityThreshold,
-        allowAbstain: createVoteRulesetSchema.shape.allowAbstain,
-        abstainExcludedFromMajorityDenominator:
-            createVoteRulesetSchema.shape
-                .abstainExcludedFromMajorityDenominator,
-        allowCoOwnerIndividualVote:
-            createVoteRulesetSchema.shape.allowCoOwnerIndividualVote,
+        majorityRuleType: rulesetFieldSchemas.majorityRuleType,
+        majorityDenominatorBasis: rulesetFieldSchemas.majorityDenominatorBasis,
+        majorityThreshold: rulesetFieldSchemas.majorityThreshold,
+        majorityComparator: rulesetFieldSchemas.majorityComparator,
         options: z.array(
             z.object({
                 id: z.string().optional(),
@@ -49,12 +36,44 @@ const questionSchema = z
         ),
     })
     .superRefine((data, ctx) => {
-        if (data.useCustomRuleset) {
-            majorityThresholdRefinement(data, ctx);
+        if (
+            data.useCustomRuleset &&
+            data.majorityRuleType === "QUALIFIED_MAJORITY" &&
+            (!data.majorityThreshold || !data.majorityComparator)
+        ) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message:
+                    "voting:create.fields.majorityThreshold.errors.requiredForQualified",
+                path: ["majorityThreshold"],
+            });
         }
     });
 
 export type QuestionFormValues = z.infer<typeof questionSchema>;
+
+/**
+ * Majority-field defaults for the override form: the question's own
+ * override when it has one, otherwise the vote's base ruleset — so turning
+ * "use custom ruleset" on starts from the currently effective rule rather
+ * than an unrelated hardcoded default. weightBasis/quorum/allowAbstain
+ * aren't part of this form at all (see mapQuestionToUpdateDto): the server
+ * requires an override to match the base ruleset on those dimensions
+ * exactly, so they're echoed from vote.ruleset at submit time instead.
+ */
+function majorityDefaults(
+    vote: VoteDetailResponseDto,
+    question: VoteQuestionResponseDto,
+) {
+    const source = question.rulesetOverride ?? vote.ruleset;
+    return {
+        majorityRuleType: source?.majorityRuleType ?? "SIMPLE_MAJORITY",
+        majorityDenominatorBasis:
+            source?.majorityDenominatorBasis ?? "ALL_VOTES",
+        majorityThreshold: source?.majorityThreshold ?? undefined,
+        majorityComparator: source?.majorityComparator ?? undefined,
+    };
+}
 
 interface UseQuestionFormParams {
     vote: VoteDetailResponseDto;
@@ -78,27 +97,7 @@ export function useQuestionForm({
             description: question.description ?? "",
             type: question.type as CreateVoteQuestionDtoType,
             useCustomRuleset: hasOverride,
-            ...(hasOverride
-                ? {
-                      weightBasis: question.rulesetOverride!.weightBasis,
-                      quorumMeasure: question.rulesetOverride!.quorumMeasure,
-                      quorumElectorateBasis:
-                          question.rulesetOverride!.quorumElectorateBasis,
-                      quorumThreshold:
-                          question.rulesetOverride!.quorumThreshold,
-                      majorityRuleType:
-                          question.rulesetOverride!.majorityRuleType,
-                      majorityThreshold:
-                          question.rulesetOverride!.majorityThreshold ??
-                          undefined,
-                      allowAbstain: question.rulesetOverride!.allowAbstain,
-                      abstainExcludedFromMajorityDenominator:
-                          question.rulesetOverride!
-                              .abstainExcludedFromMajorityDenominator,
-                      allowCoOwnerIndividualVote:
-                          question.rulesetOverride!.allowCoOwnerIndividualVote,
-                  }
-                : rulesetDefaultValues),
+            ...majorityDefaults(vote, question),
             options: (question.options ?? []).map((o) => ({
                 id: o.id,
                 label: o.label,
@@ -117,29 +116,7 @@ export function useQuestionForm({
                 description: question.description ?? "",
                 type: question.type as CreateVoteQuestionDtoType,
                 useCustomRuleset: hasOverride,
-                ...(hasOverride
-                    ? {
-                          weightBasis: question.rulesetOverride!.weightBasis,
-                          quorumMeasure:
-                              question.rulesetOverride!.quorumMeasure,
-                          quorumElectorateBasis:
-                              question.rulesetOverride!.quorumElectorateBasis,
-                          quorumThreshold:
-                              question.rulesetOverride!.quorumThreshold,
-                          majorityRuleType:
-                              question.rulesetOverride!.majorityRuleType,
-                          majorityThreshold:
-                              question.rulesetOverride!.majorityThreshold ??
-                              undefined,
-                          allowAbstain: question.rulesetOverride!.allowAbstain,
-                          abstainExcludedFromMajorityDenominator:
-                              question.rulesetOverride!
-                                  .abstainExcludedFromMajorityDenominator,
-                          allowCoOwnerIndividualVote:
-                              question.rulesetOverride!
-                                  .allowCoOwnerIndividualVote,
-                      }
-                    : rulesetDefaultValues),
+                ...majorityDefaults(vote, question),
                 options: (question.options ?? []).map((o) => ({
                     id: o.id,
                     label: o.label,
@@ -148,10 +125,10 @@ export function useQuestionForm({
                 })),
             });
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [question, form, hasOverride]);
 
     const type = form.watch("type");
-    const allowAbstain = form.watch("allowAbstain");
     const useCustomRuleset = form.watch("useCustomRuleset");
 
     useEffect(() => {
@@ -160,9 +137,11 @@ export function useQuestionForm({
             (o) => o.optionKey === "CUSTOM" || !o.optionKey,
         );
 
-        const effectiveAllowAbstain = useCustomRuleset
-            ? allowAbstain
-            : vote.ruleset?.allowAbstain ?? false;
+        // allowAbstain is vote-level: an override can never change it (the
+        // server requires override.allowAbstain === base.allowAbstain), so
+        // the effective value is always the base ruleset's, regardless of
+        // useCustomRuleset.
+        const effectiveAllowAbstain = vote.ruleset?.allowAbstain ?? false;
 
         if (type === CreateVoteQuestionDtoType.YES_NO) {
             const systemOptions = [
@@ -214,7 +193,6 @@ export function useQuestionForm({
         }
     }, [
         type,
-        allowAbstain,
         useCustomRuleset,
         vote.ruleset?.allowAbstain,
         form,
@@ -252,6 +230,7 @@ export function useQuestionForm({
             description: values.description,
             sortOrder: question.sortOrder,
             useCustomRuleset: values.useCustomRuleset,
+            baseRuleset: vote.ruleset,
             rulesetValues: values,
             options: values.options as VoteQuestionResponseDto["options"],
         });

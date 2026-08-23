@@ -12,4 +12,5 @@ export type SetVoteRulesetResponseDtoMajorityRuleType =
 export const SetVoteRulesetResponseDtoMajorityRuleType = {
     SIMPLE_MAJORITY: "SIMPLE_MAJORITY",
     QUALIFIED_MAJORITY: "QUALIFIED_MAJORITY",
+    UNANIMITY: "UNANIMITY",
 } as const;

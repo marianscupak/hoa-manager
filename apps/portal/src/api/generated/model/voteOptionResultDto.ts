@@ -5,9 +5,11 @@
  * The HOA Manager API description
  * OpenAPI spec version: 1.0
  */
+import type { FractionDto } from "./fractionDto";
 
 export interface VoteOptionResultDto {
     optionId: string;
-    voteWeight: number;
+    voteWeight: FractionDto;
+    percent: string;
     voteUnitCount: number;
 }

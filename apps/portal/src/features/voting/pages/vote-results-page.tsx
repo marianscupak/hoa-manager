@@ -20,6 +20,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@hoa-mngr/ui";
 
 import { VoteActivityTab } from "../components/activity/vote-activity-tab";
 import { AuditExportButton } from "../components/audit-export-button";
+import { ModeBadge } from "../components/mode-badge";
 import { ParticipationBanner } from "../components/results/participation-banner";
 import { VerdictCard } from "../components/results/verdict-card";
 import { StatusBadge } from "../components/status-badge";
@@ -155,6 +156,7 @@ export function VoteResultsPage() {
                             {vote.title}
                         </h1>
                         <StatusBadge status={vote.status} />
+                        <ModeBadge mode={vote.mode} />
                     </div>
                     {ranLine && (
                         <p className="text-muted-foreground mt-2 text-sm">

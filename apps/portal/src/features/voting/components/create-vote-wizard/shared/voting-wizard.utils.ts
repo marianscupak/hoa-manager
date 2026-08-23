@@ -1,16 +1,15 @@
 import {
     CreateVoteQuestionDtoType,
-    SetVoteRulesetDtoMajorityRuleType as MajorityRuleType,
-    SetVoteRulesetDtoQuorumElectorateBasis as QuorumElectorateBasis,
-    SetVoteRulesetDtoQuorumMeasure as QuorumMeasure,
-    SetVoteRulesetDtoWeightBasis as VoteWeightBasis,
+    SetVoteRulesetResponseDto,
     UpdateVoteQuestionDto,
     VoteQuestionResponseDto,
 } from "@/api/generated/model";
 
+import type { CreateVoteRulesetValues } from "./ruleset-schema";
+
 /**
  * Shared utility to build the UpdateVoteQuestionDto from form values or existing question data.
- * Ensures consistent handling of numeric fields and ruleset overrides.
+ * Ensures consistent handling of the ruleset override.
  */
 export function mapQuestionToUpdateDto(params: {
     title: string;
@@ -18,17 +17,22 @@ export function mapQuestionToUpdateDto(params: {
     description?: string;
     sortOrder: number;
     useCustomRuleset?: boolean;
-    rulesetValues?: {
-        weightBasis: VoteWeightBasis;
-        quorumMeasure: QuorumMeasure;
-        quorumElectorateBasis: QuorumElectorateBasis;
-        quorumThreshold: number | string;
-        majorityRuleType: MajorityRuleType;
-        majorityThreshold?: number | string | null;
-        allowAbstain: boolean;
-        abstainExcludedFromMajorityDenominator: boolean;
-        allowCoOwnerIndividualVote: boolean;
-    };
+    /**
+     * The vote's base ruleset. A question override may only tighten the
+     * majority rule (majorityRuleType / majorityDenominatorBasis /
+     * threshold / comparator) — the server's validateQuestionOverride
+     * requires weightBasis, quorum and allowAbstain to equal the base
+     * ruleset exactly, so those three are always echoed from here rather
+     * than taken from the (majority-only) override form.
+     */
+    baseRuleset?: SetVoteRulesetResponseDto | null;
+    rulesetValues?: Pick<
+        CreateVoteRulesetValues,
+        | "majorityRuleType"
+        | "majorityDenominatorBasis"
+        | "majorityThreshold"
+        | "majorityComparator"
+    >;
     options: VoteQuestionResponseDto["options"];
 }): UpdateVoteQuestionDto {
     const {
@@ -37,29 +41,23 @@ export function mapQuestionToUpdateDto(params: {
         description,
         sortOrder,
         useCustomRuleset,
+        baseRuleset,
         rulesetValues,
         options,
     } = params;
 
     const rulesetOverride =
-        useCustomRuleset && rulesetValues
+        useCustomRuleset && rulesetValues && baseRuleset
             ? {
-                  weightBasis: rulesetValues.weightBasis,
-                  quorumMeasure: rulesetValues.quorumMeasure,
-                  quorumElectorateBasis: rulesetValues.quorumElectorateBasis,
-                  quorumThreshold: Number(rulesetValues.quorumThreshold),
+                  weightBasis: baseRuleset.weightBasis,
+                  quorum: baseRuleset.quorum,
+                  allowAbstain: baseRuleset.allowAbstain,
+                  acknowledgedNonStatutory: baseRuleset.acknowledgedNonStatutory,
                   majorityRuleType: rulesetValues.majorityRuleType,
-                  majorityThreshold:
-                      rulesetValues.majorityThreshold !== undefined &&
-                      rulesetValues.majorityThreshold !== null &&
-                      String(rulesetValues.majorityThreshold) !== ""
-                          ? Number(rulesetValues.majorityThreshold)
-                          : undefined,
-                  allowAbstain: rulesetValues.allowAbstain,
-                  abstainExcludedFromMajorityDenominator:
-                      rulesetValues.abstainExcludedFromMajorityDenominator,
-                  allowCoOwnerIndividualVote:
-                      rulesetValues.allowCoOwnerIndividualVote,
+                  majorityDenominatorBasis:
+                      rulesetValues.majorityDenominatorBasis,
+                  majorityThreshold: rulesetValues.majorityThreshold,
+                  majorityComparator: rulesetValues.majorityComparator,
               }
             : undefined;
 

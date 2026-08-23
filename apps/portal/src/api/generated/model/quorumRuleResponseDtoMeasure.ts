@@ -6,10 +6,10 @@
  * OpenAPI spec version: 1.0
  */
 
-export type SetVoteRulesetResponseDtoQuorumMeasure =
-    (typeof SetVoteRulesetResponseDtoQuorumMeasure)[keyof typeof SetVoteRulesetResponseDtoQuorumMeasure];
+export type QuorumRuleResponseDtoMeasure =
+    (typeof QuorumRuleResponseDtoMeasure)[keyof typeof QuorumRuleResponseDtoMeasure];
 
-export const SetVoteRulesetResponseDtoQuorumMeasure = {
+export const QuorumRuleResponseDtoMeasure = {
     UNIT_SHARE: "UNIT_SHARE",
     UNIT_COUNT: "UNIT_COUNT",
 } as const;

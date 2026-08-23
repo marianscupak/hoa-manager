@@ -6,6 +6,7 @@
  * OpenAPI spec version: 1.0
  */
 import type { QuestionOutcomeDto } from "./questionOutcomeDto";
+import type { VoteListItemResponseDtoMode } from "./voteListItemResponseDtoMode";
 import type { VoterSummaryDto } from "./voterSummaryDto";
 
 export interface VoteListItemResponseDto {
@@ -18,7 +19,7 @@ export interface VoteListItemResponseDto {
     /** @nullable */
     scheduledTo?: string | null;
     status: string;
+    mode: VoteListItemResponseDtoMode;
     voterSummary?: VoterSummaryDto | null;
-    allowCoOwnerIndividualVote: boolean;
     questionOutcomes?: QuestionOutcomeDto[];
 }

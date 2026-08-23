@@ -55,8 +55,6 @@ export default {
     NOT_A_UNIT_OWNER: "Nejste vlastníkem této jednotky.",
     MEMBERSHIP_HAS_NO_ASSOCIATED_OWNER:
         "Vaše členství není správně propojeno s profilem vlastníka.",
-    MUTUAL_DELEGATION_NOT_ALLOWED:
-        "Vzájemné delegování není povoleno. Tato osoba na vás již svůj hlas delegovala.",
     LAST_ADMIN_CANNOT_BE_REMOVED:
         "Posledního administrátora nelze odstranit ani mu změnit roli.",
     BALLOT_ALREADY_CAST: "V tomto hlasování jste již odevzdali svůj hlas.",
@@ -64,7 +62,16 @@ export default {
     FORBIDDEN: "K provedení této akce nemáte dostatečná oprávnění.",
     INCOMPLETE_VOTE: "Konfigurace hlasování není úplná.",
     INVALID_BALLOT_ANSWERS: "Odevzdané odpovědi v hlasování jsou neplatné.",
-    INVALID_QUESTION_RULESET_OVERRIDE: "Přepsání pravidel otázky je neplatné.",
+    VOTE_RULESET_SUBLEGAL:
+        "Zvolená pravidla hlasování porušují zákonné minimum a nelze je uložit.",
+    VOTE_RULESET_ACK_REQUIRED:
+        "Je nutné potvrdit, že stanovy umožňují zvolenou odchylku od zákonných pravidel.",
+    VOTE_RULESET_OVERRIDE_NOT_STRICTER:
+        "Přepsání pravidel pro otázku musí být přísnější než výchozí pravidla hlasování.",
+    VOTE_WINDOW_TOO_SHORT_PER_ROLLAM:
+        "Hlasovací okno per rollam musí trvat alespoň 15 dnů (§ 1211 odst. 2 OZ).",
+    VOTE_BUILDING_SHARES_INCOMPLETE:
+        "Podíly jednotek na domě nedávají dohromady 1/1 — aktuální součet {{param}}. Doplňte jednotky před otevřením hlasování.",
     MEMBERSHIP_NOT_FOUND:
         "Členství uživatele v tomto společenství nebylo nalezeno.",
     NOT_UNIT_REPRESENTATIVE: "Nejste určeným zástupcem pro tuto jednotku.",

@@ -19,8 +19,9 @@ function buildResult(
         questionId: "q1",
         majorityMet: false,
         winningOptionId: null,
-        majorityThresholdValue: null,
-        majorityDenominatorValue: 1,
+        majorityThreshold: { num: 1, den: 2 },
+        majorityComparator: "STRICT_GREATER",
+        majorityDenominator: { num: "1", den: "1", decimal: "1.0000" },
         optionResults: [],
         ...overrides,
     };
@@ -103,5 +104,16 @@ describe("mapQuestionVerdict", () => {
         });
 
         expect(outcome.verdict).toBe("notDecided");
+    });
+
+    it("passes a null quorum (per-rollam votes, which have no quorum by law) through to the majority logic", () => {
+        const outcome = mapQuestionVerdict({
+            quorumMet: null,
+            questionType: "YES_NO",
+            result: buildResult({ majorityMet: true, winningOptionId: "o-yes" }),
+            options,
+        });
+
+        expect(outcome.verdict).toBe("approved");
     });
 });

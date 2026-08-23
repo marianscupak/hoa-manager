@@ -2,6 +2,7 @@ import * as fs from 'fs';
 
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { cleanupOpenApiDoc } from 'nestjs-zod';
 
 import { AppModule } from '@/app.module';
 
@@ -18,7 +19,7 @@ async function generateOpenApi() {
     .setVersion('1.0')
     .build();
 
-  const document = SwaggerModule.createDocument(app, config);
+  const document = cleanupOpenApiDoc(SwaggerModule.createDocument(app, config));
   fs.writeFileSync('./openapi-spec.json', JSON.stringify(document, null, 2));
 
   await app.close();

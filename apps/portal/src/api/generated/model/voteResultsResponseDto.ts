@@ -5,16 +5,19 @@
  * The HOA Manager API description
  * OpenAPI spec version: 1.0
  */
+import type { FractionDto } from "./fractionDto";
 import type { VoteQuestionResultDto } from "./voteQuestionResultDto";
 import type { VoteResultsResponseDtoResultStatus } from "./voteResultsResponseDtoResultStatus";
 
 export interface VoteResultsResponseDto {
     resultStatus: VoteResultsResponseDtoResultStatus;
-    quorumMet: boolean;
-    participationWeight: number;
+    /** @nullable */
+    quorumMet: boolean | null;
+    participationWeight: FractionDto;
+    participationPercent: string;
     participationUnitCount: number;
-    denominatorWeight: number;
-    denominatorUnitCount: number;
+    totalVotesWeight: FractionDto;
+    totalVotesUnitCount: number;
     computedAt: string;
     questionResults: VoteQuestionResultDto[];
 }

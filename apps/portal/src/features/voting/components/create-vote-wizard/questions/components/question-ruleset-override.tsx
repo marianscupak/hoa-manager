@@ -6,6 +6,7 @@ import { Button, cn } from "@hoa-mngr/ui";
 import { RulesetFormFields } from "../../shared/ruleset-form-fields";
 
 interface QuestionRulesetOverrideProps {
+    mode: "PER_ROLLAM" | "ASSEMBLY_RECORD";
     hasOverride: boolean;
     isOverrideVisible: boolean;
     onToggleVisibility: () => void;
@@ -13,6 +14,7 @@ interface QuestionRulesetOverrideProps {
 }
 
 export function QuestionRulesetOverride({
+    mode,
     hasOverride,
     isOverrideVisible,
     onToggleVisibility,
@@ -49,11 +51,16 @@ export function QuestionRulesetOverride({
             {isOverrideVisible && (
                 <div className="mt-4 rounded-md border bg-slate-50/50 p-4">
                     <div className="mb-4 flex items-center justify-between">
-                        <p className="text-muted-foreground text-sm">
-                            {t(
-                                "voting:create.steps.questions.override.description",
-                            )}
-                        </p>
+                        <div className="space-y-1">
+                            <p className="text-muted-foreground text-sm">
+                                {t(
+                                    "voting:create.steps.questions.override.description",
+                                )}
+                            </p>
+                            <p className="text-muted-foreground text-xs">
+                                {t("voting:create.legal.overrideStricterOnly")}
+                            </p>
+                        </div>
                         {hasOverride && (
                             <Button
                                 type="button"
@@ -70,10 +77,7 @@ export function QuestionRulesetOverride({
                         )}
                     </div>
 
-                    <RulesetFormFields
-                        showCoOwnerOption={false}
-                        variant="majorityOnly"
-                    />
+                    <RulesetFormFields mode={mode} variant="majorityOnly" />
                 </div>
             )}
         </div>

@@ -5,27 +5,21 @@
  * The HOA Manager API description
  * OpenAPI spec version: 1.0
  */
+import type { UpdateVoteQuestionDtoRulesetOverrideMajorityComparator } from "./updateVoteQuestionDtoRulesetOverrideMajorityComparator";
+import type { UpdateVoteQuestionDtoRulesetOverrideMajorityDenominatorBasis } from "./updateVoteQuestionDtoRulesetOverrideMajorityDenominatorBasis";
 import type { UpdateVoteQuestionDtoRulesetOverrideMajorityRuleType } from "./updateVoteQuestionDtoRulesetOverrideMajorityRuleType";
-import type { UpdateVoteQuestionDtoRulesetOverrideQuorumElectorateBasis } from "./updateVoteQuestionDtoRulesetOverrideQuorumElectorateBasis";
-import type { UpdateVoteQuestionDtoRulesetOverrideQuorumMeasure } from "./updateVoteQuestionDtoRulesetOverrideQuorumMeasure";
+import type { UpdateVoteQuestionDtoRulesetOverrideMajorityThreshold } from "./updateVoteQuestionDtoRulesetOverrideMajorityThreshold";
+import type { UpdateVoteQuestionDtoRulesetOverrideQuorum } from "./updateVoteQuestionDtoRulesetOverrideQuorum";
 import type { UpdateVoteQuestionDtoRulesetOverrideWeightBasis } from "./updateVoteQuestionDtoRulesetOverrideWeightBasis";
 
 export type UpdateVoteQuestionDtoRulesetOverride = {
     weightBasis: UpdateVoteQuestionDtoRulesetOverrideWeightBasis;
-    quorumMeasure: UpdateVoteQuestionDtoRulesetOverrideQuorumMeasure;
-    quorumElectorateBasis: UpdateVoteQuestionDtoRulesetOverrideQuorumElectorateBasis;
-    /**
-     * @minimum 0
-     * @maximum 100
-     */
-    quorumThreshold: number;
+    /** @nullable */
+    quorum: UpdateVoteQuestionDtoRulesetOverrideQuorum;
     majorityRuleType: UpdateVoteQuestionDtoRulesetOverrideMajorityRuleType;
-    /**
-     * @minimum 0
-     * @maximum 100
-     */
-    majorityThreshold?: number;
+    majorityDenominatorBasis: UpdateVoteQuestionDtoRulesetOverrideMajorityDenominatorBasis;
+    majorityThreshold?: UpdateVoteQuestionDtoRulesetOverrideMajorityThreshold;
+    majorityComparator?: UpdateVoteQuestionDtoRulesetOverrideMajorityComparator;
     allowAbstain: boolean;
-    abstainExcludedFromMajorityDenominator: boolean;
-    allowCoOwnerIndividualVote: boolean;
+    acknowledgedNonStatutory?: boolean;
 };

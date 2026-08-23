@@ -83,7 +83,7 @@ export function resolveVoteStatus(
         if (summary?.requiresDelegation) {
             return {
                 line: {
-                    text: t("list.card.delegationNeededSubtitle"),
+                    text: t("status.requiresDelegation"),
                     tone: "warning",
                 },
                 action: {

@@ -7,6 +7,8 @@
  */
 
 export interface TotalVotingPowerDto {
-    value: number;
-    maximum: number;
+    /** Decimal string, 4 places */
+    value: string;
+    /** Decimal string, 4 places */
+    maximum: string;
 }

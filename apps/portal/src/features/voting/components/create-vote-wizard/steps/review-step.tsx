@@ -3,7 +3,7 @@ import { AlertTriangle, Check, Send, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
-import { Button } from "@hoa-mngr/ui";
+import { Badge, Button, formatFraction } from "@hoa-mngr/ui";
 import { cn } from "@hoa-mngr/ui/lib/utils";
 
 import { VoteDetailResponseDto } from "@/api/generated/model";
@@ -22,9 +22,13 @@ export interface ReviewCheck {
  * six `VOTE_*` error checks mirror the server's known `INCOMPLETE_VOTE` codes
  * (see `voting:detail.validation.errors.*`); the server remains the source of
  * truth — `useScheduleVote` + `ScheduleValidationModal` still handle any
- * mismatch. `SHORT_VOTING_PERIOD` has no server counterpart: it is a
- * client-side advisory warning (a 15-day heuristic) and never blocks
- * scheduling.
+ * mismatch. `SHORT_VOTING_PERIOD` is a client-side advisory warning (a
+ * 15-day heuristic) and never blocks scheduling here — note that for
+ * PER_ROLLAM votes the server *does* enforce a real 15-day floor
+ * (`VOTE_WINDOW_TOO_SHORT_PER_ROLLAM`, part of the same `INCOMPLETE_VOTE`
+ * details on schedule); this client-side check hasn't been split by mode
+ * yet, so a too-short per-rollam window still only surfaces here as a
+ * non-blocking warning and gets caught for real by the server on submit.
  */
 export function buildReviewChecks(vote: VoteDetailResponseDto): ReviewCheck[] {
     const from = vote.scheduledFrom ? new Date(vote.scheduledFrom) : null;
@@ -134,6 +138,52 @@ function ReviewCheckRow({ check, onEditStep }: ReviewCheckRowProps) {
     );
 }
 
+/**
+ * Vote-level ruleset facts the admin should see one last time before
+ * scheduling: the mode, the assembly quorum (per-rollam has none by law, so
+ * it's omitted rather than shown as "none"), and the majority bar. Fractions
+ * render via formatFraction + the comparator word, matching how the ruleset
+ * step's threshold picker presents them.
+ */
+function RulesetSummary({ vote }: { vote: VoteDetailResponseDto }) {
+    const { t } = useTranslation(["voting"]);
+    const ruleset = vote.ruleset;
+    if (!ruleset) return null;
+
+    const comparatorWord = (comparator: string) =>
+        t(`voting:create.thresholdPicker.comparator.${comparator}`, {
+            defaultValue: comparator,
+        });
+
+    return (
+        <div className="rounded-card border-hairline bg-card border p-5">
+            <div className="mb-3 flex items-center gap-2">
+                <Badge variant="neutral">
+                    {t(`voting:create.mode.${vote.mode}.title`)}
+                </Badge>
+            </div>
+            <div className="space-y-1.5 text-sm">
+                {vote.mode === "ASSEMBLY_RECORD" && ruleset.quorum && (
+                    <p>
+                        {t("voting:wizard.review.quorumLine", {
+                            comparator: comparatorWord(
+                                ruleset.quorum.comparator,
+                            ),
+                            threshold: formatFraction(ruleset.quorum.threshold),
+                        })}
+                    </p>
+                )}
+                <p>
+                    {t("voting:wizard.review.majorityLine", {
+                        comparator: comparatorWord(ruleset.majorityComparator),
+                        threshold: formatFraction(ruleset.majorityThreshold),
+                    })}
+                </p>
+            </div>
+        </div>
+    );
+}
+
 export interface ReviewStepProps {
     vote: VoteDetailResponseDto;
     onEditStep: (id: WizardStepId) => void;
@@ -169,6 +219,8 @@ export function ReviewStep({
                     />
                 ))}
             </div>
+
+            <RulesetSummary vote={vote} />
 
             <div className="rounded-card border-hairline bg-card shadow-clay-card border p-5">
                 <h2 className="font-display text-base font-extrabold">

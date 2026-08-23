@@ -44,9 +44,7 @@ export function UserDelegationList() {
         return (
             votes.filter(
                 (v) =>
-                    v.status === "SCHEDULED" &&
-                    voteIdsWithConsents.has(v.id) &&
-                    !v.allowCoOwnerIndividualVote,
+                    v.status === "SCHEDULED" && voteIdsWithConsents.has(v.id),
             ) || []
         );
     }, [votes, consents]);

@@ -18,10 +18,14 @@ import {
 import { cn } from "@hoa-mngr/ui/lib/utils";
 
 import {
+    OwnedUnitResponseDtoPartyType,
     type OwningUnitStatusDtoStatus,
     type VoteDetailResponseDto,
 } from "@/api/generated/model";
+import { useUnitControllerGetMyOwnedUnits } from "@/api/generated/property-units/property-units";
 import { useVotesControllerGetVoterStatus } from "@/api/generated/votes/votes";
+
+import { formatTotalVotingPower } from "../utils/total-voting-power";
 
 interface VoterStatusSidebarProps {
     vote: VoteDetailResponseDto;
@@ -68,6 +72,14 @@ export function VoterStatusSidebar({ vote }: VoterStatusSidebarProps) {
         },
     });
 
+    // Separate, vote-independent endpoint (Task 3) that's the only place
+    // carrying `partyType` — the voter-status DTO's owningUnits don't have
+    // it. Deliberately not folded into the loading/error gates below: this
+    // is only needed for one supplementary sentence (SJM second-spouse
+    // hint), so an unrelated failure/slow load here must not blank the
+    // whole status card. `.data` is read optionally further down instead.
+    const ownedUnitsQuery = useUnitControllerGetMyOwnedUnits();
+
     if (statusQuery.isLoading) {
         return (
             <div className="border-hairline bg-card rounded-card flex h-64 items-center justify-center border">
@@ -92,6 +104,15 @@ export function VoterStatusSidebar({ vote }: VoterStatusSidebarProps) {
     const unitRequiringDelegation = statusData.owningUnits.find(
         (u) => u.status === "REQUIRES_DELEGATION",
     );
+    // The SJM second-spouse hint only applies when the flagged unit is
+    // itself held in marital community property. `ownedUnitsQuery.data`
+    // may still be loading/absent (see the comment above) — that just
+    // means the hint is omitted, not that the whole card breaks.
+    const isSjmDelegationUnit = !!ownedUnitsQuery.data?.some(
+        (u) =>
+            u.id === unitRequiringDelegation?.id &&
+            u.partyType === OwnedUnitResponseDtoPartyType.SJM,
+    );
 
     return (
         <div className="flex flex-col gap-4">
@@ -101,8 +122,11 @@ export function VoterStatusSidebar({ vote }: VoterStatusSidebarProps) {
                     <p className="text-muted-foreground text-sm">
                         {t("detail.statusSidebar.totalPower")}{" "}
                         <span className="text-foreground font-semibold">
-                            {statusData.totalVotingPower.value}/
-                            {statusData.totalVotingPower.maximum}
+                            {formatTotalVotingPower(
+                                statusData.totalVotingPower,
+                                vote.ruleset?.weightBasis,
+                                t,
+                            )}
                         </span>
                     </p>
                 </CardHeader>
@@ -172,10 +196,13 @@ export function VoterStatusSidebar({ vote }: VoterStatusSidebarProps) {
                     {unitRequiringDelegation && (
                         <div className="rounded-panel border-warning-tint-border bg-warning-muted border p-3">
                             <p className="text-warning-deep text-sm leading-[19px]">
-                                {t("detail.statusSidebar.delegationWarning", {
-                                    unitName: unitRequiringDelegation.name,
-                                })}
+                                {t("status.requiresDelegation")}
                             </p>
+                            {isSjmDelegationUnit && (
+                                <p className="text-warning-deep mt-1.5 text-sm leading-[19px]">
+                                    {t("status.requiresDelegationSjm")}
+                                </p>
+                            )}
                             <Link
                                 to={`/voting/${voteId}/delegate`}
                                 className="text-primary-tint-foreground mt-1.5 inline-block text-sm font-semibold hover:underline"

@@ -5,15 +5,18 @@
  * The HOA Manager API description
  * OpenAPI spec version: 1.0
  */
+import type { FractionDto } from "./fractionDto";
+import type { RulesetFractionDto } from "./rulesetFractionDto";
 import type { VoteOptionResultDto } from "./voteOptionResultDto";
+import type { VoteQuestionResultDtoMajorityComparator } from "./voteQuestionResultDtoMajorityComparator";
 
 export interface VoteQuestionResultDto {
     questionId: string;
     majorityMet: boolean;
     /** @nullable */
     winningOptionId: string | null;
-    /** @nullable */
-    majorityThresholdValue: number | null;
-    majorityDenominatorValue: number;
+    majorityThreshold: RulesetFractionDto;
+    majorityComparator: VoteQuestionResultDtoMajorityComparator;
+    majorityDenominator: FractionDto;
     optionResults: VoteOptionResultDto[];
 }

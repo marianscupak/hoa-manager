@@ -1,67 +1,43 @@
 import { z } from "zod";
 
-import {
-    SetVoteRulesetDtoMajorityRuleType as MajorityRuleType,
-    SetVoteRulesetDtoQuorumElectorateBasis as QuorumElectorateBasis,
-    SetVoteRulesetDtoQuorumMeasure as QuorumMeasure,
-    SetVoteRulesetDtoWeightBasis as VoteWeightBasis,
-} from "@/api/generated/model";
+const fractionSchema = z.object({ num: z.number().int().min(1), den: z.number().int().min(1) });
+const comparatorSchema = z.enum(["STRICT_GREATER", "AT_LEAST"]);
 
-export const createVoteRulesetSchema = z.object({
-    weightBasis: z.nativeEnum(VoteWeightBasis),
-    quorumMeasure: z.nativeEnum(QuorumMeasure),
-    quorumElectorateBasis: z.nativeEnum(QuorumElectorateBasis),
-    quorumThreshold: z.coerce
-        .number()
-        .min(0, "voting:create.fields.quorumThreshold.errors.positiveNumber")
-        .max(100, "voting:create.fields.quorumThreshold.errors.max"),
-    majorityRuleType: z.nativeEnum(MajorityRuleType),
-    majorityThreshold: z.coerce
-        .number()
-        .optional()
-        .refine((v) => v === undefined || (!isNaN(v) && v >= 0), {
-            message:
-                "voting:create.fields.majorityThreshold.errors.positiveNumber",
+const rulesetObjectSchema = z.object({
+    weightBasis: z.enum(["UNIT_SHARE", "ONE_UNIT_ONE_VOTE"]),
+    quorum: z
+        .object({
+            measure: z.enum(["UNIT_SHARE", "UNIT_COUNT"]),
+            threshold: fractionSchema,
+            comparator: comparatorSchema,
         })
-        .refine((v) => v === undefined || (typeof v === "number" && v <= 100), {
-            message: "voting:create.fields.majorityThreshold.errors.max",
-        }),
+        .nullable(),
+    majorityRuleType: z.enum(["SIMPLE_MAJORITY", "QUALIFIED_MAJORITY", "UNANIMITY"]),
+    majorityDenominatorBasis: z.enum(["VOTES_CAST", "ALL_VOTES"]),
+    majorityThreshold: fractionSchema.optional(),
+    majorityComparator: comparatorSchema.optional(),
     allowAbstain: z.boolean(),
-    abstainExcludedFromMajorityDenominator: z.boolean(),
-    allowCoOwnerIndividualVote: z.boolean(),
+    acknowledgedNonStatutory: z.boolean(),
 });
 
-export const majorityThresholdRefinement = (
-    data: {
-        majorityRuleType: MajorityRuleType;
-        majorityThreshold?: number | null;
-    },
-    ctx: z.RefinementCtx,
-) => {
-    if (
-        data.majorityRuleType === MajorityRuleType.QUALIFIED_MAJORITY &&
-        (data.majorityThreshold === undefined ||
-            data.majorityThreshold === null)
-    ) {
+export const createVoteRulesetSchema = rulesetObjectSchema.superRefine((data, ctx) => {
+    if (data.majorityRuleType === "QUALIFIED_MAJORITY" && (!data.majorityThreshold || !data.majorityComparator)) {
         ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message:
-                "voting:create.fields.majorityThreshold.errors.requiredForQualified",
+            message: "voting:create.fields.majorityThreshold.errors.requiredForQualified",
             path: ["majorityThreshold"],
         });
     }
-};
+});
+
+/**
+ * The plain (pre-`superRefine`) object schema's field shapes, for callers
+ * that need to compose individual fields into a larger schema (e.g. the
+ * per-question override form in use-question-form.ts). `createVoteRulesetSchema`
+ * itself is a `ZodEffects` once wrapped in `.superRefine`, which drops the
+ * `.shape` accessor.
+ */
+export const rulesetFieldSchemas = rulesetObjectSchema.shape;
 
 export type CreateVoteRulesetValues = z.infer<typeof createVoteRulesetSchema>;
-
-export const rulesetDefaultValues: CreateVoteRulesetValues = {
-    weightBasis: VoteWeightBasis.UNIT_SHARE,
-    quorumMeasure: QuorumMeasure.UNIT_SHARE,
-    quorumElectorateBasis: QuorumElectorateBasis.ALL_UNITS,
-    quorumThreshold: 50,
-    majorityRuleType: MajorityRuleType.SIMPLE_MAJORITY,
-    majorityThreshold: undefined,
-    allowAbstain: true,
-    abstainExcludedFromMajorityDenominator: false,
-    allowCoOwnerIndividualVote: false,
-};
+export { PER_ROLLAM_PRESET as rulesetDefaultValues } from "./ruleset-legal";

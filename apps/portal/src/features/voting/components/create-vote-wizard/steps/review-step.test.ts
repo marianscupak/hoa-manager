@@ -16,6 +16,7 @@ function buildVote(
         scheduledFrom: null,
         scheduledTo: null,
         status: "DRAFT",
+        mode: "PER_ROLLAM",
         ruleset: null,
         questions: [],
         ...overrides,

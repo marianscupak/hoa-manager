@@ -30,6 +30,7 @@ import { tenantContextAtom } from "@/auth/atoms";
 import { isAdminOrBoard } from "@/auth/role-checks";
 
 import { DeleteDraftVoteDialog } from "../components/delete-draft-vote-dialog";
+import { ModeBadge } from "../components/mode-badge";
 import { ScheduleValidationModal } from "../components/schedule-validation-modal";
 import { StatusBadge } from "../components/status-badge";
 import { VoteDetailTimeline } from "../components/vote-detail-timeline";
@@ -161,6 +162,7 @@ export function VoteDetailPage() {
                             {vote.title}
                         </h1>
                         <StatusBadge status={vote.status} />
+                        <ModeBadge mode={vote.mode} />
                     </div>
                     {metaLine && (
                         <p className="text-muted-foreground mt-2 text-sm">
@@ -171,7 +173,7 @@ export function VoteDetailPage() {
                         <p className="text-muted-foreground mt-1 text-sm">
                             {t("dashboard:featuredVote.turnoutLine", {
                                 voted: turnoutQuery.data.participationUnitCount,
-                                total: turnoutQuery.data.denominatorUnitCount,
+                                total: turnoutQuery.data.totalVotesUnitCount,
                             })}
                         </p>
                     )}

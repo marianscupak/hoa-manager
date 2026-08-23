@@ -3,8 +3,6 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import {
-    SetVoteRulesetResponseDtoMajorityRuleType,
-    SetVoteRulesetResponseDtoQuorumMeasure,
     VoteOptionResponseDtoOptionKey,
     VoteQuestionResponseDtoType,
     type SetVoteRulesetResponseDto,
@@ -12,14 +10,24 @@ import {
     type VoteOptionResultDto,
     type VoteResultsResponseDto,
 } from "@/api/generated/model";
-import { Badge, type BadgeProps, Card } from "@hoa-mngr/ui";
+import {
+    Badge,
+    type BadgeProps,
+    Card,
+    formatFraction,
+    reduceFraction,
+    trimTrailingZeros,
+} from "@hoa-mngr/ui";
 
 import {
     mapQuestionVerdict,
     type QuestionVerdict,
 } from "../../utils/question-verdict";
 import { buildMajorityFragment } from "../../utils/rule-sentence";
-import { computeParticipationStats } from "./participation-banner";
+import {
+    computeParticipationStats,
+    deriveQuorumThresholdPercentLabel,
+} from "./participation-banner";
 
 type EnrichedQuestion = VoteResultsResponseDto["questionResults"][number] & {
     title: string;
@@ -90,28 +98,72 @@ function findOptionResultByKey(
     );
 }
 
-// The majority tick's threshold fraction (0-1). Prefers the result's own
-// majorityThresholdValue when the server actually computed one; that field
-// is null both for SIMPLE_MAJORITY (implicit 0.5) *and* whenever there's no
-// winner (a tie) or a zero denominator regardless of rule type — so on a
-// null value we still have to ask the effective ruleset what the real
-// threshold is instead of assuming 0.5, or a tied QUALIFIED_MAJORITY
-// question would draw its tick at the wrong spot.
-function deriveMajorityFraction(
+// The majority tick's threshold fraction (0-1). The server always
+// materializes majorityThreshold now (SIMPLE_MAJORITY -> 1/2, UNANIMITY ->
+// 1/1, QUALIFIED_MAJORITY -> its own bar), so this is a plain fraction read
+// — no more null-threshold ambiguity to fall back to the ruleset for.
+function deriveMajorityFraction(question: EnrichedQuestion): number {
+    return question.majorityThreshold.num / question.majorityThreshold.den;
+}
+
+// `majorityDenominator.decimal` is basis-dependent, same distinction
+// total-voting-power.ts's formatTotalVotingPower already had to solve:
+// a UNIT_SHARE weight is a building-share fraction (0-1), so its decimal
+// only means something to a reader as a percent of the building's shares;
+// a ONE_UNIT_ONE_VOTE weight is a flat per-unit count, so the decimal *is*
+// already a literal vote count. `weightBasis` lives on the vote-level
+// ruleset and cannot diverge per question (validateQuestionOverride
+// requires override.weightBasis === base.weightBasis), so this always
+// reads the vote's own ruleset — never the question's effectiveRuleset —
+// mirroring how `isUnitCount` is derived below.
+function formatMajorityDenominator(
+    denominator: { decimal: string },
+    weightBasis: string | undefined,
+    t: TFunction<"voting">,
+): string {
+    if (weightBasis === "ONE_UNIT_ONE_VOTE") {
+        return t("detail.statusSidebar.totalPowerVotes", {
+            count: Math.round(Number(denominator.decimal)),
+        });
+    }
+    const percent = Number(denominator.decimal) * 100;
+    return t("resultsV2.thresholdDenominatorShare", {
+        percent: trimTrailingZeros(percent.toFixed(2)),
+    });
+}
+
+// The plain-language threshold caption shown under every question's
+// reason sentence: comparator word + exact fraction (e.g. "alespoň 2/3"),
+// not a percentage — the wizard's rule sentences already say the percent
+// equivalent, this states the legal fraction itself. `majorityThreshold`
+// is a RulesetFractionDto (plain numbers), so formatFraction/reduceFraction
+// need no BigInt handling. The denominator's exact string fraction is
+// surfaced via `title` since it can be a large share-weighted value that
+// doesn't round cleanly.
+function buildThresholdCaption(
     question: EnrichedQuestion,
     ruleset: SetVoteRulesetResponseDto | null | undefined,
-): number {
-    if (question.majorityThresholdValue !== null) {
-        return question.majorityThresholdValue;
-    }
-    const effective = question.effectiveRuleset ?? ruleset;
-    if (
-        effective?.majorityRuleType ===
-        SetVoteRulesetResponseDtoMajorityRuleType.QUALIFIED_MAJORITY
-    ) {
-        return (effective.majorityThreshold ?? 50) / 100;
-    }
-    return 0.5;
+    t: TFunction<"voting">,
+): { text: string; title: string } {
+    const comparator = t(
+        `create.thresholdPicker.comparator.${question.majorityComparator}`,
+    );
+    const fraction = formatFraction(reduceFraction(question.majorityThreshold));
+    return {
+        text: t("resultsV2.thresholdCaption", {
+            comparator,
+            fraction,
+            denominator: formatMajorityDenominator(
+                question.majorityDenominator,
+                ruleset?.weightBasis,
+                t,
+            ),
+        }),
+        title: t("resultsV2.thresholdExactTitle", {
+            num: question.majorityDenominator.num,
+            den: question.majorityDenominator.den,
+        }),
+    };
 }
 
 function buildReason(args: {
@@ -132,7 +184,6 @@ function buildReason(args: {
         winningOption,
         t,
     } = args;
-    const majorityDenominator = question.majorityDenominatorValue;
 
     if (verdict === "approved" || verdict === "rejected") {
         const forResult = findOptionResultByKey(
@@ -140,10 +191,9 @@ function buildReason(args: {
             optionLabels,
             VoteOptionResponseDtoOptionKey.YES,
         );
-        const pct =
-            majorityDenominator > 0
-                ? ((forResult?.voteWeight ?? 0) / majorityDenominator) * 100
-                : 0;
+        // `.percent` is voteWeight / majorityDenominator × 100, precomputed
+        // server-side (Rational, not float) — see VoteOptionResultDto.
+        const pct = Number(forResult?.percent ?? "0");
         const majority = buildMajorityFragment(
             question.effectiveRuleset ?? ruleset,
             t,
@@ -162,22 +212,21 @@ function buildReason(args: {
                   (o) => o.optionId === winningOption.id,
               )
             : undefined;
-        const pct =
-            majorityDenominator > 0
-                ? ((winnerResult?.voteWeight ?? 0) / majorityDenominator) * 100
-                : 0;
+        const pct = Number(winnerResult?.percent ?? "0");
         return t("resultsV2.reasonWinner", {
             option: winningOption?.label ?? "",
             pct: pct.toFixed(1),
         });
     }
 
-    // notDecided
-    if (!results.quorumMet) {
+    // notDecided. quorumMet is `null` for per-rollam votes (no quorum by
+    // law) — only an explicit `false` means quorum actually failed; a null
+    // "notDecided" here can only mean the majority wasn't met.
+    if (results.quorumMet === false) {
         const { pct } = computeParticipationStats(results, ruleset);
         return t("resultsV2.reasonNoQuorum", {
             turnout: pct.toFixed(1),
-            threshold: ruleset?.quorumThreshold ?? 50,
+            threshold: deriveQuorumThresholdPercentLabel(ruleset),
         });
     }
     return t("resultsV2.reasonNoMajority");
@@ -205,7 +254,6 @@ interface YesNoBarsProps {
     question: EnrichedQuestion;
     results: VoteResultsResponseDto;
     optionLabels: OptionLabelMap;
-    ruleset: SetVoteRulesetResponseDto | null | undefined;
     isUnitCount: boolean;
     animated: boolean;
     t: TFunction<"voting">;
@@ -215,22 +263,22 @@ function YesNoBars({
     question,
     results,
     optionLabels,
-    ruleset,
     isUnitCount,
     animated,
     t,
 }: YesNoBarsProps) {
     // A UNIT_COUNT vote counts units everywhere else on this page (headline
     // %, participation sentence), so the bars use the same axis: units over
-    // the vote's unit denominator.
+    // the vote's unit denominator. The weight axis uses totalVotesWeight's
+    // rounded `.decimal` (4 places) — plenty of precision for a bar width.
     const denom = isUnitCount
-        ? results.denominatorUnitCount
-        : results.denominatorWeight;
+        ? results.totalVotesUnitCount
+        : Number(results.totalVotesWeight.decimal);
     const pctOf = (option: VoteOptionResultDto | undefined) => {
         if (denom <= 0) return 0;
         const value = isUnitCount
             ? option?.voteUnitCount ?? 0
-            : option?.voteWeight ?? 0;
+            : Number(option?.voteWeight.decimal ?? "0");
         return (value / denom) * 100;
     };
 
@@ -262,13 +310,15 @@ function YesNoBars({
     // UNIT_COUNT votes; the reason sentence still states the weight basis
     // ("% of votes cast") in words.
     const showMajorityTick = !isUnitCount;
-    const majorityFraction = deriveMajorityFraction(question, ruleset);
+    const majorityFraction = deriveMajorityFraction(question);
+    const majorityDenominatorDecimal = Number(
+        question.majorityDenominator.decimal,
+    );
     const majorityTickPct =
         denom > 0
             ? Math.min(
                   100,
-                  ((question.majorityDenominatorValue * majorityFraction) /
-                      denom) *
+                  ((majorityDenominatorDecimal * majorityFraction) / denom) *
                       100,
               )
             : 0;
@@ -356,12 +406,10 @@ function SingleChoiceBars({
     t,
 }: SingleChoiceBarsProps) {
     // Same axis rule as YesNoBars: unit counts over the vote's unit
-    // denominator for a UNIT_COUNT vote, weights over the majority
-    // denominator otherwise.
-    const denom = isUnitCount
-        ? results.denominatorUnitCount
-        : question.majorityDenominatorValue;
-
+    // denominator for a UNIT_COUNT vote. The weight axis instead reuses each
+    // option's server-precomputed `.percent` (voteWeight / majorityDenominator
+    // × 100, exact Rational math) rather than re-deriving it from the raw
+    // fractions.
     return (
         <div className="flex flex-col gap-2.5">
             {question.optionResults.map((opt) => {
@@ -370,8 +418,12 @@ function SingleChoiceBars({
                     optionKey: "",
                 };
                 const isWinner = opt.optionId === winningOptionId;
-                const value = isUnitCount ? opt.voteUnitCount : opt.voteWeight;
-                const pct = denom > 0 ? (value / denom) * 100 : 0;
+                const pct = isUnitCount
+                    ? results.totalVotesUnitCount > 0
+                        ? (opt.voteUnitCount / results.totalVotesUnitCount) *
+                          100
+                        : 0
+                    : Number(opt.percent);
 
                 return (
                     <div key={opt.optionId}>
@@ -456,12 +508,14 @@ export function VerdictCard({
 
     // Quorum measure is vote-level (spec §3), so this deliberately reads the
     // vote's ruleset and never the question's effectiveRuleset — a majority
-    // override must not flip the axis the bars are drawn on.
-    const isUnitCount =
-        ruleset?.quorumMeasure ===
-        SetVoteRulesetResponseDtoQuorumMeasure.UNIT_COUNT;
+    // override must not flip the axis the bars are drawn on. `quorum` is
+    // null for PER_ROLLAM votes (no quorum by law), which defaults to the
+    // weight axis.
+    const isUnitCount = ruleset?.quorum?.measure === "UNIT_COUNT";
 
-    const isQuorumFailed = !results.quorumMet;
+    // quorumMet is `null` for per-rollam votes — only an explicit `false`
+    // means quorum actually failed.
+    const isQuorumFailed = results.quorumMet === false;
     const reason = buildReason({
         verdict,
         question,
@@ -471,6 +525,7 @@ export function VerdictCard({
         winningOption,
         t,
     });
+    const thresholdCaption = buildThresholdCaption(question, ruleset, t);
 
     return (
         <Card
@@ -498,8 +553,14 @@ export function VerdictCard({
                 </Badge>
             </div>
 
-            <p className="text-secondary-foreground mt-2.5 mb-4 text-[13.5px] leading-[19px]">
+            <p className="text-secondary-foreground mt-2.5 mb-1 text-[13.5px] leading-[19px]">
                 {reason}
+            </p>
+            <p
+                className="text-muted-foreground mb-4 cursor-help text-[12px]"
+                title={thresholdCaption.title}
+            >
+                {thresholdCaption.text}
             </p>
 
             <div className={isQuorumFailed ? "opacity-45" : undefined}>
@@ -508,7 +569,6 @@ export function VerdictCard({
                         question={question}
                         results={results}
                         optionLabels={optionLabels}
-                        ruleset={ruleset}
                         isUnitCount={isUnitCount}
                         animated={animated}
                         t={t}

@@ -6,7 +6,12 @@ import { Link } from "react-router";
 import { Badge, Button } from "@hoa-mngr/ui";
 import { cn } from "@hoa-mngr/ui/lib/utils";
 
-export type WizardStepId = "details" | "rules" | "questions" | "review";
+export type WizardStepId =
+    | "mode"
+    | "details"
+    | "rules"
+    | "questions"
+    | "review";
 
 export type WizardSavedState = "saved" | "dirty" | "saving";
 

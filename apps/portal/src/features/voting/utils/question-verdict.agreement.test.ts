@@ -52,8 +52,9 @@ function buildResult(
         questionId: "q1",
         majorityMet: false,
         winningOptionId: null,
-        majorityThresholdValue: null,
-        majorityDenominatorValue: 1,
+        majorityThreshold: { num: 1, den: 2 },
+        majorityComparator: "STRICT_GREATER",
+        majorityDenominator: { num: "1", den: "1", decimal: "1.0000" },
         optionResults: [],
         ...overrides,
     };

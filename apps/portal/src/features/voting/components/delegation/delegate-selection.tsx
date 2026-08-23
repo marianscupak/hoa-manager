@@ -95,7 +95,12 @@ export const DelegateSelection = ({
                             </Avatar>
                             <div className="flex-1">
                                 <p className="font-medium">{candidate.name}</p>
-                                <div className="mt-1 flex gap-2">
+                                <div className="mt-1 flex flex-wrap gap-2">
+                                    {candidate.isUnitOwner && (
+                                        <span className="rounded bg-blue-100 px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-blue-700 uppercase">
+                                            {t("delegation.coOwner")}
+                                        </span>
+                                    )}
                                     {candidate.hasDelegatedToRequester && (
                                         <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-emerald-700 uppercase">
                                             {t("delegate.assignedToYou")}

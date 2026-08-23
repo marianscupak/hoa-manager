@@ -7,6 +7,7 @@ import { cn } from "@hoa-mngr/ui/lib/utils";
 
 import { VoteListItemResponseDto } from "@/api/generated/model";
 
+import { ModeBadge } from "./mode-badge";
 import { StatusBadge } from "./status-badge";
 import { resolveVoteStatus, VoteStatusLineTone } from "./vote-status-section";
 
@@ -41,6 +42,7 @@ export function VoteCard({ vote }: VoteCardProps) {
             <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2.5">
                     <StatusBadge status={vote.status} />
+                    <ModeBadge mode={vote.mode} />
                     <Link
                         to={`/voting/${vote.id}`}
                         className="font-display hover:text-primary-hover text-[16.5px] font-extrabold tracking-tight"

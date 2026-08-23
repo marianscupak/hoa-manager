@@ -3055,8 +3055,7 @@
               "id",
               "email",
               "fullName"
-            ],
-            "x-nestjs_zod-self-required": true
+            ]
           },
           "createdAt": {
             "type": "string"
@@ -4371,12 +4370,162 @@
             "enum": [
               "UNIT_SHARE",
               "ONE_UNIT_ONE_VOTE"
-            ],
-            "x-nestjs_zod-has-null": true
+            ]
           },
           "quorum": {
-            "anyOf": [
-              {
+            "type": "object",
+            "properties": {
+              "measure": {
+                "type": "string",
+                "enum": [
+                  "UNIT_SHARE",
+                  "UNIT_COUNT"
+                ]
+              },
+              "threshold": {
+                "type": "object",
+                "properties": {
+                  "num": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "den": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "num",
+                  "den"
+                ]
+              },
+              "comparator": {
+                "type": "string",
+                "enum": [
+                  "STRICT_GREATER",
+                  "AT_LEAST"
+                ]
+              }
+            },
+            "required": [
+              "measure",
+              "threshold",
+              "comparator"
+            ],
+            "nullable": true
+          },
+          "majorityRuleType": {
+            "type": "string",
+            "enum": [
+              "SIMPLE_MAJORITY",
+              "QUALIFIED_MAJORITY",
+              "UNANIMITY"
+            ]
+          },
+          "majorityDenominatorBasis": {
+            "type": "string",
+            "enum": [
+              "VOTES_CAST",
+              "ALL_VOTES"
+            ]
+          },
+          "majorityThreshold": {
+            "type": "object",
+            "properties": {
+              "num": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "den": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "num",
+              "den"
+            ]
+          },
+          "majorityComparator": {
+            "type": "string",
+            "enum": [
+              "STRICT_GREATER",
+              "AT_LEAST"
+            ]
+          },
+          "allowAbstain": {
+            "type": "boolean"
+          },
+          "acknowledgedNonStatutory": {
+            "default": false,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "weightBasis",
+          "quorum",
+          "majorityRuleType",
+          "majorityDenominatorBasis",
+          "allowAbstain"
+        ]
+      },
+      "CreateVoteQuestionDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "YES_NO",
+              "SINGLE_CHOICE"
+            ]
+          },
+          "sortOrder": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sortOrder": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "label"
+              ]
+            }
+          },
+          "rulesetOverride": {
+            "type": "object",
+            "properties": {
+              "weightBasis": {
+                "type": "string",
+                "enum": [
+                  "UNIT_SHARE",
+                  "ONE_UNIT_ONE_VOTE"
+                ]
+              },
+              "quorum": {
                 "type": "object",
                 "properties": {
                   "measure": {
@@ -4417,185 +4566,8 @@
                   "measure",
                   "threshold",
                   "comparator"
-                ]
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "x-nestjs_zod-has-null": true,
-            "x-nestjs_zod-empty-type": true
-          },
-          "majorityRuleType": {
-            "type": "string",
-            "enum": [
-              "SIMPLE_MAJORITY",
-              "QUALIFIED_MAJORITY",
-              "UNANIMITY"
-            ],
-            "x-nestjs_zod-has-null": true
-          },
-          "majorityDenominatorBasis": {
-            "type": "string",
-            "enum": [
-              "VOTES_CAST",
-              "ALL_VOTES"
-            ],
-            "x-nestjs_zod-has-null": true
-          },
-          "majorityThreshold": {
-            "type": "object",
-            "properties": {
-              "num": {
-                "type": "integer",
-                "minimum": 1,
-                "maximum": 9007199254740991
-              },
-              "den": {
-                "type": "integer",
-                "minimum": 1,
-                "maximum": 9007199254740991
-              }
-            },
-            "required": [
-              "num",
-              "den"
-            ],
-            "x-nestjs_zod-has-null": true,
-            "x-nestjs_zod-self-required": false
-          },
-          "majorityComparator": {
-            "type": "string",
-            "enum": [
-              "STRICT_GREATER",
-              "AT_LEAST"
-            ],
-            "x-nestjs_zod-has-null": true
-          },
-          "allowAbstain": {
-            "type": "boolean",
-            "x-nestjs_zod-has-null": true
-          },
-          "acknowledgedNonStatutory": {
-            "default": false,
-            "type": "boolean",
-            "x-nestjs_zod-has-null": true
-          }
-        },
-        "required": [
-          "weightBasis",
-          "quorum",
-          "majorityRuleType",
-          "majorityDenominatorBasis",
-          "allowAbstain"
-        ]
-      },
-      "CreateVoteQuestionDto": {
-        "type": "object",
-        "properties": {
-          "title": {
-            "type": "string",
-            "minLength": 1,
-            "x-nestjs_zod-has-null": true
-          },
-          "description": {
-            "type": "string",
-            "x-nestjs_zod-has-null": true
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "YES_NO",
-              "SINGLE_CHOICE"
-            ],
-            "x-nestjs_zod-has-null": true
-          },
-          "sortOrder": {
-            "type": "integer",
-            "minimum": -9007199254740991,
-            "maximum": 9007199254740991,
-            "x-nestjs_zod-has-null": true
-          },
-          "options": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "label": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "sortOrder": {
-                  "type": "integer",
-                  "minimum": -9007199254740991,
-                  "maximum": 9007199254740991
-                }
-              },
-              "required": [
-                "label"
-              ]
-            },
-            "x-nestjs_zod-has-null": true
-          },
-          "rulesetOverride": {
-            "type": "object",
-            "properties": {
-              "weightBasis": {
-                "type": "string",
-                "enum": [
-                  "UNIT_SHARE",
-                  "ONE_UNIT_ONE_VOTE"
-                ]
-              },
-              "quorum": {
-                "anyOf": [
-                  {
-                    "type": "object",
-                    "properties": {
-                      "measure": {
-                        "type": "string",
-                        "enum": [
-                          "UNIT_SHARE",
-                          "UNIT_COUNT"
-                        ]
-                      },
-                      "threshold": {
-                        "type": "object",
-                        "properties": {
-                          "num": {
-                            "type": "integer",
-                            "minimum": 1,
-                            "maximum": 9007199254740991
-                          },
-                          "den": {
-                            "type": "integer",
-                            "minimum": 1,
-                            "maximum": 9007199254740991
-                          }
-                        },
-                        "required": [
-                          "num",
-                          "den"
-                        ]
-                      },
-                      "comparator": {
-                        "type": "string",
-                        "enum": [
-                          "STRICT_GREATER",
-                          "AT_LEAST"
-                        ]
-                      }
-                    },
-                    "required": [
-                      "measure",
-                      "threshold",
-                      "comparator"
-                    ]
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
+                ],
+                "nullable": true
               },
               "majorityRuleType": {
                 "type": "string",
@@ -4652,9 +4624,7 @@
               "majorityRuleType",
               "majorityDenominatorBasis",
               "allowAbstain"
-            ],
-            "x-nestjs_zod-has-null": true,
-            "x-nestjs_zod-self-required": false
+            ]
           }
         },
         "required": [
@@ -4667,26 +4637,22 @@
         "properties": {
           "title": {
             "type": "string",
-            "minLength": 1,
-            "x-nestjs_zod-has-null": true
+            "minLength": 1
           },
           "description": {
-            "type": "string",
-            "x-nestjs_zod-has-null": true
+            "type": "string"
           },
           "type": {
             "type": "string",
             "enum": [
               "YES_NO",
               "SINGLE_CHOICE"
-            ],
-            "x-nestjs_zod-has-null": true
+            ]
           },
           "sortOrder": {
             "type": "integer",
             "minimum": -9007199254740991,
-            "maximum": 9007199254740991,
-            "x-nestjs_zod-has-null": true
+            "maximum": 9007199254740991
           },
           "options": {
             "type": "array",
@@ -4706,8 +4672,7 @@
               "required": [
                 "label"
               ]
-            },
-            "x-nestjs_zod-has-null": true
+            }
           },
           "rulesetOverride": {
             "type": "object",
@@ -4720,54 +4685,48 @@
                 ]
               },
               "quorum": {
-                "anyOf": [
-                  {
+                "type": "object",
+                "properties": {
+                  "measure": {
+                    "type": "string",
+                    "enum": [
+                      "UNIT_SHARE",
+                      "UNIT_COUNT"
+                    ]
+                  },
+                  "threshold": {
                     "type": "object",
                     "properties": {
-                      "measure": {
-                        "type": "string",
-                        "enum": [
-                          "UNIT_SHARE",
-                          "UNIT_COUNT"
-                        ]
+                      "num": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 9007199254740991
                       },
-                      "threshold": {
-                        "type": "object",
-                        "properties": {
-                          "num": {
-                            "type": "integer",
-                            "minimum": 1,
-                            "maximum": 9007199254740991
-                          },
-                          "den": {
-                            "type": "integer",
-                            "minimum": 1,
-                            "maximum": 9007199254740991
-                          }
-                        },
-                        "required": [
-                          "num",
-                          "den"
-                        ]
-                      },
-                      "comparator": {
-                        "type": "string",
-                        "enum": [
-                          "STRICT_GREATER",
-                          "AT_LEAST"
-                        ]
+                      "den": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 9007199254740991
                       }
                     },
                     "required": [
-                      "measure",
-                      "threshold",
-                      "comparator"
+                      "num",
+                      "den"
                     ]
                   },
-                  {
-                    "type": "null"
+                  "comparator": {
+                    "type": "string",
+                    "enum": [
+                      "STRICT_GREATER",
+                      "AT_LEAST"
+                    ]
                   }
-                ]
+                },
+                "required": [
+                  "measure",
+                  "threshold",
+                  "comparator"
+                ],
+                "nullable": true
               },
               "majorityRuleType": {
                 "type": "string",
@@ -4824,9 +4783,7 @@
               "majorityRuleType",
               "majorityDenominatorBasis",
               "allowAbstain"
-            ],
-            "x-nestjs_zod-has-null": true,
-            "x-nestjs_zod-self-required": false
+            ]
           }
         },
         "required": [

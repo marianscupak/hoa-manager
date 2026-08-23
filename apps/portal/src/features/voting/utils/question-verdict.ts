@@ -12,9 +12,11 @@ export interface QuestionVerdictOutcome {
 
 // Mirrors the server's deriveQuestionOutcome (spec §3): quorum is vote-level;
 // for yes/no questions "majority met" can mean NO won — approval requires the
-// YES-semantic option to be the winner.
+// YES-semantic option to be the winner. `quorumMet: null` (per-rollam votes,
+// which have no quorum by law) passes straight through to the majority
+// logic, same as the server — only an explicit `false` blocks the verdict.
 export function mapQuestionVerdict(args: {
-    quorumMet: boolean;
+    quorumMet: boolean | null;
     questionType: string;
     result: VoteQuestionResultDto;
     options: VoteOptionResponseDto[];
@@ -22,7 +24,7 @@ export function mapQuestionVerdict(args: {
     const winningOption =
         args.options.find((o) => o.id === args.result.winningOptionId) ?? null;
 
-    if (!args.quorumMet) {
+    if (args.quorumMet === false) {
         return { verdict: "notDecided", winningOption };
     }
     if (args.questionType === "YES_NO") {

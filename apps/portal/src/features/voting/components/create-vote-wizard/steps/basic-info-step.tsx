@@ -28,6 +28,13 @@ type CreateVoteFormValues = z.infer<typeof createVoteFormSchema>;
 export interface CreateVoteBasicInfoStepProps {
     onSuccess: (id: string) => void;
     voteId?: string | null;
+    /**
+     * The mode chosen in the (preceding) mode step. Only sent when creating
+     * a new vote — mode is immutable after creation, so an update to an
+     * existing draft never includes it (the field is optional on
+     * UpdateVoteDto for exactly this reason).
+     */
+    mode: "PER_ROLLAM" | "ASSEMBLY_RECORD";
     initialData?: VoteDetailResponseDto;
     /** Id the wizard footer's Continue button submits via `form={formId}`. */
     formId: string;
@@ -38,6 +45,7 @@ export interface CreateVoteBasicInfoStepProps {
 export function CreateVoteBasicInfoStep({
     onSuccess,
     voteId,
+    mode,
     initialData,
     formId,
     onDirtyChange,
@@ -110,7 +118,7 @@ export function CreateVoteBasicInfoStep({
             );
         } else {
             createVoteMutation.mutate(
-                { data },
+                { data: { ...data, mode } },
                 {
                     onSuccess: (response) => {
                         toast.success(t("voting:create.toast.createSuccess"));

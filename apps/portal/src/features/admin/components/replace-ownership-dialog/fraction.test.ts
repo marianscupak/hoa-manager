@@ -7,6 +7,8 @@ import {
     fractionEqualsOne,
     fractionToDecimalString,
     fractionToPercentString,
+    fractionToTrimmedPercentString,
+    trimTrailingZeros,
     reduceFraction,
 } from "@hoa-mngr/ui/lib/fraction";
 
@@ -60,5 +62,25 @@ describe("fraction lib", () => {
         expect(formatFraction({ num: 3, den: 8 })).toBe("3/8");
         expect(fractionToDecimalString({ num: 1, den: 3 }, 4)).toBe("0.3333");
         expect(fractionToPercentString({ num: 1, den: 2 }, 2)).toBe("50.00 %");
+    });
+
+    it("trims the percent string instead of padding, with no % suffix", () => {
+        // The 2/3 preset is the reported regression case: raw float division
+        // renders "66.66666666666666", this must round-and-trim to "66.67".
+        expect(fractionToTrimmedPercentString({ num: 2, den: 3 })).toBe(
+            "66.67",
+        );
+        expect(fractionToTrimmedPercentString({ num: 1, den: 2 })).toBe("50");
+        expect(fractionToTrimmedPercentString({ num: 3, den: 4 })).toBe("75");
+        expect(fractionToTrimmedPercentString({ num: 1, den: 8 })).toBe(
+            "12.5",
+        );
+    });
+
+    it("trims a plain decimal string the same way, for non-fraction callers", () => {
+        expect(trimTrailingZeros("50.00")).toBe("50");
+        expect(trimTrailingZeros("66.67")).toBe("66.67");
+        expect(trimTrailingZeros("12.50")).toBe("12.5");
+        expect(trimTrailingZeros("100")).toBe("100");
     });
 });

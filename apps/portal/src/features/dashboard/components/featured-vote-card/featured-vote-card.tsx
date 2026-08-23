@@ -179,7 +179,7 @@ export function FeaturedVoteCard() {
                     <p className="text-secondary-foreground mt-1 text-sm">
                         {t("featuredVote.turnoutLine", {
                             voted: turnoutQuery.data.participationUnitCount,
-                            total: turnoutQuery.data.denominatorUnitCount,
+                            total: turnoutQuery.data.totalVotesUnitCount,
                         })}
                     </p>
                 )}

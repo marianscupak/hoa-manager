@@ -74,3 +74,30 @@ export function fractionToDecimalString(f: Fraction, dp = 4): string {
 export function fractionToPercentString(f: Fraction, dp = 2): string {
     return `${fractionToDecimalString({ num: f.num * 100, den: f.den }, dp)} %`;
 }
+
+/**
+ * Strips trailing fractional zeros (and a bare trailing ".") from a decimal
+ * string, e.g. "50.00" -> "50", "66.67" is left alone, "12.50" -> "12.5".
+ * Shared by fractionToTrimmedPercentString and any caller formatting a
+ * plain (non-fraction) percent, such as pre-rounded decimal strings from
+ * the API — so the trimming rule only lives in one place.
+ */
+export function trimTrailingZeros(decimal: string): string {
+    if (!decimal.includes(".")) return decimal;
+    return decimal.replace(/0+$/, "").replace(/\.$/, "");
+}
+
+/**
+ * Same BigInt-safe rounding as fractionToPercentString, but trims trailing
+ * fractional zeros (and a bare trailing ".") instead of always padding to
+ * `dp` places, and omits the " %" suffix. Use this for inline text where a
+ * clean "50" / "66.67" reads better than "50.00" / "66.67", and the
+ * surrounding copy (often an i18next string) supplies its own "%" sign —
+ * see fractionToPercentString's own docstring-equivalent callers for the
+ * padded, suffixed alternative.
+ */
+export function fractionToTrimmedPercentString(f: Fraction, dp = 2): string {
+    return trimTrailingZeros(
+        fractionToDecimalString({ num: f.num * 100, den: f.den }, dp),
+    );
+}

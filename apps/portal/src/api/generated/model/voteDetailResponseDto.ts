@@ -6,6 +6,7 @@
  * OpenAPI spec version: 1.0
  */
 import type { SetVoteRulesetResponseDto } from "./setVoteRulesetResponseDto";
+import type { VoteDetailResponseDtoMode } from "./voteDetailResponseDtoMode";
 import type { VoteDocumentResponseDto } from "./voteDocumentResponseDto";
 import type { VoteQuestionResponseDto } from "./voteQuestionResponseDto";
 
@@ -19,6 +20,7 @@ export interface VoteDetailResponseDto {
     /** @nullable */
     scheduledTo?: string | null;
     status: string;
+    mode: VoteDetailResponseDtoMode;
     ruleset?: SetVoteRulesetResponseDto | null;
     questions: VoteQuestionResponseDto[];
     documents: VoteDocumentResponseDto[];

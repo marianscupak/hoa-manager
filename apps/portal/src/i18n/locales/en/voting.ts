@@ -18,11 +18,23 @@ export const voting = {
         save: "Save",
         cancel: "Cancel",
     },
+    mode: {
+        PER_ROLLAM: {
+            label: "Per rollam",
+            citation: "§ 1210–1214 OZ",
+        },
+        ASSEMBLY_RECORD: {
+            label: "Assembly record",
+            citation: "§ 1206 OZ",
+        },
+    },
     rules: {
         sentence: "Passes with {{majority}} {{denominator}}, {{weighting}}.",
         majoritySimple: "a simple majority (more than 50 %)",
         majorityQualified: "a qualified majority (at least {{threshold}} %)",
+        majorityUnanimity: "unanimous consent (100 %)",
         ofVotesCast: "of votes cast",
+        ofAllVotes: "of all votes",
         ofVotesCastExclAbstain: "of votes cast (abstentions excluded)",
         weightedByShares: "weighted by ownership shares",
         onePerUnit: "one vote per unit",
@@ -31,7 +43,28 @@ export const voting = {
     },
     create: {
         description: "Set up a new vote for the association.",
+        mode: {
+            PER_ROLLAM: {
+                title: "Per-rollam vote",
+                description:
+                    "A written vote held outside a meeting. Decided by a majority of **all** owners' votes; window must be at least 15 days.",
+                citation: "§ 1210–1214 OZ",
+            },
+            ASSEMBLY_RECORD: {
+                title: "Assembly record",
+                description:
+                    "Records the results of an in-person assembly. Quorum is a simple majority of all votes; decided by a majority of those present.",
+                citation: "§ 1206 OZ",
+            },
+            switchResets:
+                "Switching the vote type resets the voting rules to the statutory defaults for the selected type. Continue?",
+        },
         steps: {
+            mode: {
+                title: "Vote type",
+                description:
+                    "Choose whether this is a per-rollam vote or an assembly record. The type can't be changed once the vote is created.",
+            },
             basicInfo: {
                 title: "Details",
                 description: "Provide the primary details for this vote.",
@@ -143,27 +176,15 @@ export const voting = {
                     },
                 },
             },
-            quorumElectorateBasis: {
-                label: "Quorum Electorate Basis",
-                placeholder: "Select basis",
-                options: {
-                    ALL_UNITS: "All Units",
-                    ELIGIBLE_UNITS_ONLY: "Eligible Units Only",
-                },
+            quorum: {
+                label: "Quorum",
+                perRollamNone:
+                    "A per-rollam vote has no quorum — decided by a majority of all owners' votes (§ 1214 OZ).",
             },
             quorumMeasure: {
-                label: "Quorum Measure",
-                placeholder: "Select measure",
                 options: {
                     UNIT_SHARE: "Unit Share",
                     UNIT_COUNT: "Unit Count",
-                },
-            },
-            quorumThreshold: {
-                label: "Quorum Threshold",
-                errors: {
-                    positiveNumber: "Must be a positive number",
-                    max: "Must be at most 100 %",
                 },
             },
             majorityRuleType: {
@@ -172,21 +193,19 @@ export const voting = {
                 options: {
                     SIMPLE_MAJORITY: "Simple Majority (>50 %)",
                     QUALIFIED_MAJORITY: "Qualified Majority",
+                    UNANIMITY: "Unanimity (100 %)",
                 },
-                cards: {
-                    SIMPLE_MAJORITY: {
-                        hint: "More than 50% of votes cast",
-                    },
-                    QUALIFIED_MAJORITY: {
-                        hint: "A higher threshold you set, e.g. 75%",
-                    },
+            },
+            majorityDenominatorBasis: {
+                label: "Majority Denominator Basis",
+                options: {
+                    VOTES_CAST: "Of votes cast",
+                    ALL_VOTES: "Of all votes",
                 },
             },
             majorityThreshold: {
                 label: "Majority Threshold",
                 errors: {
-                    positiveNumber: "Must be a positive number",
-                    max: "Must be at most 100 %",
                     requiredForQualified:
                         "Required when majority rule is qualified",
                 },
@@ -196,17 +215,38 @@ export const voting = {
                 description:
                     "Enables voters to explicitly abstain from voting on questions.",
             },
-            abstainExcluded: {
-                label: "Exclude Abstains From Majority?",
-                description:
-                    "If true, abstain votes are omitted from the denominator when evaluating majority thresholds.",
-            },
-            allowCoOwnerIndividualVote: {
-                label: "Allow Co-Owners to Vote Individually?",
-                description:
-                    "If enabled, each co-owner of a unit can cast their own ballot instead of requiring a single representative.",
-            },
             time: "Time",
+        },
+        thresholdPicker: {
+            customLabel: "Custom fraction",
+            percentLabel: "Percent",
+            comparatorLabel: "Comparator",
+            comparator: {
+                AT_LEAST: "at least",
+                STRICT_GREATER: "more than",
+            },
+        },
+        legal: {
+            tier1: {
+                MAJORITY_BELOW_FLOOR:
+                    "The required majority is below the statutory simple-majority floor.",
+                PER_ROLLAM_QUORUM_PRESENT:
+                    "A per-rollam vote may not have a quorum set.",
+                PER_ROLLAM_BASIS_NOT_ALL_VOTES:
+                    "A per-rollam vote must count the majority against all votes, not just votes cast.",
+                ASSEMBLY_QUORUM_MISSING:
+                    "An assembly record must have a quorum set.",
+                ASSEMBLY_QUORUM_BELOW_FLOOR:
+                    "The quorum is below the statutory simple-majority floor.",
+            },
+            tier3: {
+                ONE_UNIT_ONE_VOTE: "one-unit-one-vote weighting",
+                UNIT_COUNT_QUORUM: "unit-count quorum",
+            },
+            ackLabel:
+                "I confirm that our association's bylaws explicitly permit: {{deviations}}",
+            overrideStricterOnly:
+                "An override may only make the majority rule stricter, never looser.",
         },
         documents: {
             title: "Documents",
@@ -247,8 +287,9 @@ export const voting = {
         saved: "All changes saved",
         unsaved: "Unsaved changes",
         saving: "Saving…",
-        railTitle: "Set up in 4 steps",
+        railTitle: "Set up in 5 steps",
         steps: {
+            mode: "Vote type",
             details: "Details",
             rules: "Voting rules",
             questions: "Questions",
@@ -267,6 +308,8 @@ export const voting = {
                 "Once scheduled, owners are notified and the setup can no longer be edited.",
             keepDraft: "Keep as draft",
             scheduleAction: "Schedule vote",
+            quorumLine: "Quorum: {{comparator}} {{threshold}}.",
+            majorityLine: "Majority: {{comparator}} {{threshold}}.",
             checks: {
                 VOTE_SCHEDULE_MISSING_DATES:
                     "Opening and closing dates are set",
@@ -298,8 +341,6 @@ export const voting = {
             noDescription: "No description provided.",
             voteRequired: "Your vote is required.",
             voteAction: "Vote",
-            delegationNeededSubtitle:
-                "Consent from your co-owners is required before voting opens.",
             manageDelegation: "Manage Delegation",
             readyToVoteSubtitle: "You are eligible when voting opens.",
             alreadyDelegatedSubtitle: "You have assigned a representative.",
@@ -325,6 +366,12 @@ export const voting = {
         REJECTED: "Rejected",
         NOT_DECIDED: "Not decided",
         winner: "{{option}} wins",
+    },
+    status: {
+        requiresDelegation:
+            "The unit needs a common representative — co-owners must consent by a majority of shares (§ 1185(2) OZ).",
+        requiresDelegationSjm:
+            "For a unit held in marital community property, the other spouse must also confirm the representative.",
     },
     detail: {
         backToVoting: "Voting",
@@ -373,6 +420,8 @@ export const voting = {
                 VOTE_QUESTION_MISSING_OPTIONS:
                     'Question "{{param}}" requires at least two answer options.',
                 VOTE_RULESET_REQUIRED: "A default ruleset must be configured.",
+                VOTE_WINDOW_TOO_SHORT_PER_ROLLAM:
+                    "The per-rollam voting window must last at least 15 days (§ 1211(2) OZ).",
             },
         },
         documents: {
@@ -397,11 +446,13 @@ export const voting = {
                 NO_REPRESENTATIVE: "No common representative was chosen.",
                 MISSING_OWNERSHIP:
                     "Ownership information missing at start time.",
+                ASSOCIATION_OWNED:
+                    "The unit is owned by the association and has no voting right.",
             },
-            delegationWarning:
-                "{{unitName}} is co-owned. A common representative must be chosen.",
             manageDelegation: "Manage Delegation",
             totalPower: "Total Voting Power:",
+            totalPowerVotes_one: "{{count}} vote",
+            totalPowerVotes_other: "{{count}} votes",
             voteButton: "Vote",
             alreadyVotedButton: "Already Voted",
             ballotsFinal: "Ballots are final and cannot be changed.",
@@ -423,8 +474,8 @@ export const voting = {
         cancelExisting: "Cancel delegation",
         selectUnit: "Select Unit",
         whoWillRepresent: "Who will represent you?",
-        searchByCoOwner: "Search co-owners by name",
-        noCandidatesFound: "No eligible co-owners found.",
+        searchByCoOwner: "Search representatives by name",
+        noCandidatesFound: "No eligible representatives found.",
         noSelectableUnits:
             "All your units have already been delegated in this event.",
         assignedToYou: "Assigned to you",
@@ -435,7 +486,7 @@ export const voting = {
         notice: {
             title: "Important Notice",
             description:
-                "Once you delegate your vote for this unit, you cannot vote personally in this specific event unless you revoke the delegation before the vote starts.",
+                "A common representative is chosen by co-owners consenting by a majority of shares (§ 1185(2) OZ). Once you delegate your vote for this unit, you cannot vote personally in this specific event unless you revoke the delegation before the vote starts.",
         },
         summary: {
             title: "Delegation Summary",
@@ -466,6 +517,9 @@ export const voting = {
             terms: "By proceeding, you acknowledge that this delegation complies with the statutes of the HOA. This action grants full voting power for this specific agenda item to the designated delegate listed above.",
             allowAction: "Allow person to vote on my behalf",
         },
+    },
+    delegation: {
+        coOwner: "Co-owner",
     },
     delegations: {
         tabs: {
@@ -574,15 +628,23 @@ export const voting = {
             expandDetails: "Show details",
             collapseDetails: "Hide details",
         },
+        perRollamDenominator:
+            "The majority is counted from all votes in the building (§ 1214 OZ).",
     },
     resultsV2: {
         participationLine:
             "Owners holding {{pct}} % of building shares took part ({{units}} of {{total}} units).",
         participationLineUnits:
             "{{pct}} % of units took part ({{units}} of {{total}} units).",
+        participationExactTitle:
+            "Exact: {{participationNum}}/{{participationDen}} of {{totalNum}}/{{totalDen}}",
         quorumMetLine: "Quorum of {{threshold}} % was met.",
         quorumNotMetLine:
             "Quorum of {{threshold}} % was not met — resolutions are not decided.",
+        thresholdCaption:
+            "Threshold: {{comparator}} {{fraction}} (base {{denominator}})",
+        thresholdDenominatorShare: "{{percent}} % of shares",
+        thresholdExactTitle: "Exact base: {{num}}/{{den}}",
         multipleChoice: "multiple choice",
         ranLine: "Voting ran {{from}} – {{to}} · results computed {{computed}}",
         footnote:

@@ -1,12 +1,12 @@
 import { TFunction } from "i18next";
 
-import { Badge, ColumnDef, DataTable } from "@hoa-mngr/ui";
+import { Badge, LegacyColumnDef, DataTableLegacy } from "@hoa-mngr/ui";
 
 import type { UnitOwnershipResponseDto } from "@/api/generated/model";
 
 export function getUnitOwnershipColumns(
     t: TFunction<"admin" | "common">,
-): ColumnDef<UnitOwnershipResponseDto>[] {
+): LegacyColumnDef<UnitOwnershipResponseDto>[] {
     return [
         {
             header: t("units.details.ownership.owner"),
@@ -55,7 +55,7 @@ export function UnitOwnershipsTable({
     const columns = getUnitOwnershipColumns(t);
 
     return (
-        <DataTable
+        <DataTableLegacy
             columns={columns}
             data={ownerships ?? []}
             isLoading={isLoading}

@@ -5,8 +5,8 @@ import { Link } from "react-router";
 
 import {
     Button,
-    ColumnDef,
-    DataTable,
+    LegacyColumnDef,
+    DataTableLegacy,
     Tooltip,
     TooltipContent,
     TooltipProvider,
@@ -53,7 +53,7 @@ export function UnitsPage({ createOpen, onCreateOpenChange }: UnitsPageProps) {
         .toFixed(4)
         .replace(/\.?0+$/, "");
 
-    const columns: ColumnDef<UnitResponseDto>[] = [
+    const columns: LegacyColumnDef<UnitResponseDto>[] = [
         {
             header: t("units.table.unitNumber"),
             accessorKey: "unitNo",
@@ -132,7 +132,7 @@ export function UnitsPage({ createOpen, onCreateOpenChange }: UnitsPageProps) {
                 </div>
             )}
 
-            <DataTable
+            <DataTableLegacy
                 columns={columns}
                 data={units ?? []}
                 isLoading={isLoading}

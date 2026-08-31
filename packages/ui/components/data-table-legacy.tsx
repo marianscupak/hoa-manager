@@ -1,0 +1,99 @@
+import * as React from "react";
+
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "./table";
+
+export interface LegacyColumnDef<TData> {
+    header: React.ReactNode;
+    accessorKey?: keyof TData;
+    cell?: (props: { row: TData }) => React.ReactNode;
+    className?: string;
+}
+
+export interface DataTableLegacyProps<TData> {
+    columns: LegacyColumnDef<TData>[];
+    data: TData[];
+    isLoading?: boolean;
+    emptyMessage?: string;
+    loadingMessage?: string;
+    /**
+     * Extra className applied to every data `TableRow`. Useful for e.g.
+     * `"group"` so cell content can be revealed with `group-hover:`.
+     */
+    rowClassName?: string;
+}
+
+export function DataTableLegacy<TData>({
+    columns,
+    data,
+    isLoading,
+    emptyMessage = "No results.",
+    loadingMessage,
+    rowClassName,
+}: DataTableLegacyProps<TData>) {
+    return (
+        <div className="bg-card rounded-card shadow-clay-card overflow-hidden border">
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        {columns.map((col, i) => (
+                            <TableHead key={i} className={col.className}>
+                                {col.header}
+                            </TableHead>
+                        ))}
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {isLoading ? (
+                        <TableRow>
+                            <TableCell
+                                colSpan={columns.length}
+                                className="h-24 text-center"
+                            >
+                                {loadingMessage ?? "Loading..."}
+                            </TableCell>
+                        </TableRow>
+                    ) : data.length === 0 ? (
+                        <TableRow>
+                            <TableCell
+                                colSpan={columns.length}
+                                className="text-muted-foreground h-24 text-center"
+                            >
+                                {emptyMessage}
+                            </TableCell>
+                        </TableRow>
+                    ) : (
+                        data.map((row, rowIndex) => (
+                            <TableRow key={rowIndex} className={rowClassName}>
+                                {columns.map((col, colIndex) => {
+                                    let content: React.ReactNode = null;
+                                    if (col.cell) {
+                                        content = col.cell({ row });
+                                    } else if (col.accessorKey) {
+                                        content = String(
+                                            row[col.accessorKey] ?? "",
+                                        );
+                                    }
+                                    return (
+                                        <TableCell
+                                            key={colIndex}
+                                            className={col.className}
+                                        >
+                                            {content}
+                                        </TableCell>
+                                    );
+                                })}
+                            </TableRow>
+                        ))
+                    )}
+                </TableBody>
+            </Table>
+        </div>
+    );
+}

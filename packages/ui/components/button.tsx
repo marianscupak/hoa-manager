@@ -19,12 +19,18 @@ const buttonVariants = cva(
                     "border-border bg-card text-foreground shadow-clay-secondary hover:bg-muted border",
                 ghost: "hover:bg-muted hover:text-foreground",
                 link: "text-primary underline-offset-4 hover:underline",
+                tableAction:
+                    "border-border bg-card text-secondary-foreground hover:bg-muted border font-sans font-medium",
+                tableActionDanger:
+                    "border-border bg-card text-secondary-foreground hover:bg-destructive-faint hover:text-destructive border font-sans font-medium",
             },
             size: {
                 default: "h-10 px-5 py-2",
                 sm: "h-9 px-4",
                 lg: "h-11 px-7",
                 icon: "h-10 w-10",
+                tableIcon: "h-[30px] w-[30px] rounded-lg [&_svg]:size-3.5",
+                tableText: "h-[30px] rounded-lg px-[11px] text-[12.5px]",
             },
         },
         defaultVariants: {

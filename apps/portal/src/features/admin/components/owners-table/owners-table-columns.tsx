@@ -1,7 +1,7 @@
 import { TFunction } from "i18next";
 import { MailIcon } from "lucide-react";
 
-import { Badge, ColumnDef } from "@hoa-mngr/ui";
+import { Badge, LegacyColumnDef } from "@hoa-mngr/ui";
 
 import type { OwnerResponseDto } from "@/api/generated/model";
 
@@ -12,7 +12,7 @@ export const getOwnerColumns = (
     onSuccess: () => void,
     onDelete: (owner: OwnerResponseDto) => void,
     onAddEmail: (owner: OwnerResponseDto) => void,
-): ColumnDef<OwnerResponseDto>[] => [
+): LegacyColumnDef<OwnerResponseDto>[] => [
     {
         header: t("owners.table.displayName"),
         cell: ({ row }) => (

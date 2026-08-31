@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 
-import { DataTable } from "@hoa-mngr/ui";
+import { DataTableLegacy } from "@hoa-mngr/ui";
 
 import { useMemberControllerGetMembers } from "@/api/generated/tenant-members/tenant-members";
 
@@ -31,7 +31,7 @@ export function UsersPage() {
                 </p>
             </div>
 
-            <DataTable
+            <DataTableLegacy
                 columns={columns}
                 data={members ?? []}
                 isLoading={isLoading}

@@ -403,6 +403,9 @@ importers:
       '@radix-ui/react-tooltip':
         specifier: 1.2.8
         version: 1.2.8(@types/react@19.2.14)(react-dom@19.2.4)(react@19.2.4)
+      '@tanstack/react-table':
+        specifier: 8.21.3
+        version: 8.21.3(react-dom@19.2.4)(react@19.2.4)
       class-variance-authority:
         specifier: 0.7.1
         version: 0.7.1
@@ -473,6 +476,9 @@ importers:
       typescript-eslint:
         specifier: 8.57.0
         version: 8.57.0(eslint@10.0.2)(typescript@5.5.4)
+      vitest:
+        specifier: 4.1.11
+        version: 4.1.11(vite@7.3.1)
 
 packages:
 
@@ -4490,6 +4496,23 @@ packages:
     dependencies:
       '@tanstack/query-core': 5.90.20
       react: 19.2.4
+    dev: false
+
+  /@tanstack/react-table@8.21.3(react-dom@19.2.4)(react@19.2.4):
+    resolution: {integrity: sha512-5nNMTSETP4ykGegmVkhjcS8tTLW6Vl4axfEGQN3v0zdHYbK4UfoqfPChclTrJ4EoK9QynqAu9oUf8VEmrpZ5Ww==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      react: '>=16.8'
+      react-dom: '>=16.8'
+    dependencies:
+      '@tanstack/table-core': 8.21.3
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
+    dev: false
+
+  /@tanstack/table-core@8.21.3:
+    resolution: {integrity: sha512-ldZXEhOBb8Is7xLs01fR3YEc3DERiz5silj8tnGkFZytt1abEvl/GhUmCE0PMLaMPTa3Jk4HbKmRlHmu+gCftg==}
+    engines: {node: '>=12'}
     dev: false
 
   /@tokenizer/inflate@0.4.1:

@@ -3,7 +3,7 @@ import { cs, enUS } from "date-fns/locale";
 import { TFunction } from "i18next";
 import { MailIcon } from "lucide-react";
 
-import { Badge, ColumnDef } from "@hoa-mngr/ui";
+import { Badge, LegacyColumnDef } from "@hoa-mngr/ui";
 
 import type { MemberResponseDto } from "@/api/generated/model";
 import { getInitials } from "@/components/user-menu";
@@ -20,7 +20,7 @@ export const getUserColumns = (
     onSuccess: () => void,
     adminsCount: number,
     language: string,
-): ColumnDef<MemberResponseDto>[] => [
+): LegacyColumnDef<MemberResponseDto>[] => [
     {
         header: t("users.table.name"),
         cell: ({ row }) => (

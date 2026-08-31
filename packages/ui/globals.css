@@ -32,8 +32,10 @@
     --color-destructive-muted: #fee2e2;
     --color-destructive-muted-foreground: #b91c1c;
     --color-destructive-bar: #f43f5e;
+    --color-destructive-faint: #fef2f2;
     --color-border: #e2e8f0;
     --color-hairline: #f1f5f9;
+    --color-surface-zebra: #fafbfe;
     --color-input: #e2e8f0;
     --color-ring: #7c3aed;
 

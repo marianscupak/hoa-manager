@@ -1,99 +1,332 @@
+import {
+    flexRender,
+    getCoreRowModel,
+    getFilteredRowModel,
+    getPaginationRowModel,
+    getSortedRowModel,
+    useReactTable,
+    type ColumnDef,
+    type Row,
+    type RowData,
+    type SortingFn,
+    type SortingState,
+} from "@tanstack/react-table";
+import { ChevronLeftIcon, ChevronRightIcon, SearchIcon } from "lucide-react";
 import * as React from "react";
 
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "./table";
+    getFooterInfo,
+    localeNumericCompare,
+    matchesSearch,
+    type FooterInfo,
+} from "../lib/data-table-logic";
+import { cn } from "../lib/utils";
 
-export interface ColumnDef<TData> {
-    header: React.ReactNode;
-    accessorKey?: keyof TData;
-    cell?: (props: { row: TData }) => React.ReactNode;
-    className?: string;
+declare module "@tanstack/react-table" {
+    interface ColumnMeta<TData extends RowData, TValue> {
+        align?: "right";
+        className?: string;
+    }
+    interface SortingFns {
+        localeNumeric: SortingFn<unknown>;
+    }
 }
 
-export interface DataTableProps<TData> {
+export type { ColumnDef, SortingState };
+
+export interface DataTableProps<TData extends { id: string }> {
     columns: ColumnDef<TData>[];
     data: TData[];
+    /** Shared grid template for header + rows, e.g. "1.9fr 1.1fr 118px 140px" */
+    gridTemplate: string;
     isLoading?: boolean;
-    emptyMessage?: string;
     loadingMessage?: string;
-    /**
-     * Extra className applied to every data `TableRow`. Useful for e.g.
-     * `"group"` so cell content can be revealed with `group-hover:`.
-     */
-    rowClassName?: string;
+    /** Shown when the table has no rows at all. */
+    emptyMessage: string;
+    /** Shown when a search query matches nothing; falls back to emptyMessage. */
+    emptySearchMessage?: string;
+    /** Omit to hide the search field. */
+    searchPlaceholder?: string;
+    /** Extra toolbar content, right-aligned (e.g. a filter select). */
+    toolbarEnd?: React.ReactNode;
+    pageSize?: number;
+    zebra?: boolean;
+    initialSorting?: SortingState;
+    /** Footer text; check info.paginated to choose range vs plain count. */
+    countLabel: (info: FooterInfo) => string;
+    /** Aria labels for the prev/next pager buttons. */
+    paginationLabels?: { previous: string; next: string };
 }
 
-export function DataTable<TData>({
+function diacriticGlobalFilter<TData>(
+    row: Row<TData>,
+    columnId: string,
+    filterValue: string,
+): boolean {
+    return matchesSearch(row.getValue(columnId), filterValue);
+}
+
+/** Stable identity for the empty case. TanStack v8 recomputes row models
+ *  on every new array reference; a fresh `[]` per render (e.g. `data ?? []`
+ *  while loading) combined with autoResetPageIndex causes render loops. */
+const EMPTY_DATA: never[] = [];
+
+export function DataTable<TData extends { id: string }>({
     columns,
     data,
+    gridTemplate,
     isLoading,
-    emptyMessage = "No results.",
     loadingMessage,
-    rowClassName,
+    emptyMessage,
+    emptySearchMessage,
+    searchPlaceholder,
+    toolbarEnd,
+    pageSize = 10,
+    zebra = true,
+    initialSorting,
+    countLabel,
+    paginationLabels,
 }: DataTableProps<TData>) {
+    const [sorting, setSorting] = React.useState<SortingState>(
+        initialSorting ?? [],
+    );
+    const [globalFilter, setGlobalFilter] = React.useState("");
+    const [pagination, setPagination] = React.useState({
+        pageIndex: 0,
+        pageSize,
+    });
+
+    const table = useReactTable({
+        data: data.length === 0 ? (EMPTY_DATA as TData[]) : data,
+        columns,
+        state: { sorting, globalFilter, pagination },
+        onSortingChange: setSorting,
+        onGlobalFilterChange: setGlobalFilter,
+        onPaginationChange: setPagination,
+        getCoreRowModel: getCoreRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        globalFilterFn: diacriticGlobalFilter,
+        getColumnCanGlobalFilter: (column) =>
+            column.columnDef.enableGlobalFilter === true,
+        sortingFns: {
+            localeNumeric: (rowA, rowB, columnId) =>
+                localeNumericCompare(
+                    String(rowA.getValue(columnId) ?? ""),
+                    String(rowB.getValue(columnId) ?? ""),
+                ),
+        },
+        enableSortingRemoval: false,
+        autoResetPageIndex: true,
+        getRowId: (row) => row.id,
+    });
+
+    const rows = table.getRowModel().rows;
+    const total = table.getFilteredRowModel().rows.length;
+    const footer = getFooterInfo(
+        pagination.pageIndex,
+        pagination.pageSize,
+        total,
+    );
+    const pageCount = table.getPageCount();
+
+    const headers = table.getHeaderGroups()[0]?.headers ?? [];
+
     return (
-        <div className="bg-card rounded-card shadow-clay-card overflow-hidden border">
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        {columns.map((col, i) => (
-                            <TableHead key={i} className={col.className}>
-                                {col.header}
-                            </TableHead>
-                        ))}
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {isLoading ? (
-                        <TableRow>
-                            <TableCell
-                                colSpan={columns.length}
-                                className="h-24 text-center"
-                            >
-                                {loadingMessage ?? "Loading..."}
-                            </TableCell>
-                        </TableRow>
-                    ) : data.length === 0 ? (
-                        <TableRow>
-                            <TableCell
-                                colSpan={columns.length}
-                                className="text-muted-foreground h-24 text-center"
-                            >
-                                {emptyMessage}
-                            </TableCell>
-                        </TableRow>
+        <div
+            role="table"
+            className="bg-card rounded-card shadow-clay-card overflow-hidden border"
+        >
+            {(searchPlaceholder || toolbarEnd) && (
+                <div className="border-hairline flex items-center justify-between gap-3 border-b px-4 py-3">
+                    {searchPlaceholder ? (
+                        <div className="bg-background border-border relative h-[34px] w-full max-w-[300px] rounded-full border">
+                            <SearchIcon className="text-faint pointer-events-none absolute top-1/2 left-[13px] h-3.5 w-3.5 -translate-y-1/2" />
+                            <input
+                                type="search"
+                                value={globalFilter}
+                                onChange={(e) =>
+                                    setGlobalFilter(e.target.value)
+                                }
+                                placeholder={searchPlaceholder}
+                                aria-label={searchPlaceholder}
+                                className="placeholder:text-faint focus-visible:ring-ring h-full w-full rounded-full bg-transparent pr-[13px] pl-9 text-[13.5px] focus-visible:ring-2 focus-visible:outline-none"
+                            />
+                        </div>
                     ) : (
-                        data.map((row, rowIndex) => (
-                            <TableRow key={rowIndex} className={rowClassName}>
-                                {columns.map((col, colIndex) => {
-                                    let content: React.ReactNode = null;
-                                    if (col.cell) {
-                                        content = col.cell({ row });
-                                    } else if (col.accessorKey) {
-                                        content = String(
-                                            row[col.accessorKey] ?? "",
-                                        );
-                                    }
-                                    return (
-                                        <TableCell
-                                            key={colIndex}
-                                            className={col.className}
-                                        >
-                                            {content}
-                                        </TableCell>
-                                    );
-                                })}
-                            </TableRow>
-                        ))
+                        <div />
                     )}
-                </TableBody>
-            </Table>
+                    {toolbarEnd}
+                </div>
+            )}
+
+            <div
+                role="row"
+                className="bg-background border-hairline grid items-center gap-3 border-b px-5 py-[9px]"
+                style={{ gridTemplateColumns: gridTemplate }}
+            >
+                {headers.map((header) => {
+                    const canSort = header.column.getCanSort();
+                    const sorted = header.column.getIsSorted();
+                    const align = header.column.columnDef.meta?.align;
+                    const label = header.isPlaceholder
+                        ? null
+                        : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                          );
+                    return (
+                        <div
+                            role="columnheader"
+                            aria-sort={
+                                sorted === "asc"
+                                    ? "ascending"
+                                    : sorted === "desc"
+                                      ? "descending"
+                                      : undefined
+                            }
+                            key={header.id}
+                            className={cn(
+                                "min-w-0",
+                                align === "right" && "flex justify-end",
+                            )}
+                        >
+                            {canSort ? (
+                                <button
+                                    type="button"
+                                    onClick={header.column.getToggleSortingHandler()}
+                                    className={cn(
+                                        "focus-visible:ring-ring inline-flex cursor-pointer items-center gap-2 text-xs font-semibold tracking-[0.3px] uppercase focus-visible:ring-2 focus-visible:outline-none",
+                                        sorted
+                                            ? "text-primary-hover font-bold"
+                                            : "text-muted-foreground",
+                                    )}
+                                >
+                                    {label}
+                                    {sorted && (
+                                        <span
+                                            aria-hidden
+                                            className="text-[8px] leading-none"
+                                        >
+                                            {sorted === "asc" ? "▲" : "▼"}
+                                        </span>
+                                    )}
+                                </button>
+                            ) : (
+                                <span className="text-muted-foreground text-xs font-semibold tracking-[0.3px] uppercase">
+                                    {label}
+                                </span>
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+
+            <div>
+                {isLoading ? (
+                    <div className="text-muted-foreground px-5 py-8 text-center text-[13.5px]">
+                        {loadingMessage ?? "…"}
+                    </div>
+                ) : rows.length === 0 ? (
+                    <div className="text-muted-foreground px-5 py-8 text-center text-[13.5px]">
+                        {globalFilter
+                            ? (emptySearchMessage ?? emptyMessage)
+                            : emptyMessage}
+                    </div>
+                ) : (
+                    rows.map((row, rowIndex) => (
+                        <div
+                            role="row"
+                            key={row.id}
+                            className={cn(
+                                "border-hairline hover:bg-muted grid items-center gap-3 border-b px-5 py-[9px] text-sm last:border-b-0",
+                                zebra &&
+                                    rowIndex % 2 === 0 &&
+                                    "bg-surface-zebra",
+                            )}
+                            style={{ gridTemplateColumns: gridTemplate }}
+                        >
+                            {row.getVisibleCells().map((cell) => (
+                                <div
+                                    role="cell"
+                                    key={cell.id}
+                                    className={cn(
+                                        "min-w-0",
+                                        cell.column.columnDef.meta?.align ===
+                                            "right" && "flex justify-end",
+                                        cell.column.columnDef.meta?.className,
+                                    )}
+                                >
+                                    {flexRender(
+                                        cell.column.columnDef.cell,
+                                        cell.getContext(),
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    ))
+                )}
+            </div>
+
+            <div className="bg-background border-hairline flex items-center justify-between gap-3 border-t py-[9px] pr-3.5 pl-5">
+                <span className="text-muted-foreground text-[12.5px]">
+                    {countLabel(footer)}
+                </span>
+                {footer.paginated && (
+                    <div className="flex items-center gap-1.5">
+                        <PagerButton
+                            aria-label={
+                                paginationLabels?.previous ?? "Previous page"
+                            }
+                            disabled={!table.getCanPreviousPage()}
+                            onClick={() => table.previousPage()}
+                        >
+                            <ChevronLeftIcon className="h-4 w-4" />
+                        </PagerButton>
+                        {Array.from({ length: pageCount }, (_, i) => (
+                            <PagerButton
+                                key={i}
+                                aria-current={
+                                    pagination.pageIndex === i
+                                        ? "page"
+                                        : undefined
+                                }
+                                active={pagination.pageIndex === i}
+                                onClick={() => table.setPageIndex(i)}
+                            >
+                                {i + 1}
+                            </PagerButton>
+                        ))}
+                        <PagerButton
+                            aria-label={paginationLabels?.next ?? "Next page"}
+                            disabled={!table.getCanNextPage()}
+                            onClick={() => table.nextPage()}
+                        >
+                            <ChevronRightIcon className="h-4 w-4" />
+                        </PagerButton>
+                    </div>
+                )}
+            </div>
         </div>
+    );
+}
+
+function PagerButton({
+    active,
+    className,
+    ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & { active?: boolean }) {
+    return (
+        <button
+            type="button"
+            className={cn(
+                "border-border bg-card text-secondary-foreground hover:bg-muted focus-visible:ring-ring flex h-[30px] min-w-[30px] cursor-pointer items-center justify-center rounded-lg border px-1 text-[12.5px] focus-visible:ring-2 focus-visible:outline-none disabled:cursor-default disabled:opacity-40",
+                active &&
+                    "bg-primary border-primary text-primary-foreground hover:bg-primary font-bold shadow-[0_2px_0_#5b21b6]",
+                className,
+            )}
+            {...props}
+        />
     );
 }

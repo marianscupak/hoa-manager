@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { DataTable } from "@hoa-mngr/ui";
+import { DataTableLegacy } from "@hoa-mngr/ui";
 
 import type { OwnerResponseDto } from "@/api/generated/model";
 import { useOwnerControllerGetOwners } from "@/api/generated/property-owners/property-owners";
@@ -39,7 +39,7 @@ export function OwnersPage({
 
     return (
         <div className="space-y-6">
-            <DataTable
+            <DataTableLegacy
                 columns={columns}
                 data={owners ?? []}
                 isLoading={isLoading}

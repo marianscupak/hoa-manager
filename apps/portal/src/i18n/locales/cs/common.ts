@@ -32,4 +32,8 @@ export default {
         closeMenu: "Zavřít menu",
     },
     menu: "Menu",
+    pagination: {
+        previous: "Předchozí stránka",
+        next: "Další stránka",
+    },
 } as const;

@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { MailPlusIcon, SendIcon, Trash2Icon, XIcon } from "lucide-react";
+import { Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button, toast } from "@hoa-mngr/ui";
@@ -58,14 +58,13 @@ export function OwnerRowActions({
     const isRevoking = revokeInvite.isPending;
 
     return (
-        <div className="flex items-center justify-end gap-2">
+        <div className="flex items-center justify-end gap-1.5">
             {!row.userId && !row.email && (
                 <Button
-                    variant="ghost"
-                    size="sm"
+                    variant="tableAction"
+                    size="tableText"
                     onClick={() => onAddEmail(row)}
                 >
-                    <MailPlusIcon className="h-3.5 w-3.5" />
                     {t("owners.addEmail.action")}
                 </Button>
             )}
@@ -74,42 +73,39 @@ export function OwnerRowActions({
                     {row.inviteStatus === "pending" && (
                         <>
                             <Button
-                                variant="ghost"
-                                size="sm"
+                                variant="tableAction"
+                                size="tableText"
                                 onClick={() =>
                                     sendInvite.mutate({ ownerId: row.id })
                                 }
                                 disabled={isSending}
                             >
-                                <SendIcon className="h-3.5 w-3.5" />
                                 {isSending
                                     ? t("owners.invite.sending")
                                     : t("owners.invite.resend")}
                             </Button>
                             <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                variant="tableActionDanger"
+                                size="tableText"
+                                className="text-destructive"
                                 onClick={() =>
                                     revokeInvite.mutate({ ownerId: row.id })
                                 }
                                 disabled={isRevoking}
                             >
-                                <XIcon className="h-3.5 w-3.5" />
                                 {t("owners.invite.revoke")}
                             </Button>
                         </>
                     )}
                     {row.inviteStatus === "expired" && (
                         <Button
-                            variant="ghost"
-                            size="sm"
+                            variant="tableAction"
+                            size="tableText"
                             onClick={() =>
                                 sendInvite.mutate({ ownerId: row.id })
                             }
                             disabled={isSending}
                         >
-                            <SendIcon className="h-3.5 w-3.5" />
                             {isSending
                                 ? t("owners.invite.sending")
                                 : t("owners.invite.resend")}
@@ -117,14 +113,13 @@ export function OwnerRowActions({
                     )}
                     {!row.inviteStatus && (
                         <Button
-                            variant="ghost"
-                            size="sm"
+                            variant="tableAction"
+                            size="tableText"
                             onClick={() =>
                                 sendInvite.mutate({ ownerId: row.id })
                             }
                             disabled={isSending}
                         >
-                            <SendIcon className="h-3.5 w-3.5" />
                             {isSending
                                 ? t("owners.invite.sending")
                                 : t("owners.invite.send")}
@@ -133,9 +128,9 @@ export function OwnerRowActions({
                 </>
             )}
             <Button
-                variant="ghost"
-                size="icon"
-                className="text-destructive hover:bg-destructive/10 hover:text-destructive h-8 w-8"
+                variant="tableActionDanger"
+                size="tableIcon"
+                aria-label={t("owners.delete.title")}
                 onClick={() => onDelete(row)}
             >
                 <Trash2Icon />

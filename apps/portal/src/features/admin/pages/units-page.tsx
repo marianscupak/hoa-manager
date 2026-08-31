@@ -1,23 +1,15 @@
-import { AlertTriangleIcon, PencilIcon, Trash2Icon } from "lucide-react";
+import { AlertTriangleIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
 
-import {
-    Button,
-    LegacyColumnDef,
-    DataTableLegacy,
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "@hoa-mngr/ui";
+import { DataTable } from "@hoa-mngr/ui";
 
 import type { UnitResponseDto } from "@/api/generated/model";
 import { useUnitControllerGetUnits } from "@/api/generated/property-units/property-units";
 
 import { CreateUnitDialog } from "../components/create-unit-dialog";
 import { DeleteUnitDialog } from "../components/delete-unit-dialog";
+import { getUnitColumns } from "../components/units-table/units-table-columns";
 
 export interface UnitsPageProps {
     createOpen: boolean;
@@ -53,70 +45,10 @@ export function UnitsPage({ createOpen, onCreateOpenChange }: UnitsPageProps) {
         .toFixed(4)
         .replace(/\.?0+$/, "");
 
-    const columns: LegacyColumnDef<UnitResponseDto>[] = [
-        {
-            header: t("units.table.unitNumber"),
-            accessorKey: "unitNo",
-            className: "font-semibold",
-        },
-        {
-            header: t("units.table.buildingShare"),
-            accessorKey: "buildingShareNumerator",
-            cell: ({ row }) => {
-                const percent = (
-                    (row.buildingShareNumerator /
-                        row.buildingShareDenominator) *
-                    100
-                ).toFixed(2);
-                return (
-                    <span>
-                        {row.buildingShareNumerator}/
-                        {row.buildingShareDenominator}{" "}
-                        <span className="text-muted-foreground">
-                            ({percent} %)
-                        </span>
-                    </span>
-                );
-            },
-        },
-        {
-            header: tCommon("actions"),
-            className: "text-right",
-            cell: ({ row }) => {
-                return (
-                    <div className="flex items-center justify-end gap-2">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                            asChild
-                        >
-                            <Link to={`/admin/units/${row.id}`}>
-                                <TooltipProvider>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <PencilIcon className="h-4 w-4" />
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            {t("units.details.ownership.edit")}
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
-                            </Link>
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-destructive hover:bg-destructive/10 hover:text-destructive h-8 w-8"
-                            onClick={() => setDeletingUnit(row)}
-                        >
-                            <Trash2Icon className="h-4 w-4" />
-                        </Button>
-                    </div>
-                );
-            },
-        },
-    ];
+    const columns = useMemo(
+        () => getUnitColumns(t, (unit) => setDeletingUnit(unit)),
+        [t],
+    );
 
     return (
         <div className="space-y-6">
@@ -132,12 +64,29 @@ export function UnitsPage({ createOpen, onCreateOpenChange }: UnitsPageProps) {
                 </div>
             )}
 
-            <DataTableLegacy
+            <DataTable
                 columns={columns}
                 data={units ?? []}
+                gridTemplate="1.1fr 1.4fr 1.5fr 88px"
                 isLoading={isLoading}
-                emptyMessage={t("units.empty")}
                 loadingMessage={tCommon("loading")}
+                emptyMessage={t("units.empty")}
+                emptySearchMessage={t("units.table.noMatch")}
+                searchPlaceholder={t("units.table.searchPlaceholder")}
+                initialSorting={[{ id: "unitNo", desc: false }]}
+                countLabel={(info) =>
+                    info.paginated
+                        ? t("units.table.range", {
+                              from: info.from,
+                              to: info.to,
+                              total: info.total,
+                          })
+                        : t("units.table.count", { count: info.total })
+                }
+                paginationLabels={{
+                    previous: tCommon("pagination.previous"),
+                    next: tCommon("pagination.next"),
+                }}
             />
 
             <CreateUnitDialog

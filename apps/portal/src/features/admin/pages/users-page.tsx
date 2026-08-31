@@ -1,6 +1,7 @@
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
-import { DataTableLegacy } from "@hoa-mngr/ui";
+import { DataTable } from "@hoa-mngr/ui";
 
 import { useMemberControllerGetMembers } from "@/api/generated/tenant-members/tenant-members";
 
@@ -18,7 +19,10 @@ export function UsersPage() {
 
     const adminsCount = members?.filter((m) => m.role === "ADMIN").length ?? 0;
 
-    const columns = getUserColumns(t, refetch, adminsCount, i18n.language);
+    const columns = useMemo(
+        () => getUserColumns(t, refetch, adminsCount, i18n.language),
+        [t, refetch, adminsCount, i18n.language],
+    );
 
     return (
         <div className="space-y-6">
@@ -31,12 +35,16 @@ export function UsersPage() {
                 </p>
             </div>
 
-            <DataTableLegacy
+            <DataTable
                 columns={columns}
                 data={members ?? []}
+                gridTemplate="1.4fr 1.6fr 0.9fr 0.9fr 150px"
                 isLoading={isLoading}
-                emptyMessage={t("users.empty")}
                 loadingMessage={tCommon("loading")}
+                emptyMessage={t("users.empty")}
+                countLabel={(info) =>
+                    t("users.table.count", { count: info.total })
+                }
             />
         </div>
     );

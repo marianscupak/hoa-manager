@@ -1,41 +1,58 @@
 import { TFunction } from "i18next";
 
-import { Badge, LegacyColumnDef, DataTableLegacy } from "@hoa-mngr/ui";
+import {
+    Badge,
+    CellNumeric,
+    DataTable,
+    StatusChip,
+    type ColumnDef,
+} from "@hoa-mngr/ui";
 
 import type { UnitOwnershipResponseDto } from "@/api/generated/model";
 
 export function getUnitOwnershipColumns(
     t: TFunction<"admin" | "common">,
-): LegacyColumnDef<UnitOwnershipResponseDto>[] {
+): ColumnDef<UnitOwnershipResponseDto>[] {
     return [
         {
+            id: "owner",
             header: t("units.details.ownership.owner"),
+            enableSorting: false,
+            enableGlobalFilter: false,
             cell: ({ row }) => (
-                <span className="text-foreground inline-flex items-center gap-2 font-medium">
-                    {row.members.map((member) => member.displayName).join(", ")}
-                    {row.partyType === "SJM" && (
+                <span className="text-foreground inline-flex min-w-0 items-center gap-2 text-sm font-semibold">
+                    <span className="truncate">
+                        {row.original.members
+                            .map((member) => member.displayName)
+                            .join(", ")}
+                    </span>
+                    {row.original.partyType === "SJM" && (
                         <Badge variant="primaryTint">SJM</Badge>
                     )}
                 </span>
             ),
         },
         {
+            id: "share",
             header: t("units.details.ownership.share"),
+            enableSorting: false,
+            enableGlobalFilter: false,
             cell: ({ row }) => (
-                <span className="text-foreground">
-                    {row.shareNumerator}/{row.shareDenominator}
-                    <span className="text-muted-foreground ml-2 text-xs">
-                        {row.shareDecimal}
-                    </span>
-                </span>
+                <CellNumeric
+                    value={`${row.original.shareNumerator}/${row.original.shareDenominator}`}
+                    secondary={row.original.shareDecimal}
+                />
             ),
         },
         {
+            id: "active",
             header: t("units.details.ownership.active"),
+            enableSorting: false,
+            enableGlobalFilter: false,
             cell: () => (
-                <span className="bg-success-muted text-success ring-success/20 inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset">
+                <StatusChip variant="success">
                     {t("units.details.ownership.active")}
-                </span>
+                </StatusChip>
             ),
         },
     ];
@@ -55,12 +72,16 @@ export function UnitOwnershipsTable({
     const columns = getUnitOwnershipColumns(t);
 
     return (
-        <DataTableLegacy
+        <DataTable
             columns={columns}
             data={ownerships ?? []}
+            gridTemplate="1.6fr 1.2fr 110px"
             isLoading={isLoading}
-            emptyMessage={t("units.details.ownership.empty")}
             loadingMessage={t("loading", { ns: "common" })}
+            emptyMessage={t("units.details.ownership.empty")}
+            countLabel={(info) =>
+                t("units.details.ownership.count", { count: info.total })
+            }
         />
     );
 }

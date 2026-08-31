@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { DataTableLegacy } from "@hoa-mngr/ui";
+import { DataTable } from "@hoa-mngr/ui";
 
 import type { OwnerResponseDto } from "@/api/generated/model";
 import { useOwnerControllerGetOwners } from "@/api/generated/property-owners/property-owners";
@@ -30,21 +30,42 @@ export function OwnersPage({
 
     const { data: owners, isLoading, refetch } = useOwnerControllerGetOwners();
 
-    const columns = getOwnerColumns(
-        t,
-        refetch,
-        (owner) => setDeletingOwner(owner),
-        (owner) => setAddingEmailOwner(owner),
+    const columns = useMemo(
+        () =>
+            getOwnerColumns(
+                t,
+                refetch,
+                (owner) => setDeletingOwner(owner),
+                (owner) => setAddingEmailOwner(owner),
+            ),
+        [t, refetch],
     );
 
     return (
         <div className="space-y-6">
-            <DataTableLegacy
+            <DataTable
                 columns={columns}
                 data={owners ?? []}
+                gridTemplate="1.9fr 1.1fr 118px 210px"
                 isLoading={isLoading}
-                emptyMessage={t("owners.empty")}
                 loadingMessage={tCommon("loading")}
+                emptyMessage={t("owners.empty")}
+                emptySearchMessage={t("owners.table.noMatch")}
+                searchPlaceholder={t("owners.table.searchPlaceholder")}
+                initialSorting={[{ id: "name", desc: false }]}
+                countLabel={(info) =>
+                    info.paginated
+                        ? t("owners.table.range", {
+                              from: info.from,
+                              to: info.to,
+                              total: info.total,
+                          })
+                        : t("owners.table.count", { count: info.total })
+                }
+                paginationLabels={{
+                    previous: tCommon("pagination.previous"),
+                    next: tCommon("pagination.next"),
+                }}
             />
 
             <CreateOwnerDialog

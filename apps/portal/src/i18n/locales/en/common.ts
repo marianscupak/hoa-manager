@@ -32,4 +32,8 @@ export default {
         closeMenu: "Close menu",
     },
     menu: "Menu",
+    pagination: {
+        previous: "Previous page",
+        next: "Next page",
+    },
 } as const;

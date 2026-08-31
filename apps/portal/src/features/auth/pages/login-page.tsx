@@ -36,7 +36,6 @@ export function LoginPage() {
                         name="password"
                         label={t("loginPage.passwordLabel")}
                         type="password"
-                        placeholder={t("loginPage.passwordPlaceholder")}
                         disabled={isPending}
                     />
 

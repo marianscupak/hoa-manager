@@ -53,8 +53,6 @@ export const voting = {
                 description:
                     "Zápis výsledků prezenčního shromáždění. Kvórum nadpoloviční většiny všech hlasů; rozhoduje většina přítomných.",
             },
-            switchResets:
-                "Změna typu hlasování obnoví pravidla hlasování na zákonné výchozí nastavení pro zvolený typ. Pokračovat?",
         },
         steps: {
             mode: {

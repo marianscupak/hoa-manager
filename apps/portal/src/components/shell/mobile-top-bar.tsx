@@ -7,6 +7,7 @@ import { Button } from "@hoa-mngr/ui";
 import { cn } from "@hoa-mngr/ui/lib/utils";
 
 import { AppSidebar } from "./app-sidebar";
+import { BrandMark } from "./brand-mark";
 
 export function MobileTopBar({ className }: { className?: string }) {
     const { t } = useTranslation(["common"]);
@@ -40,14 +41,7 @@ export function MobileTopBar({ className }: { className?: string }) {
                     className,
                 )}
             >
-                <div className="flex items-center gap-2.5">
-                    <div className="font-display bg-primary text-primary-foreground flex h-7 w-7 items-center justify-center rounded-[10px] text-sm font-black shadow-[0_3px_0_#5b21b6]">
-                        H
-                    </div>
-                    <span className="font-display text-foreground text-base font-extrabold tracking-tight">
-                        HOA Manager
-                    </span>
-                </div>
+                <BrandMark />
                 <Button
                     variant="ghost"
                     size="icon"

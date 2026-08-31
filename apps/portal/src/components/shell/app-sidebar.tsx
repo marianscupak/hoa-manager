@@ -21,6 +21,7 @@ import { Role } from "@/auth/roles";
 import { useTenantSwitcher } from "@/auth/use-tenant-switcher";
 import { getInitials, UserMenu } from "@/components/user-menu";
 
+import { BrandMark } from "./brand-mark";
 import {
     ADMIN_NAV,
     MAIN_NAV,
@@ -137,14 +138,7 @@ export function AppSidebar({ className }: { className?: string }) {
                 className,
             )}
         >
-            <div className="mb-4 flex items-center gap-2.5 px-1.5">
-                <div className="font-display bg-primary text-primary-foreground flex h-7 w-7 items-center justify-center rounded-[10px] text-sm font-black shadow-[0_3px_0_#5b21b6]">
-                    H
-                </div>
-                <span className="font-display text-foreground text-base font-extrabold tracking-tight">
-                    HOA Manager
-                </span>
-            </div>
+            <BrandMark className="mb-4 px-1.5" />
 
             <TenantSwitcherPill tenantName={tenantName} />
 

@@ -52,8 +52,6 @@ export const voting = {
                 description:
                     "Records the results of an in-person assembly. Quorum is a simple majority of all votes; decided by a majority of those present.",
             },
-            switchResets:
-                "Switching the vote type resets the voting rules to the statutory defaults for the selected type. Continue?",
         },
         steps: {
             mode: {

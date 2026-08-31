@@ -125,16 +125,6 @@ export function CreateVoteWizard({
     // truth) always wins over the local pre-creation selection.
     const mode = voteData?.mode ?? selectedMode;
 
-    const handleModeChange = useCallback(
-        (nextMode: "PER_ROLLAM" | "ASSEMBLY_RECORD") => {
-            if (nextMode === mode) return;
-            if (window.confirm(t("voting:create.mode.switchResets"))) {
-                setSelectedMode(nextMode);
-            }
-        },
-        [mode, t],
-    );
-
     useEffect(() => {
         if (!createdVoteId) return;
 
@@ -334,7 +324,7 @@ export function CreateVoteWizard({
                                 {t("voting:create.steps.mode.description")}
                             </p>
                         </div>
-                        <ModeStep value={mode} onChange={handleModeChange} />
+                        <ModeStep value={mode} onChange={setSelectedMode} />
                     </div>
                 )}
 

@@ -112,6 +112,9 @@ const PAYLOADS: Record<CoreEventType, Record<string, unknown>> = {
       linkedBy: 'Alice Admin',
     },
   },
+  [CoreEventType.OWNER_EMAIL_ADDED]: {
+    labels: { ownerName: 'Bob Owner', addedBy: 'Alice Admin' },
+  },
   [CoreEventType.OWNER_INVITE_SENT]: {
     inviteId: '33333333-3333-3333-3333-333333333333',
     emailHash: 'a'.repeat(64),

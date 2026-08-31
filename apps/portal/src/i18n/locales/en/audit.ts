@@ -27,6 +27,7 @@ export const audit = {
         OWNER_CREATED: "Owner added",
         OWNER_DELETED: "Owner removed",
         UNIT_OWNERSHIP_REPLACED: "Unit ownership changed",
+        OWNER_EMAIL_ADDED: "Owner email added",
         OWNER_USER_LINKED: "Owner linked to user",
         OWNER_INVITE_SENT: "Invitation sent",
         OWNER_INVITE_REVOKED: "Invitation revoked",

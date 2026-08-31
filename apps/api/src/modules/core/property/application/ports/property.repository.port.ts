@@ -43,6 +43,7 @@ export interface OwnerRepository {
   existsAssociationOwner(tenantId: string): Promise<boolean>;
   listByTenant(tenantId: string): Promise<Owner[]>;
   setUserId(tenantId: string, ownerId: string, userId: string): Promise<void>;
+  setEmail(tenantId: string, ownerId: string, email: string): Promise<void>;
   delete(tenantId: string, ownerId: string): Promise<void>;
 }
 

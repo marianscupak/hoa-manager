@@ -86,6 +86,7 @@ const META: Record<string, EventTypeMeta> = {
         icon: Repeat,
         dotColor: "bg-faint",
     },
+    "CORE.OWNER_EMAIL_ADDED": { icon: MailPlus, dotColor: "bg-faint" },
     "CORE.OWNER_USER_LINKED": { icon: Link2, dotColor: "bg-faint" },
     "CORE.OWNER_INVITE_SENT": { icon: MailPlus, dotColor: "bg-faint" },
     "CORE.OWNER_INVITE_REVOKED": {

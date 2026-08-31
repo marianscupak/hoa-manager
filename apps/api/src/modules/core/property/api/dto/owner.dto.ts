@@ -22,6 +22,12 @@ export const createOwnerSchema = z.object({
 
 export class CreateOwnerDto extends createZodDto(createOwnerSchema) {}
 
+export const setOwnerEmailSchema = z.object({
+  email: z.email().describe('Email address to set for the owner'),
+});
+
+export class SetOwnerEmailDto extends createZodDto(setOwnerEmailSchema) {}
+
 export class CreateOwnerResponseDto {
   @ApiProperty({
     description: 'The unique identifier of the newly created owner',

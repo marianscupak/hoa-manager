@@ -79,6 +79,7 @@ export * from "./replaceOwnershipsDtoOwnershipsItemPartyType";
 export * from "./requestDocumentUploadDto";
 export * from "./requestDocumentUploadResponseDto";
 export * from "./rulesetFractionDto";
+export * from "./setOwnerEmailDto";
 export * from "./setVoteRulesetDto";
 export * from "./setVoteRulesetDtoMajorityComparator";
 export * from "./setVoteRulesetDtoMajorityDenominatorBasis";

@@ -26,6 +26,7 @@ import type {
     CreateOwnerResponseDto,
     ErrorResponseDto,
     OwnerResponseDto,
+    SetOwnerEmailDto,
 } from ".././model";
 
 import { customInstance } from "../../axios";
@@ -264,6 +265,95 @@ export const useOwnerControllerCreateOwner = <
 > => {
     return useMutation(
         getOwnerControllerCreateOwnerMutationOptions(options),
+        queryClient,
+    );
+};
+export const ownerControllerSetOwnerEmail = (
+    ownerId: string,
+    setOwnerEmailDto: BodyType<SetOwnerEmailDto>,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<void>(
+        {
+            url: `/api/owners/${ownerId}/email`,
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            data: setOwnerEmailDto,
+            signal,
+        },
+        options,
+    );
+};
+
+export const getOwnerControllerSetOwnerEmailMutationOptions = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof ownerControllerSetOwnerEmail>>,
+        TError,
+        { ownerId: string; data: BodyType<SetOwnerEmailDto> },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof ownerControllerSetOwnerEmail>>,
+    TError,
+    { ownerId: string; data: BodyType<SetOwnerEmailDto> },
+    TContext
+> => {
+    const mutationKey = ["ownerControllerSetOwnerEmail"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof ownerControllerSetOwnerEmail>>,
+        { ownerId: string; data: BodyType<SetOwnerEmailDto> }
+    > = (props) => {
+        const { ownerId, data } = props ?? {};
+
+        return ownerControllerSetOwnerEmail(ownerId, data, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type OwnerControllerSetOwnerEmailMutationResult = NonNullable<
+    Awaited<ReturnType<typeof ownerControllerSetOwnerEmail>>
+>;
+export type OwnerControllerSetOwnerEmailMutationBody =
+    BodyType<SetOwnerEmailDto>;
+export type OwnerControllerSetOwnerEmailMutationError =
+    ErrorType<ErrorResponseDto>;
+
+export const useOwnerControllerSetOwnerEmail = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof ownerControllerSetOwnerEmail>>,
+            TError,
+            { ownerId: string; data: BodyType<SetOwnerEmailDto> },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof ownerControllerSetOwnerEmail>>,
+    TError,
+    { ownerId: string; data: BodyType<SetOwnerEmailDto> },
+    TContext
+> => {
+    return useMutation(
+        getOwnerControllerSetOwnerEmailMutationOptions(options),
         queryClient,
     );
 };

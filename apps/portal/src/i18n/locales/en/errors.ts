@@ -25,6 +25,7 @@ export default {
         "A unit with this number already exists in this association.",
     DUPLICATE_OWNER_EMAIL:
         "An owner with this email already exists in this association.",
+    OWNER_EMAIL_ALREADY_SET: "This owner already has an email address.",
     INVALID_OWNERSHIP_SHARE: "Ownership share must be a positive number.",
     INVALID_OWNERSHIP_SUM:
         "Total ownership shares must sum exactly to 1/1 (100%).",

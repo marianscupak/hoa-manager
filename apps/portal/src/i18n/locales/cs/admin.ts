@@ -33,6 +33,17 @@ export default {
             emailLabel: "E-mailová adresa",
             emailPlaceholder: "Např. jan@priklad.cz",
         },
+        addEmail: {
+            action: "Přidat e-mail",
+            title: "Přidat e-mailovou adresu",
+            description:
+                "Přidejte e-mailovou adresu pro vlastníka {{name}}. Po uložení jej budete moci pozvat do portálu.",
+            emailLabel: "E-mailová adresa",
+            invalid: "Zadejte platnou e-mailovou adresu",
+            submit: "Uložit e-mail",
+            submitting: "Ukládání...",
+            success: "E-mailová adresa byla uložena",
+        },
         invite: {
             send: "Odeslat pozvánku",
             resend: "Znovu odeslat",

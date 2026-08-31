@@ -1,5 +1,6 @@
 import { OwnerCreatedAuditEvent } from './events/owner-created.event';
 import { OwnerDeletedAuditEvent } from './events/owner-deleted.event';
+import { OwnerEmailAddedAuditEvent } from './events/owner-email-added.event';
 import { OwnerUserLinkedAuditEvent } from './events/owner-user-linked.event';
 import { UnitCreatedAuditEvent } from './events/unit-created.event';
 import { UnitDeletedAuditEvent } from './events/unit-deleted.event';
@@ -14,4 +15,5 @@ export const PROPERTY_AUDIT_EVENTS = [
   OwnerDeletedAuditEvent,
   UnitOwnershipReplacedAuditEvent,
   OwnerUserLinkedAuditEvent,
+  OwnerEmailAddedAuditEvent,
 ];

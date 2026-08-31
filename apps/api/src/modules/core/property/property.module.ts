@@ -19,6 +19,7 @@ import { GetUnitDetailHandler } from '@/modules/core/property/application/handle
 import { ListOwnersHandler } from '@/modules/core/property/application/handlers/list-owners.handler';
 import { ListUnitsHandler } from '@/modules/core/property/application/handlers/list-units.handler';
 import { ReplaceUnitOwnershipHandler } from '@/modules/core/property/application/handlers/replace-unit-ownership.handler';
+import { SetOwnerEmailHandler } from '@/modules/core/property/application/handlers/set-owner-email.handler';
 import { SetOwnerUserIdHandler } from '@/modules/core/property/application/handlers/set-owner-user-id.handler';
 import { UpdateUnitHandler } from '@/modules/core/property/application/handlers/update-unit.handler';
 import { OWNER_READ_REPOSITORY } from '@/modules/core/property/application/ports/owner-read.repository.port';
@@ -44,6 +45,7 @@ const CommandHandlers = [
   CreateOwnerHandler,
   CreateUnitHandler,
   ReplaceUnitOwnershipHandler,
+  SetOwnerEmailHandler,
   SetOwnerUserIdHandler,
   UpdateUnitHandler,
   DeleteUnitHandler,

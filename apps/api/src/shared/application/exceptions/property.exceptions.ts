@@ -25,6 +25,12 @@ export class DuplicateOwnerEmailException extends DomainException {
   }
 }
 
+export class OwnerEmailAlreadySetException extends DomainException {
+  constructor() {
+    super(ErrorCode.OWNER_EMAIL_ALREADY_SET);
+  }
+}
+
 export class InvalidOwnershipShareException extends DomainException {
   constructor() {
     super(ErrorCode.INVALID_OWNERSHIP_SHARE);

@@ -1176,6 +1176,79 @@
         ]
       }
     },
+    "/api/owners/{ownerId}/email": {
+      "patch": {
+        "operationId": "OwnerController_setOwnerEmail",
+        "parameters": [
+          {
+            "name": "ownerId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetOwnerEmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Email address set on an owner that had none"
+          },
+          "400": {
+            "description": "Bad Request - Validation or Domain logic error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Property Owners"
+        ]
+      }
+    },
     "/api/owners/{ownerId}/invite": {
       "post": {
         "operationId": "OwnerController_sendInvite",
@@ -3313,6 +3386,20 @@
         },
         "required": [
           "ownerId"
+        ]
+      },
+      "SetOwnerEmailDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+            "description": "Email address to set for the owner"
+          }
+        },
+        "required": [
+          "email"
         ]
       },
       "UnitsOverviewDto": {

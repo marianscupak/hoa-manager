@@ -21,6 +21,8 @@ const STRINGS: Record<
       `${v.actor} removed owner record ${v.owner}.`,
     'unit.ownership.replaced.privileged': (v) =>
       `${v.actor} changed ownership of unit ${v.unit} (now: ${v.owners}).`,
+    'owner.email.added.privileged': (v) =>
+      `${v.actor} added an email address for owner ${v.owner}.`,
     'owner.user.linked.privileged': (v) =>
       `${v.actor} linked owner ${v.owner} to user ${v.user}.`,
     'invite.sent.privileged': (v) =>
@@ -49,6 +51,8 @@ const STRINGS: Record<
       `${v.actor} odstranil/a vlastníka ${v.owner}.`,
     'unit.ownership.replaced.privileged': (v) =>
       `${v.actor} změnil/a vlastnictví jednotky ${v.unit} (nyní: ${v.owners}).`,
+    'owner.email.added.privileged': (v) =>
+      `${v.actor} přidal/a e-mail vlastníkovi ${v.owner}.`,
     'owner.user.linked.privileged': (v) =>
       `${v.actor} propojil/a vlastníka ${v.owner} s uživatelem ${v.user}.`,
     'invite.sent.privileged': (v) =>

@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Delete,
   Body,
   Param,
@@ -23,9 +24,11 @@ import {
   CreateOwnerDto,
   CreateOwnerResponseDto,
   OwnerResponseDto,
+  SetOwnerEmailDto,
 } from '@/modules/core/property/api/dto/owner.dto';
 import { CreateOwnerCommand } from '@/modules/core/property/application/commands/create-owner.command';
 import { DeleteOwnerCommand } from '@/modules/core/property/application/commands/delete-owner.command';
+import { SetOwnerEmailCommand } from '@/modules/core/property/application/commands/set-owner-email.command';
 import { ListOwnersQuery } from '@/modules/core/property/application/queries/list-owners.query';
 import type { OwnerKind } from '@/modules/core/property/domain/ownership-plan';
 import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
@@ -87,6 +90,22 @@ export class OwnerController {
         user.userId,
         dto.kind as OwnerKind,
       ),
+    );
+  }
+
+  @Patch(':ownerId/email')
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({
+    description: 'Email address set on an owner that had none',
+  })
+  async setOwnerEmail(
+    @Tenant() tenantCtx: TenantContext,
+    @Param('ownerId') ownerId: string,
+    @Body() dto: SetOwnerEmailDto,
+  ): Promise<void> {
+    await this.commandBus.execute(
+      new SetOwnerEmailCommand(tenantCtx.tenantId, ownerId, dto.email),
     );
   }
 

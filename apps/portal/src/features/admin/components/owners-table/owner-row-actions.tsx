@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { SendIcon, Trash2Icon, XIcon } from "lucide-react";
+import { MailPlusIcon, SendIcon, Trash2Icon, XIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button, toast } from "@hoa-mngr/ui";
@@ -16,12 +16,14 @@ interface OwnerRowActionsProps {
     row: OwnerResponseDto;
     onSuccess: () => void;
     onDelete: (owner: OwnerResponseDto) => void;
+    onAddEmail: (owner: OwnerResponseDto) => void;
 }
 
 export function OwnerRowActions({
     row,
     onSuccess,
     onDelete,
+    onAddEmail,
 }: OwnerRowActionsProps) {
     const { t } = useTranslation(["admin"]);
     const queryClient = useQueryClient();
@@ -57,6 +59,16 @@ export function OwnerRowActions({
 
     return (
         <div className="flex items-center justify-end gap-2">
+            {!row.userId && !row.email && (
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onAddEmail(row)}
+                >
+                    <MailPlusIcon className="h-3.5 w-3.5" />
+                    {t("owners.addEmail.action")}
+                </Button>
+            )}
             {!row.userId && row.email && (
                 <>
                     {row.inviteStatus === "pending" && (

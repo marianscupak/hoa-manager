@@ -6,6 +6,7 @@ import { DataTable } from "@hoa-mngr/ui";
 import type { OwnerResponseDto } from "@/api/generated/model";
 import { useOwnerControllerGetOwners } from "@/api/generated/property-owners/property-owners";
 
+import { AddOwnerEmailDialog } from "../components/add-owner-email-dialog";
 import { CreateOwnerDialog } from "../components/create-owner-dialog";
 import { DeleteOwnerDialog } from "../components/delete-owner-dialog";
 import { getOwnerColumns } from "../components/owners-table/owners-table-columns";
@@ -24,11 +25,16 @@ export function OwnersPage({
     const [deletingOwner, setDeletingOwner] = useState<OwnerResponseDto | null>(
         null,
     );
+    const [addingEmailOwner, setAddingEmailOwner] =
+        useState<OwnerResponseDto | null>(null);
 
     const { data: owners, isLoading, refetch } = useOwnerControllerGetOwners();
 
-    const columns = getOwnerColumns(t, refetch, (owner) =>
-        setDeletingOwner(owner),
+    const columns = getOwnerColumns(
+        t,
+        refetch,
+        (owner) => setDeletingOwner(owner),
+        (owner) => setAddingEmailOwner(owner),
     );
 
     return (
@@ -51,6 +57,13 @@ export function OwnersPage({
                 owner={deletingOwner}
                 open={!!deletingOwner}
                 onOpenChange={(open) => !open && setDeletingOwner(null)}
+                onSuccess={refetch}
+            />
+
+            <AddOwnerEmailDialog
+                owner={addingEmailOwner}
+                open={!!addingEmailOwner}
+                onOpenChange={(open) => !open && setAddingEmailOwner(null)}
                 onSuccess={refetch}
             />
         </div>

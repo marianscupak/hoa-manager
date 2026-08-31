@@ -11,6 +11,7 @@ export const getOwnerColumns = (
     t: TFunction<"admin">,
     onSuccess: () => void,
     onDelete: (owner: OwnerResponseDto) => void,
+    onAddEmail: (owner: OwnerResponseDto) => void,
 ): ColumnDef<OwnerResponseDto>[] => [
     {
         header: t("owners.table.displayName"),
@@ -76,6 +77,7 @@ export const getOwnerColumns = (
                 row={row}
                 onSuccess={onSuccess}
                 onDelete={onDelete}
+                onAddEmail={onAddEmail}
             />
         ),
     },

@@ -161,6 +161,18 @@ export class CoreAuditFormatter implements AuditEventFormatter, OnModuleInit {
           }),
         };
       }
+      case CoreEventType.OWNER_EMAIL_ADDED: {
+        const p = event.payload as {
+          labels: { ownerName: string; addedBy: string };
+        };
+        return {
+          ...base,
+          message: t(lang, 'owner.email.added.privileged', {
+            actor: p.labels.addedBy,
+            owner: p.labels.ownerName,
+          }),
+        };
+      }
       case CoreEventType.OWNER_USER_LINKED: {
         const p = event.payload as {
           labels: { ownerName: string; userName: string; linkedBy: string };

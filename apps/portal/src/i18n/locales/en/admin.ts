@@ -33,6 +33,17 @@ export default {
             emailLabel: "Email Address",
             emailPlaceholder: "E.g. john@example.com",
         },
+        addEmail: {
+            action: "Add Email",
+            title: "Add Email Address",
+            description:
+                "Add an email address for {{name}}. Once saved, you can invite this owner to the portal.",
+            emailLabel: "Email Address",
+            invalid: "Enter a valid email address",
+            submit: "Save Email",
+            submitting: "Saving...",
+            success: "Email address saved",
+        },
         invite: {
             send: "Send Invite",
             resend: "Resend",

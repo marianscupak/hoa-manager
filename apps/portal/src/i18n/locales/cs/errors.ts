@@ -28,6 +28,7 @@ export default {
         "Jednotka s tímto číslem v tomto společenství již existuje.",
     DUPLICATE_OWNER_EMAIL:
         "Vlastník s tímto e-mailem v tomto společenství již existuje.",
+    OWNER_EMAIL_ALREADY_SET: "Tento vlastník již má e-mailovou adresu.",
     INVALID_OWNERSHIP_SHARE: "Vlastnický podíl musí být kladné číslo.",
     INVALID_OWNERSHIP_SUM:
         "Součet vlastnických podílů musí být přesně 1/1 (100 %).",

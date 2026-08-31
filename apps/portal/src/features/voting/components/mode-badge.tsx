@@ -9,8 +9,6 @@ export function ModeBadge({
 }) {
     const { t } = useTranslation(["voting"]);
     return (
-        <Badge variant="outline" title={t(`voting:mode.${mode}.citation`)}>
-            {t(`voting:mode.${mode}.label`)}
-        </Badge>
+        <Badge variant="outline">{t(`voting:mode.${mode}.label`)}</Badge>
     );
 }

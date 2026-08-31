@@ -97,7 +97,7 @@ export const DelegateSelection = ({
                                 <p className="font-medium">{candidate.name}</p>
                                 <div className="mt-1 flex flex-wrap gap-2">
                                     {candidate.isUnitOwner && (
-                                        <span className="rounded bg-blue-100 px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-blue-700 uppercase">
+                                        <span className="bg-primary-tint text-primary-tint-foreground rounded px-1.5 py-0.5 text-[10px] font-bold tracking-wider uppercase">
                                             {t("delegation.coOwner")}
                                         </span>
                                     )}

@@ -20,6 +20,16 @@ export interface VoteReadRepository {
     tenantId: string,
     membershipId: string,
   ): Promise<string | null>;
+  /**
+   * Whether `ownerId` is currently an active (non-association) member of a
+   * unit's ownership party — used to validate a POA grantor supplied
+   * directly by an admin/board member, who may have no user account.
+   */
+  isActiveUnitOwner(
+    tenantId: string,
+    unitId: string,
+    ownerId: string,
+  ): Promise<boolean>;
   getMembershipByOwnerId(
     tenantId: string,
     ownerId: string,

@@ -376,7 +376,7 @@ export class VotesController {
         tenantCtx.membershipId,
         body.delegateMembershipId,
         tenantCtx.roles,
-        body.ownerMembershipId,
+        body.fromOwnerId,
       ),
     );
   }

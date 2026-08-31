@@ -218,7 +218,7 @@ export class VotingAuditFormatter implements AuditEventFormatter, OnModuleInit {
       }
       case VotingEventType.VOTE_CONSENT_CREATED: {
         const p = event.payload as {
-          ownerMembershipId: string;
+          ownerMembershipId: string | null;
           recordedByMembershipId?: string;
           labels: {
             voteTitle: string;
@@ -257,7 +257,7 @@ export class VotingAuditFormatter implements AuditEventFormatter, OnModuleInit {
       }
       case VotingEventType.VOTE_CONSENT_REVOKED: {
         const p = event.payload as {
-          ownerMembershipId?: string;
+          ownerMembershipId?: string | null;
           revokedByMembershipId?: string;
           labels: {
             voteTitle: string;

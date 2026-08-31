@@ -9,6 +9,7 @@ import {
   VoteConsentWriteRepository,
 } from '@/modules/voting/application/ports/vote-consent-write.repository.port';
 import { VoteUnitConsentStatus } from '@/modules/voting/domain/vote/vote.types';
+import { ConsentAlreadyRecordedException } from '@/shared/application/exceptions/vote.exceptions';
 
 @Injectable()
 export class DrizzleVoteConsentWriteRepository
@@ -44,19 +45,30 @@ export class DrizzleVoteConsentWriteRepository
       return existing.id;
     }
 
-    const [inserted] = await this.db
-      .insert(voteUnitConsents)
-      .values({
-        tenantId: data.tenantId,
-        voteId: data.voteId,
-        unitId: data.unitId,
-        fromOwnerId: data.fromOwnerId,
-        toMembershipId: data.toMembershipId,
-        recordedByMembershipId: data.recordedByMembershipId,
-        status: data.status,
-      })
-      .returning({ id: voteUnitConsents.id });
-    return inserted.id;
+    try {
+      const [inserted] = await this.db
+        .insert(voteUnitConsents)
+        .values({
+          tenantId: data.tenantId,
+          voteId: data.voteId,
+          unitId: data.unitId,
+          fromOwnerId: data.fromOwnerId,
+          toMembershipId: data.toMembershipId,
+          recordedByMembershipId: data.recordedByMembershipId,
+          status: data.status,
+        })
+        .returning({ id: voteUnitConsents.id });
+      return inserted.id;
+    } catch (error: any) {
+      // Concurrent submissions can both pass the `existing` lookup above
+      // under READ COMMITTED and both attempt an insert. The partial unique
+      // index on (vote_id, unit_id, from_owner_id) WHERE status = 'VALID'
+      // then rejects the loser — translate that into a clean domain error.
+      if (error?.code === '23505') {
+        throw new ConsentAlreadyRecordedException();
+      }
+      throw error;
+    }
   }
 
   async findById(

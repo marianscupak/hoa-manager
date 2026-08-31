@@ -203,10 +203,7 @@ export function CastVotePage() {
                         ? t("castVote.alreadyVoted.description")
                         : t("castVote.noUnits.description")}
                 </p>
-                <Button
-                    onClick={() => navigate(`/voting/${voteId}`)}
-                    className="bg-blue-600 text-white hover:bg-blue-700"
-                >
+                <Button onClick={() => navigate(`/voting/${voteId}`)}>
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     {t("castVote.backToDetail")}
                 </Button>
@@ -241,14 +238,14 @@ export function CastVotePage() {
                                 className="rounded-lg border border-slate-200 p-4"
                             >
                                 <div className="mb-3 flex items-center gap-3">
-                                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-100">
-                                        <Home className="h-4 w-4 text-blue-600" />
+                                    <div className="bg-primary-tint flex h-9 w-9 items-center justify-center rounded-lg">
+                                        <Home className="text-primary h-4 w-4" />
                                     </div>
                                     <div>
                                         <span className="font-semibold text-slate-900">
                                             {unit.name}
                                         </span>
-                                        <span className="ml-2 text-sm text-blue-600">
+                                        <span className="text-primary ml-2 text-sm">
                                             ({t("castVote.voteShare")}{" "}
                                             {unit.share})
                                         </span>
@@ -311,7 +308,7 @@ export function CastVotePage() {
                         {t("castVote.review.editAnswers")}
                     </Button>
                     <Button
-                        className="flex-1 bg-blue-600 font-semibold text-white hover:bg-blue-700"
+                        className="flex-1 font-semibold"
                         size="lg"
                         disabled={submitMutation.isPending}
                         onClick={handleSubmit}
@@ -356,13 +353,13 @@ export function CastVotePage() {
                             total: totalQuestions,
                         })}
                     </span>
-                    <span className="text-sm font-bold text-blue-600">
+                    <span className="text-primary text-sm font-bold">
                         {completionPct} % {t("castVote.progress.completed")}
                     </span>
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-slate-200">
                     <div
-                        className="h-full rounded-full bg-blue-600 transition-all duration-300"
+                        className="bg-primary h-full rounded-full transition-all duration-300"
                         style={{
                             width: `${totalQuestions > 0 ? ((currentQuestionIndex + 1) / totalQuestions) * 100 : 0}%`,
                         }}
@@ -391,13 +388,13 @@ export function CastVotePage() {
                             {t("castVote.votingFor")}
                         </span>
                         <div className="mt-1 flex items-center justify-center gap-2">
-                            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-100">
-                                <Home className="h-4 w-4 text-blue-600" />
+                            <div className="bg-primary-tint flex h-7 w-7 items-center justify-center rounded-lg">
+                                <Home className="text-primary h-4 w-4" />
                             </div>
                             <span className="font-bold text-slate-900">
                                 {unit.name}
                             </span>
-                            <span className="text-sm text-blue-600">
+                            <span className="text-primary text-sm">
                                 ({unit.share} {t("castVote.voteShareLabel")})
                             </span>
                         </div>
@@ -421,9 +418,9 @@ export function CastVotePage() {
                                         )
                                     }
                                     className={cn(
-                                        "flex flex-col items-center gap-2 rounded-lg border-2 bg-white p-5 transition-all hover:shadow-md",
+                                        "flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 bg-white p-5 transition-all hover:shadow-md",
                                         isSelected
-                                            ? "border-blue-500 bg-blue-50 shadow-md ring-2 ring-blue-200"
+                                            ? "border-primary bg-primary/5 ring-primary/20 shadow-md ring-2"
                                             : "border-slate-200 hover:border-slate-300",
                                     )}
                                 >
@@ -465,7 +462,7 @@ export function CastVotePage() {
                 <Button
                     disabled={!allCurrentAnswered}
                     onClick={handleNext}
-                    className="gap-2 bg-blue-600 text-white hover:bg-blue-700"
+                    className="gap-2"
                 >
                     {currentQuestionIndex < totalQuestions - 1
                         ? t("castVote.navigation.next")

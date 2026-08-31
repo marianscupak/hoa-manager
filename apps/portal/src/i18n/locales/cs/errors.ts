@@ -63,13 +63,13 @@ export default {
     INCOMPLETE_VOTE: "Konfigurace hlasování není úplná.",
     INVALID_BALLOT_ANSWERS: "Odevzdané odpovědi v hlasování jsou neplatné.",
     VOTE_RULESET_SUBLEGAL:
-        "Zvolená pravidla hlasování porušují zákonné minimum a nelze je uložit.",
+        "Zvolená pravidla hlasování jsou mírnější než povolené minimum a nelze je uložit.",
     VOTE_RULESET_ACK_REQUIRED:
         "Je nutné potvrdit, že stanovy umožňují zvolenou odchylku od zákonných pravidel.",
     VOTE_RULESET_OVERRIDE_NOT_STRICTER:
         "Přepsání pravidel pro otázku musí být přísnější než výchozí pravidla hlasování.",
     VOTE_WINDOW_TOO_SHORT_PER_ROLLAM:
-        "Hlasovací okno per rollam musí trvat alespoň 15 dnů (§ 1211 odst. 2 OZ).",
+        "Hlasovací okno per rollam musí trvat alespoň 15 dnů.",
     VOTE_BUILDING_SHARES_INCOMPLETE:
         "Podíly jednotek na domě nedávají dohromady 1/1 — aktuální součet {{param}}. Doplňte jednotky před otevřením hlasování.",
     MEMBERSHIP_NOT_FOUND:
@@ -91,4 +91,6 @@ export default {
     VOTE_DOCUMENT_UPLOAD_INCOMPLETE:
         "Nahrávání se nedokončilo. Zkuste to prosím znovu.",
     DOCUMENT_STORAGE_NOT_CONFIGURED: "Úložiště dokumentů není nakonfigurováno.",
+    CONSENT_ALREADY_RECORDED:
+        "Plná moc od tohoto vlastníka už je pro toto hlasování zaevidována. Nejprve ji odvolejte.",
 } as const;

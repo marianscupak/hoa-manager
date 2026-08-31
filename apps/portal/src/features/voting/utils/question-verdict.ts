@@ -10,7 +10,7 @@ export interface QuestionVerdictOutcome {
     winningOption: VoteOptionResponseDto | null;
 }
 
-// Mirrors the server's deriveQuestionOutcome (spec §3): quorum is vote-level;
+// Mirrors the server's deriveQuestionOutcome (spec section 3): quorum is vote-level;
 // for yes/no questions "majority met" can mean NO won — approval requires the
 // YES-semantic option to be the winner. `quorumMet: null` (per-rollam votes,
 // which have no quorum by law) passes straight through to the majority

@@ -27,7 +27,11 @@ import {
 } from "@hoa-mngr/ui";
 
 import { showApiError } from "@/api/error-utils";
-import { useUnitControllerGetUnits } from "@/api/generated/property-units/property-units";
+import { UnitOwnershipMemberResponseDtoKind } from "@/api/generated/model/unitOwnershipMemberResponseDtoKind";
+import {
+    useUnitControllerGetUnitDetail,
+    useUnitControllerGetUnits,
+} from "@/api/generated/property-units/property-units";
 import {
     useVotesControllerCreateVoteConsent,
     useVotesControllerGetDelegationCandidates,
@@ -50,21 +54,49 @@ export function AdminRecordDelegation() {
         defaultValues: {
             voteId: "",
             unitId: "",
-            ownerMembershipId: "",
+            fromOwnerId: "",
             delegateMembershipId: "",
         },
     });
 
     const selectedVoteId = form.watch("voteId");
     const selectedUnitId = form.watch("unitId");
-    const selectedOwnerMembershipId = form.watch("ownerMembershipId");
+    const selectedFromOwnerId = form.watch("fromOwnerId");
 
     const { data: votes } = useVotesControllerGetVotes();
     const { data: units } = useUnitControllerGetUnits();
 
     const filteredVotes = votes?.filter((v) => v.status !== "CLOSED") || [];
 
-    const { data: candidates } = useVotesControllerGetDelegationCandidates(
+    // The Zmocnitel (grantor) list comes from the selected unit's actual
+    // owners — including owners without a user account (e.g. an SJM spouse)
+    // — not from tenant memberships, since anyone who owns the unit may
+    // grant a paper power of attorney (requires majority-of-shares consent).
+    const { data: unitDetail } = useUnitControllerGetUnitDetail(
+        selectedUnitId,
+        {
+            query: { enabled: !!selectedUnitId },
+        },
+    );
+
+    const grantorOptions = useMemo(() => {
+        const members = (unitDetail?.ownerships ?? []).flatMap(
+            (ownership) => ownership.members,
+        );
+        const byOwnerId = new Map<string, (typeof members)[number]>();
+        for (const member of members) {
+            if (member.kind === UnitOwnershipMemberResponseDtoKind.ASSOCIATION) {
+                continue;
+            }
+            byOwnerId.set(member.ownerId, member);
+        }
+        return [...byOwnerId.values()];
+    }, [unitDetail]);
+
+    // The Zmocněnec (delegate) side may be any active member of the
+    // association — a consent is a power of attorney, not a co-ownership
+    // matter — so it keeps using every tenant membership.
+    const { data: delegateCandidates } = useVotesControllerGetDelegationCandidates(
         selectedVoteId,
         {
             unitId: selectedUnitId,
@@ -83,7 +115,7 @@ export function AdminRecordDelegation() {
                 id: data.voteId,
                 data: {
                     unitId: data.unitId,
-                    ownerMembershipId: data.ownerMembershipId,
+                    fromOwnerId: data.fromOwnerId,
                     delegateMembershipId: data.delegateMembershipId,
                 },
             },
@@ -93,7 +125,7 @@ export function AdminRecordDelegation() {
                     form.reset({
                         voteId: data.voteId, // Keep vote to add multiple
                         unitId: "",
-                        ownerMembershipId: "",
+                        fromOwnerId: "",
                         delegateMembershipId: "",
                     });
                     queryClient.invalidateQueries({
@@ -112,12 +144,6 @@ export function AdminRecordDelegation() {
             },
         );
     }
-
-    const ownerCandidates = candidates || [];
-    const delegateCandidates =
-        ownerCandidates.filter(
-            (c) => c.membershipId !== selectedOwnerMembershipId,
-        ) || [];
 
     return (
         <Card className="shadow-sm">
@@ -152,7 +178,7 @@ export function AdminRecordDelegation() {
                                                 field.onChange(val);
                                                 form.setValue("unitId", "");
                                                 form.setValue(
-                                                    "ownerMembershipId",
+                                                    "fromOwnerId",
                                                     "",
                                                 );
                                                 form.setValue(
@@ -202,7 +228,7 @@ export function AdminRecordDelegation() {
                                             onValueChange={(val) => {
                                                 field.onChange(val);
                                                 form.setValue(
-                                                    "ownerMembershipId",
+                                                    "fromOwnerId",
                                                     "",
                                                 );
                                                 form.setValue(
@@ -242,7 +268,7 @@ export function AdminRecordDelegation() {
                         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                             <FormField
                                 control={form.control}
-                                name="ownerMembershipId"
+                                name="fromOwnerId"
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel className="flex items-center gap-2 text-sm font-medium text-slate-700">
@@ -272,12 +298,12 @@ export function AdminRecordDelegation() {
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                {ownerCandidates.map((c) => (
+                                                {grantorOptions.map((m) => (
                                                     <SelectItem
-                                                        key={c.membershipId}
-                                                        value={c.membershipId}
+                                                        key={m.ownerId}
+                                                        value={m.ownerId}
                                                     >
-                                                        {c.name}
+                                                        {m.displayName}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>
@@ -301,9 +327,7 @@ export function AdminRecordDelegation() {
                                         <Select
                                             onValueChange={field.onChange}
                                             value={field.value}
-                                            disabled={
-                                                !selectedOwnerMembershipId
-                                            }
+                                            disabled={!selectedFromOwnerId}
                                         >
                                             <FormControl>
                                                 <SelectTrigger>
@@ -315,14 +339,18 @@ export function AdminRecordDelegation() {
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                {delegateCandidates.map((c) => (
-                                                    <SelectItem
-                                                        key={c.membershipId}
-                                                        value={c.membershipId}
-                                                    >
-                                                        {c.name}
-                                                    </SelectItem>
-                                                ))}
+                                                {(delegateCandidates ?? []).map(
+                                                    (c) => (
+                                                        <SelectItem
+                                                            key={c.membershipId}
+                                                            value={
+                                                                c.membershipId
+                                                            }
+                                                        >
+                                                            {c.name}
+                                                        </SelectItem>
+                                                    ),
+                                                )}
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />

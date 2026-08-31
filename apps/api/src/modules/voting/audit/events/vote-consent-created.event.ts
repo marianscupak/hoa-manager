@@ -9,7 +9,10 @@ import { VotingEventType } from '../voting-event-types';
 const PayloadSchema = z.object({
   consentId: z.uuid(),
   unitId: z.uuid(),
-  ownerMembershipId: z.uuid(),
+  // `null` when the grantor was supplied by ownerId directly (admin
+  // recording a POA for an account-less owner) — there is no membership to
+  // point to in that case.
+  ownerMembershipId: z.uuid().nullable(),
   delegateMembershipId: z.uuid(),
   recordedByMembershipId: z.uuid(),
   labels: z.object({
@@ -36,7 +39,7 @@ export const VoteConsentCreatedAuditEvent = defineAuditEvent({
     consentId: string;
     unitId: string;
     unitLabel: string;
-    ownerMembershipId: string;
+    ownerMembershipId: string | null;
     ownerLabel: string;
     delegateMembershipId: string;
     delegateLabel: string;

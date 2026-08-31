@@ -21,11 +21,9 @@ export const voting = {
     mode: {
         PER_ROLLAM: {
             label: "Per rollam",
-            citation: "§ 1210–1214 OZ",
         },
         ASSEMBLY_RECORD: {
             label: "Záznam shromáždění",
-            citation: "§ 1206 OZ",
         },
     },
     rules: {
@@ -49,13 +47,11 @@ export const voting = {
                 title: "Hlasování per rollam",
                 description:
                     "Písemné hlasování mimo zasedání. Rozhoduje většina hlasů **všech** vlastníků; lhůta min. 15 dnů.",
-                citation: "§ 1210–1214 OZ",
             },
             ASSEMBLY_RECORD: {
                 title: "Záznam shromáždění",
                 description:
                     "Zápis výsledků prezenčního shromáždění. Kvórum nadpoloviční většiny všech hlasů; rozhoduje většina přítomných.",
-                citation: "§ 1206 OZ",
             },
             switchResets:
                 "Změna typu hlasování obnoví pravidla hlasování na zákonné výchozí nastavení pro zvolený typ. Pokračovat?",
@@ -179,7 +175,7 @@ export const voting = {
             quorum: {
                 label: "Kvórum",
                 perRollamNone:
-                    "Hlasování per rollam nemá kvórum — rozhoduje většina hlasů všech vlastníků (§ 1214 OZ).",
+                    "Hlasování per rollam nemá kvórum — většina se počítá ze všech hlasů v domě.",
             },
             quorumMeasure: {
                 options: {
@@ -229,7 +225,7 @@ export const voting = {
         legal: {
             tier1: {
                 MAJORITY_BELOW_FLOOR:
-                    "Požadovaná většina je nižší než zákonné minimum nadpoloviční většiny.",
+                    "Požadovaná většina nesmí být nižší než nadpoloviční většina (více než 50 %).",
                 PER_ROLLAM_QUORUM_PRESENT:
                     "Hlasování per rollam nesmí mít nastaveno kvórum.",
                 PER_ROLLAM_BASIS_NOT_ALL_VOTES:
@@ -237,7 +233,7 @@ export const voting = {
                 ASSEMBLY_QUORUM_MISSING:
                     "Záznam shromáždění musí mít nastaveno kvórum.",
                 ASSEMBLY_QUORUM_BELOW_FLOOR:
-                    "Kvórum je nižší než zákonné minimum nadpoloviční většiny.",
+                    "Kvórum shromáždění nelze nastavit pod nadpoloviční většinu všech hlasů.",
             },
             tier3: {
                 ONE_UNIT_ONE_VOTE: "hlasování jedna jednotka = jeden hlas",
@@ -368,7 +364,7 @@ export const voting = {
     },
     status: {
         requiresDelegation:
-            "Jednotka potřebuje společného zástupce — souhlas spoluvlastníků s nadpoloviční většinou podílů (§ 1185 odst. 2 OZ).",
+            "K hlasování za jednotku je potřeba zmocnit společného zástupce (souhlasem spoluvlastníků s nadpoloviční většinou podílů).",
         requiresDelegationSjm:
             "U jednotky ve společném jmění manželů musí zástupce potvrdit i druhý z manželů.",
     },
@@ -421,7 +417,7 @@ export const voting = {
                     "Otázka „{{param}}“ musí mít alespoň dvě možnosti odpovědi.",
                 VOTE_RULESET_REQUIRED: "Musí být nastaven výchozí ruleset.",
                 VOTE_WINDOW_TOO_SHORT_PER_ROLLAM:
-                    "Hlasovací okno per rollam musí trvat alespoň 15 dnů (§ 1211 odst. 2 OZ).",
+                    "Hlasovací okno per rollam musí trvat alespoň 15 dnů.",
             },
         },
         documents: {
@@ -487,7 +483,7 @@ export const voting = {
         notice: {
             title: "Důležité upozornění",
             description:
-                "Společný zástupce se volí souhlasem spoluvlastníků s nadpoloviční většinou podílů (§ 1185 odst. 2 OZ). Jakmile delegujete svůj hlas pro tuto jednotku, nemůžete v tomto konkrétním hlasování hlasovat osobně, dokud delegaci nezrušíte před začátkem hlasování.",
+                "Společný zástupce se volí souhlasem spoluvlastníků s nadpoloviční většinou podílů. Jakmile delegujete svůj hlas pro tuto jednotku, nemůžete v tomto konkrétním hlasování hlasovat osobně, dokud delegaci nezrušíte před začátkem hlasování.",
         },
         summary: {
             title: "Přehled delegace",
@@ -630,7 +626,7 @@ export const voting = {
             collapseDetails: "Skrýt detaily",
         },
         perRollamDenominator:
-            "Většina se počítá ze všech hlasů v domě (§ 1214 OZ).",
+            "Většina se počítá ze všech hlasů v domě.",
     },
     resultsV2: {
         participationLine:

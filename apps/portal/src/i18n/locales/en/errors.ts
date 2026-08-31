@@ -62,13 +62,13 @@ export default {
     INCOMPLETE_VOTE: "The vote configuration is incomplete.",
     INVALID_BALLOT_ANSWERS: "The submitted ballot answers are invalid.",
     VOTE_RULESET_SUBLEGAL:
-        "The selected voting rules violate the statutory floor and cannot be saved.",
+        "The selected voting rules are looser than the allowed floor and cannot be saved.",
     VOTE_RULESET_ACK_REQUIRED:
         "You must confirm that the bylaws permit the selected deviation from the statutory rules.",
     VOTE_RULESET_OVERRIDE_NOT_STRICTER:
         "The question's rule override must be stricter than the vote's default rules.",
     VOTE_WINDOW_TOO_SHORT_PER_ROLLAM:
-        "The per-rollam voting window must last at least 15 days (§ 1211(2) OZ).",
+        "The per-rollam voting window must last at least 15 days.",
     VOTE_BUILDING_SHARES_INCOMPLETE:
         "Building unit shares don't add up to 1/1 — current total {{param}}. Complete the units before opening the vote.",
     MEMBERSHIP_NOT_FOUND: "User membership not found in this association.",
@@ -89,4 +89,6 @@ export default {
     VOTE_DOCUMENT_UPLOAD_INCOMPLETE:
         "The upload did not complete. Please try again.",
     DOCUMENT_STORAGE_NOT_CONFIGURED: "Document storage is not configured.",
+    CONSENT_ALREADY_RECORDED:
+        "A power of attorney from this owner is already recorded for this vote. Revoke it first.",
 } as const;

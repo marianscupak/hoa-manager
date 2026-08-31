@@ -21,11 +21,9 @@ export const voting = {
     mode: {
         PER_ROLLAM: {
             label: "Per rollam",
-            citation: "§ 1210–1214 OZ",
         },
         ASSEMBLY_RECORD: {
             label: "Assembly record",
-            citation: "§ 1206 OZ",
         },
     },
     rules: {
@@ -48,13 +46,11 @@ export const voting = {
                 title: "Per-rollam vote",
                 description:
                     "A written vote held outside a meeting. Decided by a majority of **all** owners' votes; window must be at least 15 days.",
-                citation: "§ 1210–1214 OZ",
             },
             ASSEMBLY_RECORD: {
                 title: "Assembly record",
                 description:
                     "Records the results of an in-person assembly. Quorum is a simple majority of all votes; decided by a majority of those present.",
-                citation: "§ 1206 OZ",
             },
             switchResets:
                 "Switching the vote type resets the voting rules to the statutory defaults for the selected type. Continue?",
@@ -179,7 +175,7 @@ export const voting = {
             quorum: {
                 label: "Quorum",
                 perRollamNone:
-                    "A per-rollam vote has no quorum — decided by a majority of all owners' votes (§ 1214 OZ).",
+                    "A per-rollam vote has no quorum — the majority is counted from all votes in the building.",
             },
             quorumMeasure: {
                 options: {
@@ -229,7 +225,7 @@ export const voting = {
         legal: {
             tier1: {
                 MAJORITY_BELOW_FLOOR:
-                    "The required majority is below the statutory simple-majority floor.",
+                    "The required majority may not be set below a simple majority (more than 50 %).",
                 PER_ROLLAM_QUORUM_PRESENT:
                     "A per-rollam vote may not have a quorum set.",
                 PER_ROLLAM_BASIS_NOT_ALL_VOTES:
@@ -237,7 +233,7 @@ export const voting = {
                 ASSEMBLY_QUORUM_MISSING:
                     "An assembly record must have a quorum set.",
                 ASSEMBLY_QUORUM_BELOW_FLOOR:
-                    "The quorum is below the statutory simple-majority floor.",
+                    "The assembly quorum may not be set below a simple majority of all votes.",
             },
             tier3: {
                 ONE_UNIT_ONE_VOTE: "one-unit-one-vote weighting",
@@ -369,7 +365,7 @@ export const voting = {
     },
     status: {
         requiresDelegation:
-            "The unit needs a common representative — co-owners must consent by a majority of shares (§ 1185(2) OZ).",
+            "To vote for this unit, a common representative must be authorized (by co-owners holding a majority of shares).",
         requiresDelegationSjm:
             "For a unit held in marital community property, the other spouse must also confirm the representative.",
     },
@@ -421,7 +417,7 @@ export const voting = {
                     'Question "{{param}}" requires at least two answer options.',
                 VOTE_RULESET_REQUIRED: "A default ruleset must be configured.",
                 VOTE_WINDOW_TOO_SHORT_PER_ROLLAM:
-                    "The per-rollam voting window must last at least 15 days (§ 1211(2) OZ).",
+                    "The per-rollam voting window must last at least 15 days.",
             },
         },
         documents: {
@@ -486,7 +482,7 @@ export const voting = {
         notice: {
             title: "Important Notice",
             description:
-                "A common representative is chosen by co-owners consenting by a majority of shares (§ 1185(2) OZ). Once you delegate your vote for this unit, you cannot vote personally in this specific event unless you revoke the delegation before the vote starts.",
+                "A common representative is chosen by co-owners consenting by a majority of shares. Once you delegate your vote for this unit, you cannot vote personally in this specific event unless you revoke the delegation before the vote starts.",
         },
         summary: {
             title: "Delegation Summary",
@@ -629,7 +625,7 @@ export const voting = {
             collapseDetails: "Hide details",
         },
         perRollamDenominator:
-            "The majority is counted from all votes in the building (§ 1214 OZ).",
+            "The majority is counted from all votes in the building.",
     },
     resultsV2: {
         participationLine:

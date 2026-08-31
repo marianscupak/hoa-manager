@@ -16,10 +16,7 @@ import { VoteConsentRevokedAuditEvent } from '@/modules/voting/audit/events/vote
 import { VotingAuditLabelResolver } from '@/modules/voting/audit/label-resolver.service';
 import { VoteUnitConsentStatus } from '@/modules/voting/domain/vote/vote.types';
 import { ForbiddenException } from '@/shared/application/exceptions/auth.exceptions';
-import {
-  DelegationNotFoundException,
-  MembershipHasNoAssociatedOwnerException,
-} from '@/shared/application/exceptions/vote.exceptions';
+import { DelegationNotFoundException } from '@/shared/application/exceptions/vote.exceptions';
 import { type Clock, CLOCK } from '@/shared/application/ports/clock.port';
 
 import { RevokeConsentCommand } from './revoke-consent.command';
@@ -70,13 +67,13 @@ export class RevokeConsentHandler
       }
     }
 
+    // `null` when the grantor has no user account (e.g. a POA recorded for
+    // an account-less SJM spouse) — that's a normal state, not an error:
+    // there is simply no membership to attribute a "self-revoke" to.
     const ownerMembershipId = await this.voteReadRepo.getMembershipByOwnerId(
       command.tenantId,
       consent.fromOwnerId,
     );
-    if (!ownerMembershipId) {
-      throw new MembershipHasNoAssociatedOwnerException();
-    }
     const delegateMembershipId = consent.toMembershipId;
 
     await this.unitOfWork.execute(async () => {
@@ -90,7 +87,7 @@ export class RevokeConsentHandler
         await Promise.all([
           this.labelResolver.resolveVoteTitle(consent.voteId),
           this.labelResolver.resolveUnitLabel(consent.unitId),
-          this.labelResolver.resolveMembershipLabel(ownerMembershipId),
+          this.labelResolver.resolveOwnerLabel(consent.fromOwnerId),
           this.labelResolver.resolveMembershipLabel(delegateMembershipId),
           this.labelResolver.resolveActorLabel(actor),
         ]);

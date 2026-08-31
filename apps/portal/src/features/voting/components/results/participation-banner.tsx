@@ -22,7 +22,7 @@ export interface ParticipationStats {
 /**
  * Shared by ParticipationBanner and VerdictCard (for the reasonNoQuorum
  * sentence's `turnout`), so both surfaces report the exact same number for
- * "how many took part" — quorum is vote-level (spec §3), so there is only
+ * "how many took part" — quorum is vote-level (spec section 3), so there is only
  * ever one participation figure for the whole vote. Quorum only exists for
  * ASSEMBLY_RECORD votes — `ruleset.quorum` is `null` for PER_ROLLAM, in
  * which case the weight axis is used (matching the weight-based
@@ -116,8 +116,8 @@ export function ParticipationBanner({
               totalDen: results.totalVotesWeight.den,
           });
 
-    // Quorum only exists for ASSEMBLY_RECORD votes; PER_ROLLAM has none by
-    // law (§ 1214) and reports `quorumMet: null`, which is not the same as
+    // Quorum only exists for ASSEMBLY_RECORD votes; PER_ROLLAM has none under
+    // the per-rollam rule and reports `quorumMet: null`, which is not the same as
     // "failed" — it must not render as a warning.
     const quorumDotClass =
         results.quorumMet === null

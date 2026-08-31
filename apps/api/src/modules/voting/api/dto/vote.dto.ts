@@ -441,7 +441,11 @@ export class DelegationCandidateDto {
 export const createVoteConsentSchema = z.object({
   unitId: z.string().uuid(),
   delegateMembershipId: z.string().uuid(),
-  ownerMembershipId: z.string().uuid().optional(),
+  // Self-service callers omit this — the grantor is resolved from their own
+  // membership. Admins/board members recording a paper POA send the
+  // grantor's ownerId directly, since the grantor may have no user account
+  // (e.g. an SJM spouse).
+  fromOwnerId: z.string().uuid().optional(),
 });
 
 export class CreateVoteConsentDto extends createZodDto(

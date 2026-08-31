@@ -506,7 +506,7 @@ export function VerdictCard({
         options,
     });
 
-    // Quorum measure is vote-level (spec §3), so this deliberately reads the
+    // Quorum measure is vote-level (spec section 3), so this deliberately reads the
     // vote's ruleset and never the question's effectiveRuleset — a majority
     // override must not flip the axis the bars are drawn on. `quorum` is
     // null for PER_ROLLAM votes (no quorum by law), which defaults to the

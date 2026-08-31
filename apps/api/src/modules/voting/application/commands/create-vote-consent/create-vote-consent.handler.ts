@@ -66,9 +66,14 @@ export class CreateVoteConsentHandler
       throw new InvalidVoteStatusForDelegationException();
     }
 
-    let effectiveMembershipId = command.membershipId;
+    let ownerId: string;
+    // Only the self-service path has a caller membership behind the
+    // grantor — an admin-supplied fromOwnerId may belong to an
+    // account-less owner (e.g. an SJM spouse), so there is nothing to
+    // point the audit trail's "owner membership" at in that case.
+    let ownerMembershipIdForAudit: string | null;
 
-    if (command.ownerMembershipId) {
+    if (command.fromOwnerId) {
       const isAdminOrBoard =
         command.roles.includes('ADMIN') ||
         command.roles.includes('BOARD_MEMBER');
@@ -76,27 +81,43 @@ export class CreateVoteConsentHandler
       if (!isAdminOrBoard) {
         throw new ForbiddenException();
       }
-      effectiveMembershipId = command.ownerMembershipId;
-    }
 
-    const statuses = await this.voteReadRepo.findVoterStatus(
-      command.tenantId,
-      command.voteId,
-      effectiveMembershipId,
-    );
+      const isOwner = await this.voteReadRepo.isActiveUnitOwner(
+        command.tenantId,
+        command.unitId,
+        command.fromOwnerId,
+      );
+      if (!isOwner) {
+        throw new NotAUnitOwnerException();
+      }
 
-    const isOwner = statuses.owningUnits.some((u) => u.id === command.unitId);
-    if (!isOwner) {
-      throw new NotAUnitOwnerException();
-    }
+      ownerId = command.fromOwnerId;
+      ownerMembershipIdForAudit = null;
+    } else {
+      const statuses = await this.voteReadRepo.findVoterStatus(
+        command.tenantId,
+        command.voteId,
+        command.membershipId,
+      );
 
-    const ownerId = await this.voteReadRepo.getOwnerIdByMembership(
-      command.tenantId,
-      effectiveMembershipId,
-    );
+      const isOwner = statuses.owningUnits.some(
+        (u) => u.id === command.unitId,
+      );
+      if (!isOwner) {
+        throw new NotAUnitOwnerException();
+      }
 
-    if (!ownerId) {
-      throw new MembershipHasNoAssociatedOwnerException();
+      const resolvedOwnerId = await this.voteReadRepo.getOwnerIdByMembership(
+        command.tenantId,
+        command.membershipId,
+      );
+
+      if (!resolvedOwnerId) {
+        throw new MembershipHasNoAssociatedOwnerException();
+      }
+
+      ownerId = resolvedOwnerId;
+      ownerMembershipIdForAudit = command.membershipId;
     }
 
     await this.unitOfWork.execute(async () => {
@@ -115,7 +136,7 @@ export class CreateVoteConsentHandler
         await Promise.all([
           this.labelResolver.resolveActorLabel(actor),
           this.labelResolver.resolveUnitLabel(command.unitId),
-          this.labelResolver.resolveMembershipLabel(effectiveMembershipId),
+          this.labelResolver.resolveOwnerLabel(ownerId),
           this.labelResolver.resolveMembershipLabel(
             command.delegateMembershipId,
           ),
@@ -129,7 +150,7 @@ export class CreateVoteConsentHandler
           consentId,
           unitId: command.unitId,
           unitLabel,
-          ownerMembershipId: effectiveMembershipId,
+          ownerMembershipId: ownerMembershipIdForAudit,
           ownerLabel,
           delegateMembershipId: command.delegateMembershipId,
           delegateLabel,

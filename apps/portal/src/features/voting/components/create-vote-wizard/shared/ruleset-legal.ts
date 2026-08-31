@@ -28,7 +28,7 @@ export const ASSEMBLY_PRESET: CreateVoteRulesetValues = {
 };
 
 export function tierIssues(mode: "PER_ROLLAM" | "ASSEMBLY_RECORD", v: CreateVoteRulesetValues) {
-    const tier1: { code: string; citation: string }[] = [];
+    const tier1: { code: string }[] = [];
     const tier3: ("ONE_UNIT_ONE_VOTE" | "UNIT_COUNT_QUORUM")[] = [];
     const majorityBar: Bar = {
         threshold:
@@ -44,17 +44,17 @@ export function tierIssues(mode: "PER_ROLLAM" | "ASSEMBLY_RECORD", v: CreateVote
                   ? "AT_LEAST"
                   : "STRICT_GREATER",
     };
-    if (!barAtLeastAsStrict(majorityBar, FLOOR)) tier1.push({ code: "MAJORITY_BELOW_FLOOR", citation: "NOZ § 1206 odst. 2 / § 1214" });
+    if (!barAtLeastAsStrict(majorityBar, FLOOR)) tier1.push({ code: "MAJORITY_BELOW_FLOOR" });
     if (mode === "PER_ROLLAM") {
-        if (v.quorum) tier1.push({ code: "PER_ROLLAM_QUORUM_PRESENT", citation: "NOZ § 1210–1214" });
+        if (v.quorum) tier1.push({ code: "PER_ROLLAM_QUORUM_PRESENT" });
         if (v.majorityRuleType !== "UNANIMITY" && v.majorityDenominatorBasis !== "ALL_VOTES") {
-            tier1.push({ code: "PER_ROLLAM_BASIS_NOT_ALL_VOTES", citation: "NOZ § 1214" });
+            tier1.push({ code: "PER_ROLLAM_BASIS_NOT_ALL_VOTES" });
         }
     } else {
-        if (!v.quorum) tier1.push({ code: "ASSEMBLY_QUORUM_MISSING", citation: "NOZ § 1206 odst. 2" });
+        if (!v.quorum) tier1.push({ code: "ASSEMBLY_QUORUM_MISSING" });
         else {
             if (!barAtLeastAsStrict({ threshold: v.quorum.threshold, comparator: v.quorum.comparator }, FLOOR)) {
-                tier1.push({ code: "ASSEMBLY_QUORUM_BELOW_FLOOR", citation: "NOZ § 1206 odst. 2" });
+                tier1.push({ code: "ASSEMBLY_QUORUM_BELOW_FLOOR" });
             }
             if (v.quorum.measure === "UNIT_COUNT") tier3.push("UNIT_COUNT_QUORUM");
         }

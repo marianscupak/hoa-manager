@@ -202,3 +202,9 @@ export class DocumentStorageNotConfiguredException extends DomainException {
     super(ErrorCode.DOCUMENT_STORAGE_NOT_CONFIGURED);
   }
 }
+
+export class ConsentAlreadyRecordedException extends DomainException {
+  constructor() {
+    super(ErrorCode.CONSENT_ALREADY_RECORDED);
+  }
+}

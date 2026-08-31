@@ -31,9 +31,6 @@ export function ModeStep({ value, onChange }: ModeStepProps) {
                     <p className="text-muted-foreground mt-1 text-sm">
                         {t(`voting:create.mode.${mode}.description`)}
                     </p>
-                    <p className="text-muted-foreground mt-2 text-xs">
-                        {t(`voting:create.mode.${mode}.citation`)}
-                    </p>
                 </button>
             ))}
         </div>

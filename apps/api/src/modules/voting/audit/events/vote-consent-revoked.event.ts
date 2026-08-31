@@ -9,7 +9,9 @@ import { VotingEventType } from '../voting-event-types';
 const PayloadSchema = z.object({
   consentId: z.uuid(),
   unitId: z.uuid(),
-  ownerMembershipId: z.uuid(),
+  // `null` when the consent's grantor has no user account (and therefore no
+  // membership) — e.g. a POA recorded for an SJM spouse without a login.
+  ownerMembershipId: z.uuid().nullable(),
   delegateMembershipId: z.uuid(),
   revokedByMembershipId: z.uuid(),
   labels: z.object({
@@ -36,7 +38,7 @@ export const VoteConsentRevokedAuditEvent = defineAuditEvent({
     consentId: string;
     unitId: string;
     unitLabel: string;
-    ownerMembershipId: string;
+    ownerMembershipId: string | null;
     ownerLabel: string;
     delegateMembershipId: string;
     delegateLabel: string;

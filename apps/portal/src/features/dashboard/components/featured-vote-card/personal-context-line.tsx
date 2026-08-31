@@ -10,7 +10,7 @@ export function PersonalContextLine({ voterStatus }: PersonalContextLineProps) {
     const { t } = useTranslation("dashboard");
     const units = voterStatus.owningUnits ?? [];
 
-    // Priority order — first match wins (per spec §6.1).
+    // Priority order — first match wins (per spec section 6.1).
     // 1. Outstanding action — any unit READY or REQUIRES_DELEGATION.
     if (
         units.some(
@@ -35,7 +35,7 @@ export function PersonalContextLine({ voterStatus }: PersonalContextLineProps) {
 
     // 3. Any unit DELEGATED. The current OwningUnitStatusDto does not carry
     // the delegate identity, so render a generic confirmation rather than
-    // fabricating a name. See plan §8.3 — wording is implementer's call.
+    // fabricating a name. See plan section 8.3 — wording is implementer's call.
     if (units.some((u) => u.status === "DELEGATED")) {
         return (
             <p className="text-secondary-foreground mt-1 text-sm">

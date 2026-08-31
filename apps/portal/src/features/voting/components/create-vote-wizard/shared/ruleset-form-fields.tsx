@@ -417,8 +417,7 @@ export function RulesetFormFields({
                         >
                             {t(`voting:create.legal.tier1.${issue.code}`, {
                                 defaultValue: issue.code,
-                            })}{" "}
-                            ({issue.citation})
+                            })}
                         </p>
                     ))}
                     {issues.tier3.length > 0 && (

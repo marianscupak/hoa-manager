@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm';
 
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
 import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
+import { owners } from '@/infrastructure/db/schema/core/owners';
 import { tenantMemberships } from '@/infrastructure/db/schema/core/tenant-memberships';
 import { units } from '@/infrastructure/db/schema/core/units';
 import { users } from '@/infrastructure/db/schema/core/users';
@@ -32,6 +33,20 @@ export class VotingAuditLabelResolver {
       .where(eq(users.id, userId))
       .limit(1);
     return row?.fullName ?? `User ${userId.slice(0, 8)}`;
+  }
+
+  /**
+   * Labels a POA grantor directly by ownerId — works even when the owner has
+   * no user account (and therefore no membership), unlike
+   * `resolveMembershipLabel`.
+   */
+  async resolveOwnerLabel(ownerId: string): Promise<string> {
+    const [row] = await this.db
+      .select({ displayName: owners.displayName })
+      .from(owners)
+      .where(eq(owners.id, ownerId))
+      .limit(1);
+    return row?.displayName ?? `Owner ${ownerId.slice(0, 8)}`;
   }
 
   async resolveMembershipLabel(membershipId: string): Promise<string> {

@@ -8,10 +8,10 @@ import type {
 import { mapQuestionVerdict, type QuestionVerdict } from "./question-verdict";
 
 /**
- * Agreement test for the §3 verdict table.
+ * Agreement test for the section 3 verdict table.
  *
  * The design spec (`docs/superpowers/specs/2026-08-19-soft-clay-redesign-design.md`,
- * §3 "Verdict mapping") defines one table that both sides of the wire must
+ * section 3 "Verdict mapping") defines one table that both sides of the wire must
  * implement identically: the server derives the persisted/exported outcome in
  * `deriveQuestionOutcome`, the client derives the displayed chip in
  * `mapQuestionVerdict`. Every row here therefore names the server outcome it
@@ -61,7 +61,7 @@ function buildResult(
 }
 
 interface VerdictTableRow {
-    /** The spec §3 row this case comes from. */
+    /** The spec section 3 row this case comes from. */
     specRow: string;
     /** The server outcome `deriveQuestionOutcome` returns for the same inputs. */
     serverOutcome: "NOT_DECIDED" | "APPROVED" | "REJECTED" | "WINNER";
@@ -150,7 +150,7 @@ const table: VerdictTableRow[] = [
     },
 ];
 
-describe("mapQuestionVerdict agrees with the spec §3 verdict table", () => {
+describe("mapQuestionVerdict agrees with the spec section 3 verdict table", () => {
     it.each(table)(
         "$specRow (server: $serverOutcome)",
         ({

@@ -22,6 +22,7 @@ import {
   VoteWriteRepository,
   type BallotInput,
 } from '../../application/ports/vote-write.repository.port';
+import { planOptionPersistence } from '../../domain/vote/option-persistence';
 import { VoteResultSnapshot } from '../../domain/vote/vote-result.types';
 import { VoteAggregate } from '../../domain/vote/vote.aggregate';
 import {
@@ -284,18 +285,59 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
       }
 
       for (const q of vote.questions) {
-        await tx
-          .delete(voteOptions)
+        const existingOptionRows = await tx
+          .select({ id: voteOptions.id })
+          .from(voteOptions)
           .where(
             and(
               eq(voteOptions.tenantId, vote.tenantId),
               eq(voteOptions.questionId, q.id),
             ),
           );
-        if (q.options.length > 0) {
+        const existingOptionIds = existingOptionRows.map((o) => o.id);
+
+        const optionPlan = planOptionPersistence(existingOptionIds, q.options);
+
+        if (optionPlan.toDelete.length > 0) {
+          await tx
+            .delete(voteOptions)
+            .where(
+              and(
+                eq(voteOptions.tenantId, vote.tenantId),
+                inArray(voteOptions.id, optionPlan.toDelete),
+              ),
+            );
+        }
+
+        const optionsToUpdate = q.options.filter((o) =>
+          optionPlan.toUpdate.includes(o.id),
+        );
+        for (const o of optionsToUpdate) {
+          await tx
+            .update(voteOptions)
+            .set({
+              label: o.label,
+              optionKey: o.optionKey,
+              sortOrder: o.sortOrder,
+              updatedAt: new Date(),
+            })
+            .where(
+              and(
+                eq(voteOptions.tenantId, vote.tenantId),
+                eq(voteOptions.id, o.id),
+              ),
+            );
+        }
+
+        const optionsToInsert = q.options.filter((o) =>
+          optionPlan.toInsert.includes(o.id),
+        );
+        if (optionsToInsert.length > 0) {
           await tx
             .insert(voteOptions)
-            .values(q.options.map((o) => this.mapOptionInsert(o, q, vote)));
+            .values(
+              optionsToInsert.map((o) => this.mapOptionInsert(o, q, vote)),
+            );
         }
       }
     });

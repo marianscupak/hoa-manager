@@ -64,6 +64,14 @@ export class OwnerResponseDto {
   })
   inviteStatus!: 'pending' | 'expired' | null;
 
+  @ApiProperty({
+    nullable: true,
+    type: String,
+    format: 'date-time',
+    description: 'When the current invite was created, null if no invite',
+  })
+  inviteCreatedAt!: Date | null;
+
   @ApiProperty()
   createdAt!: Date;
 

@@ -3318,6 +3318,12 @@
             ],
             "description": "Status of the invite for this owner, null if no pending invite"
           },
+          "inviteCreatedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "description": "When the current invite was created, null if no invite"
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string"
@@ -3335,6 +3341,7 @@
           "userId",
           "kind",
           "inviteStatus",
+          "inviteCreatedAt",
           "createdAt",
           "updatedAt"
         ]
@@ -3524,6 +3531,13 @@
             "type": "number",
             "description": "Denominator of the building share fraction"
           },
+          "owners": {
+            "description": "Display names of the current owners of this unit",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string"
@@ -3539,6 +3553,7 @@
           "unitNo",
           "buildingShareNumerator",
           "buildingShareDenominator",
+          "owners",
           "createdAt",
           "updatedAt"
         ]
@@ -3667,6 +3682,13 @@
             "type": "number",
             "description": "Denominator of the building share fraction"
           },
+          "owners": {
+            "description": "Display names of the current owners of this unit",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string"
@@ -3688,6 +3710,7 @@
           "unitNo",
           "buildingShareNumerator",
           "buildingShareDenominator",
+          "owners",
           "createdAt",
           "updatedAt",
           "ownerships"

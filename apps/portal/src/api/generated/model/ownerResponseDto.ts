@@ -22,6 +22,11 @@ export interface OwnerResponseDto {
      * @nullable
      */
     inviteStatus: OwnerResponseDtoInviteStatus;
+    /**
+     * When the current invite was created, null if no invite
+     * @nullable
+     */
+    inviteCreatedAt: string | null;
     createdAt: string;
     updatedAt: string;
 }

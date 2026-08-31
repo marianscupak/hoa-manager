@@ -84,6 +84,12 @@ export class UnitResponseDto {
   @ApiProperty({ description: 'Denominator of the building share fraction' })
   buildingShareDenominator!: number;
 
+  @ApiProperty({
+    type: [String],
+    description: 'Display names of the current owners of this unit',
+  })
+  owners!: string[];
+
   @ApiProperty()
   createdAt!: Date;
 

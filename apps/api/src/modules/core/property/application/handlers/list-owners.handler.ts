@@ -18,6 +18,7 @@ export interface OwnerWithInviteStatus {
   userId: string | null;
   kind: OwnerKind;
   inviteStatus: 'pending' | 'expired' | null;
+  inviteCreatedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -40,19 +41,21 @@ export class ListOwnersHandler
     return Promise.all(
       owners.map(async (owner) => {
         let inviteStatus: 'pending' | 'expired' | null = null;
+        let inviteCreatedAt: Date | null = null;
 
         if (!owner.userId && owner.email) {
           const invite = await this.queryBus.execute<
             GetPendingInviteByOwnerIdQuery,
-            { expiresAt: Date } | null
+            { expiresAt: Date; createdAt: Date } | null
           >(new GetPendingInviteByOwnerIdQuery(query.tenantId, owner.id));
 
           if (invite) {
             inviteStatus = invite.expiresAt > now ? 'pending' : 'expired';
+            inviteCreatedAt = invite.createdAt;
           }
         }
 
-        return { ...owner, inviteStatus };
+        return { ...owner, inviteStatus, inviteCreatedAt };
       }),
     );
   }

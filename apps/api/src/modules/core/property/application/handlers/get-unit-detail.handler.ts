@@ -35,6 +35,7 @@ export interface UnitOwnershipDetailItem {
 
 export interface UnitDetail extends Unit {
   ownerships: UnitOwnershipDetailItem[];
+  owners: string[];
 }
 
 @QueryHandler(GetUnitDetailQuery)
@@ -64,6 +65,15 @@ export class GetUnitDetailHandler
 
     const ownersById = new Map(tenantOwners.map((o) => [o.id, o]));
 
+    const owners = [
+      ...new Set(
+        ownerships
+          .flatMap((p) => p.memberOwnerIds)
+          .map((id) => ownersById.get(id)?.displayName)
+          .filter((name): name is string => !!name),
+      ),
+    ];
+
     return {
       ...unit,
       ownerships: ownerships.map((party) => ({
@@ -84,6 +94,7 @@ export class GetUnitDetailHandler
           };
         }),
       })),
+      owners,
     };
   }
 }

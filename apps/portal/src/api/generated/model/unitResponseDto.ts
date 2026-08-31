@@ -14,6 +14,8 @@ export interface UnitResponseDto {
     buildingShareNumerator: number;
     /** Denominator of the building share fraction */
     buildingShareDenominator: number;
+    /** Display names of the current owners of this unit */
+    owners: string[];
     createdAt: string;
     updatedAt: string;
 }

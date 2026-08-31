@@ -9,6 +9,7 @@ import { GetPendingInviteByOwnerIdQuery } from '@/modules/core/invitation/applic
 
 export type PendingInviteResult = {
   expiresAt: Date;
+  createdAt: Date;
 } | null;
 
 @QueryHandler(GetPendingInviteByOwnerIdQuery)
@@ -29,6 +30,6 @@ export class GetPendingInviteByOwnerIdHandler
     );
 
     if (!invite) return null;
-    return { expiresAt: invite.expiresAt };
+    return { expiresAt: invite.expiresAt, createdAt: invite.createdAt };
   }
 }

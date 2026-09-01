@@ -1,20 +1,11 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { Loader2, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 
-import {
-    Button,
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@hoa-mngr/ui";
+import { Button, ConfirmDialog } from "@hoa-mngr/ui";
 
 import { showApiError } from "@/api/error-utils";
 import {
@@ -58,46 +49,29 @@ export function DeleteDraftVoteDialog({
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
-                <Button
-                    variant="outline"
-                    size={triggerSize}
-                    className={`text-destructive hover:text-destructive hover:bg-destructive/5 ${triggerClassName ?? ""}`}
-                >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    {t("voting:detail.actions.delete")}
-                </Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>
-                        {t("voting:detail.actions.deleteConfirmTitle")}
-                    </DialogTitle>
-                    <DialogDescription>
-                        {t("voting:detail.actions.deleteConfirmDescription")}
-                    </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                    <Button
-                        variant="outline"
-                        onClick={() => setIsOpen(false)}
-                        disabled={deleteMutation.isPending}
-                    >
-                        {t("voting:detail.actions.cancel")}
-                    </Button>
-                    <Button
-                        variant="destructive"
-                        onClick={handleDelete}
-                        disabled={deleteMutation.isPending}
-                    >
-                        {deleteMutation.isPending ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : null}
-                        {t("voting:detail.actions.deleteConfirm")}
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+        <>
+            <Button
+                type="button"
+                variant="outline"
+                size={triggerSize}
+                className={`text-destructive hover:text-destructive hover:bg-destructive/5 ${triggerClassName ?? ""}`}
+                onClick={() => setIsOpen(true)}
+                aria-haspopup="dialog"
+                aria-expanded={isOpen}
+            >
+                <Trash2 className="mr-2 h-4 w-4" />
+                {t("voting:detail.actions.delete")}
+            </Button>
+            <ConfirmDialog
+                open={isOpen}
+                onOpenChange={setIsOpen}
+                title={t("voting:detail.actions.deleteConfirmTitle")}
+                description={t("voting:detail.actions.deleteConfirmDescription")}
+                confirmLabel={t("voting:detail.actions.deleteConfirm")}
+                cancelLabel={t("voting:detail.actions.cancel")}
+                confirming={deleteMutation.isPending}
+                onConfirm={handleDelete}
+            />
+        </>
     );
 }

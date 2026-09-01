@@ -1,16 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 
-import {
-    Button,
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    toast,
-} from "@hoa-mngr/ui";
+import { ConfirmDialog, toast } from "@hoa-mngr/ui";
 
 import { showApiError } from "@/api/error-utils";
 import type { OwnerResponseDto } from "@/api/generated/model";
@@ -49,42 +40,21 @@ export function DeleteOwnerDialog({
         },
     });
 
-    const onConfirm = () => {
-        if (!owner) return;
-        deleteOwner.mutate({ ownerId: owner.id });
-    };
-
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>{t("owners.delete.title")}</DialogTitle>
-                    <DialogDescription>
-                        {t("owners.delete.description", {
-                            name: owner?.displayName,
-                        })}
-                    </DialogDescription>
-                </DialogHeader>
-
-                <DialogFooter>
-                    <Button
-                        variant="outline"
-                        onClick={() => onOpenChange(false)}
-                        disabled={deleteOwner.isPending}
-                    >
-                        {t("owners.delete.cancel")}
-                    </Button>
-                    <Button
-                        variant="destructive"
-                        onClick={onConfirm}
-                        disabled={deleteOwner.isPending}
-                    >
-                        {deleteOwner.isPending
-                            ? t("common:loading")
-                            : t("admin:owners.delete.confirm")}
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+        <ConfirmDialog
+            open={open}
+            onOpenChange={onOpenChange}
+            title={t("owners.delete.title")}
+            description={t("owners.delete.description", {
+                name: owner?.displayName,
+            })}
+            confirmLabel={t("admin:owners.delete.confirm")}
+            cancelLabel={t("owners.delete.cancel")}
+            confirmingLabel={t("common:loading")}
+            confirming={deleteOwner.isPending}
+            onConfirm={() => {
+                if (owner) deleteOwner.mutate({ ownerId: owner.id });
+            }}
+        />
     );
 }

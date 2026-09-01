@@ -1,47 +1,38 @@
 import { useTranslation } from "react-i18next";
 
+import { StatusChip, type StatusChipVariant } from "@hoa-mngr/ui";
+
+const VOTE_STATUS_VARIANT: Record<string, StatusChipVariant> = {
+    OPEN: "success",
+    SCHEDULED: "primary",
+    CLOSED: "neutral",
+    DRAFT: "draft",
+};
+
+const VOTE_STATUS_LABEL_KEY: Record<
+    string,
+    | "list.status.OPEN"
+    | "list.status.SCHEDULED"
+    | "list.status.CLOSED"
+    | "list.status.DRAFT"
+> = {
+    OPEN: "list.status.OPEN",
+    SCHEDULED: "list.status.SCHEDULED",
+    CLOSED: "list.status.CLOSED",
+    DRAFT: "list.status.DRAFT",
+};
+
 interface StatusBadgeProps {
     status: string;
 }
 
 export function StatusBadge({ status }: StatusBadgeProps) {
     const { t } = useTranslation(["voting"]);
+    const labelKey = VOTE_STATUS_LABEL_KEY[status];
 
-    if (status === "OPEN") {
-        return (
-            <div className="bg-success-muted text-success-tint-foreground inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold">
-                <span className="bg-success h-1.5 w-1.5 rounded-full" />
-                {t("list.status.OPEN")}
-            </div>
-        );
-    }
-    if (status === "SCHEDULED") {
-        return (
-            <div className="bg-primary-tint text-primary-tint-foreground inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold">
-                <span className="bg-primary h-1.5 w-1.5 rounded-full" />
-                {t("list.status.SCHEDULED")}
-            </div>
-        );
-    }
-    if (status === "CLOSED") {
-        return (
-            <div className="bg-muted text-secondary-foreground inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold">
-                <span className="bg-faint h-1.5 w-1.5 rounded-full" />
-                {t("list.status.CLOSED")}
-            </div>
-        );
-    }
-    if (status === "DRAFT") {
-        return (
-            <div className="text-muted-foreground border-faint inline-flex items-center rounded-full border border-dashed px-2.5 py-0.5 text-xs font-semibold">
-                {t("list.status.DRAFT")}
-            </div>
-        );
-    }
     return (
-        <div className="bg-muted text-secondary-foreground inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold">
-            <span className="bg-faint h-1.5 w-1.5 rounded-full" />
-            {status}
-        </div>
+        <StatusChip variant={VOTE_STATUS_VARIANT[status] ?? "neutral"}>
+            {labelKey ? t(labelKey) : status}
+        </StatusChip>
     );
 }

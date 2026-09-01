@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router";
 
-import { Button } from "@hoa-mngr/ui";
+import { Button, PageLoading } from "@hoa-mngr/ui";
 
 import { useUnitControllerGetUnitDetail } from "@/api/generated/property-units/property-units";
 
@@ -29,7 +29,7 @@ export function UnitDetailPage() {
     } = useUnitControllerGetUnitDetail(id);
 
     if (isLoading) {
-        return <div className="p-8 text-center">{t("common:loading")}</div>;
+        return <PageLoading label={t("common:loading")} />;
     }
 
     return (

@@ -2,7 +2,13 @@ import { CheckCircle2, Search } from "lucide-react";
 import { ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 
-import { Avatar, AvatarFallback, Card, Input } from "@hoa-mngr/ui";
+import {
+    Avatar,
+    AvatarFallback,
+    Card,
+    EmptyState,
+    Input,
+} from "@hoa-mngr/ui";
 import { cn } from "@hoa-mngr/ui/lib/utils";
 
 import { DelegationCandidateDto } from "@/api/generated/model";
@@ -122,9 +128,7 @@ export const DelegateSelection = ({
                 ))}
 
                 {isEnabled && candidates.length === 0 && (
-                    <div className="text-muted-foreground rounded-xl border-2 border-dashed py-12 text-center italic">
-                        {t("delegate.noCandidatesFound")}
-                    </div>
+                    <EmptyState message={t("delegate.noCandidatesFound")} />
                 )}
             </div>
         </section>

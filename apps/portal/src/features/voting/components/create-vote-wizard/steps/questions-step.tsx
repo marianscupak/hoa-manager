@@ -2,7 +2,7 @@ import { Loader2, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { Button } from "@hoa-mngr/ui";
+import { Button, EmptyState } from "@hoa-mngr/ui";
 
 import { showApiError } from "@/api/error-utils";
 import {
@@ -118,9 +118,7 @@ export function CreateVoteQuestionsStep({
             />
 
             {questions.length === 0 && (
-                <div className="text-muted-foreground rounded-lg border-2 border-dashed p-12 text-center">
-                    {t("create.steps.questions.emptyState")}
-                </div>
+                <EmptyState message={t("create.steps.questions.emptyState")} />
             )}
         </div>
     );

@@ -2,7 +2,13 @@ import { useAtomValue } from "jotai";
 import { Globe, Mail, Shield, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@hoa-mngr/ui";
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+    PageHeader,
+} from "@hoa-mngr/ui";
 
 import { useTenancyControllerGetUserTenants } from "@/api/generated/tenants/tenants";
 import { tenantContextAtom, userAtom } from "@/auth/atoms";
@@ -49,16 +55,10 @@ export function ProfilePage() {
 
     return (
         <div className="mx-auto max-w-2xl space-y-6 p-4 sm:p-6 lg:p-8">
-            <div>
-                <h1 className="text-foreground text-2xl font-bold tracking-tight">
-                    {t("common:profile")}
-                </h1>
-                {activeTenant && (
-                    <p className="text-muted-foreground mt-1 text-sm">
-                        {activeTenant.name}
-                    </p>
-                )}
-            </div>
+            <PageHeader
+                title={t("common:profile")}
+                description={activeTenant?.name}
+            />
 
             <Card>
                 <CardHeader>

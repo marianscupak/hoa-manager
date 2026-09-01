@@ -3,6 +3,8 @@ import { Loader2 } from "lucide-react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
+import { EmptyState } from "@hoa-mngr/ui";
+
 import { VoteListItemResponseDto } from "@/api/generated/model";
 import { useVotesControllerGetVotes } from "@/api/generated/votes/votes";
 import { tenantContextAtom } from "@/auth/atoms";
@@ -62,11 +64,7 @@ export function VotingActiveTab() {
         draftVotes.length === 0;
 
     if (isEmpty) {
-        return (
-            <div className="text-muted-foreground rounded-lg border border-dashed p-12 text-center">
-                {t("list.empty.all")}
-            </div>
-        );
+        return <EmptyState message={t("list.empty.all")} />;
     }
 
     return (

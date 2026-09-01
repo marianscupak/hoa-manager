@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import {
     Button,
     DataTable,
+    EmptyState,
     Select,
     SelectContent,
     SelectItem,
@@ -62,11 +63,7 @@ export function UserDelegationList() {
     const isLoading = isLoadingConsents || isLoadingVotes;
 
     if (!isLoading && (!consents || consents.length === 0)) {
-        return (
-            <div className="text-muted-foreground rounded-lg border border-dashed p-12 text-center">
-                {t("voting:delegations.empty.all")}
-            </div>
-        );
+        return <EmptyState message={t("voting:delegations.empty.all")} />;
     }
 
     const handleRevoke = (id: string) => {

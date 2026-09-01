@@ -1,7 +1,7 @@
 import { CheckCircle2, Home } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Card } from "@hoa-mngr/ui";
+import { Card, EmptyState } from "@hoa-mngr/ui";
 import { cn } from "@hoa-mngr/ui/lib/utils";
 
 import { OwningUnitStatusDto } from "@/api/generated/model";
@@ -79,9 +79,7 @@ export const UnitSelection = ({
                 ))}
 
                 {units.length === 0 && (
-                    <div className="text-muted-foreground rounded-xl border-2 border-dashed py-12 text-center italic">
-                        {t("delegate.noSelectableUnits")}
-                    </div>
+                    <EmptyState message={t("delegate.noSelectableUnits")} />
                 )}
             </div>
         </section>

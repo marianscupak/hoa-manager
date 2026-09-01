@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
-import { DataTable } from "@hoa-mngr/ui";
+import { DataTable, PageHeader } from "@hoa-mngr/ui";
 
 import { useMemberControllerGetMembers } from "@/api/generated/tenant-members/tenant-members";
 
@@ -26,14 +26,10 @@ export function UsersPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-foreground text-2xl font-bold tracking-tight">
-                    {t("users.title")}
-                </h1>
-                <p className="text-muted-foreground mt-2 text-sm">
-                    {t("users.description")}
-                </p>
-            </div>
+            <PageHeader
+                title={t("users.title")}
+                description={t("users.description")}
+            />
 
             <DataTable
                 columns={columns}

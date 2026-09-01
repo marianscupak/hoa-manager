@@ -1,16 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 
-import {
-    Button,
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    toast,
-} from "@hoa-mngr/ui";
+import { ConfirmDialog, toast } from "@hoa-mngr/ui";
 
 import { showApiError } from "@/api/error-utils";
 import type { UnitResponseDto } from "@/api/generated/model";
@@ -49,42 +40,21 @@ export function DeleteUnitDialog({
         },
     });
 
-    const onConfirm = () => {
-        if (!unit) return;
-        deleteUnit.mutate({ id: unit.id });
-    };
-
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>{t("units.delete.title")}</DialogTitle>
-                    <DialogDescription>
-                        {t("units.delete.description", {
-                            unitNo: unit?.unitNo,
-                        })}
-                    </DialogDescription>
-                </DialogHeader>
-
-                <DialogFooter>
-                    <Button
-                        variant="outline"
-                        onClick={() => onOpenChange(false)}
-                        disabled={deleteUnit.isPending}
-                    >
-                        {t("units.delete.cancel")}
-                    </Button>
-                    <Button
-                        variant="destructive"
-                        onClick={onConfirm}
-                        disabled={deleteUnit.isPending}
-                    >
-                        {deleteUnit.isPending
-                            ? t("common:loading")
-                            : t("units.delete.confirm")}
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+        <ConfirmDialog
+            open={open}
+            onOpenChange={onOpenChange}
+            title={t("units.delete.title")}
+            description={t("units.delete.description", {
+                unitNo: unit?.unitNo,
+            })}
+            confirmLabel={t("units.delete.confirm")}
+            cancelLabel={t("units.delete.cancel")}
+            confirmingLabel={t("common:loading")}
+            confirming={deleteUnit.isPending}
+            onConfirm={() => {
+                if (unit) deleteUnit.mutate({ id: unit.id });
+            }}
+        />
     );
 }

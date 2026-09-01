@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
-import { Badge, BadgeProps, Button, Card } from "@hoa-mngr/ui";
+import { Badge, BadgeProps, Button, Card, EmptyState } from "@hoa-mngr/ui";
 
 import {
     QuestionOutcomeDto,
@@ -77,11 +77,7 @@ export function VotingResultsTab() {
     }
 
     if (!closedVotes || closedVotes.length === 0) {
-        return (
-            <div className="text-muted-foreground rounded-lg border border-dashed p-12 text-center">
-                {t("resultsOverview.empty")}
-            </div>
-        );
+        return <EmptyState message={t("resultsOverview.empty")} />;
     }
 
     return (

@@ -170,11 +170,16 @@ export function WizardShell({
                         variant="secondary"
                         size="sm"
                         asChild
-                        className="h-8 shrink-0 px-3 text-[13px]"
+                        className="h-8 shrink-0 px-3 text-[13px] [&_svg]:size-3.5"
                     >
                         <Link to="/voting">
-                            <ArrowLeft className="h-3.5 w-3.5" />
-                            {t("voting:wizard.exit")}
+                            <ArrowLeft />
+                            {/* Nunito bold sits ~1px above optical center at
+                                this size; compensate so the label aligns with
+                                the icon. */}
+                            <span className="translate-y-px">
+                                {t("voting:wizard.exit")}
+                            </span>
                         </Link>
                     </Button>
                     <div className="bg-border hidden h-5 w-px sm:block" />

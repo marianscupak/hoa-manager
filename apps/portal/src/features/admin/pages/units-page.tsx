@@ -2,7 +2,12 @@ import { AlertTriangleIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { Button, DataTable, ErrorState } from "@hoa-mngr/ui";
+import {
+    Button,
+    DataTable,
+    ErrorState,
+    formatPercentValue,
+} from "@hoa-mngr/ui";
 
 import type { UnitResponseDto } from "@/api/generated/model";
 import { useUnitControllerGetUnits } from "@/api/generated/property-units/property-units";
@@ -45,10 +50,11 @@ export function UnitsPage({ createOpen, onCreateOpenChange }: UnitsPageProps) {
     // The drift, expressed in the same unit as the sum itself (percent) so the
     // banner does not mix a percentage with a bare fraction. The validity gate
     // is 1e-6 on the fraction — 0.0001 % — so two decimals would print a real
-    // drift as "0.00 %"; keep four and trim the zeros toFixed pads with.
-    const offPercent = (Math.abs(1 - sumOfFractions) * 100)
-        .toFixed(4)
-        .replace(/\.?0+$/, "");
+    // drift as "0.00 %"; keep four and trim the trailing zeros.
+    const offPercent = formatPercentValue(
+        Math.abs(1 - sumOfFractions) * 100,
+        4,
+    );
 
     const columns = useMemo(
         () => getUnitColumns(t, (unit) => setDeletingUnit(unit)),
@@ -79,7 +85,7 @@ export function UnitsPage({ createOpen, onCreateOpenChange }: UnitsPageProps) {
                     <AlertTriangleIcon className="text-warning-tint-foreground h-4 w-4 shrink-0" />
                     <p className="text-warning-deep flex-1 text-sm leading-[19px]">
                         {t("units.sumBanner", {
-                            sum: (sumOfFractions * 100).toFixed(2),
+                            sum: formatPercentValue(sumOfFractions * 100),
                             off: offPercent,
                         })}
                     </p>

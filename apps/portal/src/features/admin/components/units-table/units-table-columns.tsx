@@ -2,7 +2,13 @@ import { TFunction } from "i18next";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import { Link } from "react-router";
 
-import { Button, CellNumeric, StatusChip, type ColumnDef } from "@hoa-mngr/ui";
+import {
+    Button,
+    CellNumeric,
+    formatPercent,
+    StatusChip,
+    type ColumnDef,
+} from "@hoa-mngr/ui";
 
 import type { UnitResponseDto } from "@/api/generated/model";
 
@@ -32,19 +38,17 @@ export function getUnitColumns(
             enableSorting: true,
             sortDescFirst: true,
             enableGlobalFilter: false,
-            cell: ({ row }) => {
-                const percent = (
-                    (row.original.buildingShareNumerator /
-                        row.original.buildingShareDenominator) *
-                    100
-                ).toFixed(1);
-                return (
-                    <CellNumeric
-                        value={`${percent} %`}
-                        secondary={`${row.original.buildingShareNumerator}/${row.original.buildingShareDenominator}`}
-                    />
-                );
-            },
+            cell: ({ row }) => (
+                <CellNumeric
+                    value={formatPercent(
+                        (row.original.buildingShareNumerator /
+                            row.original.buildingShareDenominator) *
+                            100,
+                        1,
+                    )}
+                    secondary={`${row.original.buildingShareNumerator}/${row.original.buildingShareDenominator}`}
+                />
+            ),
         },
         {
             id: "owners",

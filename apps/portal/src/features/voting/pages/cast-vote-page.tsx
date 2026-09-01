@@ -13,7 +13,7 @@ import { useState, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router";
 
-import { Button, PageLoading } from "@hoa-mngr/ui";
+import { Button, formatPercent, PageLoading } from "@hoa-mngr/ui";
 import { cn } from "@hoa-mngr/ui/lib/utils";
 
 import {
@@ -350,7 +350,8 @@ export function CastVotePage() {
                         })}
                     </span>
                     <span className="text-primary text-sm font-bold">
-                        {completionPct} % {t("castVote.progress.completed")}
+                        {formatPercent(completionPct, 0)}{" "}
+                        {t("castVote.progress.completed")}
                     </span>
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-slate-200">

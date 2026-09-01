@@ -5,7 +5,11 @@ import {
     type SetVoteRulesetResponseDto,
     type VoteResultsResponseDto,
 } from "@/api/generated/model";
-import { Card, fractionToTrimmedPercentString } from "@hoa-mngr/ui";
+import {
+    Card,
+    formatPercentValue,
+    fractionToTrimmedPercentString,
+} from "@hoa-mngr/ui";
 import { cn } from "@hoa-mngr/ui/lib/utils";
 
 export interface ParticipationStats {
@@ -99,13 +103,13 @@ export function ParticipationBanner({
 
     // The weight axis has a server-computed percent string (exact Rational
     // math via toPercentString) — display it verbatim rather than
-    // round-tripping it through Number()/toFixed(1). The UNIT_COUNT quorum
-    // measure has no server-side percent field to fall back to (the wire
-    // only carries literal unit counts for that axis), so its plain integer
-    // division stays; it's small-integer arithmetic, not the BigInt-losing
-    // kind the fraction work was about.
+    // round-tripping it through Number()/formatPercentValue. The UNIT_COUNT
+    // quorum measure has no server-side percent field to fall back to (the
+    // wire only carries literal unit counts for that axis), so its plain
+    // integer division stays; it's small-integer arithmetic, not the
+    // BigInt-losing kind the fraction work was about.
     const participationDisplay = isUnitCount
-        ? pct.toFixed(1)
+        ? formatPercentValue(pct, 1)
         : results.participationPercent;
     const participationExactTitle = isUnitCount
         ? undefined

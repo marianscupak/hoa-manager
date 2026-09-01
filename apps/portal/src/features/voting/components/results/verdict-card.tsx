@@ -13,10 +13,11 @@ import {
 import {
     Card,
     formatFraction,
+    formatPercent,
+    formatPercentValue,
     reduceFraction,
     StatusChip,
     type StatusChipVariant,
-    trimTrailingZeros,
 } from "@hoa-mngr/ui";
 
 import {
@@ -128,7 +129,7 @@ function formatMajorityDenominator(
     }
     const percent = Number(denominator.decimal) * 100;
     return t("resultsV2.thresholdDenominatorShare", {
-        percent: trimTrailingZeros(percent.toFixed(2)),
+        percent: formatPercentValue(percent),
     });
 }
 
@@ -202,7 +203,7 @@ function buildReason(args: {
             verdict === "approved"
                 ? "resultsV2.reasonApproved"
                 : "resultsV2.reasonRejected",
-            { pct: pct.toFixed(1), majority },
+            { pct: formatPercentValue(pct, 1), majority },
         );
     }
 
@@ -215,7 +216,7 @@ function buildReason(args: {
         const pct = Number(winnerResult?.percent ?? "0");
         return t("resultsV2.reasonWinner", {
             option: winningOption?.label ?? "",
-            pct: pct.toFixed(1),
+            pct: formatPercentValue(pct, 1),
         });
     }
 
@@ -225,7 +226,7 @@ function buildReason(args: {
     if (results.quorumMet === false) {
         const { pct } = computeParticipationStats(results, ruleset);
         return t("resultsV2.reasonNoQuorum", {
-            turnout: pct.toFixed(1),
+            turnout: formatPercentValue(pct, 1),
             threshold: deriveQuorumThresholdPercentLabel(ruleset),
         });
     }
@@ -244,7 +245,7 @@ function LegendItem({ colorClass, label, pct, units, t }: LegendItemProps) {
     return (
         <span className="inline-flex items-center gap-1.5">
             <span className={`h-2 w-2 rounded-[2px] ${colorClass}`} />
-            {label} {pct.toFixed(1)} % ·{" "}
+            {label} {formatPercent(pct, 1)} ·{" "}
             {t("results.unitCount", { count: units })}
         </span>
     );
@@ -377,7 +378,7 @@ function YesNoBars({
                 )}
                 <span className="text-muted-foreground inline-flex items-center gap-1.5">
                     <span className="bg-muted ring-border h-2 w-2 rounded-[2px] ring-1" />
-                    {t("resultsV2.didntVote")} {nonePct.toFixed(1)} %
+                    {t("resultsV2.didntVote")} {formatPercent(nonePct, 1)}
                 </span>
             </div>
         </div>
@@ -449,7 +450,7 @@ function SingleChoiceBars({
                                 )}
                             </span>
                             <span className="font-semibold">
-                                {pct.toFixed(1)} % ·{" "}
+                                {formatPercent(pct, 1)} ·{" "}
                                 {t("results.unitCount", {
                                     count: opt.voteUnitCount,
                                 })}

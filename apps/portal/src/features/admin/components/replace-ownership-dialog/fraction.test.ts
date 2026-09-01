@@ -6,7 +6,6 @@ import {
     sumFractions,
     fractionEqualsOne,
     fractionToDecimalString,
-    fractionToPercentString,
     fractionToTrimmedPercentString,
     trimTrailingZeros,
     reduceFraction,
@@ -61,7 +60,6 @@ describe("fraction lib", () => {
         });
         expect(formatFraction({ num: 3, den: 8 })).toBe("3/8");
         expect(fractionToDecimalString({ num: 1, den: 3 }, 4)).toBe("0.3333");
-        expect(fractionToPercentString({ num: 1, den: 2 }, 2)).toBe("50.00 %");
     });
 
     it("trims the percent string instead of padding, with no % suffix", () => {

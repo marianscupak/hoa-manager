@@ -9,6 +9,7 @@ import {
     CardHeader,
     CardTitle,
     ErrorState,
+    formatPercent,
     Skeleton,
 } from "@hoa-mngr/ui";
 import { cn } from "@hoa-mngr/ui/lib/utils";
@@ -106,7 +107,7 @@ export function BuildingOverviewSection() {
                             isWarning && "text-warning-tint-foreground",
                         )}
                     >
-                        {units.buildingShareSum.toFixed(2)} %
+                        {formatPercent(units.buildingShareSum)}
                     </span>
                     <span className="text-muted-foreground text-xs">
                         {t("buildingOverview.buildingShare.title")}

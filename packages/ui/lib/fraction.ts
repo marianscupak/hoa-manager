@@ -71,10 +71,6 @@ export function fractionToDecimalString(f: Fraction, dp = 4): string {
     return dp === 0 ? whole.toString() : `${whole}.${frac}`;
 }
 
-export function fractionToPercentString(f: Fraction, dp = 2): string {
-    return `${fractionToDecimalString({ num: f.num * 100, den: f.den }, dp)} %`;
-}
-
 /**
  * Strips trailing fractional zeros (and a bare trailing ".") from a decimal
  * string, e.g. "50.00" -> "50", "66.67" is left alone, "12.50" -> "12.5".
@@ -88,16 +84,29 @@ export function trimTrailingZeros(decimal: string): string {
 }
 
 /**
- * Same BigInt-safe rounding as fractionToPercentString, but trims trailing
- * fractional zeros (and a bare trailing ".") instead of always padding to
- * `dp` places, and omits the " %" suffix. Use this for inline text where a
- * clean "50" / "66.67" reads better than "50.00" / "66.67", and the
- * surrounding copy (often an i18next string) supplies its own "%" sign —
- * see fractionToPercentString's own docstring-equivalent callers for the
- * padded, suffixed alternative.
+ * Same BigInt-safe rounding as fractionToDecimalString at percent scale, but
+ * trims trailing fractional zeros (and a bare trailing ".") instead of
+ * always padding to `dp` places, and omits the " %" suffix. Use this for
+ * inline text where a clean "50" / "66.67" reads better than "50.00" /
+ * "66.67", and the surrounding copy (often an i18next string) supplies its
+ * own "%" sign.
  */
 export function fractionToTrimmedPercentString(f: Fraction, dp = 2): string {
     return trimTrailingZeros(
         fractionToDecimalString({ num: f.num * 100, den: f.den }, dp),
     );
+}
+
+/**
+ * Formats a plain percent number (already scaled 0-100) as a trimmed
+ * decimal string: formatPercentValue(99.85) -> "99.85", (100) -> "100".
+ * For i18n params where the translation string supplies the "%" sign.
+ */
+export function formatPercentValue(value: number, dp = 2): string {
+    return trimTrailingZeros(value.toFixed(dp));
+}
+
+/** formatPercentValue plus the house-style spaced sign: "99.85 %". */
+export function formatPercent(value: number, dp = 2): string {
+    return `${formatPercentValue(value, dp)} %`;
 }

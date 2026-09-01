@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 
-import { StatusChip } from "@hoa-mngr/ui";
+import { formatPercent, StatusChip } from "@hoa-mngr/ui";
 
 import type { OwnedUnitResponseDto } from "@/api/generated/model";
 
@@ -41,10 +41,10 @@ export function OwnedUnitsTable({ units }: OwnedUnitsTableProps) {
                             </span>
                         </td>
                         <td className="py-2 text-right">
-                            {u.ownerSharePct.toFixed(2)}%
+                            {formatPercent(u.ownerSharePct)}
                         </td>
                         <td className="py-2 text-right">
-                            {u.buildingSharePct.toFixed(2)}%
+                            {formatPercent(u.buildingSharePct)}
                         </td>
                     </tr>
                 ))}

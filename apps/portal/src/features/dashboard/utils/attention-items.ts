@@ -1,3 +1,5 @@
+import { formatPercentValue } from "@hoa-mngr/ui";
+
 import type { PropertyOverviewResponseDto } from "@/api/generated/model";
 
 export interface AttentionItem {
@@ -20,7 +22,9 @@ export function deriveAttentionItems(
             tone: "warning",
             to: "/admin/units",
             labelKey: "dashboard:attention.shareDrift",
-            labelParams: { sum: overview.units.buildingShareSum.toFixed(2) },
+            labelParams: {
+                sum: formatPercentValue(overview.units.buildingShareSum),
+            },
             count: 1,
         });
     }

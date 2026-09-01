@@ -1,6 +1,6 @@
 import type { TFunction } from "i18next";
 
-import { trimTrailingZeros } from "@hoa-mngr/ui";
+import { formatPercent } from "@hoa-mngr/ui";
 
 // Callers must pass a "voting"-namespace-scoped t (e.g. useTranslation("voting").t);
 // a default-namespace TFunction won't type-check the "detail.statusSidebar.*"
@@ -66,5 +66,5 @@ export function formatTotalVotingPower(
     const maximum = Number(power.maximum);
     if (maximum <= 0) return "0 %";
     const percent = (Number(power.value) / maximum) * 100;
-    return `${trimTrailingZeros(percent.toFixed(2))} %`;
+    return formatPercent(percent);
 }

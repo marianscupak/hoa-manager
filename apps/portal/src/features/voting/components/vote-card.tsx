@@ -35,7 +35,7 @@ export function VoteCard({ vote }: VoteCardProps) {
     return (
         <Card
             className={cn(
-                "flex items-center gap-5 px-[22px] py-[18px]",
+                "relative flex items-center gap-5 px-[22px] py-[18px]",
                 isDraft && "border-2 border-dashed shadow-none",
             )}
         >
@@ -45,7 +45,7 @@ export function VoteCard({ vote }: VoteCardProps) {
                     <ModeBadge mode={vote.mode} />
                     <Link
                         to={`/voting/${vote.id}`}
-                        className="font-display hover:text-primary-hover text-title font-extrabold tracking-tight"
+                        className="font-display hover:text-primary-hover text-title after:rounded-card focus-visible:after:ring-ring font-extrabold tracking-tight after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:ring-2"
                     >
                         {vote.title}
                     </Link>
@@ -76,7 +76,7 @@ export function VoteCard({ vote }: VoteCardProps) {
             </div>
             <Button
                 variant={action.variant ?? "default"}
-                className="shrink-0"
+                className="relative shrink-0"
                 asChild
             >
                 <Link to={action.to}>{action.label}</Link>

@@ -35,7 +35,8 @@ export function QuestionHeader({
             <button
                 {...dragAttributes}
                 {...dragListeners}
-                className="text-muted-foreground hover:text-foreground cursor-grab p-1 active:cursor-grabbing"
+                type="button"
+                className="text-muted-foreground hover:text-foreground focus-visible:ring-ring cursor-grab rounded-sm p-1 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:cursor-grabbing"
             >
                 <GripVertical className="h-4 w-4" />
             </button>

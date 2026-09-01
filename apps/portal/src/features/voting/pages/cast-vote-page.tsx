@@ -415,7 +415,7 @@ export function CastVotePage() {
                                         )
                                     }
                                     className={cn(
-                                        "flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 bg-white p-5 transition-all hover:shadow-md",
+                                        "focus-visible:ring-ring flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 bg-white p-5 transition-all hover:shadow-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
                                         isSelected
                                             ? "border-primary bg-primary/5 ring-primary/20 shadow-md ring-2"
                                             : "border-slate-200 hover:border-slate-300",

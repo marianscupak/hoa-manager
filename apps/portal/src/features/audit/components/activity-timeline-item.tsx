@@ -89,7 +89,7 @@ export function ActivityTimelineItem({
                         <button
                             type="button"
                             onClick={() => setExpanded((v) => !v)}
-                            className="text-muted-foreground hover:text-foreground ml-auto inline-flex cursor-pointer items-center gap-1 text-xs"
+                            className="text-muted-foreground hover:text-foreground focus-visible:ring-ring ml-auto inline-flex cursor-pointer items-center gap-1 rounded-sm text-xs focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                             aria-expanded={expanded}
                         >
                             {expanded ? (

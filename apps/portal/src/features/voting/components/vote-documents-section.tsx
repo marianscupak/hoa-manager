@@ -133,15 +133,17 @@ export function VoteDocumentsSection({
                             <span className="text-muted-foreground text-xs">
                                 {formatFileSize(doc.sizeBytes)}
                             </span>
-                            <button
+                            <Button
                                 type="button"
+                                variant="ghost"
+                                size="tableIcon"
                                 aria-label={t("voting:detail.documents.delete")}
                                 disabled={deleteMutation.isPending}
                                 onClick={() => handleDelete(doc.id)}
-                                className="text-muted-foreground hover:text-destructive shrink-0 cursor-pointer rounded-md p-1 transition-colors"
+                                className="text-muted-foreground hover:text-destructive shrink-0"
                             >
-                                <X className="h-4 w-4" />
-                            </button>
+                                <X />
+                            </Button>
                         </div>
                     </div>
                 ))}
@@ -177,36 +179,40 @@ export function VoteDocumentsSection({
                                             dismiss(key);
                                             addFile(u.file);
                                         }}
-                                        className="cursor-pointer text-xs font-medium underline-offset-2 hover:underline"
+                                        className="focus-visible:ring-ring cursor-pointer rounded-sm text-xs font-medium underline-offset-2 hover:underline focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                                     >
                                         {t("voting:create.documents.retry")}
                                     </button>
-                                    <button
+                                    <Button
                                         type="button"
+                                        variant="ghost"
+                                        size="tableIcon"
                                         aria-label={t(
                                             "voting:create.documents.dismiss",
                                         )}
                                         onClick={() => dismiss(key)}
-                                        className="text-muted-foreground hover:text-foreground cursor-pointer rounded-md p-1 transition-colors"
+                                        className="text-muted-foreground hover:text-foreground shrink-0"
                                     >
-                                        <X className="h-4 w-4" />
-                                    </button>
+                                        <X />
+                                    </Button>
                                 </div>
                             ) : u.status === "queued" ? (
                                 <div className="flex shrink-0 items-center gap-2">
                                     <span className="text-muted-foreground text-xs">
                                         {t("voting:create.documents.queued")}
                                     </span>
-                                    <button
+                                    <Button
                                         type="button"
+                                        variant="ghost"
+                                        size="tableIcon"
                                         aria-label={t(
                                             "voting:create.documents.dismiss",
                                         )}
                                         onClick={() => dismiss(key)}
-                                        className="text-muted-foreground hover:text-foreground cursor-pointer rounded-md p-1 transition-colors"
+                                        className="text-muted-foreground hover:text-foreground shrink-0"
                                     >
-                                        <X className="h-4 w-4" />
-                                    </button>
+                                        <X />
+                                    </Button>
                                 </div>
                             ) : (
                                 <span className="text-muted-foreground shrink-0 text-xs">

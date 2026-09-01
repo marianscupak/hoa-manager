@@ -242,7 +242,7 @@ export function VoterStatusSidebar({ vote }: VoterStatusSidebarProps) {
                 {t("detail.statusSidebar.help.description")}{" "}
                 <a
                     href="#"
-                    className="text-primary font-medium hover:underline"
+                    className="text-primary focus-visible:ring-ring rounded-sm font-medium hover:underline focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                 >
                     {t("detail.statusSidebar.help.contact")}
                 </a>

@@ -28,7 +28,7 @@ export function QuestionRulesetOverride({
                 type="button"
                 onClick={onToggleVisibility}
                 className={cn(
-                    "flex w-full cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                    "focus-visible:ring-ring flex w-full cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
                     hasOverride
                         ? "bg-primary/10 text-primary"
                         : "text-muted-foreground hover:text-foreground hover:bg-muted",

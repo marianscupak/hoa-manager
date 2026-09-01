@@ -2,6 +2,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Download, File, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { Button } from "@hoa-mngr/ui";
+
 import { showApiError } from "@/api/error-utils";
 import { VoteDocumentResponseDto } from "@/api/generated/model";
 import {
@@ -86,24 +88,28 @@ export function VoteDocuments({
                         <span className="text-muted-foreground text-xs">
                             {formatFileSize(doc.sizeBytes)}
                         </span>
-                        <button
+                        <Button
                             type="button"
+                            variant="ghost"
+                            size="tableIcon"
                             aria-label={t("detail.documents.download")}
                             onClick={() => void handleDownload(doc.id)}
-                            className="text-muted-foreground hover:text-foreground shrink-0 cursor-pointer rounded-md p-1 transition-colors"
+                            className="text-muted-foreground hover:text-foreground shrink-0"
                         >
-                            <Download className="h-[15px] w-[15px]" />
-                        </button>
+                            <Download />
+                        </Button>
                         {canManage && (
-                            <button
+                            <Button
                                 type="button"
+                                variant="ghost"
+                                size="tableIcon"
                                 aria-label={t("detail.documents.delete")}
                                 disabled={deleteMutation.isPending}
                                 onClick={() => handleDelete(doc.id)}
-                                className="text-muted-foreground hover:text-destructive shrink-0 cursor-pointer rounded-md p-1 transition-colors"
+                                className="text-muted-foreground hover:text-destructive shrink-0"
                             >
-                                <X className="h-[15px] w-[15px]" />
-                            </button>
+                                <X />
+                            </Button>
                         )}
                     </div>
                 </div>

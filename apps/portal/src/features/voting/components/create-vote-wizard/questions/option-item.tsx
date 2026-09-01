@@ -50,7 +50,7 @@ export function OptionItem({
             <button
                 {...attributes}
                 {...listeners}
-                className="text-muted-foreground hover:text-foreground cursor-grab p-1 active:cursor-grabbing"
+                className="text-muted-foreground hover:text-foreground focus-visible:ring-ring cursor-grab rounded-sm p-1 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:cursor-grabbing"
                 type="button"
             >
                 <GripVertical className="h-3.5 w-3.5" />

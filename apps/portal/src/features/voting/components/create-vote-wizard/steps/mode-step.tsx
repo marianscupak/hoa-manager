@@ -19,7 +19,7 @@ export function ModeStep({ value, onChange }: ModeStepProps) {
                     type="button"
                     onClick={() => onChange(mode)}
                     className={cn(
-                        "cursor-pointer rounded-xl border p-5 text-left transition-colors",
+                        "focus-visible:ring-ring cursor-pointer rounded-xl border p-5 text-left transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
                         value === mode
                             ? "border-primary bg-primary/5"
                             : "border-border hover:bg-muted/50",

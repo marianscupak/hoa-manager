@@ -96,7 +96,7 @@ interface VoteGroupProps {
 function VoteGroup({ label, votes }: VoteGroupProps) {
     return (
         <section>
-            <h2 className="text-faint mb-2.5 text-[11px] font-bold tracking-wider uppercase">
+            <h2 className="text-faint text-2xs mb-2.5 font-bold tracking-wider uppercase">
                 {label}
             </h2>
             <div className="flex flex-col gap-3">

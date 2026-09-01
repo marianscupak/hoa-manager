@@ -146,7 +146,7 @@ export function ParticipationBanner({
             <div className="shrink-0">
                 <p
                     className={cn(
-                        "font-display text-[32px] leading-9 font-black tracking-tight",
+                        "font-display text-stat-lg leading-9 font-black tracking-tight",
                         participationExactTitle && "cursor-help",
                     )}
                     title={participationExactTitle}
@@ -155,7 +155,7 @@ export function ParticipationBanner({
                 </p>
             </div>
             <div className="w-full min-w-0 flex-1">
-                <p className="mb-3 text-[14.5px] font-semibold">
+                <p className="text-md mb-3 font-semibold">
                     {/* The headline % is already measure-aware, so the
                         sentence has to name the same basis: a UNIT_COUNT
                         vote's turnout is a share of units, not of building
@@ -171,7 +171,7 @@ export function ParticipationBanner({
                         },
                     )}
                 </p>
-                <div className="mb-3 flex items-center gap-2 text-[13px] font-semibold">
+                <div className="text-detail mb-3 flex items-center gap-2 font-semibold">
                     <span
                         className={`h-1.5 w-1.5 rounded-full ${quorumDotClass}`}
                     />
@@ -194,7 +194,7 @@ export function ParticipationBanner({
                                 style={{ left: `${threshold}%` }}
                             />
                             <span
-                                className="text-muted-foreground absolute -top-5 -translate-x-1/2 text-[10.5px] font-semibold whitespace-nowrap"
+                                className="text-muted-foreground text-2xs absolute -top-5 -translate-x-1/2 font-semibold whitespace-nowrap"
                                 style={{ left: `${threshold}%` }}
                             >
                                 {thresholdLabel} %

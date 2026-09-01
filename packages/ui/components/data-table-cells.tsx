@@ -14,9 +14,7 @@ export function CellPrimary({
                 {title}
             </div>
             {subtitle != null && (
-                <div className="text-faint truncate text-[11.5px]">
-                    {subtitle}
-                </div>
+                <div className="text-faint text-2xs truncate">{subtitle}</div>
             )}
         </div>
     );
@@ -32,11 +30,11 @@ export function CellNumeric({
 }) {
     return (
         <div className="flex items-baseline gap-2 tabular-nums">
-            <span className="text-foreground text-[13.5px] font-semibold">
+            <span className="text-foreground text-detail font-semibold">
                 {value}
             </span>
             {secondary != null && (
-                <span className="text-faint text-[12.5px]">{secondary}</span>
+                <span className="text-faint text-detail">{secondary}</span>
             )}
         </div>
     );

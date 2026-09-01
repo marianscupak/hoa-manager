@@ -45,7 +45,7 @@ export function VoteCard({ vote }: VoteCardProps) {
                     <ModeBadge mode={vote.mode} />
                     <Link
                         to={`/voting/${vote.id}`}
-                        className="font-display hover:text-primary-hover text-[16.5px] font-extrabold tracking-tight"
+                        className="font-display hover:text-primary-hover text-title font-extrabold tracking-tight"
                     >
                         {vote.title}
                     </Link>

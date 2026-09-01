@@ -6,6 +6,20 @@
         "Helvetica Neue", Arial, sans-serif;
     --font-display: "Nunito", var(--font-sans);
 
+    /* Type scale — six custom steps; Tailwind defaults 12/14/16 stay in use */
+    --text-2xs: 0.6875rem; /* 11px — micro labels, uppercase tags */
+    --text-2xs--line-height: 1rem;
+    --text-detail: 0.8125rem; /* 13px — table/detail text, small card titles */
+    --text-detail--line-height: 1.25rem;
+    --text-md: 0.9375rem; /* 15px — emphasized body */
+    --text-md--line-height: 1.375rem;
+    --text-title: 1.0625rem; /* 17px — card/hero titles */
+    --text-title--line-height: 1.5rem;
+    --text-stat: 1.625rem; /* 26px — stat numbers */
+    --text-stat--line-height: 2rem;
+    --text-stat-lg: 2rem; /* 32px — hero stat */
+    --text-stat-lg--line-height: 2.375rem;
+
     /* Base */
     --color-background: #f8fafc;
     --color-foreground: #0f172a;
@@ -20,6 +34,7 @@
     --color-primary-tint: #f5f3ff;
     --color-primary-tint-border: #ede9fe;
     --color-primary-tint-foreground: #6d28d9;
+    --color-hero-tint: #faf9ff; /* hero gradient top stop */
     --color-secondary: #f1f5f9;
     --color-secondary-foreground: #475569;
     --color-muted: #f1f5f9;
@@ -69,10 +84,8 @@
     --shadow-clay-hero: 0 4px 0 rgba(124, 58, 237, 0.1),
         0 16px 40px rgba(124, 58, 237, 0.12);
     --shadow-clay-btn: 0 4px 0 #5b21b6, 0 12px 26px rgba(124, 58, 237, 0.25);
-    --shadow-clay-btn-hover: 0 6px 0 #5b21b6,
-        0 16px 32px rgba(124, 58, 237, 0.3);
-    --shadow-clay-btn-active: 0 2px 0 #5b21b6,
-        0 6px 14px rgba(124, 58, 237, 0.2);
+    --shadow-clay-btn-sm: 0 2px 0 #5b21b6;
+    --shadow-clay-btn-destructive: 0 4px 0 #991b1b;
     --shadow-clay-secondary: 0 3px 0 rgba(2, 6, 23, 0.05);
     --shadow-clay-inset: inset 0 -2px 0 rgba(124, 58, 237, 0.1);
     --shadow-clay-inset-lg: inset 0 -3px 0 rgba(124, 58, 237, 0.12);

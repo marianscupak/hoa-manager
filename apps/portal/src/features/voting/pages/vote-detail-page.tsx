@@ -258,13 +258,13 @@ export function VoteDetailPage() {
                 <div className="flex min-w-0 flex-col gap-4">
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-muted-foreground text-[13px] font-semibold tracking-wide uppercase">
+                            <CardTitle className="text-muted-foreground text-detail font-semibold tracking-wide uppercase">
                                 {t("voting:detail.about.title")}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="flex flex-col gap-4 pt-0">
                             {vote.description && (
-                                <p className="text-foreground/80 text-[14.5px] leading-[23px] whitespace-pre-wrap">
+                                <p className="text-foreground/80 text-md leading-[23px] whitespace-pre-wrap">
                                     {vote.description}
                                 </p>
                             )}

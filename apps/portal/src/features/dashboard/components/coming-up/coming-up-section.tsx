@@ -59,7 +59,7 @@ export function ComingUpSection() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="text-muted-foreground text-[13px] font-semibold tracking-wide uppercase">
+                <CardTitle className="text-muted-foreground text-detail font-semibold tracking-wide uppercase">
                     {t("comingUp.sectionTitle")}
                 </CardTitle>
             </CardHeader>
@@ -81,7 +81,7 @@ export function ComingUpSection() {
                             <span className="font-display text-base leading-none font-black">
                                 {format(row.date, "d")}
                             </span>
-                            <span className="text-muted-foreground mt-0.5 text-[10px] leading-none uppercase">
+                            <span className="text-muted-foreground text-2xs mt-0.5 leading-none uppercase">
                                 {format(row.date, "LLL", { locale })}
                             </span>
                         </div>

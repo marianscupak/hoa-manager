@@ -54,7 +54,7 @@ export function UnitsPage({ createOpen, onCreateOpenChange }: UnitsPageProps) {
         <div className="space-y-6">
             {!isSumValid && units && units.length > 0 && (
                 <div className="rounded-panel border-warning-tint-border bg-warning-muted shadow-clay-card-amber flex items-center gap-3 border px-[18px] py-3">
-                    <AlertTriangleIcon className="text-warning-tint-foreground h-[17px] w-[17px] shrink-0" />
+                    <AlertTriangleIcon className="text-warning-tint-foreground h-4 w-4 shrink-0" />
                     <p className="text-warning-deep flex-1 text-sm leading-[19px]">
                         {t("units.sumBanner", {
                             sum: (sumOfFractions * 100).toFixed(2),

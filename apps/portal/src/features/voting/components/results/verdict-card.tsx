@@ -336,7 +336,7 @@ function YesNoBars({
                         style={{ width: `${animated ? againstPct : 0}%` }}
                     />
                     <div
-                        className="h-full bg-[#cbd5e1] motion-safe:transition-[width] motion-safe:duration-700 motion-safe:ease-out"
+                        className="bg-faint h-full motion-safe:transition-[width] motion-safe:duration-700 motion-safe:ease-out"
                         style={{ width: `${animated ? abstainPct : 0}%` }}
                     />
                 </div>
@@ -347,7 +347,7 @@ function YesNoBars({
                     />
                 )}
             </div>
-            <div className="text-secondary-foreground mt-2.5 flex flex-wrap items-center gap-4 text-[12.5px]">
+            <div className="text-secondary-foreground text-detail mt-2.5 flex flex-wrap items-center gap-4">
                 {yes && (
                     <LegendItem
                         colorClass="bg-success"
@@ -368,7 +368,7 @@ function YesNoBars({
                 )}
                 {abstain && (
                     <LegendItem
-                        colorClass="bg-[#cbd5e1]"
+                        colorClass="bg-faint"
                         label={t("create.optionLabels.ABSTAIN")}
                         pct={abstainPct}
                         units={abstain.voteUnitCount}
@@ -427,7 +427,7 @@ function SingleChoiceBars({
 
                 return (
                     <div key={opt.optionId}>
-                        <div className="mb-1 flex items-center justify-between text-[13px]">
+                        <div className="text-detail mb-1 flex items-center justify-between">
                             <span
                                 className={
                                     isWinner
@@ -443,7 +443,7 @@ function SingleChoiceBars({
                                 "winner" — that chip would contradict the
                                 Not decided badge above. */}
                                 {isWinner && !isQuorumFailed && (
-                                    <span className="bg-primary-tint text-primary-tint-foreground ml-1.5 rounded-[6px] px-1.5 py-0.5 text-[11px] font-semibold">
+                                    <span className="bg-primary-tint text-primary-tint-foreground text-2xs ml-1.5 rounded-[6px] px-1.5 py-0.5 font-semibold">
                                         {t("resultsV2.winnerChip")}
                                     </span>
                                 )}
@@ -537,27 +537,27 @@ export function VerdictCard({
         >
             <div className="flex items-start justify-between gap-4">
                 <div>
-                    <p className="text-primary mb-1 text-[11px] font-bold tracking-wider uppercase">
+                    <p className="text-primary text-2xs mb-1 font-bold tracking-wider uppercase">
                         {t("resultsV2.resolutionLabel", { index })}
                         {!isYesNo && ` · ${t("resultsV2.multipleChoice")}`}
                     </p>
-                    <h2 className="font-display text-[17.5px] leading-6 font-extrabold tracking-tight">
+                    <h2 className="font-display text-title leading-6 font-extrabold tracking-tight">
                         {question.title}
                     </h2>
                 </div>
                 <Badge
                     variant={verdictBadgeVariant(verdict)}
-                    className="shrink-0 px-3.5 py-1.5 text-[13.5px]"
+                    className="text-detail shrink-0 px-3.5 py-1.5"
                 >
                     {verdictLabel(verdict, winningOption, t)}
                 </Badge>
             </div>
 
-            <p className="text-secondary-foreground mt-2.5 mb-1 text-[13.5px] leading-[19px]">
+            <p className="text-secondary-foreground text-detail mt-2.5 mb-1 leading-[19px]">
                 {reason}
             </p>
             <p
-                className="text-muted-foreground mb-4 cursor-help text-[12px]"
+                className="text-muted-foreground mb-4 cursor-help text-xs"
                 title={thresholdCaption.title}
             >
                 {thresholdCaption.text}

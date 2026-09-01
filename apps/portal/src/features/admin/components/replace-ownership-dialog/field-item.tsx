@@ -160,7 +160,7 @@ export function ReplaceOwnershipFieldItem({
             </div>
 
             {membersError && (
-                <p className="text-destructive text-[0.8rem] font-medium">
+                <p className="text-destructive text-detail font-medium">
                     {membersError}
                 </p>
             )}

@@ -140,7 +140,7 @@ export function VoterStatusSidebar({ vote }: VoterStatusSidebarProps) {
                                     STATUS_ICON_TILE[unit.status],
                                 )}
                             >
-                                <Home className="h-[18px] w-[18px]" />
+                                <Home className="h-4 w-4" />
                             </div>
                             <div className="min-w-0 flex-1">
                                 <p className="truncate text-sm font-semibold">
@@ -169,7 +169,7 @@ export function VoterStatusSidebar({ vote }: VoterStatusSidebarProps) {
                                                     ],
                                                 )}
                                                 {unit.ineligibleReason && (
-                                                    <Info className="h-3 w-3 opacity-70" />
+                                                    <Info className="h-3.5 w-3.5 opacity-70" />
                                                 )}
                                             </Badge>
                                         </span>

@@ -34,7 +34,7 @@ export const getUserColumns = (
         enableGlobalFilter: false,
         cell: ({ row }) => (
             <div className="flex min-w-0 items-center gap-2">
-                <div className="bg-primary-tint text-primary-tint-foreground flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full text-[11px] font-bold">
+                <div className="bg-primary-tint text-primary-tint-foreground text-2xs flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full font-bold">
                     {getInitials(
                         row.original.user.fullName,
                         row.original.user.email,

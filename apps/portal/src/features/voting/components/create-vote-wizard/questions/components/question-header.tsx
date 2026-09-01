@@ -51,7 +51,7 @@ export function QuestionHeader({
             <div className="flex items-center gap-1">
                 {hasOverride && (
                     <Badge variant="primaryTint">
-                        <Settings2 className="h-3 w-3" />
+                        <Settings2 className="h-3.5 w-3.5" />
                         {t("voting:create.steps.questions.override.badge")}
                     </Badge>
                 )}

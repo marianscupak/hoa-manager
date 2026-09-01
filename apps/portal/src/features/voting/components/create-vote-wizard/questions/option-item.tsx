@@ -53,7 +53,7 @@ export function OptionItem({
                 className="text-muted-foreground hover:text-foreground cursor-grab p-1 active:cursor-grabbing"
                 type="button"
             >
-                <GripVertical className="h-3 w-3" />
+                <GripVertical className="h-3.5 w-3.5" />
             </button>
 
             <Input

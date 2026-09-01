@@ -148,7 +148,7 @@ export function OptionsList() {
                     onClick={handleAddOption}
                     type="button"
                 >
-                    <Plus className="mr-1 h-3 w-3" />
+                    <Plus className="mr-1 h-3.5 w-3.5" />
                     {t("voting:create.steps.questions.options.addOption")}
                 </Button>
             </div>

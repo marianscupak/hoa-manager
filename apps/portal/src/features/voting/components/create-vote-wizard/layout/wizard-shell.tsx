@@ -141,7 +141,7 @@ function StepRailButton({
             >
                 {t(step.labelKey, { defaultValue: step.labelKey })}
                 {step.badge !== undefined && step.badge > 0 && (
-                    <span className="bg-muted text-secondary-foreground ml-1.5 rounded-full px-1.5 py-px text-[11px] font-semibold">
+                    <span className="bg-muted text-secondary-foreground text-2xs ml-1.5 rounded-full px-1.5 py-px font-semibold">
                         {step.badge}
                     </span>
                 )}
@@ -170,7 +170,7 @@ export function WizardShell({
                         variant="secondary"
                         size="sm"
                         asChild
-                        className="h-8 shrink-0 px-3 text-[13px] [&_svg]:size-3.5"
+                        className="text-detail h-8 shrink-0 px-3 [&_svg]:size-3.5"
                     >
                         <Link to="/voting">
                             <ArrowLeft />
@@ -208,7 +208,7 @@ export function WizardShell({
 
             <div className="flex flex-1 items-stretch">
                 <aside className="bg-card hidden w-[264px] shrink-0 flex-col border-r px-5 py-7 lg:flex">
-                    <p className="text-muted-foreground mb-4 px-2 text-[11px] font-semibold tracking-[0.8px] uppercase">
+                    <p className="text-muted-foreground text-2xs mb-4 px-2 font-semibold tracking-[0.8px] uppercase">
                         {t("voting:wizard.railTitle")}
                     </p>
                     <nav className="flex flex-col gap-0.5">

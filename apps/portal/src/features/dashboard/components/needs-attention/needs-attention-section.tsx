@@ -32,7 +32,7 @@ export function NeedsAttentionSection() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="text-muted-foreground text-[13px] font-semibold tracking-wide uppercase">
+                <CardTitle className="text-muted-foreground text-detail font-semibold tracking-wide uppercase">
                     {t("attention.sectionTitle")}
                 </CardTitle>
             </CardHeader>
@@ -50,7 +50,7 @@ export function NeedsAttentionSection() {
                     >
                         <span
                             className={cn(
-                                "font-display flex h-[22px] w-[22px] items-center justify-center rounded-full text-[11.5px] font-extrabold text-white shadow-[inset_0_-2px_0_rgba(0,0,0,0.12)]",
+                                "font-display text-2xs flex h-[22px] w-[22px] items-center justify-center rounded-full font-extrabold text-white shadow-[inset_0_-2px_0_rgba(0,0,0,0.12)]",
                                 item.tone === "warning"
                                     ? "bg-warning"
                                     : "bg-primary",

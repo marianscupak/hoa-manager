@@ -12,7 +12,7 @@ const buttonVariants = cva(
                 default:
                     "bg-primary text-primary-foreground shadow-clay-btn hover:bg-primary-hover",
                 destructive:
-                    "bg-destructive text-destructive-foreground shadow-[0_4px_0_#991b1b] hover:bg-destructive/90",
+                    "bg-destructive text-destructive-foreground shadow-clay-btn-destructive hover:bg-destructive/90",
                 outline:
                     "border-border bg-card text-foreground shadow-clay-secondary hover:bg-muted border",
                 secondary:
@@ -30,7 +30,7 @@ const buttonVariants = cva(
                 lg: "h-11 px-7",
                 icon: "h-10 w-10",
                 tableIcon: "h-[30px] w-[30px] rounded-lg [&_svg]:size-3.5",
-                tableText: "h-[30px] rounded-lg px-[11px] text-[12.5px]",
+                tableText: "h-[30px] rounded-lg px-[11px] text-detail",
             },
         },
         defaultVariants: {

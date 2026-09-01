@@ -97,18 +97,18 @@ export const DelegateSelection = ({
                                 <p className="font-medium">{candidate.name}</p>
                                 <div className="mt-1 flex flex-wrap gap-2">
                                     {candidate.isUnitOwner && (
-                                        <span className="bg-primary-tint text-primary-tint-foreground rounded px-1.5 py-0.5 text-[10px] font-bold tracking-wider uppercase">
+                                        <span className="bg-primary-tint text-primary-tint-foreground text-2xs rounded px-1.5 py-0.5 font-bold tracking-wider uppercase">
                                             {t("delegation.coOwner")}
                                         </span>
                                     )}
                                     {candidate.hasDelegatedToRequester && (
-                                        <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-emerald-700 uppercase">
+                                        <span className="text-2xs rounded bg-emerald-100 px-1.5 py-0.5 font-bold tracking-wider text-emerald-700 uppercase">
                                             {t("delegate.assignedToYou")}
                                         </span>
                                     )}
                                     {!candidate.isEligible &&
                                         !candidate.hasDelegatedToRequester && (
-                                            <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-slate-600 uppercase">
+                                            <span className="text-2xs rounded bg-slate-100 px-1.5 py-0.5 font-bold tracking-wider text-slate-600 uppercase">
                                                 {t("delegate.alreadyDelegated")}
                                             </span>
                                         )}

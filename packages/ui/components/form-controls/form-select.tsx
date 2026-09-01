@@ -73,7 +73,7 @@ export const FormSelect = ({
                         </SelectContent>
                     </Select>
                     {description && (
-                        <p className="text-muted-foreground text-[0.8rem]">
+                        <p className="text-muted-foreground text-detail">
                             {description}
                         </p>
                     )}

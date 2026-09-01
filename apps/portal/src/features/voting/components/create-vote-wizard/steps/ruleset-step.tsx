@@ -141,7 +141,7 @@ export function CreateVoteRulesetStep({
                 </div>
 
                 <div className="rounded-panel bg-primary-tint border-primary-tint-border border p-4">
-                    <p className="text-primary text-[11px] font-bold tracking-wider uppercase">
+                    <p className="text-primary text-2xs font-bold tracking-wider uppercase">
                         {t("voting:rules.inPlainLanguage")}
                     </p>
                     <p className="mt-1 text-sm font-medium">

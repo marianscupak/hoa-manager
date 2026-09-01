@@ -82,7 +82,7 @@ export const getOwnerColumns = (
                     <span className="truncate">{row.original.email}</span>
                 </span>
             ) : (
-                <span className="text-faint text-[13.5px]">
+                <span className="text-faint text-detail">
                     {t("owners.noEmail")}
                 </span>
             ),

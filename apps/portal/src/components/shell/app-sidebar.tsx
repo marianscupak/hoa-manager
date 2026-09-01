@@ -74,7 +74,7 @@ function TenantSwitcherPill({ tenantName }: { tenantName: string }) {
 
     return (
         <DropdownMenu>
-            <DropdownMenuTrigger className="rounded-tile border-border bg-card text-foreground hover:bg-muted focus-visible:ring-ring mb-4 flex w-full cursor-pointer items-center justify-between gap-2 border px-3 py-2 text-[13px] font-semibold shadow-[0_2px_0_rgba(124,58,237,0.08)] transition-colors focus-visible:ring-2 focus-visible:outline-none">
+            <DropdownMenuTrigger className="rounded-tile border-border bg-card text-foreground hover:bg-muted focus-visible:ring-ring text-detail shadow-clay-card mb-4 flex w-full cursor-pointer items-center justify-between gap-2 border px-3 py-2 font-semibold transition-colors focus-visible:ring-2 focus-visible:outline-none">
                 <span className="flex min-w-0 items-center gap-2">
                     <Building
                         className="text-muted-foreground h-3.5 w-3.5 shrink-0"
@@ -84,7 +84,7 @@ function TenantSwitcherPill({ tenantName }: { tenantName: string }) {
                         {tenantName || t("auth:tenantSwitcher.select")}
                     </span>
                 </span>
-                <ChevronsUpDown className="text-muted-foreground h-3 w-3 shrink-0" />
+                <ChevronsUpDown className="text-muted-foreground h-3.5 w-3.5 shrink-0" />
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="start" className="w-[220px]">
@@ -148,7 +148,7 @@ export function AppSidebar({ className }: { className?: string }) {
                 ))}
                 {adminOrBoard && (
                     <>
-                        <p className="text-faint mt-4 mb-1 px-3.5 text-[11px] font-bold tracking-wider uppercase">
+                        <p className="text-faint text-2xs mt-4 mb-1 px-3.5 font-bold tracking-wider uppercase">
                             {t("common:shell.administrationGroup")}
                         </p>
                         {ADMIN_NAV.map((item) => (
@@ -156,7 +156,7 @@ export function AppSidebar({ className }: { className?: string }) {
                         ))}
                     </>
                 )}
-                <p className="text-faint mt-4 mb-1 px-3.5 text-[11px] font-bold tracking-wider uppercase">
+                <p className="text-faint text-2xs mt-4 mb-1 px-3.5 font-bold tracking-wider uppercase">
                     {t("common:shell.plannedGroup")}
                 </p>
                 {PLANNED_NAV.map((item) => (
@@ -170,7 +170,7 @@ export function AppSidebar({ className }: { className?: string }) {
                             strokeWidth={2}
                         />
                         {t(item.labelKey, { defaultValue: item.labelKey })}
-                        <span className="bg-primary-tint text-primary ml-auto rounded-full px-2 py-px text-[10px] font-bold">
+                        <span className="bg-primary-tint text-primary text-2xs ml-auto rounded-full px-2 py-px font-bold">
                             {t("common:shell.soon")}
                         </span>
                     </div>
@@ -188,11 +188,11 @@ export function AppSidebar({ className }: { className?: string }) {
                                 {getInitials(user?.fullName, user?.email)}
                             </span>
                             <span className="min-w-0">
-                                <span className="text-foreground block truncate text-[13px] font-semibold">
+                                <span className="text-foreground text-detail block truncate font-semibold">
                                     {user?.fullName ?? user?.email}
                                 </span>
                                 {highestRole && (
-                                    <span className="text-muted-foreground block text-[11px]">
+                                    <span className="text-muted-foreground text-2xs block">
                                         {t(`common:roles.${highestRole}`)}
                                     </span>
                                 )}

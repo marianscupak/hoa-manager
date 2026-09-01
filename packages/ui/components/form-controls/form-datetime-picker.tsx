@@ -163,7 +163,7 @@ export const FormDatetimePicker = React.forwardRef<
                                 </PopoverContent>
                             </Popover>
                             {description && (
-                                <p className="text-muted-foreground text-[0.8rem]">
+                                <p className="text-muted-foreground text-detail">
                                     {description}
                                 </p>
                             )}

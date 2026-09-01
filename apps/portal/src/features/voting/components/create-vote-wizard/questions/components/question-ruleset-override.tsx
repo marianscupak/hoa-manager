@@ -69,7 +69,7 @@ export function QuestionRulesetOverride({
                                 className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 px-2 text-xs"
                                 onClick={onRemoveOverride}
                             >
-                                <Trash2 className="mr-1 h-3 w-3" />
+                                <Trash2 className="mr-1 h-3.5 w-3.5" />
                                 {t(
                                     "voting:create.steps.questions.override.remove",
                                 )}

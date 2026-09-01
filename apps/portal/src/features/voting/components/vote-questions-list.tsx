@@ -41,7 +41,7 @@ export function VoteQuestionsList({ questions }: VoteQuestionsListProps) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="text-muted-foreground text-[13px] font-semibold tracking-wide uppercase">
+                <CardTitle className="text-muted-foreground text-detail font-semibold tracking-wide uppercase">
                     {t("detail.questions.title")}
                 </CardTitle>
             </CardHeader>
@@ -59,14 +59,14 @@ export function VoteQuestionsList({ questions }: VoteQuestionsListProps) {
                             key={question.id}
                             className="border-hairline flex gap-3.5 border-b py-3.5 first:pt-0 last:border-b-0 last:pb-0"
                         >
-                            <div className="bg-primary-tint text-primary-tint-foreground font-display flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-lg text-[13px] font-extrabold">
+                            <div className="bg-primary-tint text-primary-tint-foreground font-display text-detail flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-lg font-extrabold">
                                 {index + 1}
                             </div>
                             <div className="min-w-0 pt-px">
-                                <h3 className="text-[15px] leading-[22px] font-semibold">
+                                <h3 className="text-md leading-[22px] font-semibold">
                                     {question.title}
                                 </h3>
-                                <div className="text-muted-foreground mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[13px] leading-[19px]">
+                                <div className="text-muted-foreground text-detail mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 leading-[19px]">
                                     {ruleSentence && (
                                         <span>{ruleSentence}</span>
                                     )}

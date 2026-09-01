@@ -90,7 +90,7 @@ export const DelegationSummary = ({
                         : t("delegate.confirmButton")}
                 </Button>
 
-                <p className="text-muted-foreground px-4 text-center text-[10px] leading-relaxed tracking-widest uppercase">
+                <p className="text-muted-foreground text-2xs px-4 text-center leading-relaxed tracking-widest uppercase">
                     {t("delegate.terms")}
                 </p>
             </div>

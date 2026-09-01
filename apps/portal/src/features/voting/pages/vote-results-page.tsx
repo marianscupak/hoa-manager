@@ -195,7 +195,7 @@ export function VoteResultsPage() {
                         />
                     ))}
 
-                    <p className="text-muted-foreground text-[12.5px]">
+                    <p className="text-muted-foreground text-detail">
                         {t("voting:resultsV2.footnote")}
                     </p>
                 </TabsContent>

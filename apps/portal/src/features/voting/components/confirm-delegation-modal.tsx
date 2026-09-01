@@ -53,7 +53,7 @@ export const ConfirmDelegationModal = ({
                         <div className="hover:border-primary/50 hover:bg-primary/5 bg-muted/30 flex flex-col gap-3 rounded-xl border p-4 transition-all">
                             <div className="text-primary flex items-center gap-2">
                                 <User className="h-4 w-4" />
-                                <span className="text-[10px] font-bold tracking-wider uppercase opacity-70">
+                                <span className="text-2xs font-bold tracking-wider uppercase opacity-70">
                                     {t("delegate.modal.delegateLabel")}
                                 </span>
                             </div>
@@ -61,7 +61,7 @@ export const ConfirmDelegationModal = ({
                                 <p className="truncate font-bold">
                                     {delegateName}
                                 </p>
-                                <p className="text-faint text-[11px]">
+                                <p className="text-faint text-2xs">
                                     {t("delegate.modal.delegateSubtext")}
                                 </p>
                             </div>
@@ -70,13 +70,13 @@ export const ConfirmDelegationModal = ({
                         <div className="hover:border-primary/50 hover:bg-primary/5 bg-muted/30 flex flex-col gap-3 rounded-xl border p-4 transition-all">
                             <div className="text-primary flex items-center gap-2">
                                 <Building2 className="h-4 w-4" />
-                                <span className="text-[10px] font-bold tracking-wider uppercase opacity-70">
+                                <span className="text-2xs font-bold tracking-wider uppercase opacity-70">
                                     {t("delegate.modal.unitLabel")}
                                 </span>
                             </div>
                             <div className="space-y-1">
                                 <p className="truncate font-bold">{unitName}</p>
-                                <p className="text-faint text-[11px]">
+                                <p className="text-faint text-2xs">
                                     {t("delegate.modal.unitSubtext")}
                                 </p>
                             </div>
@@ -85,7 +85,7 @@ export const ConfirmDelegationModal = ({
                         <div className="hover:border-primary/50 hover:bg-primary/5 bg-muted/30 flex flex-col gap-3 rounded-xl border p-4 transition-all">
                             <div className="text-primary flex items-center gap-2">
                                 <Vote className="h-4 w-4" />
-                                <span className="text-[10px] font-bold tracking-wider uppercase opacity-70">
+                                <span className="text-2xs font-bold tracking-wider uppercase opacity-70">
                                     {t("delegate.modal.eventLabel")}
                                 </span>
                             </div>
@@ -93,7 +93,7 @@ export const ConfirmDelegationModal = ({
                                 <p className="truncate font-bold">
                                     {voteTitle}
                                 </p>
-                                <p className="text-faint text-[11px]">
+                                <p className="text-faint text-2xs">
                                     {scheduledFrom
                                         ? format(
                                               new Date(scheduledFrom),

@@ -164,13 +164,13 @@ export function FeaturedVoteCard() {
         canSeeTurnout && isOpen && Boolean(turnoutQuery.data);
 
     return (
-        <div className="rounded-card-lg border-primary-tint-border shadow-clay-hero flex flex-col gap-4 border bg-gradient-to-b from-[#faf9ff] to-white p-5 sm:flex-row sm:items-center sm:gap-5 sm:p-6">
+        <div className="rounded-card-lg border-primary-tint-border shadow-clay-hero from-hero-tint flex flex-col gap-4 border bg-gradient-to-b to-white p-5 sm:flex-row sm:items-center sm:gap-5 sm:p-6">
             <div className="bg-primary-tint text-primary shadow-clay-inset-lg rounded-panel flex h-11 w-11 shrink-0 items-center justify-center">
-                <Vote className="h-[22px] w-[22px]" />
+                <Vote className="h-5 w-5" />
             </div>
             <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-baseline gap-2">
-                    <h2 className="font-display text-[17px] leading-6 font-extrabold tracking-tight">
+                    <h2 className="font-display text-title leading-6 font-extrabold tracking-tight">
                         {featuredVote.title}
                     </h2>
                     {timing && <Badge variant="warningTint">{timing}</Badge>}

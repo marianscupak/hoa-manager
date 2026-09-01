@@ -102,7 +102,7 @@ function ResultRow({ vote, t }: ResultRowProps) {
                     <StatusBadge status={vote.status} />
                     <Link
                         to={`/voting/${vote.id}/results`}
-                        className="font-display hover:text-primary-hover text-[16.5px] font-extrabold tracking-tight"
+                        className="font-display hover:text-primary-hover text-title font-extrabold tracking-tight"
                     >
                         {vote.title}
                     </Link>

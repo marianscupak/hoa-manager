@@ -58,13 +58,13 @@ export function BuildingOverviewSection() {
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
-                <CardTitle className="text-muted-foreground text-[13px] font-semibold tracking-wide uppercase">
+                <CardTitle className="text-muted-foreground text-detail font-semibold tracking-wide uppercase">
                     {t("buildingOverview.sectionTitle")}
                 </CardTitle>
                 {canManage && (
                     <Link
                         to="/admin/units"
-                        className="text-[13px] font-medium hover:underline"
+                        className="text-detail font-medium hover:underline"
                     >
                         {t("buildingOverview.manage")}
                     </Link>
@@ -72,7 +72,7 @@ export function BuildingOverviewSection() {
             </CardHeader>
             <CardContent className="grid grid-cols-2 gap-x-5 gap-y-3.5 pt-0">
                 <div className="flex items-baseline gap-2">
-                    <span className="font-display text-[26px] font-black">
+                    <span className="font-display text-stat font-black">
                         {units.total}
                     </span>
                     <span className="text-muted-foreground text-xs">
@@ -80,7 +80,7 @@ export function BuildingOverviewSection() {
                     </span>
                 </div>
                 <div className="flex items-baseline gap-2">
-                    <span className="font-display text-[26px] font-black">
+                    <span className="font-display text-stat font-black">
                         {owners.active}
                     </span>
                     <span className="text-muted-foreground text-xs">
@@ -90,7 +90,7 @@ export function BuildingOverviewSection() {
                 <div className="flex items-baseline gap-2">
                     <span
                         className={cn(
-                            "font-display text-[26px] font-black",
+                            "font-display text-stat font-black",
                             isWarning && "text-warning-tint-foreground",
                         )}
                     >
@@ -101,7 +101,7 @@ export function BuildingOverviewSection() {
                     </span>
                 </div>
                 <div className="flex items-baseline gap-2">
-                    <span className="font-display text-[26px] font-black">
+                    <span className="font-display text-stat font-black">
                         {invites.pending}
                     </span>
                     <span className="text-muted-foreground text-xs">

@@ -117,7 +117,7 @@ function ReviewCheckRow({ check, onEditStep }: ReviewCheckRowProps) {
                           : "bg-destructive-muted text-destructive-muted-foreground",
                 )}
             >
-                <Icon className="h-3 w-3" strokeWidth={3} />
+                <Icon className="h-3.5 w-3.5" strokeWidth={3} />
             </span>
             <span className="flex-1 text-sm font-medium">
                 {t(`voting:wizard.review.checks.${check.code}`, {
@@ -226,7 +226,7 @@ export function ReviewStep({
                 <h2 className="font-display text-base font-extrabold">
                     {t("voting:wizard.review.scheduleTitle")}
                 </h2>
-                <p className="text-muted-foreground mt-1.5 mb-4 text-[13.5px] leading-[19px]">
+                <p className="text-muted-foreground text-detail mt-1.5 mb-4 leading-[19px]">
                     {t("voting:wizard.review.scheduleCopy")}
                 </p>
                 <div className="flex flex-wrap items-center gap-2.5">

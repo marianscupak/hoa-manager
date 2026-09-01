@@ -16,7 +16,7 @@ export function OwnedUnitsSection() {
         return (
             <Card>
                 <CardHeader>
-                    <CardTitle className="text-muted-foreground text-[13px] font-semibold tracking-wide uppercase">
+                    <CardTitle className="text-muted-foreground text-detail font-semibold tracking-wide uppercase">
                         {t("ownedUnits.sectionTitle")}
                     </CardTitle>
                 </CardHeader>
@@ -58,7 +58,7 @@ export function OwnedUnitsSection() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="text-muted-foreground text-[13px] font-semibold tracking-wide uppercase">
+                <CardTitle className="text-muted-foreground text-detail font-semibold tracking-wide uppercase">
                     {t("ownedUnits.sectionTitle")}
                 </CardTitle>
             </CardHeader>

@@ -151,7 +151,7 @@ export function DataTable<TData extends { id: string }>({
                                 }
                                 placeholder={searchPlaceholder}
                                 aria-label={searchPlaceholder}
-                                className="placeholder:text-faint focus-visible:ring-ring h-full w-full rounded-full bg-transparent pr-[13px] pl-9 text-[13.5px] focus-visible:ring-2 focus-visible:outline-none"
+                                className="placeholder:text-faint focus-visible:ring-ring text-detail h-full w-full rounded-full bg-transparent pr-[13px] pl-9 focus-visible:ring-2 focus-visible:outline-none"
                             />
                         </div>
                     ) : (
@@ -205,6 +205,7 @@ export function DataTable<TData extends { id: string }>({
                                 >
                                     {label}
                                     {sorted && (
+                                        // Deliberate off-scale size: decorative sort-direction glyph, not readable text.
                                         <span
                                             aria-hidden
                                             className="text-[8px] leading-none"
@@ -225,11 +226,11 @@ export function DataTable<TData extends { id: string }>({
 
             <div>
                 {isLoading ? (
-                    <div className="text-muted-foreground px-5 py-8 text-center text-[13.5px]">
+                    <div className="text-muted-foreground text-detail px-5 py-8 text-center">
                         {loadingMessage ?? "…"}
                     </div>
                 ) : rows.length === 0 ? (
-                    <div className="text-muted-foreground px-5 py-8 text-center text-[13.5px]">
+                    <div className="text-muted-foreground text-detail px-5 py-8 text-center">
                         {globalFilter
                             ? emptySearchMessage ?? emptyMessage
                             : emptyMessage}
@@ -270,7 +271,7 @@ export function DataTable<TData extends { id: string }>({
             </div>
 
             <div className="bg-background border-hairline flex items-center justify-between gap-3 border-t py-[9px] pr-3.5 pl-5">
-                <span className="text-muted-foreground text-[12.5px]">
+                <span className="text-muted-foreground text-detail">
                     {isLoading ? null : countLabel(footer)}
                 </span>
                 {footer.paginated && (
@@ -321,9 +322,9 @@ function PagerButton({
         <button
             type="button"
             className={cn(
-                "border-border bg-card text-secondary-foreground hover:bg-muted focus-visible:ring-ring flex h-[30px] min-w-[30px] cursor-pointer items-center justify-center rounded-lg border px-1 text-[12.5px] focus-visible:ring-2 focus-visible:outline-none disabled:cursor-default disabled:opacity-40",
+                "border-border bg-card text-secondary-foreground hover:bg-muted focus-visible:ring-ring text-detail flex h-[30px] min-w-[30px] cursor-pointer items-center justify-center rounded-lg border px-1 focus-visible:ring-2 focus-visible:outline-none disabled:cursor-default disabled:opacity-40",
                 active &&
-                    "bg-primary border-primary text-primary-foreground hover:bg-primary font-bold shadow-[0_2px_0_#5b21b6]",
+                    "bg-primary border-primary text-primary-foreground hover:bg-primary shadow-clay-btn-sm font-bold",
                 className,
             )}
             {...props}

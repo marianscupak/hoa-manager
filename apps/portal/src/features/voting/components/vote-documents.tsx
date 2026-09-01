@@ -76,7 +76,7 @@ export function VoteDocuments({
                 >
                     <div className="flex min-w-0 flex-1 items-center gap-3">
                         <div className="bg-destructive-muted text-destructive-muted-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
-                            <File className="h-[17px] w-[17px]" />
+                            <File className="h-4 w-4" />
                         </div>
                         <span className="truncate text-sm font-medium">
                             {doc.fileName}

@@ -13,7 +13,13 @@ import { useState, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router";
 
-import { Button, formatPercent, PageLoading } from "@hoa-mngr/ui";
+import {
+    Button,
+    Card,
+    ErrorState,
+    formatPercent,
+    PageLoading,
+} from "@hoa-mngr/ui";
 import { cn } from "@hoa-mngr/ui/lib/utils";
 
 import {
@@ -45,11 +51,11 @@ function OptionIcon({
     className?: string;
 }) {
     if (optionKey === "YES")
-        return <Check className={cn("h-6 w-6 text-emerald-500", className)} />;
+        return <Check className={cn("text-success h-6 w-6", className)} />;
     if (optionKey === "NO")
-        return <X className={cn("h-6 w-6 text-red-500", className)} />;
+        return <X className={cn("text-destructive h-6 w-6", className)} />;
     if (optionKey === "ABSTAIN")
-        return <Minus className={cn("h-6 w-6 text-slate-400", className)} />;
+        return <Minus className={cn("text-faint h-6 w-6", className)} />;
     return null;
 }
 
@@ -66,7 +72,7 @@ function getOptionLabel(
 
 // ── Main Page ──────────────────────────────────────────────
 export function CastVotePage() {
-    const { t } = useTranslation(["voting"]);
+    const { t } = useTranslation(["voting", "common"]);
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const voteId = id ?? "";
@@ -175,26 +181,36 @@ export function CastVotePage() {
 
     if (!voteQuery.data || !statusQuery.data) {
         return (
-            <div className="flex h-96 items-center justify-center">
-                <p className="text-destructive text-sm">
-                    {t("castVote.error")}
-                </p>
-            </div>
+            <ErrorState
+                message={t("castVote.error")}
+                action={
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                            void voteQuery.refetch();
+                            void statusQuery.refetch();
+                        }}
+                    >
+                        {t("common:retry")}
+                    </Button>
+                }
+            />
         );
     }
 
     if (readyUnits.length === 0) {
         return (
             <div className="mx-auto flex max-w-lg flex-col items-center justify-center py-20 text-center">
-                <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100">
-                    <ShieldCheck className="h-10 w-10 text-emerald-600" />
+                <div className="bg-success-muted mb-6 flex h-20 w-20 items-center justify-center rounded-full">
+                    <ShieldCheck className="text-success-tint-foreground h-10 w-10" />
                 </div>
-                <h2 className="text-foreground mb-2 text-2xl font-bold">
+                <h2 className="font-display text-foreground mb-2 text-2xl font-extrabold tracking-tight">
                     {hasAlreadyVoted
                         ? t("castVote.alreadyVoted.title")
                         : t("castVote.noUnits.title")}
                 </h2>
-                <p className="mb-8 text-slate-500">
+                <p className="text-muted-foreground mb-8">
                     {hasAlreadyVoted
                         ? t("castVote.alreadyVoted.description")
                         : t("castVote.noUnits.description")}
@@ -214,16 +230,16 @@ export function CastVotePage() {
         return (
             <div className="mx-auto max-w-3xl space-y-6 py-8">
                 <div>
-                    <h1 className="text-foreground text-2xl font-bold">
+                    <h1 className="font-display text-foreground text-2xl font-extrabold tracking-tight">
                         {t("castVote.review.title")}
                     </h1>
-                    <p className="text-sm text-slate-500 italic">
+                    <p className="text-muted-foreground text-sm italic">
                         {t("castVote.review.subtitle")}
                     </p>
                 </div>
 
-                <div className="rounded-lg border border-slate-200 bg-white p-6">
-                    <h3 className="mb-4 font-bold text-slate-800">
+                <Card className="p-6">
+                    <h3 className="mb-4 font-bold">
                         {t("castVote.review.selectedChoices")}
                     </h3>
 
@@ -231,14 +247,14 @@ export function CastVotePage() {
                         {readyUnits.map((unit) => (
                             <div
                                 key={unit.id}
-                                className="rounded-lg border border-slate-200 p-4"
+                                className="rounded-panel border-hairline border p-4"
                             >
                                 <div className="mb-3 flex items-center gap-3">
                                     <div className="bg-primary-tint flex h-9 w-9 items-center justify-center rounded-lg">
                                         <Home className="text-primary h-4 w-4" />
                                     </div>
                                     <div>
-                                        <span className="font-semibold text-slate-900">
+                                        <span className="text-foreground font-semibold">
                                             {unit.name}
                                         </span>
                                         <span className="text-primary ml-2 text-sm">
@@ -258,19 +274,19 @@ export function CastVotePage() {
                                         return (
                                             <div
                                                 key={q.id}
-                                                className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50/50 px-4 py-3"
+                                                className="border-hairline bg-muted/50 rounded-panel flex items-center justify-between border px-4 py-3"
                                             >
                                                 <div className="flex items-center gap-3">
-                                                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-200 text-xs font-bold text-slate-600">
+                                                    <span className="bg-muted text-secondary-foreground flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold">
                                                         {qi + 1}
                                                     </span>
-                                                    <span className="text-sm text-slate-700">
+                                                    <span className="text-secondary-foreground text-sm">
                                                         {q.title}
                                                     </span>
                                                 </div>
                                                 {selectedOption && (
                                                     <div className="flex items-center gap-2">
-                                                        <span className="text-sm font-medium text-slate-700">
+                                                        <span className="text-secondary-foreground text-sm font-medium">
                                                             {getOptionLabel(
                                                                 selectedOption.optionKey,
                                                                 selectedOption.label,
@@ -291,7 +307,7 @@ export function CastVotePage() {
                             </div>
                         ))}
                     </div>
-                </div>
+                </Card>
 
                 <div className="flex items-center gap-3">
                     <Button
@@ -338,12 +354,14 @@ export function CastVotePage() {
     return (
         <div className="mx-auto max-w-3xl space-y-6 py-8">
             {/* Title */}
-            <h1 className="text-foreground text-2xl font-bold">{vote.title}</h1>
+            <h1 className="font-display text-foreground text-2xl font-extrabold tracking-tight">
+                {vote.title}
+            </h1>
 
             {/* Progress Bar */}
-            <div className="rounded-lg border border-slate-200 bg-white p-4">
+            <Card className="p-4">
                 <div className="mb-2 flex items-center justify-between">
-                    <span className="text-sm font-medium text-slate-700">
+                    <span className="text-secondary-foreground text-sm font-medium">
                         {t("castVote.progress.question", {
                             current: currentQuestionIndex + 1,
                             total: totalQuestions,
@@ -354,7 +372,7 @@ export function CastVotePage() {
                         {t("castVote.progress.completed")}
                     </span>
                 </div>
-                <div className="h-2 overflow-hidden rounded-full bg-slate-200">
+                <div className="bg-muted h-2 overflow-hidden rounded-full">
                     <div
                         className="bg-primary h-full rounded-full transition-all duration-300"
                         style={{
@@ -362,40 +380,40 @@ export function CastVotePage() {
                         }}
                     />
                 </div>
-            </div>
+            </Card>
 
             {/* Question Card */}
-            <div className="rounded-lg border border-slate-200 bg-white p-6">
-                <h2 className="text-xl font-bold text-slate-900">
+            <Card className="p-6">
+                <h2 className="font-display text-title font-extrabold tracking-tight">
                     {currentQuestion.title}
                 </h2>
                 {currentQuestion.description && (
-                    <p className="mt-2 text-sm text-slate-500">
+                    <p className="text-muted-foreground mt-2 text-sm">
                         {currentQuestion.description}
                     </p>
                 )}
-            </div>
+            </Card>
 
             {/* Per-unit voting sections */}
             {readyUnits.map((unit) => (
                 <div key={unit.id} className="space-y-3">
                     {/* Unit header */}
-                    <div className="rounded-lg border border-slate-200 bg-white p-4 text-center">
-                        <span className="text-xs font-semibold tracking-wider text-slate-400 uppercase">
+                    <Card className="p-4 text-center">
+                        <span className="text-faint text-xs font-semibold tracking-wider uppercase">
                             {t("castVote.votingFor")}
                         </span>
                         <div className="mt-1 flex items-center justify-center gap-2">
                             <div className="bg-primary-tint flex h-7 w-7 items-center justify-center rounded-lg">
                                 <Home className="text-primary h-4 w-4" />
                             </div>
-                            <span className="font-bold text-slate-900">
+                            <span className="text-foreground font-bold">
                                 {unit.name}
                             </span>
                             <span className="text-primary text-sm">
                                 ({unit.share} {t("castVote.voteShareLabel")})
                             </span>
                         </div>
-                    </div>
+                    </Card>
 
                     {/* Option Cards */}
                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -415,14 +433,14 @@ export function CastVotePage() {
                                         )
                                     }
                                     className={cn(
-                                        "focus-visible:ring-ring flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 bg-white p-5 transition-all hover:shadow-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
+                                        "focus-visible:ring-ring flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 p-5 transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
                                         isSelected
-                                            ? "border-primary bg-primary/5 ring-primary/20 shadow-md ring-2"
-                                            : "border-slate-200 hover:border-slate-300",
+                                            ? "border-primary bg-primary/5 ring-primary/20 ring-2"
+                                            : "border-border bg-card hover:bg-muted/50",
                                     )}
                                 >
                                     {option.optionKey === "CUSTOM" ? (
-                                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-200 text-sm font-bold text-slate-600">
+                                        <span className="bg-muted text-secondary-foreground flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold">
                                             {option.sortOrder}
                                         </span>
                                     ) : (
@@ -431,7 +449,7 @@ export function CastVotePage() {
                                             className="h-7 w-7"
                                         />
                                     )}
-                                    <span className="text-sm font-medium text-slate-700">
+                                    <span className="text-secondary-foreground text-sm font-medium">
                                         {getOptionLabel(
                                             option.optionKey,
                                             option.label,

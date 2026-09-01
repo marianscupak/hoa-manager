@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import { cs, enUS } from "date-fns/locale";
 import { useAtomValue } from "jotai";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router";
@@ -16,7 +16,15 @@ import {
     useVotesControllerGetVoteResults,
 } from "@/api/generated/votes/votes";
 import { tenantContextAtom } from "@/auth/atoms";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@hoa-mngr/ui";
+import {
+    Button,
+    ErrorState,
+    PageLoading,
+    Tabs,
+    TabsContent,
+    TabsList,
+    TabsTrigger,
+} from "@hoa-mngr/ui";
 
 import { VoteActivityTab } from "../components/activity/vote-activity-tab";
 import { AuditExportButton } from "../components/audit-export-button";
@@ -67,7 +75,7 @@ function buildEnrichedQuestions(
 }
 
 export function VoteResultsPage() {
-    const { t, i18n } = useTranslation(["voting"]);
+    const { t, i18n } = useTranslation(["voting", "common"]);
     const { id } = useParams<{ id: string }>();
     const tenantCtx = useAtomValue(tenantContextAtom);
     const locale = i18n.language === "cs" ? cs : enUS;
@@ -102,18 +110,26 @@ export function VoteResultsPage() {
         !resultsQuery.data;
 
     if (isLoading) {
-        return (
-            <div className="flex min-h-[400px] items-center justify-center">
-                <Loader2 className="text-primary h-8 w-8 animate-spin" />
-            </div>
-        );
+        return <PageLoading />;
     }
 
     if (isError) {
         return (
-            <div className="text-destructive p-8 text-center">
-                {t("voting:list.error")}
-            </div>
+            <ErrorState
+                message={t("voting:list.error")}
+                action={
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                            void detailQuery.refetch();
+                            void resultsQuery.refetch();
+                        }}
+                    >
+                        {t("common:retry")}
+                    </Button>
+                }
+            />
         );
     }
 

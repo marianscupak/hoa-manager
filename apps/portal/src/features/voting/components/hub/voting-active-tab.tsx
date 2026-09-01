@@ -1,9 +1,8 @@
 import { useAtomValue } from "jotai";
-import { Loader2 } from "lucide-react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
-import { EmptyState } from "@hoa-mngr/ui";
+import { Button, EmptyState, ErrorState, Skeleton } from "@hoa-mngr/ui";
 
 import { VoteListItemResponseDto } from "@/api/generated/model";
 import { useVotesControllerGetVotes } from "@/api/generated/votes/votes";
@@ -23,10 +22,15 @@ function needsAction(vote: VoteListItemResponseDto): boolean {
 }
 
 export function VotingActiveTab() {
-    const { t } = useTranslation(["voting"]);
+    const { t } = useTranslation(["voting", "common"]);
     const tenantCtx = useAtomValue(tenantContextAtom);
     const adminOrBoard = isAdminOrBoard(tenantCtx?.roles);
-    const { data: votes, isLoading, error } = useVotesControllerGetVotes();
+    const {
+        data: votes,
+        isLoading,
+        error,
+        refetch,
+    } = useVotesControllerGetVotes();
 
     const { needsActionVotes, upcomingVotes, draftVotes } = useMemo(() => {
         const all = votes ?? [];
@@ -44,17 +48,31 @@ export function VotingActiveTab() {
 
     if (isLoading) {
         return (
-            <div className="flex justify-center p-8">
-                <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
+            <div className="flex flex-col gap-3">
+                {[0, 1].map((i) => (
+                    <Skeleton
+                        key={i}
+                        className="rounded-card h-[110px] w-full"
+                    />
+                ))}
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="text-destructive rounded-md border p-4">
-                {t("list.error")}
-            </div>
+            <ErrorState
+                message={t("list.error")}
+                action={
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => refetch()}
+                    >
+                        {t("common:retry")}
+                    </Button>
+                }
+            />
         );
     }
 

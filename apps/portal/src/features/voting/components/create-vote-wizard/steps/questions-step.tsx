@@ -2,7 +2,7 @@ import { Loader2, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { Button, EmptyState } from "@hoa-mngr/ui";
+import { Button, EmptyState, ErrorState } from "@hoa-mngr/ui";
 
 import { showApiError } from "@/api/error-utils";
 import {
@@ -25,7 +25,7 @@ export function CreateVoteQuestionsStep({
     voteId,
     onSavingChange,
 }: CreateVoteQuestionsStepProps) {
-    const { t } = useTranslation(["voting"]);
+    const { t } = useTranslation(["voting", "common"]);
 
     const voteQuery = useVotesControllerGetVoteDetail(voteId ?? "", {
         query: { enabled: !!voteId },
@@ -82,9 +82,18 @@ export function CreateVoteQuestionsStep({
 
     if (voteQuery.isError) {
         return (
-            <div className="text-destructive py-8 text-center">
-                {t("create.steps.questions.loadError")}
-            </div>
+            <ErrorState
+                message={t("create.steps.questions.loadError")}
+                action={
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => voteQuery.refetch()}
+                    >
+                        {t("common:retry")}
+                    </Button>
+                }
+            />
         );
     }
 

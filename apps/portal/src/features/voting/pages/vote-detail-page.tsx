@@ -19,6 +19,8 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
+    ErrorState,
+    PageLoading,
 } from "@hoa-mngr/ui";
 
 import { type VoteDetailResponseDto } from "@/api/generated/model";
@@ -86,7 +88,7 @@ function buildMetaLine(
 }
 
 export function VoteDetailPage() {
-    const { t, i18n } = useTranslation(["voting", "dashboard"]);
+    const { t, i18n } = useTranslation(["voting", "dashboard", "common"]);
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const tenantCtx = useAtomValue(tenantContextAtom);
@@ -125,18 +127,23 @@ export function VoteDetailPage() {
     };
 
     if (voteQuery.isLoading) {
-        return (
-            <div className="flex min-h-[400px] items-center justify-center">
-                <Loader2 className="text-primary h-8 w-8 animate-spin" />
-            </div>
-        );
+        return <PageLoading />;
     }
 
     if (voteQuery.isError || !voteQuery.data) {
         return (
-            <div className="text-destructive p-8 text-center">
-                {t("voting:list.error")}
-            </div>
+            <ErrorState
+                message={t("voting:list.error")}
+                action={
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => voteQuery.refetch()}
+                    >
+                        {t("common:retry")}
+                    </Button>
+                }
+            />
         );
     }
 

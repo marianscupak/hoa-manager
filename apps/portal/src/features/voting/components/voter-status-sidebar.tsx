@@ -1,4 +1,4 @@
-import { ArrowRight, Home, Info, Loader2 } from "lucide-react";
+import { ArrowRight, Home, Info } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
@@ -9,6 +9,7 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
+    Skeleton,
     StatusChip,
     type StatusChipVariant,
     Tooltip,
@@ -81,11 +82,7 @@ export function VoterStatusSidebar({ vote }: VoterStatusSidebarProps) {
     const ownedUnitsQuery = useUnitControllerGetMyOwnedUnits();
 
     if (statusQuery.isLoading) {
-        return (
-            <div className="border-hairline bg-card rounded-card flex h-64 items-center justify-center border">
-                <Loader2 className="text-primary h-8 w-8 animate-spin" />
-            </div>
-        );
+        return <Skeleton className="rounded-card h-64 w-full" />;
     }
 
     if (statusQuery.isError || !statusQuery.data) {

@@ -79,6 +79,7 @@ export default {
         description: "Správa jednotek ve vašem společenství.",
         addUnit: "Přidat jednotku",
         empty: "Zatím nebyly přidány žádné jednotky.",
+        loadError: "Jednotky se nepodařilo načíst.",
         table: {
             unitNumber: "Číslo jednotky",
             buildingShare: "Podíl na budově",

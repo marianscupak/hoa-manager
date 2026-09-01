@@ -1,6 +1,14 @@
 import { useTranslation } from "react-i18next";
 
-import { Button, Card, CardContent, CardHeader, CardTitle } from "@hoa-mngr/ui";
+import {
+    Button,
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+    ErrorState,
+    Skeleton,
+} from "@hoa-mngr/ui";
 
 import { useUnitControllerGetMyOwnedUnits } from "@/api/generated/property-units/property-units";
 
@@ -23,10 +31,7 @@ export function OwnedUnitsSection() {
                 <CardContent className="pt-0">
                     <div className="space-y-2">
                         {[0, 1, 2].map((i) => (
-                            <div
-                                key={i}
-                                className="bg-muted h-6 w-full animate-pulse rounded"
-                            />
+                            <Skeleton key={i} className="h-6 w-full rounded" />
                         ))}
                     </div>
                 </CardContent>
@@ -37,17 +42,19 @@ export function OwnedUnitsSection() {
     if (query.isError) {
         return (
             <Card>
-                <CardContent className="flex flex-col items-start gap-2 p-4">
-                    <p className="text-destructive text-sm">
-                        {t("ownedUnits.errorMessage")}
-                    </p>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => query.refetch()}
-                    >
-                        {t("common:retry")}
-                    </Button>
+                <CardContent className="p-4">
+                    <ErrorState
+                        message={t("ownedUnits.errorMessage")}
+                        action={
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => query.refetch()}
+                            >
+                                {t("common:retry")}
+                            </Button>
+                        }
+                    />
                 </CardContent>
             </Card>
         );

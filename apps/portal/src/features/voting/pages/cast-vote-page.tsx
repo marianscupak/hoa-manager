@@ -13,7 +13,7 @@ import { useState, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router";
 
-import { Button } from "@hoa-mngr/ui";
+import { Button, PageLoading } from "@hoa-mngr/ui";
 import { cn } from "@hoa-mngr/ui/lib/utils";
 
 import {
@@ -170,11 +170,7 @@ export function CastVotePage() {
 
     // ── Loading / Error ──────────────────────────────────
     if (voteQuery.isLoading || statusQuery.isLoading) {
-        return (
-            <div className="flex h-96 items-center justify-center">
-                <Loader2 className="text-primary h-8 w-8 animate-spin" />
-            </div>
-        );
+        return <PageLoading />;
     }
 
     if (!voteQuery.data || !statusQuery.data) {

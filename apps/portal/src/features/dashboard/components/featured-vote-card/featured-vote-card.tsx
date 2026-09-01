@@ -5,7 +5,14 @@ import { Vote } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
-import { Button, Card, CardContent, StatusChip } from "@hoa-mngr/ui";
+import {
+    Button,
+    EmptyState,
+    ErrorState,
+    Skeleton,
+    StatusChip,
+} from "@hoa-mngr/ui";
+import { cn } from "@hoa-mngr/ui/lib/utils";
 
 import {
     useVotesControllerGetVoteTurnout,
@@ -33,6 +40,10 @@ function pickFeaturedVote<T extends { scheduledTo?: string | null }>(
     });
     return sorted[0];
 }
+
+const HERO_SHELL =
+    "rounded-card-lg border-primary-tint-border shadow-clay-hero from-hero-tint flex flex-col gap-4 border bg-gradient-to-b to-white p-5 sm:flex-row sm:items-center sm:gap-5 sm:p-6";
+const SLOT_MIN_H = "min-h-[104px]";
 
 export function FeaturedVoteCard() {
     const { t, i18n } = useTranslation(["dashboard", "common"]);
@@ -79,16 +90,23 @@ export function FeaturedVoteCard() {
     );
 
     if (votesQuery.isLoading) {
-        return <SkeletonCard />;
+        return (
+            <div className={cn(HERO_SHELL, SLOT_MIN_H)}>
+                <Skeleton className="rounded-panel h-11 w-11 shrink-0" />
+                <div className="min-w-0 flex-1 space-y-2">
+                    <Skeleton className="h-5 w-1/3 rounded" />
+                    <Skeleton className="h-4 w-1/4 rounded" />
+                </div>
+            </div>
+        );
     }
 
     if (votesQuery.isError) {
         return (
-            <Card>
-                <CardContent className="flex flex-col items-start gap-2 p-4">
-                    <p className="text-destructive text-sm">
-                        {t("featuredVote.errorMessage")}
-                    </p>
+            <ErrorState
+                className={SLOT_MIN_H}
+                message={t("featuredVote.errorMessage")}
+                action={
                     <Button
                         variant="outline"
                         size="sm"
@@ -96,20 +114,20 @@ export function FeaturedVoteCard() {
                     >
                         {t("common:retry")}
                     </Button>
-                </CardContent>
-            </Card>
+                }
+            />
         );
     }
 
     if (!featuredVote) {
         return (
-            <Card>
-                <CardContent className="p-6 text-center">
-                    <p className="text-muted-foreground text-sm">
-                        {t("featuredVote.emptyTitle")}
-                    </p>
-                </CardContent>
-            </Card>
+            <EmptyState
+                className={cn(
+                    SLOT_MIN_H,
+                    "flex flex-col items-center justify-center py-6",
+                )}
+                message={t("featuredVote.emptyTitle")}
+            />
         );
     }
 
@@ -164,7 +182,7 @@ export function FeaturedVoteCard() {
         canSeeTurnout && isOpen && Boolean(turnoutQuery.data);
 
     return (
-        <div className="rounded-card-lg border-primary-tint-border shadow-clay-hero from-hero-tint flex flex-col gap-4 border bg-gradient-to-b to-white p-5 sm:flex-row sm:items-center sm:gap-5 sm:p-6">
+        <div className={cn(HERO_SHELL, SLOT_MIN_H)}>
             <div className="bg-primary-tint text-primary shadow-clay-inset-lg rounded-panel flex h-11 w-11 shrink-0 items-center justify-center">
                 <Vote className="h-5 w-5" />
             </div>
@@ -193,16 +211,5 @@ export function FeaturedVoteCard() {
                 <Link to={ctaTarget}>{ctaLabel}</Link>
             </Button>
         </div>
-    );
-}
-
-function SkeletonCard() {
-    return (
-        <Card>
-            <CardContent className="h-24 animate-pulse p-4">
-                <div className="bg-muted h-4 w-1/3 rounded" />
-                <div className="bg-muted mt-2 h-3 w-1/4 rounded" />
-            </CardContent>
-        </Card>
     );
 }

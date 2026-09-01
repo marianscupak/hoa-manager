@@ -78,6 +78,7 @@ export default {
         description: "Manage the units in your association.",
         addUnit: "Add Unit",
         empty: "No units have been added yet.",
+        loadError: "Failed to load units.",
         table: {
             unitNumber: "Unit Number",
             buildingShare: "Building Share",

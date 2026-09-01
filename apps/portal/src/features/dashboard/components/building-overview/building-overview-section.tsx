@@ -2,7 +2,15 @@ import { useAtomValue } from "jotai";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
-import { Button, Card, CardContent, CardHeader, CardTitle } from "@hoa-mngr/ui";
+import {
+    Button,
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+    ErrorState,
+    Skeleton,
+} from "@hoa-mngr/ui";
 import { cn } from "@hoa-mngr/ui/lib/utils";
 
 import { usePropertyControllerGetOverview } from "@/api/generated/property/property";
@@ -28,7 +36,9 @@ export function BuildingOverviewSection() {
     if (overviewQuery.isLoading) {
         return (
             <Card>
-                <CardContent className="bg-muted/30 h-40 animate-pulse p-6" />
+                <CardContent className="p-6">
+                    <Skeleton className="h-28 w-full" />
+                </CardContent>
             </Card>
         );
     }
@@ -36,17 +46,19 @@ export function BuildingOverviewSection() {
     if (overviewQuery.isError || !overviewQuery.data) {
         return (
             <Card>
-                <CardContent className="flex flex-col items-start gap-2 p-4">
-                    <p className="text-destructive text-sm">
-                        {t("buildingOverview.errorMessage")}
-                    </p>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => overviewQuery.refetch()}
-                    >
-                        {t("common:retry")}
-                    </Button>
+                <CardContent className="p-4">
+                    <ErrorState
+                        message={t("buildingOverview.errorMessage")}
+                        action={
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => overviewQuery.refetch()}
+                            >
+                                {t("common:retry")}
+                            </Button>
+                        }
+                    />
                 </CardContent>
             </Card>
         );

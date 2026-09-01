@@ -2,7 +2,7 @@ import { AlertTriangleIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { DataTable } from "@hoa-mngr/ui";
+import { Button, DataTable, ErrorState } from "@hoa-mngr/ui";
 
 import type { UnitResponseDto } from "@/api/generated/model";
 import { useUnitControllerGetUnits } from "@/api/generated/property-units/property-units";
@@ -23,7 +23,12 @@ export function UnitsPage({ createOpen, onCreateOpenChange }: UnitsPageProps) {
         null,
     );
 
-    const { data: units, isLoading, refetch } = useUnitControllerGetUnits();
+    const {
+        data: units,
+        isLoading,
+        isError,
+        refetch,
+    } = useUnitControllerGetUnits();
 
     const sumOfFractions = useMemo(() => {
         if (!units || units.length === 0) return 0;
@@ -49,6 +54,23 @@ export function UnitsPage({ createOpen, onCreateOpenChange }: UnitsPageProps) {
         () => getUnitColumns(t, (unit) => setDeletingUnit(unit)),
         [t],
     );
+
+    if (isError) {
+        return (
+            <ErrorState
+                message={t("units.loadError")}
+                action={
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => void refetch()}
+                    >
+                        {tCommon("retry")}
+                    </Button>
+                }
+            />
+        );
+    }
 
     return (
         <div className="space-y-6">

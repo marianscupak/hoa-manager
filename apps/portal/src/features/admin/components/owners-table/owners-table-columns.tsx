@@ -53,6 +53,7 @@ export const getOwnerColumns = (
         accessorKey: "displayName",
         header: t("owners.table.displayName"),
         enableSorting: true,
+        sortingFn: "localeNumeric",
         enableGlobalFilter: true,
         cell: ({ row }) => (
             <span className="text-foreground inline-flex min-w-0 items-center gap-2 text-sm font-semibold">
@@ -72,6 +73,7 @@ export const getOwnerColumns = (
         accessorFn: (row) => row.email ?? "",
         header: t("owners.table.email"),
         enableSorting: true,
+        sortingFn: "localeNumeric",
         enableGlobalFilter: true,
         cell: ({ row }) =>
             row.original.email ? (

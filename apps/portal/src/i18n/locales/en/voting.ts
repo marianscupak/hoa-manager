@@ -526,7 +526,6 @@ export const voting = {
             from: "Principal",
             to: "Proxy",
             date: "Recorded On",
-            actions: "Actions",
             revoke: "Revoke",
             revokeSuccess: "Delegation revoked successfully",
             searchPlaceholder: "Search delegations",
@@ -540,6 +539,7 @@ export const voting = {
                 "You haven't delegated your vote to anyone yet, and no one has delegated their vote to you.",
             all: "No active delegations found.",
             filtered: "No delegations for the selected vote.",
+            search: "No delegations match your search.",
         },
         filter: {
             vote: "Filter by Vote",

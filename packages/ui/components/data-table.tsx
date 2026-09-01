@@ -271,7 +271,7 @@ export function DataTable<TData extends { id: string }>({
 
             <div className="bg-background border-hairline flex items-center justify-between gap-3 border-t py-[9px] pr-3.5 pl-5">
                 <span className="text-muted-foreground text-[12.5px]">
-                    {countLabel(footer)}
+                    {isLoading ? null : countLabel(footer)}
                 </span>
                 {footer.paginated && (
                     <div className="flex items-center gap-1.5">

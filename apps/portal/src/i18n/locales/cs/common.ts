@@ -1,5 +1,4 @@
 export default {
-    actions: "Akce",
     loading: "Načítání...",
     loadingApp: "Načítání aplikace…",
     save: "Uložit",

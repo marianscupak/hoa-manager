@@ -58,8 +58,6 @@ export default {
             resend: "Znovu odeslat",
             sending: "Odesílání...",
             revoke: "Zrušit",
-            statusPending: "Pozvánka čeká",
-            statusExpired: "Pozvánka vypršela",
             success: "Pozvánka byla úspěšně odeslána",
             error: "Nepodařilo se odeslat pozvánku",
             revokeSuccess: "Pozvánka byla zrušena",

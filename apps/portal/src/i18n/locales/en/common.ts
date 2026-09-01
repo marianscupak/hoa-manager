@@ -1,5 +1,4 @@
 export default {
-    actions: "Actions",
     loading: "Loading...",
     loadingApp: "Loading application…",
     save: "Save",

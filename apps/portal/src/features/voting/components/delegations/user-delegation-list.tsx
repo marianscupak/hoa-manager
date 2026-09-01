@@ -167,6 +167,7 @@ export function UserDelegationList() {
                 isLoading={isLoading}
                 loadingMessage={t("common:loading")}
                 emptyMessage={t("voting:delegations.empty.filtered")}
+                emptySearchMessage={t("voting:delegations.empty.search")}
                 searchPlaceholder={t(
                     "voting:delegations.table.searchPlaceholder",
                 )}

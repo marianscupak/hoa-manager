@@ -57,8 +57,6 @@ export default {
             resend: "Resend",
             sending: "Sending...",
             revoke: "Revoke",
-            statusPending: "Invite Pending",
-            statusExpired: "Invite Expired",
             success: "Invitation sent successfully",
             error: "Failed to send invitation",
             revokeSuccess: "Invitation revoked",

@@ -527,7 +527,6 @@ export const voting = {
             from: "Zmocnitel",
             to: "Zmocněnec",
             date: "Evidováno dne",
-            actions: "Akce",
             revoke: "Zrušit",
             revokeSuccess: "Delegace byla úspěšně zrušena",
             searchPlaceholder: "Hledat delegace",
@@ -542,6 +541,7 @@ export const voting = {
                 "Zatím jste nikomu svůj hlas nedelegovali a nikdo nedelegoval hlas vám.",
             all: "Nebyly nalezeny žádné aktivní delegace.",
             filtered: "Pro vybrané hlasování nebyly nalezeny žádné delegace.",
+            search: "Vašemu hledání neodpovídají žádné delegace.",
         },
         filter: {
             vote: "Filtrovat podle hlasování",

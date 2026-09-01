@@ -16,6 +16,7 @@ export function ErrorState({
 }) {
     return (
         <div
+            role="alert"
             className={cn(
                 "rounded-panel bg-destructive-muted flex items-center gap-3 px-[18px] py-3",
                 className,

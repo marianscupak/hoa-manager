@@ -2,12 +2,7 @@ import { TFunction } from "i18next";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import { Link } from "react-router";
 
-import {
-    Button,
-    CellNumeric,
-    WarningPill,
-    type ColumnDef,
-} from "@hoa-mngr/ui";
+import { Button, CellNumeric, WarningPill, type ColumnDef } from "@hoa-mngr/ui";
 
 import type { UnitResponseDto } from "@/api/generated/model";
 

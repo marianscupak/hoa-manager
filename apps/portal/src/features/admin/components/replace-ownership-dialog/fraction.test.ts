@@ -72,9 +72,7 @@ describe("fraction lib", () => {
         );
         expect(fractionToTrimmedPercentString({ num: 1, den: 2 })).toBe("50");
         expect(fractionToTrimmedPercentString({ num: 3, den: 4 })).toBe("75");
-        expect(fractionToTrimmedPercentString({ num: 1, den: 8 })).toBe(
-            "12.5",
-        );
+        expect(fractionToTrimmedPercentString({ num: 1, den: 8 })).toBe("12.5");
     });
 
     it("trims a plain decimal string the same way, for non-fraction callers", () => {

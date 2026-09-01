@@ -191,12 +191,7 @@ export function useQuestionForm({
                 form.setValue("options", [...customOptions, ...systemOptions]);
             }
         }
-    }, [
-        type,
-        useCustomRuleset,
-        vote.ruleset?.allowAbstain,
-        form,
-    ]);
+    }, [type, useCustomRuleset, vote.ruleset?.allowAbstain, form]);
 
     const handleSave = (forcedValues?: QuestionFormValues) => {
         const values = forcedValues || form.getValues();

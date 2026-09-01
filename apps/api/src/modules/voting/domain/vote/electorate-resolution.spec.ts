@@ -1,27 +1,61 @@
-import { OwnerKind, OwnershipPartyType } from '@/modules/core/property/domain/ownership-plan';
+import {
+  OwnerKind,
+  OwnershipPartyType,
+} from '@/modules/core/property/domain/ownership-plan';
 
-import { resolveElectorateUnits, type ElectoratePartyInput } from './electorate-resolution';
-import { ElectorateEligibilityStatus, ElectorateIneligibleReason, VoteWeightBasis } from './vote.types';
+import {
+  resolveElectorateUnits,
+  type ElectoratePartyInput,
+} from './electorate-resolution';
+import {
+  ElectorateEligibilityStatus,
+  ElectorateIneligibleReason,
+  VoteWeightBasis,
+} from './vote.types';
 
-const UNIT = { id: 'u1', buildingShareNumerator: 1712, buildingShareDenominator: 10000 };
+const UNIT = {
+  id: 'u1',
+  buildingShareNumerator: 1712,
+  buildingShareDenominator: 10000,
+};
 
-const member = (ownerId: string, membershipId: string | null, ownerKind = OwnerKind.PERSON) =>
-  ({ ownerId, ownerKind, membershipId });
+const member = (
+  ownerId: string,
+  membershipId: string | null,
+  ownerKind = OwnerKind.PERSON,
+) => ({ ownerId, ownerKind, membershipId });
 
-const sole = (ownerId: string, membershipId: string | null, num: number, den: number): ElectoratePartyInput => ({
-  unitId: 'u1', partyType: OwnershipPartyType.SOLE,
-  shareNumerator: num, shareDenominator: den,
+const sole = (
+  ownerId: string,
+  membershipId: string | null,
+  num: number,
+  den: number,
+): ElectoratePartyInput => ({
+  unitId: 'u1',
+  partyType: OwnershipPartyType.SOLE,
+  shareNumerator: num,
+  shareDenominator: den,
   members: [member(ownerId, membershipId)],
 });
 
-const resolve = (parties: ElectoratePartyInput[], consents: { fromOwnerId: string; toMembershipId: string }[] = []) =>
-  resolveElectorateUnits([UNIT], parties, consents.map((c) => ({ ...c, unitId: 'u1' })), VoteWeightBasis.UNIT_SHARE)[0];
+const resolve = (
+  parties: ElectoratePartyInput[],
+  consents: { fromOwnerId: string; toMembershipId: string }[] = [],
+) =>
+  resolveElectorateUnits(
+    [UNIT],
+    parties,
+    consents.map((c) => ({ ...c, unitId: 'u1' })),
+    VoteWeightBasis.UNIT_SHARE,
+  )[0];
 
 describe('resolveElectorateUnits', () => {
   it('missing ownership → INELIGIBLE / MISSING_OWNERSHIP, weight still recorded', () => {
     const row = resolve([]);
     expect(row.eligibilityStatus).toBe(ElectorateEligibilityStatus.INELIGIBLE);
-    expect(row.ineligibleReason).toBe(ElectorateIneligibleReason.MISSING_OWNERSHIP);
+    expect(row.ineligibleReason).toBe(
+      ElectorateIneligibleReason.MISSING_OWNERSHIP,
+    );
     expect(row.weightNum).toBe(107); // 1712/10000 reduced
     expect(row.weightDen).toBe(625);
   });
@@ -33,17 +67,25 @@ describe('resolveElectorateUnits', () => {
   });
 
   it('sole owner without account → NO_REPRESENTATIVE', () => {
-    expect(resolve([sole('p1', null, 1, 1)]).ineligibleReason).toBe(ElectorateIneligibleReason.NO_REPRESENTATIVE);
+    expect(resolve([sole('p1', null, 1, 1)]).ineligibleReason).toBe(
+      ElectorateIneligibleReason.NO_REPRESENTATIVE,
+    );
   });
 
   it('sole owner delegates: consent to board redirects the unit', () => {
-    const row = resolve([sole('p1', 'm1', 1, 1)], [{ fromOwnerId: 'p1', toMembershipId: 'board' }]);
+    const row = resolve(
+      [sole('p1', 'm1', 1, 1)],
+      [{ fromOwnerId: 'p1', toMembershipId: 'board' }],
+    );
     expect(row.eligibilityStatus).toBe(ElectorateEligibilityStatus.ELIGIBLE);
     expect(row.representativeMembershipId).toBe('board');
   });
 
   it('sole owner WITHOUT account delegates: board-recorded consent designates the delegate (§ 1185)', () => {
-    const row = resolve([sole('p1', null, 1, 1)], [{ fromOwnerId: 'p1', toMembershipId: 'board' }]);
+    const row = resolve(
+      [sole('p1', null, 1, 1)],
+      [{ fromOwnerId: 'p1', toMembershipId: 'board' }],
+    );
     expect(row.eligibilityStatus).toBe(ElectorateEligibilityStatus.ELIGIBLE);
     expect(row.representativeMembershipId).toBe('board');
   });
@@ -54,8 +96,10 @@ describe('resolveElectorateUnits', () => {
   });
 
   it('50/50 deadlock → NO_REPRESENTATIVE', () => {
-    expect(resolve([sole('p1', 'm1', 1, 2), sole('p2', 'm2', 1, 2)]).ineligibleReason)
-      .toBe(ElectorateIneligibleReason.NO_REPRESENTATIVE);
+    expect(
+      resolve([sole('p1', 'm1', 1, 2), sole('p2', 'm2', 1, 2)])
+        .ineligibleReason,
+    ).toBe(ElectorateIneligibleReason.NO_REPRESENTATIVE);
   });
 
   it('50/50 resolved by consent: p2 consents to m1 → m1 holds 1/1 > 1/2', () => {
@@ -69,20 +113,34 @@ describe('resolveElectorateUnits', () => {
 
   it('exactly 1/2 consented is NOT a majority (strict >1/2)', () => {
     const row = resolve(
-      [sole('p1', 'm1', 1, 4), sole('p2', 'm2', 1, 4), sole('p3', 'm3', 1, 4), sole('p4', 'm4', 1, 4)],
+      [
+        sole('p1', 'm1', 1, 4),
+        sole('p2', 'm2', 1, 4),
+        sole('p3', 'm3', 1, 4),
+        sole('p4', 'm4', 1, 4),
+      ],
       [{ fromOwnerId: 'p2', toMembershipId: 'm1' }],
     );
-    expect(row.ineligibleReason).toBe(ElectorateIneligibleReason.NO_REPRESENTATIVE);
+    expect(row.ineligibleReason).toBe(
+      ElectorateIneligibleReason.NO_REPRESENTATIVE,
+    );
   });
 
   it('SJM 1/1 is NOT auto-eligible; the other spouse designates', () => {
     const sjm: ElectoratePartyInput = {
-      unitId: 'u1', partyType: OwnershipPartyType.SJM,
-      shareNumerator: 1, shareDenominator: 1,
+      unitId: 'u1',
+      partyType: OwnershipPartyType.SJM,
+      shareNumerator: 1,
+      shareDenominator: 1,
       members: [member('wife', 'mw'), member('husband', 'mh')],
     };
-    expect(resolve([sjm]).ineligibleReason).toBe(ElectorateIneligibleReason.NO_REPRESENTATIVE);
-    const designated = resolve([sjm], [{ fromOwnerId: 'husband', toMembershipId: 'mw' }]);
+    expect(resolve([sjm]).ineligibleReason).toBe(
+      ElectorateIneligibleReason.NO_REPRESENTATIVE,
+    );
+    const designated = resolve(
+      [sjm],
+      [{ fromOwnerId: 'husband', toMembershipId: 'mw' }],
+    );
     expect(designated.representativeMembershipId).toBe('mw');
   });
 
@@ -99,11 +157,15 @@ describe('resolveElectorateUnits', () => {
 
   it('association-owned unit → ASSOCIATION_OWNED', () => {
     const assoc: ElectoratePartyInput = {
-      unitId: 'u1', partyType: OwnershipPartyType.SOLE,
-      shareNumerator: 1, shareDenominator: 1,
+      unitId: 'u1',
+      partyType: OwnershipPartyType.SOLE,
+      shareNumerator: 1,
+      shareDenominator: 1,
       members: [member('svj', 'svj-m', OwnerKind.ASSOCIATION)],
     };
-    expect(resolve([assoc]).ineligibleReason).toBe(ElectorateIneligibleReason.ASSOCIATION_OWNED);
+    expect(resolve([assoc]).ineligibleReason).toBe(
+      ElectorateIneligibleReason.ASSOCIATION_OWNED,
+    );
   });
 
   it('explicit consent overrides implicit self-support (deterministic winner)', () => {
@@ -126,7 +188,12 @@ describe('resolveElectorateUnits', () => {
   });
 
   it('ONE_UNIT_ONE_VOTE weights every unit 1/1', () => {
-    const row = resolveElectorateUnits([UNIT], [{ ...sole('p1', 'm1', 1, 1) }], [], VoteWeightBasis.ONE_UNIT_ONE_VOTE)[0];
+    const row = resolveElectorateUnits(
+      [UNIT],
+      [{ ...sole('p1', 'm1', 1, 1) }],
+      [],
+      VoteWeightBasis.ONE_UNIT_ONE_VOTE,
+    )[0];
     expect(row.weightNum).toBe(1);
     expect(row.weightDen).toBe(1);
   });

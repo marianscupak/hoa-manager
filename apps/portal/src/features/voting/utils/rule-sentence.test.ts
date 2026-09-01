@@ -1,7 +1,11 @@
 import type { TFunction } from "i18next";
 import { describe, expect, it } from "vitest";
 
-import { buildMajorityFragment, buildRuleSentence, type RuleSentenceRuleset } from "./rule-sentence";
+import {
+    buildMajorityFragment,
+    buildRuleSentence,
+    type RuleSentenceRuleset,
+} from "./rule-sentence";
 
 const fakeT = ((key: string, params?: Record<string, unknown>) =>
     `${key}${params ? ":" + JSON.stringify(params) : ""}`) as unknown as TFunction<"voting">;

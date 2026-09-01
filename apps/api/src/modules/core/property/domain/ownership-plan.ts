@@ -33,7 +33,11 @@ export type OwnershipPlanError =
   | { code: 'UNKNOWN_OWNER'; ownerId: string };
 
 const isValidFraction = (num: number, den: number): boolean =>
-  Number.isInteger(num) && Number.isInteger(den) && num > 0 && den > 0 && num <= den;
+  Number.isInteger(num) &&
+  Number.isInteger(den) &&
+  num > 0 &&
+  den > 0 &&
+  num <= den;
 
 export function validateOwnershipPlan(
   parties: OwnershipPartyInput[],
@@ -54,7 +58,10 @@ export function validateOwnershipPlan(
       .map((id) => owners.get(id) ?? null)
       .map((ref, i) => {
         if (ref === null) {
-          errors.push({ code: 'UNKNOWN_OWNER', ownerId: party.memberOwnerIds[i] });
+          errors.push({
+            code: 'UNKNOWN_OWNER',
+            ownerId: party.memberOwnerIds[i],
+          });
         }
         return ref;
       })
@@ -70,7 +77,11 @@ export function validateOwnershipPlan(
       const allPersons =
         members.length === party.memberOwnerIds.length &&
         members.every((m) => m.kind === OwnerKind.PERSON);
-      if (party.memberOwnerIds.length !== 2 || distinct.size !== 2 || !allPersons) {
+      if (
+        party.memberOwnerIds.length !== 2 ||
+        distinct.size !== 2 ||
+        !allPersons
+      ) {
         errors.push({ code: 'SJM_MEMBER_RULES', index });
       }
     }

@@ -52,7 +52,8 @@ export function mapQuestionToUpdateDto(params: {
                   weightBasis: baseRuleset.weightBasis,
                   quorum: baseRuleset.quorum,
                   allowAbstain: baseRuleset.allowAbstain,
-                  acknowledgedNonStatutory: baseRuleset.acknowledgedNonStatutory,
+                  acknowledgedNonStatutory:
+                      baseRuleset.acknowledgedNonStatutory,
                   majorityRuleType: rulesetValues.majorityRuleType,
                   majorityDenominatorBasis:
                       rulesetValues.majorityDenominatorBasis,

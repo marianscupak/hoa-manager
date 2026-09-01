@@ -110,7 +110,10 @@ describe("mapQuestionVerdict", () => {
         const outcome = mapQuestionVerdict({
             quorumMet: null,
             questionType: "YES_NO",
-            result: buildResult({ majorityMet: true, winningOptionId: "o-yes" }),
+            result: buildResult({
+                majorityMet: true,
+                winningOptionId: "o-yes",
+            }),
             options,
         });
 

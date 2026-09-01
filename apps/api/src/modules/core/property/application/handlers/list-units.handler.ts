@@ -36,9 +36,7 @@ export class ListUnitsHandler
       this.unitRepo.listByTenant(query.tenantId),
       this.ownerRepo.listByTenant(query.tenantId),
     ]);
-    const namesById = new Map(
-      tenantOwners.map((o) => [o.id, o.displayName]),
-    );
+    const namesById = new Map(tenantOwners.map((o) => [o.id, o.displayName]));
 
     // TODO: In a real app with many units, this N+1 query should be optimized
     // with a join in the repository or a dataloader, but for MVP it's OK.

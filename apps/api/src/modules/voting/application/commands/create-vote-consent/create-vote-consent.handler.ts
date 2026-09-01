@@ -100,9 +100,7 @@ export class CreateVoteConsentHandler
         command.membershipId,
       );
 
-      const isOwner = statuses.owningUnits.some(
-        (u) => u.id === command.unitId,
-      );
+      const isOwner = statuses.owningUnits.some((u) => u.id === command.unitId);
       if (!isOwner) {
         throw new NotAUnitOwnerException();
       }

@@ -8,3 +8,7 @@ apps/portal/src/paraglide
 # Grafana dashboard JSON is Grafana-shaped (exported/edited via its UI);
 # keep prettier away from it.
 docker/grafana/provisioning/dashboards/*.json
+# Generated files — regenerated unformatted by their own tools, so
+# formatting them just re-breaks format:check on the next generate.
+apps/api/openapi-spec.json
+apps/api/src/infrastructure/db/migrations

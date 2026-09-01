@@ -2,13 +2,7 @@ import { CheckCircle2, Search } from "lucide-react";
 import { ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 
-import {
-    Avatar,
-    AvatarFallback,
-    Card,
-    EmptyState,
-    Input,
-} from "@hoa-mngr/ui";
+import { Avatar, AvatarFallback, Card, EmptyState, Input } from "@hoa-mngr/ui";
 import { cn } from "@hoa-mngr/ui/lib/utils";
 
 import { DelegationCandidateDto } from "@/api/generated/model";

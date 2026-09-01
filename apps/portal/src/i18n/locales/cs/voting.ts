@@ -628,8 +628,7 @@ export const voting = {
             expandDetails: "Zobrazit detaily",
             collapseDetails: "Skrýt detaily",
         },
-        perRollamDenominator:
-            "Většina se počítá ze všech hlasů v domě.",
+        perRollamDenominator: "Většina se počítá ze všech hlasů v domě.",
     },
     resultsV2: {
         participationLine:

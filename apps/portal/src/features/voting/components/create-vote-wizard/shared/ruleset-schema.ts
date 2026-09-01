@@ -1,6 +1,9 @@
 import { z } from "zod";
 
-const fractionSchema = z.object({ num: z.number().int().min(1), den: z.number().int().min(1) });
+const fractionSchema = z.object({
+    num: z.number().int().min(1),
+    den: z.number().int().min(1),
+});
 const comparatorSchema = z.enum(["STRICT_GREATER", "AT_LEAST"]);
 
 const rulesetObjectSchema = z.object({
@@ -12,7 +15,11 @@ const rulesetObjectSchema = z.object({
             comparator: comparatorSchema,
         })
         .nullable(),
-    majorityRuleType: z.enum(["SIMPLE_MAJORITY", "QUALIFIED_MAJORITY", "UNANIMITY"]),
+    majorityRuleType: z.enum([
+        "SIMPLE_MAJORITY",
+        "QUALIFIED_MAJORITY",
+        "UNANIMITY",
+    ]),
     majorityDenominatorBasis: z.enum(["VOTES_CAST", "ALL_VOTES"]),
     majorityThreshold: fractionSchema.optional(),
     majorityComparator: comparatorSchema.optional(),
@@ -20,15 +27,21 @@ const rulesetObjectSchema = z.object({
     acknowledgedNonStatutory: z.boolean(),
 });
 
-export const createVoteRulesetSchema = rulesetObjectSchema.superRefine((data, ctx) => {
-    if (data.majorityRuleType === "QUALIFIED_MAJORITY" && (!data.majorityThreshold || !data.majorityComparator)) {
-        ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "voting:create.fields.majorityThreshold.errors.requiredForQualified",
-            path: ["majorityThreshold"],
-        });
-    }
-});
+export const createVoteRulesetSchema = rulesetObjectSchema.superRefine(
+    (data, ctx) => {
+        if (
+            data.majorityRuleType === "QUALIFIED_MAJORITY" &&
+            (!data.majorityThreshold || !data.majorityComparator)
+        ) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message:
+                    "voting:create.fields.majorityThreshold.errors.requiredForQualified",
+                path: ["majorityThreshold"],
+            });
+        }
+    },
+);
 
 /**
  * The plain (pre-`superRefine`) object schema's field shapes, for callers

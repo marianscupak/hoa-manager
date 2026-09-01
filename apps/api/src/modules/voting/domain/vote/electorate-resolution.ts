@@ -1,4 +1,7 @@
-import { OwnerKind, OwnershipPartyType } from '@/modules/core/property/domain/ownership-plan';
+import {
+  OwnerKind,
+  OwnershipPartyType,
+} from '@/modules/core/property/domain/ownership-plan';
 import { Rational } from '@/shared/domain/rational';
 
 import {
@@ -19,7 +22,11 @@ export interface ElectoratePartyInput {
   partyType: OwnershipPartyType;
   shareNumerator: number;
   shareDenominator: number;
-  members: { ownerId: string; ownerKind: OwnerKind; membershipId: string | null }[];
+  members: {
+    ownerId: string;
+    ownerKind: OwnerKind;
+    membershipId: string | null;
+  }[];
 }
 
 export interface ElectorateConsentInput {
@@ -60,8 +67,15 @@ export function resolveElectorateUnits(
     const weight =
       weightBasis === VoteWeightBasis.ONE_UNIT_ONE_VOTE
         ? Rational.one()
-        : Rational.from(unit.buildingShareNumerator, unit.buildingShareDenominator);
-    const base = { unitId: unit.id, weightNum: Number(weight.num), weightDen: Number(weight.den) };
+        : Rational.from(
+            unit.buildingShareNumerator,
+            unit.buildingShareDenominator,
+          );
+    const base = {
+      unitId: unit.id,
+      weightNum: Number(weight.num),
+      weightDen: Number(weight.den),
+    };
 
     const unitParties = partiesByUnit.get(unit.id) ?? [];
     if (unitParties.length === 0) {
@@ -96,16 +110,24 @@ export function resolveElectorateUnits(
       }
     }
 
-    const memberSupports = (m: { ownerId: string; membershipId: string | null }, candidate: string): boolean => {
+    const memberSupports = (
+      m: { ownerId: string; membershipId: string | null },
+      candidate: string,
+    ): boolean => {
       const ownerConsents = consentsByOwner.get(`${unit.id}|${m.ownerId}`);
       if (ownerConsents?.has(candidate)) return true;
-      return m.membershipId === candidate && (!ownerConsents || ownerConsents.size === 0);
+      return (
+        m.membershipId === candidate &&
+        (!ownerConsents || ownerConsents.size === 0)
+      );
     };
 
     // Relies on validateOwnershipPlan guaranteeing every party has >= 1 member
     // (SOLE = 1, SJM = 2); an empty members array would consent vacuously.
-    const partyConsentsTo = (party: ElectoratePartyInput, candidate: string): boolean =>
-      party.members.every((m) => memberSupports(m, candidate));
+    const partyConsentsTo = (
+      party: ElectoratePartyInput,
+      candidate: string,
+    ): boolean => party.members.every((m) => memberSupports(m, candidate));
 
     const winners: string[] = [];
     for (const candidate of candidates) {

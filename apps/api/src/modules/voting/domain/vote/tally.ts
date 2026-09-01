@@ -1,9 +1,13 @@
 import { Rational } from '@/shared/domain/rational';
 
 import {
-  MajorityDenominatorBasis, QuorumMeasure, ThresholdComparator,
-  VoteMode, VoteOptionSemantic,
-  type FractionValue, type QuorumRule,
+  MajorityDenominatorBasis,
+  QuorumMeasure,
+  ThresholdComparator,
+  VoteMode,
+  VoteOptionSemantic,
+  type FractionValue,
+  type QuorumRule,
 } from './vote.types';
 
 export interface TallyElectorateRow {
@@ -12,8 +16,15 @@ export interface TallyElectorateRow {
   weightNum: number;
   weightDen: number;
 }
-export interface TallyBallot { ballotId: string; unitId: string }
-export interface TallyAnswer { ballotId: string; questionId: string; optionId: string }
+export interface TallyBallot {
+  ballotId: string;
+  unitId: string;
+}
+export interface TallyAnswer {
+  ballotId: string;
+  questionId: string;
+  optionId: string;
+}
 export interface EffectiveMajorityRules {
   basis: MajorityDenominatorBasis;
   threshold: FractionValue;
@@ -32,7 +43,11 @@ export interface TallyInput {
   ballots: TallyBallot[];
   answers: TallyAnswer[];
 }
-export interface TallyOptionResult { optionId: string; voteWeight: Rational; voteUnitCount: number }
+export interface TallyOptionResult {
+  optionId: string;
+  voteWeight: Rational;
+  voteUnitCount: number;
+}
 export interface TallyQuestionResult {
   questionId: string;
   majorityMet: boolean;
@@ -51,23 +66,41 @@ export interface TallyResult {
   questionResults: TallyQuestionResult[];
 }
 
-const meets = (value: Rational, threshold: FractionValue, comparator: ThresholdComparator, denominator: Rational): boolean => {
+const meets = (
+  value: Rational,
+  threshold: FractionValue,
+  comparator: ThresholdComparator,
+  denominator: Rational,
+): boolean => {
   const bar = Rational.from(threshold.num, threshold.den).mul(denominator);
-  return comparator === ThresholdComparator.STRICT_GREATER ? value.gt(bar) : value.gte(bar);
+  return comparator === ThresholdComparator.STRICT_GREATER
+    ? value.gt(bar)
+    : value.gte(bar);
 };
 
 export function computeVoteResults(input: TallyInput): TallyResult {
-  const countable = input.electorate.filter((row) => row.ineligibleReason !== 'ASSOCIATION_OWNED');
-  const weightByUnit = new Map(countable.map((row) => [row.unitId, Rational.from(row.weightNum, row.weightDen)]));
+  const countable = input.electorate.filter(
+    (row) => row.ineligibleReason !== 'ASSOCIATION_OWNED',
+  );
+  const weightByUnit = new Map(
+    countable.map((row) => [
+      row.unitId,
+      Rational.from(row.weightNum, row.weightDen),
+    ]),
+  );
 
   const totalVotesWeight = Rational.sum([...weightByUnit.values()]);
   const totalVotesUnitCount = countable.length;
 
   const participatingUnits = new Set(
-    input.ballots.map((b) => b.unitId).filter((unitId) => weightByUnit.has(unitId)),
+    input.ballots
+      .map((b) => b.unitId)
+      .filter((unitId) => weightByUnit.has(unitId)),
   );
   const participationWeight = Rational.sum(
-    [...participatingUnits].map((unitId) => weightByUnit.get(unitId) as Rational),
+    [...participatingUnits].map(
+      (unitId) => weightByUnit.get(unitId) as Rational,
+    ),
   );
   const participationUnitCount = participatingUnits.size;
 
@@ -76,7 +109,12 @@ export function computeVoteResults(input: TallyInput): TallyResult {
     if (input.quorum.measure === QuorumMeasure.UNIT_SHARE) {
       quorumMet =
         !totalVotesWeight.isZero() &&
-        meets(participationWeight, input.quorum.threshold, input.quorum.comparator, totalVotesWeight);
+        meets(
+          participationWeight,
+          input.quorum.threshold,
+          input.quorum.comparator,
+          totalVotesWeight,
+        );
     } else {
       quorumMet =
         totalVotesUnitCount > 0 &&
@@ -89,19 +127,31 @@ export function computeVoteResults(input: TallyInput): TallyResult {
     }
   }
 
-  const unitByBallot = new Map(input.ballots.map((b) => [b.ballotId, b.unitId]));
+  const unitByBallot = new Map(
+    input.ballots.map((b) => [b.ballotId, b.unitId]),
+  );
 
   const questionResults = input.questions.map((question) => {
-    const weightByOption = new Map<string, Rational>(question.options.map((o) => [o.id, Rational.zero()]));
-    const countByOption = new Map<string, number>(question.options.map((o) => [o.id, 0]));
+    const weightByOption = new Map<string, Rational>(
+      question.options.map((o) => [o.id, Rational.zero()]),
+    );
+    const countByOption = new Map<string, number>(
+      question.options.map((o) => [o.id, 0]),
+    );
 
     for (const answer of input.answers) {
       if (answer.questionId !== question.id) continue;
       const unitId = unitByBallot.get(answer.ballotId);
       const weight = unitId ? weightByUnit.get(unitId) : undefined;
       if (!weight) continue;
-      weightByOption.set(answer.optionId, (weightByOption.get(answer.optionId) ?? Rational.zero()).add(weight));
-      countByOption.set(answer.optionId, (countByOption.get(answer.optionId) ?? 0) + 1);
+      weightByOption.set(
+        answer.optionId,
+        (weightByOption.get(answer.optionId) ?? Rational.zero()).add(weight),
+      );
+      countByOption.set(
+        answer.optionId,
+        (countByOption.get(answer.optionId) ?? 0) + 1,
+      );
     }
 
     const optionResults: TallyOptionResult[] = question.options.map((o) => ({
@@ -115,7 +165,9 @@ export function computeVoteResults(input: TallyInput): TallyResult {
         ? totalVotesWeight
         : Rational.sum(optionResults.map((o) => o.voteWeight));
 
-    const nonAbstain = question.options.filter((o) => o.optionKey !== VoteOptionSemantic.ABSTAIN);
+    const nonAbstain = question.options.filter(
+      (o) => o.optionKey !== VoteOptionSemantic.ABSTAIN,
+    );
     let winningOptionId: string | null = null;
     let maxWeight = Rational.zero();
     let hasTie = false;

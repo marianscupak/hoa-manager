@@ -4,11 +4,7 @@
  */
 
 export function normalizeForSearch(value: string): string {
-    return value
-        .normalize("NFD")
-        .replace(/[̀-ͯ]/g, "")
-        .toLowerCase()
-        .trim();
+    return value.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
 }
 
 export function matchesSearch(value: unknown, query: string): boolean {

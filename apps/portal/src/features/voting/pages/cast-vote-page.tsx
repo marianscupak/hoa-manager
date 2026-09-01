@@ -193,7 +193,7 @@ export function CastVotePage() {
                 <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100">
                     <ShieldCheck className="h-10 w-10 text-emerald-600" />
                 </div>
-                <h2 className="mb-2 text-2xl font-bold text-foreground">
+                <h2 className="text-foreground mb-2 text-2xl font-bold">
                     {hasAlreadyVoted
                         ? t("castVote.alreadyVoted.title")
                         : t("castVote.noUnits.title")}
@@ -218,7 +218,7 @@ export function CastVotePage() {
         return (
             <div className="mx-auto max-w-3xl space-y-6 py-8">
                 <div>
-                    <h1 className="text-2xl font-bold text-foreground">
+                    <h1 className="text-foreground text-2xl font-bold">
                         {t("castVote.review.title")}
                     </h1>
                     <p className="text-sm text-slate-500 italic">
@@ -342,7 +342,7 @@ export function CastVotePage() {
     return (
         <div className="mx-auto max-w-3xl space-y-6 py-8">
             {/* Title */}
-            <h1 className="text-2xl font-bold text-foreground">{vote.title}</h1>
+            <h1 className="text-foreground text-2xl font-bold">{vote.title}</h1>
 
             {/* Progress Bar */}
             <div className="rounded-lg border border-slate-200 bg-white p-4">

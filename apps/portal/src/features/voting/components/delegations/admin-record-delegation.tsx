@@ -85,7 +85,9 @@ export function AdminRecordDelegation() {
         );
         const byOwnerId = new Map<string, (typeof members)[number]>();
         for (const member of members) {
-            if (member.kind === UnitOwnershipMemberResponseDtoKind.ASSOCIATION) {
+            if (
+                member.kind === UnitOwnershipMemberResponseDtoKind.ASSOCIATION
+            ) {
                 continue;
             }
             byOwnerId.set(member.ownerId, member);
@@ -96,15 +98,16 @@ export function AdminRecordDelegation() {
     // The Zmocněnec (delegate) side may be any active member of the
     // association — a consent is a power of attorney, not a co-ownership
     // matter — so it keeps using every tenant membership.
-    const { data: delegateCandidates } = useVotesControllerGetDelegationCandidates(
-        selectedVoteId,
-        {
-            unitId: selectedUnitId,
-        },
-        {
-            query: { enabled: !!selectedVoteId && !!selectedUnitId },
-        },
-    );
+    const { data: delegateCandidates } =
+        useVotesControllerGetDelegationCandidates(
+            selectedVoteId,
+            {
+                unitId: selectedUnitId,
+            },
+            {
+                query: { enabled: !!selectedVoteId && !!selectedUnitId },
+            },
+        );
 
     const { mutate: createProxy, isPending } =
         useVotesControllerCreateVoteConsent();

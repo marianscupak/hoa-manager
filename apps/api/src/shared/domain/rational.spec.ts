@@ -31,7 +31,9 @@ describe('Rational', () => {
   });
 
   it('multiplies: 2/3 of 3/4 is 1/2', () => {
-    expect(Rational.from(2, 3).mul(Rational.from(3, 4)).eq(Rational.from(1, 2))).toBe(true);
+    expect(
+      Rational.from(2, 3).mul(Rational.from(3, 4)).eq(Rational.from(1, 2)),
+    ).toBe(true);
   });
 
   it('renders decimals half-up and percents', () => {
@@ -48,7 +50,9 @@ describe('Rational', () => {
   it('property: random integer partitions always sum to exactly 1', () => {
     let seed = 42;
     const rand = (max: number) => {
-      seed ^= seed << 13; seed ^= seed >> 17; seed ^= seed << 5;
+      seed ^= seed << 13;
+      seed ^= seed >> 17;
+      seed ^= seed << 5;
       seed |= 0;
       return (Math.abs(seed) % max) + 1;
     };

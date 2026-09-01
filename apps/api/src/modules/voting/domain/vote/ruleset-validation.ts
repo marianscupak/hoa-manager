@@ -1,9 +1,15 @@
 import { Rational } from '@/shared/domain/rational';
 
 import {
-  MajorityDenominatorBasis, MajorityRuleType, QuorumMeasure,
-  ThresholdComparator, VoteMode, VoteWeightBasis,
-  type FractionValue, type QuorumRule, type VoteRuleset,
+  MajorityDenominatorBasis,
+  MajorityRuleType,
+  QuorumMeasure,
+  ThresholdComparator,
+  VoteMode,
+  VoteWeightBasis,
+  type FractionValue,
+  type QuorumRule,
+  type VoteRuleset,
 } from './vote.types';
 
 export interface ThresholdBar {
@@ -36,7 +42,11 @@ const STATUTORY_FLOOR: ThresholdBar = {
 };
 
 const isValidFraction = (f: FractionValue): boolean =>
-  Number.isInteger(f.num) && Number.isInteger(f.den) && f.num > 0 && f.den > 0 && f.num <= f.den;
+  Number.isInteger(f.num) &&
+  Number.isInteger(f.den) &&
+  f.num > 0 &&
+  f.den > 0 &&
+  f.num <= f.den;
 
 export function barAtLeastAsStrict(a: ThresholdBar, b: ThresholdBar): boolean {
   const ta = Rational.from(a.threshold.num, a.threshold.den);
@@ -81,7 +91,10 @@ export function materializeRuleset(
   }
 }
 
-const tier1 = (code: Tier1Code) => ({ code, citation: RULESET_CITATIONS[code] });
+const tier1 = (code: Tier1Code) => ({
+  code,
+  citation: RULESET_CITATIONS[code],
+});
 
 export function validateRuleset(
   mode: VoteMode,
@@ -90,12 +103,18 @@ export function validateRuleset(
   const t1: { code: Tier1Code; citation: string }[] = [];
   const t3: Tier3Deviation[] = [];
 
-  if (!isValidFraction(r.majorityThreshold) || (r.quorum !== null && !isValidFraction(r.quorum.threshold))) {
+  if (
+    !isValidFraction(r.majorityThreshold) ||
+    (r.quorum !== null && !isValidFraction(r.quorum.threshold))
+  ) {
     t1.push(tier1('THRESHOLD_INVALID'));
     return { tier1: t1, tier3: t3 };
   }
 
-  const majorityBar: ThresholdBar = { threshold: r.majorityThreshold, comparator: r.majorityComparator };
+  const majorityBar: ThresholdBar = {
+    threshold: r.majorityThreshold,
+    comparator: r.majorityComparator,
+  };
   if (!barAtLeastAsStrict(majorityBar, STATUTORY_FLOOR)) {
     t1.push(tier1('MAJORITY_BELOW_FLOOR'));
   }
@@ -109,15 +128,20 @@ export function validateRuleset(
     if (r.quorum === null) {
       t1.push(tier1('ASSEMBLY_QUORUM_MISSING'));
     } else {
-      const quorumBar: ThresholdBar = { threshold: r.quorum.threshold, comparator: r.quorum.comparator };
+      const quorumBar: ThresholdBar = {
+        threshold: r.quorum.threshold,
+        comparator: r.quorum.comparator,
+      };
       if (!barAtLeastAsStrict(quorumBar, STATUTORY_FLOOR)) {
         t1.push(tier1('ASSEMBLY_QUORUM_BELOW_FLOOR'));
       }
-      if (r.quorum.measure === QuorumMeasure.UNIT_COUNT) t3.push('UNIT_COUNT_QUORUM');
+      if (r.quorum.measure === QuorumMeasure.UNIT_COUNT)
+        t3.push('UNIT_COUNT_QUORUM');
     }
   }
 
-  if (r.weightBasis === VoteWeightBasis.ONE_UNIT_ONE_VOTE) t3.push('ONE_UNIT_ONE_VOTE');
+  if (r.weightBasis === VoteWeightBasis.ONE_UNIT_ONE_VOTE)
+    t3.push('ONE_UNIT_ONE_VOTE');
 
   return { tier1: t1, tier3: t3 };
 }
@@ -127,7 +151,9 @@ const sameQuorum = (a: QuorumRule | null, b: QuorumRule | null): boolean => {
   return (
     a.measure === b.measure &&
     a.comparator === b.comparator &&
-    Rational.from(a.threshold.num, a.threshold.den).eq(Rational.from(b.threshold.num, b.threshold.den))
+    Rational.from(a.threshold.num, a.threshold.den).eq(
+      Rational.from(b.threshold.num, b.threshold.den),
+    )
   );
 };
 
@@ -142,16 +168,25 @@ export function validateQuestionOverride(
     return { notStricter: false, tier1: validation.tier1 };
   }
 
-  const basisRank = (b: MajorityDenominatorBasis) => (b === MajorityDenominatorBasis.ALL_VOTES ? 1 : 0);
+  const basisRank = (b: MajorityDenominatorBasis) =>
+    b === MajorityDenominatorBasis.ALL_VOTES ? 1 : 0;
   const untouchedDimensionsOk =
     override.weightBasis === base.weightBasis &&
     override.allowAbstain === base.allowAbstain &&
     sameQuorum(override.quorum, base.quorum);
-  const basisOk = basisRank(override.majorityDenominatorBasis) >= basisRank(base.majorityDenominatorBasis);
+  const basisOk =
+    basisRank(override.majorityDenominatorBasis) >=
+    basisRank(base.majorityDenominatorBasis);
   const barOk = barAtLeastAsStrict(
-    { threshold: override.majorityThreshold, comparator: override.majorityComparator },
+    {
+      threshold: override.majorityThreshold,
+      comparator: override.majorityComparator,
+    },
     { threshold: base.majorityThreshold, comparator: base.majorityComparator },
   );
 
-  return { notStricter: !(untouchedDimensionsOk && basisOk && barOk), tier1: validation.tier1 };
+  return {
+    notStricter: !(untouchedDimensionsOk && basisOk && barOk),
+    tier1: validation.tier1,
+  };
 }

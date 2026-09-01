@@ -50,9 +50,7 @@ describe("formatTotalVotingPower", () => {
         );
 
         expect(result).not.toBe("100 %");
-        expect(result).toBe(
-            'detail.statusSidebar.totalPowerVotes:{"count":1}',
-        );
+        expect(result).toBe('detail.statusSidebar.totalPowerVotes:{"count":1}');
     });
 
     it("renders a vote count for multiple ready units under ONE_UNIT_ONE_VOTE", () => {
@@ -63,9 +61,7 @@ describe("formatTotalVotingPower", () => {
         );
 
         expect(result).not.toContain("%");
-        expect(result).toBe(
-            'detail.statusSidebar.totalPowerVotes:{"count":3}',
-        );
+        expect(result).toBe('detail.statusSidebar.totalPowerVotes:{"count":3}');
     });
 
     it("renders the UNIT_SHARE percent when there is no ruleset yet (e.g. a DRAFT vote)", () => {

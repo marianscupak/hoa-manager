@@ -56,7 +56,7 @@ export function ConfirmDialog({
                         disabled={confirming}
                     >
                         {confirming
-                            ? (confirmingLabel ?? confirmLabel)
+                            ? confirmingLabel ?? confirmLabel
                             : confirmLabel}
                     </Button>
                 </DialogFooter>

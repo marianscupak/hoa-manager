@@ -8,7 +8,5 @@ export function ModeBadge({
     mode: "PER_ROLLAM" | "ASSEMBLY_RECORD";
 }) {
     const { t } = useTranslation(["voting"]);
-    return (
-        <Badge variant="outline">{t(`voting:mode.${mode}.label`)}</Badge>
-    );
+    return <Badge variant="outline">{t(`voting:mode.${mode}.label`)}</Badge>;
 }

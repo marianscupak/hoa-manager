@@ -231,7 +231,7 @@ export function DataTable<TData extends { id: string }>({
                 ) : rows.length === 0 ? (
                     <div className="text-muted-foreground px-5 py-8 text-center text-[13.5px]">
                         {globalFilter
-                            ? (emptySearchMessage ?? emptyMessage)
+                            ? emptySearchMessage ?? emptyMessage
                             : emptyMessage}
                     </div>
                 ) : (

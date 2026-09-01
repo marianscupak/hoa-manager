@@ -66,9 +66,8 @@ export class OpenVoteCommandHandler
       // Share-weighted votes need a complete building-share plan; a partial
       // plan would silently shrink every denominator (DOM-009).
       if (vote.ruleset?.weightBasis === VoteWeightBasis.UNIT_SHARE) {
-        const units = await this.electorateDataRepository.findAllUnits(
-          tenantId,
-        );
+        const units =
+          await this.electorateDataRepository.findAllUnits(tenantId);
         const total = Rational.sum(
           units.map((u) =>
             Rational.from(u.buildingShareNumerator, u.buildingShareDenominator),

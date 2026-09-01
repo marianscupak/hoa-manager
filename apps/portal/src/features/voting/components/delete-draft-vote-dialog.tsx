@@ -66,7 +66,9 @@ export function DeleteDraftVoteDialog({
                 open={isOpen}
                 onOpenChange={setIsOpen}
                 title={t("voting:detail.actions.deleteConfirmTitle")}
-                description={t("voting:detail.actions.deleteConfirmDescription")}
+                description={t(
+                    "voting:detail.actions.deleteConfirmDescription",
+                )}
                 confirmLabel={t("voting:detail.actions.deleteConfirm")}
                 cancelLabel={t("voting:detail.actions.cancel")}
                 confirming={deleteMutation.isPending}

@@ -220,10 +220,11 @@ export function RulesetFormFields({
                                             "quorum",
                                             {
                                                 measure: nextMeasure,
-                                                threshold: quorum?.threshold ?? {
-                                                    num: 1,
-                                                    den: 2,
-                                                },
+                                                threshold:
+                                                    quorum?.threshold ?? {
+                                                        num: 1,
+                                                        den: 2,
+                                                    },
                                                 comparator:
                                                     quorum?.comparator ??
                                                     "STRICT_GREATER",
@@ -282,10 +283,11 @@ export function RulesetFormFields({
                                                 measure:
                                                     quorum?.measure ??
                                                     "UNIT_SHARE",
-                                                threshold: quorum?.threshold ?? {
-                                                    num: 1,
-                                                    den: 2,
-                                                },
+                                                threshold:
+                                                    quorum?.threshold ?? {
+                                                        num: 1,
+                                                        den: 2,
+                                                    },
                                                 comparator,
                                             },
                                             {
@@ -348,10 +350,14 @@ export function RulesetFormFields({
                         <Select
                             value={majorityDenominatorBasis}
                             onValueChange={(next) =>
-                                form.setValue("majorityDenominatorBasis", next, {
-                                    shouldDirty: true,
-                                    shouldValidate: true,
-                                })
+                                form.setValue(
+                                    "majorityDenominatorBasis",
+                                    next,
+                                    {
+                                        shouldDirty: true,
+                                        shouldValidate: true,
+                                    },
+                                )
                             }
                         >
                             <SelectTrigger>

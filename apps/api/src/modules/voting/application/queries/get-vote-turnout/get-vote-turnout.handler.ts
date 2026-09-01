@@ -50,7 +50,8 @@ export class GetVoteTurnoutHandler
     // "all votes" total except association-owned ones, so mid-vote turnout
     // and the computed results quote the same denominator.
     const countable = electorate.filter(
-      (e) => e.ineligibleReason !== ElectorateIneligibleReason.ASSOCIATION_OWNED,
+      (e) =>
+        e.ineligibleReason !== ElectorateIneligibleReason.ASSOCIATION_OWNED,
     );
     const weightByUnit = new Map(
       countable.map((e) => [e.unitId, Rational.from(e.weightNum, e.weightDen)]),

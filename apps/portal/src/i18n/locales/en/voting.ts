@@ -529,6 +529,10 @@ export const voting = {
             actions: "Actions",
             revoke: "Revoke",
             revokeSuccess: "Delegation revoked successfully",
+            searchPlaceholder: "Search delegations",
+            range: "Showing {{from}}–{{to}} of {{total}} delegations",
+            count_one: "{{count}} delegation",
+            count_other: "{{count}} delegations",
         },
         empty: {
             title: "No delegations found",

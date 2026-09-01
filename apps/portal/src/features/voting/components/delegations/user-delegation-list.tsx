@@ -6,20 +6,17 @@ import { toast } from "sonner";
 
 import {
     Button,
+    DataTable,
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+    type ColumnDef,
 } from "@hoa-mngr/ui";
 
 import { showApiError } from "@/api/error-utils";
+import type { VoteConsentResponseDto } from "@/api/generated/model";
 import {
     useVotesControllerGetConsents,
     useVotesControllerGetVotes,
@@ -64,15 +61,7 @@ export function UserDelegationList() {
 
     const isLoading = isLoadingConsents || isLoadingVotes;
 
-    if (isLoading) {
-        return (
-            <div className="py-8 text-center text-slate-500">
-                {t("common:loading")}
-            </div>
-        );
-    }
-
-    if (!consents || consents.length === 0) {
+    if (!isLoading && (!consents || consents.length === 0)) {
         return (
             <div className="text-muted-foreground rounded-lg border border-dashed p-12 text-center">
                 {t("voting:delegations.empty.all")}
@@ -98,110 +87,139 @@ export function UserDelegationList() {
         );
     };
 
+    const columns: ColumnDef<VoteConsentResponseDto>[] = [
+        {
+            id: "unit",
+            accessorKey: "unitName",
+            header: t("voting:delegations.table.unit"),
+            enableSorting: true,
+            sortingFn: "localeNumeric",
+            enableGlobalFilter: true,
+            cell: ({ row }) => (
+                <span className="text-foreground truncate text-sm font-semibold">
+                    {row.original.unitName}
+                </span>
+            ),
+        },
+        {
+            id: "from",
+            accessorKey: "fromOwnerName",
+            header: t("voting:delegations.table.from"),
+            enableSorting: false,
+            enableGlobalFilter: true,
+            cell: ({ row }) => (
+                <span className="text-secondary-foreground block truncate text-sm">
+                    {row.original.fromOwnerName}
+                </span>
+            ),
+        },
+        {
+            id: "to",
+            accessorKey: "toDelegateName",
+            header: t("voting:delegations.table.to"),
+            enableSorting: false,
+            enableGlobalFilter: true,
+            cell: ({ row }) => (
+                <span className="text-secondary-foreground block truncate text-sm">
+                    {row.original.toDelegateName}
+                </span>
+            ),
+        },
+        {
+            id: "date",
+            accessorFn: (row) => new Date(row.createdAt).getTime(),
+            header: t("voting:delegations.table.date"),
+            enableSorting: true,
+            sortDescFirst: true,
+            enableGlobalFilter: false,
+            cell: ({ row }) => (
+                <span className="text-muted-foreground text-sm">
+                    {format(new Date(row.original.createdAt), "dd.MM.yyyy")}
+                </span>
+            ),
+        },
+        {
+            id: "actions",
+            header: "",
+            enableSorting: false,
+            enableGlobalFilter: false,
+            meta: { align: "right" },
+            cell: ({ row }) => (
+                <Button
+                    variant="tableActionDanger"
+                    size="tableText"
+                    className="text-destructive"
+                    onClick={() => handleRevoke(row.original.id)}
+                    disabled={isRevoking}
+                >
+                    {t("voting:delegations.table.revoke")}
+                </Button>
+            ),
+        },
+    ];
+
     return (
         <div className="space-y-4">
-            <div className="flex justify-end">
-                <div className="w-full max-w-xs">
-                    <Select
-                        value={effectiveSelectedVoteId}
-                        onValueChange={setSelectedVoteId}
-                    >
-                        <SelectTrigger className="bg-white">
-                            <SelectValue
-                                placeholder={t(
-                                    "voting:delegations.filter.vote",
-                                )}
-                            />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {scheduledVotes.map((vote) => (
-                                <SelectItem key={vote.id} value={vote.id}>
-                                    {vote.title}
-                                    {vote.scheduledFrom && (
-                                        <span className="ml-2 text-xs text-slate-400">
-                                            {format(
-                                                new Date(vote.scheduledFrom),
-                                                "dd.MM.yyyy",
-                                            )}
-                                        </span>
+            <DataTable
+                columns={columns}
+                data={filteredConsents}
+                gridTemplate="1fr 1.3fr 1.3fr 0.9fr 110px"
+                isLoading={isLoading}
+                loadingMessage={t("common:loading")}
+                emptyMessage={t("voting:delegations.empty.filtered")}
+                searchPlaceholder={t(
+                    "voting:delegations.table.searchPlaceholder",
+                )}
+                initialSorting={[{ id: "date", desc: true }]}
+                countLabel={(info) =>
+                    info.paginated
+                        ? t("voting:delegations.table.range", {
+                              from: info.from,
+                              to: info.to,
+                              total: info.total,
+                          })
+                        : t("voting:delegations.table.count", {
+                              count: info.total,
+                          })
+                }
+                paginationLabels={{
+                    previous: t("common:pagination.previous"),
+                    next: t("common:pagination.next"),
+                }}
+                toolbarEnd={
+                    <div className="w-full max-w-[240px]">
+                        <Select
+                            value={effectiveSelectedVoteId}
+                            onValueChange={setSelectedVoteId}
+                        >
+                            <SelectTrigger className="bg-white">
+                                <SelectValue
+                                    placeholder={t(
+                                        "voting:delegations.filter.vote",
                                     )}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-            </div>
-
-            <div className="rounded-card shadow-clay-card border-border bg-card overflow-hidden border">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>
-                                {t("voting:delegations.table.unit")}
-                            </TableHead>
-                            <TableHead>
-                                {t("voting:delegations.table.from")}
-                            </TableHead>
-                            <TableHead>
-                                {t("voting:delegations.table.to")}
-                            </TableHead>
-                            <TableHead>
-                                {t("voting:delegations.table.date")}
-                            </TableHead>
-                            <TableHead className="text-right">
-                                {t("voting:delegations.table.actions")}
-                            </TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {filteredConsents.length === 0 ? (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={5}
-                                    className="text-muted-foreground py-12 text-center"
-                                >
-                                    {t("voting:delegations.empty.filtered")}
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            filteredConsents.map((consent) => (
-                                <TableRow key={consent.id}>
-                                    <TableCell className="text-foreground font-medium">
-                                        {consent.unitName}
-                                    </TableCell>
-                                    <TableCell className="text-secondary-foreground">
-                                        {consent.fromOwnerName}
-                                    </TableCell>
-                                    <TableCell className="text-secondary-foreground">
-                                        {consent.toDelegateName}
-                                    </TableCell>
-                                    <TableCell className="text-muted-foreground text-sm">
-                                        {format(
-                                            new Date(consent.createdAt),
-                                            "dd.MM.yyyy",
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {scheduledVotes.map((vote) => (
+                                    <SelectItem key={vote.id} value={vote.id}>
+                                        {vote.title}
+                                        {vote.scheduledFrom && (
+                                            <span className="ml-2 text-xs text-slate-400">
+                                                {format(
+                                                    new Date(
+                                                        vote.scheduledFrom,
+                                                    ),
+                                                    "dd.MM.yyyy",
+                                                )}
+                                            </span>
                                         )}
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                                            onClick={() =>
-                                                handleRevoke(consent.id)
-                                            }
-                                            disabled={isRevoking}
-                                        >
-                                            {t(
-                                                "voting:delegations.table.revoke",
-                                            )}
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                }
+            />
             <p className="text-muted-foreground text-sm">
                 {t("voting:delegations.footnote")}
             </p>

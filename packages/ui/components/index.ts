@@ -9,7 +9,6 @@ export * from "./textarea";
 export * from "./dialog";
 export * from "./form-controls";
 export * from "./select";
-export * from "./data-table-legacy";
 export * from "./data-table";
 export * from "./data-table-cells";
 export * from "./card";

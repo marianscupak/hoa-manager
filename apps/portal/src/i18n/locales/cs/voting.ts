@@ -530,6 +530,11 @@ export const voting = {
             actions: "Akce",
             revoke: "Zrušit",
             revokeSuccess: "Delegace byla úspěšně zrušena",
+            searchPlaceholder: "Hledat delegace",
+            range: "Zobrazeno {{from}}–{{to}} z {{total}} delegací",
+            count_one: "{{count}} delegace",
+            count_few: "{{count}} delegace",
+            count_other: "{{count}} delegací",
         },
         empty: {
             title: "Žádné delegace nebyly nalezeny",

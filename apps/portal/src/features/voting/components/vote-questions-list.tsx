@@ -1,7 +1,13 @@
 import type { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
 
-import { Badge, Card, CardContent, CardHeader, CardTitle } from "@hoa-mngr/ui";
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+    StatusChip,
+} from "@hoa-mngr/ui";
 
 import {
     type VoteDetailResponseDto,
@@ -77,9 +83,12 @@ export function VoteQuestionsList({ questions }: VoteQuestionsListProps) {
                                         <span>{optionsSummary}</span>
                                     )}
                                     {question.rulesetOverride && (
-                                        <Badge variant="primaryTint">
+                                        <StatusChip
+                                            variant="primary"
+                                            dot={false}
+                                        >
                                             {t("rules.customRule")}
-                                        </Badge>
+                                        </StatusChip>
                                     )}
                                 </div>
                             </div>

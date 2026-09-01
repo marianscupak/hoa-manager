@@ -3,14 +3,14 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
 import {
-    Badge,
-    type BadgeProps,
     Button,
     Card,
     CardContent,
     CardFooter,
     CardHeader,
     CardTitle,
+    StatusChip,
+    type StatusChipVariant,
     Tooltip,
     TooltipContent,
     TooltipTrigger,
@@ -44,11 +44,11 @@ const STATUS_ICON_TILE: Record<OwningUnitStatusDtoStatus, string> = {
 
 const STATUS_BADGE_VARIANT: Record<
     OwningUnitStatusDtoStatus,
-    NonNullable<BadgeProps["variant"]>
+    StatusChipVariant
 > = {
-    READY: "successTint",
-    VOTED: "successTint",
-    REQUIRES_DELEGATION: "warningTint",
+    READY: "success",
+    VOTED: "success",
+    REQUIRES_DELEGATION: "warning",
     DELEGATED: "neutral",
     INELIGIBLE: "neutral",
 };
@@ -155,7 +155,7 @@ export function VoterStatusSidebar({ vote }: VoterStatusSidebarProps) {
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <span className="shrink-0">
-                                            <Badge
+                                            <StatusChip
                                                 variant={
                                                     STATUS_BADGE_VARIANT[
                                                         unit.status
@@ -171,7 +171,7 @@ export function VoterStatusSidebar({ vote }: VoterStatusSidebarProps) {
                                                 {unit.ineligibleReason && (
                                                     <Info className="h-3.5 w-3.5 opacity-70" />
                                                 )}
-                                            </Badge>
+                                            </StatusChip>
                                         </span>
                                     </TooltipTrigger>
                                     {unit.ineligibleReason && (
@@ -183,12 +183,12 @@ export function VoterStatusSidebar({ vote }: VoterStatusSidebarProps) {
                                     )}
                                 </Tooltip>
                             ) : (
-                                <Badge
+                                <StatusChip
                                     variant={STATUS_BADGE_VARIANT[unit.status]}
                                     className="shrink-0"
                                 >
                                     {t(STATUS_LABEL_KEY[unit.status])}
-                                </Badge>
+                                </StatusChip>
                             )}
                         </div>
                     ))}

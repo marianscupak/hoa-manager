@@ -5,7 +5,13 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
-import { Badge, BadgeProps, Button, Card, EmptyState } from "@hoa-mngr/ui";
+import {
+    Button,
+    Card,
+    EmptyState,
+    StatusChip,
+    type StatusChipVariant,
+} from "@hoa-mngr/ui";
 
 import {
     QuestionOutcomeDto,
@@ -16,19 +22,17 @@ import { useVotesControllerGetVotes } from "@/api/generated/votes/votes";
 
 import { StatusBadge } from "../status-badge";
 
-function outcomeVariant(
-    outcome: QuestionOutcomeDtoOutcome,
-): BadgeProps["variant"] {
+function outcomeVariant(outcome: QuestionOutcomeDtoOutcome): StatusChipVariant {
     switch (outcome) {
         case "APPROVED":
-            return "successTint";
+            return "success";
         case "REJECTED":
-            return "destructiveTint";
+            return "destructive";
         case "WINNER":
-            return "primaryTint";
+            return "primary";
         case "NOT_DECIDED":
         default:
-            return "warningTint";
+            return "warning";
     }
 }
 
@@ -116,13 +120,13 @@ function ResultRow({ vote, t }: ResultRowProps) {
                 {vote.questionOutcomes && vote.questionOutcomes.length > 0 && (
                     <div className="mt-2 flex flex-wrap items-center gap-1.5">
                         {vote.questionOutcomes.map((outcome) => (
-                            <Badge
+                            <StatusChip
                                 key={outcome.questionId}
                                 variant={outcomeVariant(outcome.outcome)}
                                 title={outcome.title}
                             >
                                 {outcomeLabel(outcome, t)}
-                            </Badge>
+                            </StatusChip>
                         ))}
                     </div>
                 )}

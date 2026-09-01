@@ -10,6 +10,7 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
+    StatusChip,
 } from "@hoa-mngr/ui";
 import { cn } from "@hoa-mngr/ui/lib/utils";
 
@@ -170,9 +171,13 @@ export function AppSidebar({ className }: { className?: string }) {
                             strokeWidth={2}
                         />
                         {t(item.labelKey, { defaultValue: item.labelKey })}
-                        <span className="bg-primary-tint text-primary text-2xs ml-auto rounded-full px-2 py-px font-bold">
+                        <StatusChip
+                            variant="primary"
+                            dot={false}
+                            className="text-2xs ml-auto px-2 py-px font-bold"
+                        >
                             {t("common:shell.soon")}
-                        </span>
+                        </StatusChip>
                     </div>
                 ))}
             </nav>

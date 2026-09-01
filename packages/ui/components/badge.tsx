@@ -4,7 +4,7 @@ import * as React from "react";
 import { cn } from "../lib/utils";
 
 const badgeVariants = cva(
-    "font-display focus:ring-ring inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-bold transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none",
+    "font-display focus-visible:ring-ring inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-bold transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
     {
         variants: {
             variant: {
@@ -19,16 +19,6 @@ const badgeVariants = cva(
                 warning:
                     "bg-warning text-warning-foreground border-transparent",
                 outline: "text-foreground",
-                primaryTint:
-                    "bg-primary-tint text-primary-tint-foreground border-primary-tint-border",
-                warningTint:
-                    "bg-warning-muted text-warning-tint-foreground border-warning-tint-border",
-                successTint:
-                    "bg-success-muted text-success-tint-foreground border-success-tint-border",
-                destructiveTint:
-                    "bg-destructive-muted text-destructive-muted-foreground border-transparent",
-                neutral:
-                    "bg-muted text-secondary-foreground border-transparent",
             },
         },
         defaultVariants: {

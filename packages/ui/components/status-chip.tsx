@@ -13,23 +13,33 @@ const statusChipVariants = {
 
 export type StatusChipVariant = keyof typeof statusChipVariants;
 
-/** Status pill with a 6px dot in currentColor (no dot for `draft`).
+/** Status/label pill — the only tinted pill in the system. `dot` (default
+ *  true) marks stateful chips; pass dot={false} for label-ish chips such as
+ *  counts and tags. `draft` never shows a dot.
  *  System font by design — Nunito (font-display) is reserved for titles. */
 export function StatusChip({
     variant,
+    dot = true,
+    title,
+    className,
     children,
 }: {
     variant: StatusChipVariant;
+    dot?: boolean;
+    title?: string;
+    className?: string;
     children: React.ReactNode;
 }) {
     return (
         <span
+            title={title}
             className={cn(
                 "inline-flex items-center gap-1.5 rounded-full px-2.5 py-[3px] text-xs font-semibold whitespace-nowrap",
                 statusChipVariants[variant],
+                className,
             )}
         >
-            {variant !== "draft" && (
+            {dot && variant !== "draft" && (
                 <span
                     aria-hidden
                     className="size-1.5 rounded-full bg-current"

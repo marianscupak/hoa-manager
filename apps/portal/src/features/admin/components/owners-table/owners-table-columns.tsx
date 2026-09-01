@@ -1,7 +1,7 @@
 import { TFunction } from "i18next";
 import { MailIcon } from "lucide-react";
 
-import { Badge, StatusChip, type ColumnDef } from "@hoa-mngr/ui";
+import { StatusChip, type ColumnDef } from "@hoa-mngr/ui";
 
 import type { OwnerResponseDto } from "@/api/generated/model";
 
@@ -59,11 +59,11 @@ export const getOwnerColumns = (
             <span className="text-foreground inline-flex min-w-0 items-center gap-2 text-sm font-semibold">
                 <span className="truncate">{row.original.displayName}</span>
                 {row.original.kind !== "PERSON" && (
-                    <Badge variant="neutral">
+                    <StatusChip variant="neutral" dot={false}>
                         {row.original.kind === "LEGAL_ENTITY"
                             ? t("owners.kind.legalEntity")
                             : t("owners.kind.association")}
-                    </Badge>
+                    </StatusChip>
                 )}
             </span>
         ),

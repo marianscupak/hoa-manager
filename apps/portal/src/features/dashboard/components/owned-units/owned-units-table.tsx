@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 
-import { Badge } from "@hoa-mngr/ui";
+import { StatusChip } from "@hoa-mngr/ui";
 
 import type { OwnedUnitResponseDto } from "@/api/generated/model";
 
@@ -34,9 +34,9 @@ export function OwnedUnitsTable({ units }: OwnedUnitsTableProps) {
                             <span className="inline-flex items-center gap-2">
                                 {u.unitNo}
                                 {u.ownerSharePct < 100 && (
-                                    <Badge variant="warningTint">
+                                    <StatusChip variant="warning">
                                         {t("ownedUnits.coOwned")}
-                                    </Badge>
+                                    </StatusChip>
                                 )}
                             </span>
                         </td>

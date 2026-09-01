@@ -3,7 +3,7 @@ import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
-import { Badge, Button } from "@hoa-mngr/ui";
+import { Button, StatusChip } from "@hoa-mngr/ui";
 import { cn } from "@hoa-mngr/ui/lib/utils";
 
 export type WizardStepId =
@@ -189,9 +189,13 @@ export function WizardShell({
                             {title ? ` · ${title}` : ""}
                         </p>
                         {isDraft && (
-                            <Badge variant="neutral" className="shrink-0">
+                            <StatusChip
+                                variant="neutral"
+                                dot={false}
+                                className="shrink-0"
+                            >
                                 {t("voting:wizard.draft")}
-                            </Badge>
+                            </StatusChip>
                         )}
                     </div>
                 </div>

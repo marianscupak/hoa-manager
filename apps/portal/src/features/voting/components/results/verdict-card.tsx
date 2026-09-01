@@ -11,11 +11,11 @@ import {
     type VoteResultsResponseDto,
 } from "@/api/generated/model";
 import {
-    Badge,
-    type BadgeProps,
     Card,
     formatFraction,
     reduceFraction,
+    StatusChip,
+    type StatusChipVariant,
     trimTrailingZeros,
 } from "@hoa-mngr/ui";
 
@@ -52,17 +52,17 @@ interface VerdictCardProps {
     ruleset: SetVoteRulesetResponseDto | null | undefined;
 }
 
-function verdictBadgeVariant(verdict: QuestionVerdict): BadgeProps["variant"] {
+function verdictBadgeVariant(verdict: QuestionVerdict): StatusChipVariant {
     switch (verdict) {
         case "approved":
-            return "successTint";
+            return "success";
         case "rejected":
-            return "destructiveTint";
+            return "destructive";
         case "winner":
-            return "primaryTint";
+            return "primary";
         case "notDecided":
         default:
-            return "warningTint";
+            return "warning";
     }
 }
 
@@ -545,12 +545,12 @@ export function VerdictCard({
                         {question.title}
                     </h2>
                 </div>
-                <Badge
+                <StatusChip
                     variant={verdictBadgeVariant(verdict)}
                     className="text-detail shrink-0 px-3.5 py-1.5"
                 >
                     {verdictLabel(verdict, winningOption, t)}
-                </Badge>
+                </StatusChip>
             </div>
 
             <p className="text-secondary-foreground text-detail mt-2.5 mb-1 leading-[19px]">

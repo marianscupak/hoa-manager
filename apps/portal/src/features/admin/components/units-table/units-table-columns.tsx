@@ -2,7 +2,7 @@ import { TFunction } from "i18next";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import { Link } from "react-router";
 
-import { Button, CellNumeric, WarningPill, type ColumnDef } from "@hoa-mngr/ui";
+import { Button, CellNumeric, StatusChip, type ColumnDef } from "@hoa-mngr/ui";
 
 import type { UnitResponseDto } from "@/api/generated/model";
 
@@ -58,7 +58,9 @@ export function getUnitColumns(
                         {row.original.owners.join(", ")}
                     </span>
                 ) : (
-                    <WarningPill>{t("units.table.noOwner")}</WarningPill>
+                    <StatusChip variant="warning">
+                        {t("units.table.noOwner")}
+                    </StatusChip>
                 ),
         },
         {

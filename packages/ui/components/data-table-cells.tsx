@@ -39,12 +39,3 @@ export function CellNumeric({
         </div>
     );
 }
-
-/** Amber inline warning, e.g. "No owner assigned". */
-export function WarningPill({ children }: { children: React.ReactNode }) {
-    return (
-        <span className="bg-warning-muted text-warning-tint-foreground inline-flex items-center rounded-full px-2.5 py-[3px] text-xs font-semibold whitespace-nowrap">
-            {children}
-        </span>
-    );
-}

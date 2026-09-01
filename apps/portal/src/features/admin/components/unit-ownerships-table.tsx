@@ -1,7 +1,6 @@
 import { TFunction } from "i18next";
 
 import {
-    Badge,
     CellNumeric,
     DataTable,
     StatusChip,
@@ -27,7 +26,9 @@ export function getUnitOwnershipColumns(
                             .join(", ")}
                     </span>
                     {row.original.partyType === "SJM" && (
-                        <Badge variant="primaryTint">SJM</Badge>
+                        <StatusChip variant="primary" dot={false}>
+                            SJM
+                        </StatusChip>
                     )}
                 </span>
             ),

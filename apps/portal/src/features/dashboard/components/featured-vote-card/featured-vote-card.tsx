@@ -5,7 +5,7 @@ import { Vote } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
-import { Badge, Button, Card, CardContent } from "@hoa-mngr/ui";
+import { Button, Card, CardContent, StatusChip } from "@hoa-mngr/ui";
 
 import {
     useVotesControllerGetVoteTurnout,
@@ -173,7 +173,9 @@ export function FeaturedVoteCard() {
                     <h2 className="font-display text-title leading-6 font-extrabold tracking-tight">
                         {featuredVote.title}
                     </h2>
-                    {timing && <Badge variant="warningTint">{timing}</Badge>}
+                    {timing && (
+                        <StatusChip variant="warning">{timing}</StatusChip>
+                    )}
                 </div>
                 {showTurnoutLine && turnoutQuery.data && (
                     <p className="text-secondary-foreground mt-1 text-sm">

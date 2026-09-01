@@ -5,7 +5,7 @@ import {
 import { GripVertical, Pencil, Settings2, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Badge, Button } from "@hoa-mngr/ui";
+import { Button, StatusChip } from "@hoa-mngr/ui";
 
 interface QuestionHeaderProps {
     index: number;
@@ -50,10 +50,10 @@ export function QuestionHeader({
 
             <div className="flex items-center gap-1">
                 {hasOverride && (
-                    <Badge variant="primaryTint">
+                    <StatusChip variant="primary" dot={false}>
                         <Settings2 className="h-3.5 w-3.5" />
                         {t("voting:create.steps.questions.override.badge")}
-                    </Badge>
+                    </StatusChip>
                 )}
                 <Button
                     variant="ghost"

@@ -3,7 +3,7 @@ import { AlertTriangle, Check, Send, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
-import { Badge, Button, formatFraction } from "@hoa-mngr/ui";
+import { Button, StatusChip, formatFraction } from "@hoa-mngr/ui";
 import { cn } from "@hoa-mngr/ui/lib/utils";
 
 import { VoteDetailResponseDto } from "@/api/generated/model";
@@ -158,9 +158,9 @@ function RulesetSummary({ vote }: { vote: VoteDetailResponseDto }) {
     return (
         <div className="rounded-card border-hairline bg-card border p-5">
             <div className="mb-3 flex items-center gap-2">
-                <Badge variant="neutral">
+                <StatusChip variant="neutral" dot={false}>
                     {t(`voting:create.mode.${vote.mode}.title`)}
-                </Badge>
+                </StatusChip>
             </div>
             <div className="space-y-1.5 text-sm">
                 {vote.mode === "ASSEMBLY_RECORD" && ruleset.quorum && (

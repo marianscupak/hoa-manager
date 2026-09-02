@@ -7,15 +7,18 @@
             "outputs": ["dist/**"]
         },
         "typecheck": {
-            "dependsOn": ["^typecheck"]
+            "dependsOn": ["^typecheck", "^build"]
         },
         "lint": {},
-        "test": {},
+        "test": {
+            "dependsOn": ["^build"]
+        },
         "format:check": {},
         "generate": {
             "dependsOn": ["^generate"]
         },
         "dev": {
+            "dependsOn": ["^build"],
             "cache": false,
             "persistent": true
         }

@@ -5,6 +5,8 @@ import { ConfigService } from '@nestjs/config';
 import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { addHours } from 'date-fns';
 
+import { renderOwnerInviteEmail } from '@hoa-mngr/emails';
+
 import {
   EMAIL_SENDER,
   type EmailSender,
@@ -123,11 +125,12 @@ export class SendOwnerInviteHandler
     const appUrl = this.configService.get<string>('FRONTEND_URL');
     const inviteLink = `${appUrl}/invites/owner?token=${rawToken}`;
 
-    await this.emailSender.sendOwnerInvite(
-      emailNormalized,
-      inviteLink,
+    const email = await renderOwnerInviteEmail({
       tenantName,
-    );
+      inviteLink,
+      expiresInHours: INVITE_TTL_HOURS,
+    });
+    await this.emailSender.send({ to: emailNormalized, ...email });
 
     return { success: true };
   }

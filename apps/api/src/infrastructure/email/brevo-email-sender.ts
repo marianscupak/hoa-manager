@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
 import { ConfigService } from '@/infrastructure/config/config.service';
-import { EmailSender } from '@/infrastructure/email/email-sender.port';
-import { buildOwnerInviteEmail } from '@/infrastructure/email/owner-invite-email';
+import {
+  EmailSender,
+  OutgoingEmail,
+} from '@/infrastructure/email/email-sender.port';
 
 const BREVO_SEND_URL = 'https://api.brevo.com/v3/smtp/email';
 const DEFAULT_FROM_NAME = 'HOA Manager';
@@ -11,16 +13,7 @@ const DEFAULT_FROM_NAME = 'HOA Manager';
 export class BrevoEmailSender implements EmailSender {
   constructor(private readonly configService: ConfigService) {}
 
-  async sendOwnerInvite(
-    to: string,
-    inviteLink: string,
-    tenantName: string,
-  ): Promise<void> {
-    const { subject, html, text } = buildOwnerInviteEmail(
-      inviteLink,
-      tenantName,
-    );
-
+  async send(message: OutgoingEmail): Promise<void> {
     const response = await fetch(BREVO_SEND_URL, {
       method: 'POST',
       headers: {
@@ -33,10 +26,10 @@ export class BrevoEmailSender implements EmailSender {
           name: this.configService.get('EMAIL_FROM_NAME') ?? DEFAULT_FROM_NAME,
           email: this.configService.get('EMAIL_FROM'),
         },
-        to: [{ email: to }],
-        subject,
-        htmlContent: html,
-        textContent: text,
+        to: [{ email: message.to }],
+        subject: message.subject,
+        htmlContent: message.html,
+        textContent: message.text,
       }),
     });
 

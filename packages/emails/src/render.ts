@@ -19,7 +19,12 @@ export async function renderTemplate<P extends object>(
     const element = createElement(template.Component, props);
     const [html, text] = await Promise.all([
         render(element),
-        render(element, { plainText: true }),
+        render(element, {
+            plainText: true,
+            htmlToTextOptions: {
+                selectors: [{ selector: "h1", options: { uppercase: false } }],
+            },
+        }),
     ]);
     return { subject: template.subject(props), html, text };
 }

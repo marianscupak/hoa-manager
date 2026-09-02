@@ -5,6 +5,7 @@ node_modules
 **/node_modules
 **/dist
 **/.turbo
+**/.react-email
 docs
 *.log
 .env

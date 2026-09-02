@@ -1,4 +1,4 @@
-import { Button } from "@react-email/components";
+import { Button, Text } from "@react-email/components";
 import type { CSSProperties, ReactNode } from "react";
 
 import { colors, fonts, radii } from "../theme";
@@ -24,8 +24,10 @@ export interface EmailButtonProps {
 
 export function EmailButton({ href, children, style }: EmailButtonProps) {
     return (
-        <Button href={href} style={{ ...base, ...style }}>
-            {children}
-        </Button>
+        <Text style={{ margin: "24px 0" }}>
+            <Button href={href} style={{ ...base, ...style }}>
+                {children}
+            </Button>
+        </Text>
     );
 }

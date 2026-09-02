@@ -1,10 +1,11 @@
 import {
     Body,
+    Column,
     Container,
-    Font,
     Head,
     Html,
     Preview,
+    Row,
     Section,
     Text,
 } from "@react-email/components";
@@ -47,6 +48,8 @@ const styles = {
         backgroundColor: colors.card,
         border: `1px solid ${colors.border}`,
         borderRadius: radii.card,
+    },
+    cardCell: {
         padding: layout.cardPadding,
     },
     footer: {
@@ -68,19 +71,17 @@ export function EmailLayout({
             <Head>
                 <meta name="color-scheme" content="light" />
                 <meta name="supported-color-schemes" content="light" />
-                <Font
-                    fontFamily="Nunito"
-                    fallbackFontFamily={["Helvetica", "Arial", "sans-serif"]}
-                    webFont={{ url: NUNITO_700_WOFF2, format: "woff2" }}
-                    fontWeight={700}
-                    fontStyle="normal"
-                />
+                <style>{`@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 700; mso-font-alt: 'Helvetica'; src: url(${NUNITO_700_WOFF2}) format('woff2'); }`}</style>
             </Head>
             <Body style={styles.body}>
                 <Preview>{preview}</Preview>
                 <Container style={styles.container}>
                     <Text style={styles.wordmark}>{PRODUCT_NAME}</Text>
-                    <Section style={styles.card}>{children}</Section>
+                    <Section style={styles.card}>
+                        <Row>
+                            <Column style={styles.cardCell}>{children}</Column>
+                        </Row>
+                    </Section>
                     {footerNote ? (
                         <Text style={styles.footer}>{footerNote}</Text>
                     ) : null}

@@ -19,6 +19,10 @@ describe("EmailLayout", () => {
         );
         expect(html).toContain("HOA Manager");
         expect(html).toContain("Obsah zprávy");
+        expect(html).toContain("@font-face");
+        expect(html).toContain("Nunito");
+        expect(html).not.toContain("* {");
+        expect(html).toMatch(/<td[^>]*style="[^"]*padding:32px/);
     });
 
     it("shows the footer note when given", async () => {

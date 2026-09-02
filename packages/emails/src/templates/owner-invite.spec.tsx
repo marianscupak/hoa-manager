@@ -19,10 +19,23 @@ describe("renderOwnerInviteEmail", () => {
         expect(html).toContain("Přijmout pozvánku");
     });
 
+    it("wraps the button in a block with the vertical margin", async () => {
+        const { html } = await renderOwnerInviteEmail(PROPS);
+        expect(html).toMatch(
+            /<p[^>]*style="[^"]*margin:24px 0[^"]*"[^>]*>\s*<a/,
+        );
+    });
+
     it("includes the invite URL and expiry in the plain-text body", async () => {
         const { text } = await renderOwnerInviteEmail(PROPS);
         expect(text).toContain(LINK);
         expect(text).toContain("72 hodin");
+    });
+
+    it("keeps the plain-text heading in normal case", async () => {
+        const { text } = await renderOwnerInviteEmail(PROPS);
+        expect(text).toContain("Pozvánka do portálu SVJ Květná 12");
+        expect(text).not.toContain("POZVÁNKA");
     });
 
     it("keeps the preheader out of the plain-text body", async () => {

@@ -22,7 +22,13 @@ describe('parseStudySeedArgs', () => {
 
   it('defaults the participant name and honours --force', () => {
     expect(
-      parseStudySeedArgs(['--participant', 'P4', '--email', 'a@b.cz', '--force']),
+      parseStudySeedArgs([
+        '--participant',
+        'P4',
+        '--email',
+        'a@b.cz',
+        '--force',
+      ]),
     ).toEqual({
       mode: 'seed',
       participantId: 'P4',
@@ -39,15 +45,22 @@ describe('parseStudySeedArgs', () => {
     });
   });
 
+  it('ignores a leading "--" separator forwarded by pnpm', () => {
+    expect(parseStudySeedArgs(['--', '--open', 'P2'])).toEqual({
+      mode: 'open',
+      participantId: 'P2',
+    });
+  });
+
   it('parses cleanup with and without the participant email', () => {
     expect(parseStudySeedArgs(['--cleanup', 'P5'])).toEqual({
       mode: 'cleanup',
       participantId: 'P5',
       email: null,
     });
-    expect(parseStudySeedArgs(['--cleanup', 'P5', '--email', 'X@Y.cz'])).toEqual(
-      { mode: 'cleanup', participantId: 'P5', email: 'x@y.cz' },
-    );
+    expect(
+      parseStudySeedArgs(['--cleanup', 'P5', '--email', 'X@Y.cz']),
+    ).toEqual({ mode: 'cleanup', participantId: 'P5', email: 'x@y.cz' });
   });
 
   it('parses --help', () => {

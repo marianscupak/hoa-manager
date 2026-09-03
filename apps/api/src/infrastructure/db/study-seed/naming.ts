@@ -35,6 +35,11 @@ export function studyEmail(id: string, slug: string): string {
   return `${id.toLowerCase()}.${slug}@${STUDY_EMAIL_DOMAIN}`;
 }
 
+/** True for any fictional/persona account's address; false for a real email. */
+export function isStudyEmail(email: string): boolean {
+  return email.toLowerCase().endsWith('@' + STUDY_EMAIL_DOMAIN);
+}
+
 export function personaEmail(id: string): string {
   return studyEmail(id, 'vybor');
 }

@@ -11,6 +11,7 @@
     "db:generate": "dotenv -e .env.local -- drizzle-kit generate --config=src/infrastructure/db/drizzle.config.ts",
     "db:migrate": "dotenv -e .env.local -- drizzle-kit migrate --config=src/infrastructure/db/drizzle.config.ts",
     "db:seed": "dotenv -e .env.local -- ts-node -r tsconfig-paths/register src/infrastructure/db/seed.ts",
+    "db:study-seed": "dotenv -e .env.local -- ts-node -r tsconfig-paths/register src/infrastructure/db/study-seed/index.ts",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "dev": "nest start --watch",
     "start": "nest start",

@@ -1,5 +1,6 @@
 import {
   generatePassword,
+  isStudyEmail,
   normalizeParticipantId,
   participantTag,
   personaEmail,
@@ -43,9 +44,17 @@ describe('naming', () => {
     expect('p10.milan@study.hoa.local'.startsWith('p1.')).toBe(false);
   });
 
+  it('recognizes study addresses and rejects real ones', () => {
+    expect(isStudyEmail('p3.milan@study.hoa.local')).toBe(true);
+    expect(isStudyEmail('P3.MILAN@STUDY.HOA.LOCAL')).toBe(true);
+    expect(isStudyEmail('jan.novak@gmail.com')).toBe(false);
+  });
+
   it('generates a typeable password without ambiguous characters', () => {
     const pw = generatePassword();
-    expect(pw).toMatch(/^Svj-[a-km-np-zA-HJ-NP-Z2-9]{4}-[a-km-np-zA-HJ-NP-Z2-9]{4}$/);
+    expect(pw).toMatch(
+      /^Svj-[a-km-np-zA-HJ-NP-Z2-9]{4}-[a-km-np-zA-HJ-NP-Z2-9]{4}$/,
+    );
     expect(pw).not.toMatch(/[0O1lI]/);
   });
 

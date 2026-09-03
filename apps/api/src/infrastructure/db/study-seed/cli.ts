@@ -37,8 +37,9 @@ function parseEmail(raw: string): string {
 }
 
 export function parseStudySeedArgs(argv: string[]): StudySeedArgs {
+  const args = argv[0] === '--' ? argv.slice(1) : argv;
   const { values } = parseArgs({
-    args: argv,
+    args,
     strict: true,
     options: {
       participant: { type: 'string' },

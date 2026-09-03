@@ -67,9 +67,9 @@ describe.each(PLANS.map((p) => [p.key, p] as const))(
           );
           expect(party).toBeDefined();
           expect(party!.partyType).toBe(OwnershipPartyType.SOLE);
-          expect(party!.shareNumerator / party!.shareDenominator).toBeGreaterThan(
-            0.5,
-          );
+          expect(
+            party!.shareNumerator / party!.shareDenominator,
+          ).toBeGreaterThan(0.5);
           expect(owners.get(b.ownerKey)!.hasAccount).toBe(true);
           expect(owners.get(b.ownerKey)!.kind).toBe(OwnerKind.PERSON);
         }
@@ -78,10 +78,25 @@ describe.each(PLANS.map((p) => [p.key, p] as const))(
       }
     });
 
+    it('keeps every closed vote open for at least the 15-day per rollam window', () => {
+      for (const vote of plan.votes) {
+        if (vote.state.kind !== 'CLOSED') continue;
+        expect(
+          vote.state.openedDaysAgo - vote.state.closedDaysAgo,
+        ).toBeGreaterThanOrEqual(15);
+      }
+    });
+
     it('has unique owner keys, unit numbers and vote keys', () => {
-      expect(new Set(plan.owners.map((o) => o.key)).size).toBe(plan.owners.length);
-      expect(new Set(plan.units.map((u) => u.unitNo)).size).toBe(plan.units.length);
-      expect(new Set(plan.votes.map((v) => v.key)).size).toBe(plan.votes.length);
+      expect(new Set(plan.owners.map((o) => o.key)).size).toBe(
+        plan.owners.length,
+      );
+      expect(new Set(plan.units.map((u) => u.unitNo)).size).toBe(
+        plan.units.length,
+      );
+      expect(new Set(plan.votes.map((v) => v.key)).size).toBe(
+        plan.votes.length,
+      );
     });
   },
 );
@@ -140,7 +155,9 @@ describe('JASMINOVA_3 (tenant C)', () => {
 
   it('never lets the participant vote in seeded votes', () => {
     for (const vote of JASMINOVA_3.votes) {
-      expect(vote.ballots.some((b) => b.ownerKey === 'participant')).toBe(false);
+      expect(vote.ballots.some((b) => b.ownerKey === 'participant')).toBe(
+        false,
+      );
     }
   });
 });

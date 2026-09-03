@@ -193,7 +193,10 @@ export const JASMINOVA_3: BuildingPlan = {
     person('lenka', 'Lenka Marešová'),
     person('jiri', 'Jiří Kučera'),
     person('dana', 'Dana Kučerová'),
-    person('participant', 'Účastník', { hasAccount: false, isParticipant: true }),
+    person('participant', 'Účastník', {
+      hasAccount: false,
+      isParticipant: true,
+    }),
     person('hana', 'Hana Pokorná'),
     {
       key: 'delta',
@@ -220,7 +223,7 @@ export const JASMINOVA_3: BuildingPlan = {
         'Souhlasíte s opravou výtahu podle nabídky firmy Výtahy Novák s.r.o. za 640 000 Kč?',
       state: {
         kind: 'OPEN_IN_PHASE_2',
-        opensInDays: 1,
+        opensInDays: 7,
         windowDays: 16,
         openedDaysAgo: 2,
       },
@@ -236,7 +239,7 @@ export const JASMINOVA_3: BuildingPlan = {
         'Výbor předkládá ke schválení nový domovní řád, který upravuje noční klid, užívání společných prostor a pravidla pro chov zvířat.',
       questionTitle:
         'Schvalujete nový domovní řád ve znění předloženém výborem?',
-      state: { kind: 'SCHEDULED', opensInDays: 3, windowDays: 17 },
+      state: { kind: 'SCHEDULED', opensInDays: 10, windowDays: 17 },
       ballots: [],
     },
     {

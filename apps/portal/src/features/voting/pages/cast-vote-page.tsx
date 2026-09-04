@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import { TFunction } from "i18next";
 import {
     Check,
@@ -16,18 +17,19 @@ import { useParams, useNavigate } from "react-router";
 import {
     Button,
     Card,
+    ConfirmDialog,
     ErrorState,
     formatPercent,
     PageLoading,
 } from "@hoa-mngr/ui";
 import { cn } from "@hoa-mngr/ui/lib/utils";
 
+import { showApiError } from "@/api/error-utils";
 import {
     useVotesControllerGetVoteDetail,
     useVotesControllerGetVoterStatus,
 } from "@/api/generated/votes/votes";
 
-import { VoteSuccessModal } from "../components/cast-vote/vote-success-modal";
 import {
     useSubmitBallot,
     type SubmitBallotBody,
@@ -88,7 +90,7 @@ export function CastVotePage() {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [step, setStep] = useState<CastVoteStep>("questions");
     const [answers, setAnswers] = useState<BallotAnswers>({});
-    const [showSuccess, setShowSuccess] = useState(false);
+    const [confirmOpen, setConfirmOpen] = useState(false);
     const [submittedAt, setSubmittedAt] = useState<string | null>(null);
 
     // Units this member still has a ballot to cast for — their own ready
@@ -166,8 +168,12 @@ export function CastVotePage() {
 
         submitMutation.mutate(ballotData, {
             onSuccess: (data) => {
+                setConfirmOpen(false);
                 setSubmittedAt(data.submittedAt);
-                setShowSuccess(true);
+            },
+            onError: (error) => {
+                setConfirmOpen(false);
+                showApiError(error);
             },
         });
     }, [votableUnits, questions, answers, submitMutation]);
@@ -176,6 +182,37 @@ export function CastVotePage() {
         if (!statusQuery.data) return false;
         return statusQuery.data.owningUnits.some((u) => u.status === "VOTED");
     }, [statusQuery.data]);
+
+    // ── Submitted ────────────────────────────────────────
+    // Terminal state, deliberately above every other guard: submitting
+    // invalidates the voter status, and the refetch empties `votableUnits`.
+    if (submittedAt) {
+        return (
+            <div className="mx-auto flex max-w-lg flex-col items-center justify-center py-20 text-center">
+                <div className="bg-success-muted mb-6 flex h-20 w-20 items-center justify-center rounded-full">
+                    <ShieldCheck className="text-success-tint-foreground h-10 w-10" />
+                </div>
+                <h2 className="font-display text-foreground mb-2 text-2xl font-extrabold tracking-tight">
+                    {t("castVote.success.title")}
+                </h2>
+                <p className="text-muted-foreground mb-6">
+                    {t("castVote.success.subtitle")}
+                </p>
+                <div className="border-hairline rounded-panel bg-muted/50 mb-8 flex w-full items-center justify-between border px-4 py-3">
+                    <span className="text-secondary-foreground text-sm font-medium">
+                        {t("castVote.success.timestamp")}
+                    </span>
+                    <span className="text-foreground text-sm font-bold">
+                        {format(new Date(submittedAt), "d. M. yyyy HH:mm")}
+                    </span>
+                </div>
+                <Button onClick={() => navigate(`/voting/${voteId}`)}>
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    {t("castVote.backToDetail")}
+                </Button>
+            </div>
+        );
+    }
 
     // ── Loading / Error ──────────────────────────────────
     if (voteQuery.isLoading || statusQuery.isLoading) {
@@ -326,7 +363,7 @@ export function CastVotePage() {
                         className="flex-1 font-semibold"
                         size="lg"
                         disabled={submitMutation.isPending}
-                        onClick={handleSubmit}
+                        onClick={() => setConfirmOpen(true)}
                     >
                         {submitMutation.isPending ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -337,10 +374,19 @@ export function CastVotePage() {
                     </Button>
                 </div>
 
-                <VoteSuccessModal
-                    open={showSuccess}
-                    onClose={() => navigate("/voting")}
-                    submittedAt={submittedAt}
+                <ConfirmDialog
+                    open={confirmOpen}
+                    onOpenChange={setConfirmOpen}
+                    title={t("castVote.confirmSubmit.title")}
+                    description={t("castVote.confirmSubmit.description", {
+                        count: votableUnits.length,
+                    })}
+                    confirmLabel={t("castVote.confirmSubmit.confirm")}
+                    confirmingLabel={t("castVote.confirmSubmit.confirming")}
+                    cancelLabel={t("common:cancel")}
+                    confirming={submitMutation.isPending}
+                    confirmVariant="default"
+                    onConfirm={handleSubmit}
                 />
             </div>
         );

@@ -603,16 +603,25 @@ export const voting = {
             editAnswers: "Edit Answers",
             submitVote: "Submit Vote",
         },
+        confirmSubmit: {
+            title: "Submit your vote?",
+            description_one:
+                "Your ballot for {{count}} unit will be submitted. Ballots cannot be changed afterwards.",
+            description_other:
+                "Your ballots for {{count}} units will be submitted. Ballots cannot be changed afterwards.",
+            confirm: "Submit vote",
+            confirming: "Submitting…",
+        },
         success: {
-            title: "Vote Recorded!",
-            subtitle: "Your vote has been successfully recorded.",
-            timestamp: "Timestamp",
-            backToDashboard: "Back to dashboard",
+            title: "Vote recorded",
+            subtitle:
+                "Your ballot has been stored. You can follow the progress in the vote detail.",
+            timestamp: "Recorded at",
         },
         alreadyVoted: {
-            title: "Vote Successfully Recorded",
+            title: "You have already voted",
             description:
-                "Your ballot has been successfully stored in our system. You can follow the progress in the vote detail.",
+                "Your ballot for this vote is recorded. You can follow the progress in the vote detail.",
         },
         noUnits: {
             title: "No Units to Vote",

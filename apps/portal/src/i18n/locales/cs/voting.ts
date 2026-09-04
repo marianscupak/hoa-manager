@@ -605,16 +605,27 @@ export const voting = {
             editAnswers: "Upravit odpovědi",
             submitVote: "Odeslat hlas",
         },
+        confirmSubmit: {
+            title: "Odeslat hlas?",
+            description_one:
+                "Odešlete hlas za {{count}} jednotku. Odeslaný hlas už nelze změnit.",
+            description_few:
+                "Odešlete hlasy za {{count}} jednotky. Odeslané hlasy už nelze změnit.",
+            description_other:
+                "Odešlete hlasy za {{count}} jednotek. Odeslané hlasy už nelze změnit.",
+            confirm: "Odeslat hlas",
+            confirming: "Odesílám…",
+        },
         success: {
-            title: "Hlas byl zaznamenán!",
-            subtitle: "Váš hlas byl úspěšně zaznamenán v systému.",
+            title: "Hlas byl zaznamenán",
+            subtitle:
+                "Váš hlas byl uložen. Průběh můžete sledovat v detailu hlasování.",
             timestamp: "Čas zaznamenání",
-            backToDashboard: "Zpět na přehled",
         },
         alreadyVoted: {
-            title: "Hlas byl úspěšně zaznamenán",
+            title: "V tomto hlasování jste již hlasovali",
             description:
-                "Váš hlas pro toto hlasování byl již v systému uložen. Průběh můžete sledovat v detailu hlasování.",
+                "Váš hlas je zaznamenán. Průběh můžete sledovat v detailu hlasování.",
         },
         noUnits: {
             title: "Žádné jednotky k hlasování",

@@ -72,6 +72,8 @@ export default {
             cancel: "Zrušit",
             success: "Vlastník byl úspěšně odstraněn",
             error: "Nepodařilo se odstranit vlastníka",
+            blockedHint:
+                "Vlastník má záznamy o vlastnictví jednotek a nelze ho odstranit.",
         },
     },
     units: {
@@ -123,7 +125,24 @@ export default {
                 title: "Historie vlastnictví",
                 owner: "Vlastník",
                 share: "Podíl",
+                period: "Období",
+                status: "Stav",
+                from: "od",
                 active: "Aktivní",
+                scheduled: "Naplánováno",
+                closed: "Ukončeno",
+                scheduledBanner:
+                    "Změna vlastnictví je naplánována od {{date}}.",
+                cancelScheduled: "Zrušit naplánovanou změnu",
+                editBlockedHint: "Nejdříve zrušte naplánovanou změnu.",
+                cancelDialog: {
+                    title: "Zrušit naplánovanou změnu",
+                    description:
+                        "Naplánovaná změna vlastnictví od {{date}} bude zrušena a současné vlastnictví zůstane v platnosti.",
+                    confirm: "Zrušit naplánovanou změnu",
+                    cancel: "Zpět",
+                    success: "Naplánovaná změna vlastnictví byla zrušena",
+                },
                 edit: "Upravit vlastnictví",
                 empty: "Nenalezeny žádné záznamy o vlastnictví.",
                 count_one: "{{count}} záznam",
@@ -136,6 +155,12 @@ export default {
             description:
                 "Přiřaďte vlastníky a jejich podíly pro tuto jednotku. Celkový podíl musí být přesně 1/1.",
             addOwner: "Přidat vlastníka",
+            effectiveFromLabel: "Platné od",
+            effectiveFromHint:
+                "Datum, od kterého nové vlastnictví platí. Může být i v budoucnu.",
+            effectiveFromRequired: "Zadejte datum",
+            effectiveFromTooEarly:
+                "Datum nemůže předcházet začátku současného vlastnictví.",
             partyType: {
                 label: "Typ vlastnictví",
                 sole: "Výhradní vlastnictví",

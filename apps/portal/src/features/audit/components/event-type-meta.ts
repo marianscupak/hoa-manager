@@ -17,6 +17,7 @@ import {
     Settings,
     ShieldCheck,
     Trash2,
+    Undo2,
     UserCheck,
     UserCog,
     UserMinus,
@@ -84,6 +85,10 @@ const META: Record<string, EventTypeMeta> = {
     "CORE.OWNER_DELETED": { icon: UserMinus, dotColor: "bg-destructive-bar" },
     "CORE.UNIT_OWNERSHIP_REPLACED": {
         icon: Repeat,
+        dotColor: "bg-faint",
+    },
+    "CORE.UNIT_OWNERSHIP_TRANSFER_CANCELLED": {
+        icon: Undo2,
         dotColor: "bg-faint",
     },
     "CORE.OWNER_EMAIL_ADDED": { icon: MailPlus, dotColor: "bg-faint" },

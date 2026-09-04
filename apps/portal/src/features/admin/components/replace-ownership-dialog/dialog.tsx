@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
+import { format, startOfDay } from "date-fns";
 import { PlusIcon } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -14,6 +15,7 @@ import {
     DialogHeader,
     DialogTitle,
     Form,
+    FormDatePicker,
     formatFraction,
     fractionEqualsOne,
     sumFractions,
@@ -25,6 +27,7 @@ import { showApiError } from "@/api/error-utils";
 import type { UnitOwnershipResponseDto } from "@/api/generated/model";
 import { useOwnerControllerGetOwners } from "@/api/generated/property-owners/property-owners";
 import {
+    getUnitControllerGetOwnershipHistoryQueryKey,
     getUnitControllerGetUnitDetailQueryKey,
     getUnitControllerGetUnitsQueryKey,
     useUnitControllerReplaceUnitOwnership,
@@ -39,6 +42,8 @@ interface ReplaceOwnershipDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     currentOwnerships?: UnitOwnershipResponseDto[];
+    /** Start of the latest ownership period; earlier dates are refused. */
+    minEffectiveFrom?: Date;
     onSuccess?: () => void;
 }
 
@@ -47,10 +52,14 @@ export function ReplaceOwnershipDialog({
     open,
     onOpenChange,
     currentOwnerships,
+    minEffectiveFrom,
     onSuccess,
 }: ReplaceOwnershipDialogProps) {
     const { t } = useTranslation(["admin"]);
-    const schema = useMemo(() => replaceOwnershipSchema(t), [t]);
+    const schema = useMemo(
+        () => replaceOwnershipSchema(t, minEffectiveFrom),
+        [t, minEffectiveFrom],
+    );
     const queryClient = useQueryClient();
 
     const { data: owners } = useOwnerControllerGetOwners();
@@ -59,6 +68,7 @@ export function ReplaceOwnershipDialog({
     const form = useForm<ReplaceOwnershipValues>({
         resolver: zodResolver(schema),
         defaultValues: {
+            effectiveFrom: startOfDay(new Date()),
             ownerships: initialRows(currentOwnerships),
         },
     });
@@ -69,7 +79,11 @@ export function ReplaceOwnershipDialog({
     });
 
     useEffect(() => {
-        if (open) form.reset({ ownerships: initialRows(currentOwnerships) });
+        if (open)
+            form.reset({
+                effectiveFrom: startOfDay(new Date()),
+                ownerships: initialRows(currentOwnerships),
+            });
     }, [open, currentOwnerships, form]);
 
     const onSubmit = (values: ReplaceOwnershipValues) => {
@@ -77,6 +91,7 @@ export function ReplaceOwnershipDialog({
             {
                 id: unitId,
                 data: {
+                    effectiveFrom: format(values.effectiveFrom, "yyyy-MM-dd"),
                     ownerships: values.ownerships.map((o) => ({
                         partyType: o.partyType,
                         shareNumerator: (o.share as Fraction).num,
@@ -94,6 +109,12 @@ export function ReplaceOwnershipDialog({
                     });
                     queryClient.invalidateQueries({
                         queryKey: getUnitControllerGetUnitsQueryKey(),
+                    });
+                    queryClient.invalidateQueries({
+                        queryKey:
+                            getUnitControllerGetOwnershipHistoryQueryKey(
+                                unitId,
+                            ),
                     });
                     onOpenChange(false);
                     onSuccess?.();
@@ -132,6 +153,18 @@ export function ReplaceOwnershipDialog({
                         onSubmit={form.handleSubmit(onSubmit)}
                         className="space-y-6"
                     >
+                        <FormDatePicker
+                            name="effectiveFrom"
+                            label={t(
+                                "units.ownershipEditor.effectiveFromLabel",
+                            )}
+                            description={t(
+                                "units.ownershipEditor.effectiveFromHint",
+                            )}
+                            min={minEffectiveFrom}
+                            className="max-w-xs"
+                        />
+
                         <div className="space-y-4">
                             {fields.map((field, index) => (
                                 <ReplaceOwnershipFieldItem

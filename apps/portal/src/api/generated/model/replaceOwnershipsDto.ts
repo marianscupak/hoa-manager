@@ -9,6 +9,11 @@ import type { ReplaceOwnershipsDtoOwnershipsItem } from "./replaceOwnershipsDtoO
 
 export interface ReplaceOwnershipsDto {
     /**
+     * Calendar date (association time zone) from which the new ownership applies. Past, today or future.
+     * @pattern ^\d{4}-\d{2}-\d{2}$
+     */
+    effectiveFrom: string;
+    /**
      * List of ownerships to replace the current active ones
      * @minItems 1
      */

@@ -27,6 +27,8 @@ export const audit = {
         OWNER_CREATED: "Vlastník přidán",
         OWNER_DELETED: "Vlastník odstraněn",
         UNIT_OWNERSHIP_REPLACED: "Vlastnictví jednotky změněno",
+        UNIT_OWNERSHIP_TRANSFER_CANCELLED:
+            "Naplánovaná změna vlastnictví zrušena",
         OWNER_EMAIL_ADDED: "Vlastníkovi přidán e-mail",
         OWNER_USER_LINKED: "Vlastník propojen s uživatelem",
         OWNER_INVITE_SENT: "Pozvánka odeslána",

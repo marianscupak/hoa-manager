@@ -1758,6 +1758,76 @@
         ]
       }
     },
+    "/api/units/{id}/ownership/history": {
+      "get": {
+        "operationId": "UnitController_getOwnershipHistory",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Every ownership period of the unit (scheduled, active, closed), newest first",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitOwnershipHistoryResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Validation or Domain logic error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Property Units"
+        ]
+      }
+    },
     "/api/units/{id}": {
       "get": {
         "operationId": "UnitController_getUnitDetail",
@@ -1986,6 +2056,69 @@
         "responses": {
           "200": {
             "description": "Ownership for the unit replaced successfully"
+          },
+          "400": {
+            "description": "Bad Request - Validation or Domain logic error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Property Units"
+        ]
+      }
+    },
+    "/api/units/{id}/ownership/scheduled": {
+      "delete": {
+        "operationId": "UnitController_cancelScheduledOwnershipTransfer",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Scheduled ownership transfer cancelled; the current ownership stays in force"
           },
           "400": {
             "description": "Bad Request - Validation or Domain logic error",
@@ -3403,6 +3536,10 @@
             "format": "date-time",
             "description": "When the current invite was created, null if no invite"
           },
+          "hasOwnershipRecords": {
+            "type": "boolean",
+            "description": "True when the owner appears in any ownership period; such owners cannot be deleted"
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string"
@@ -3421,6 +3558,7 @@
           "kind",
           "inviteStatus",
           "inviteCreatedAt",
+          "hasOwnershipRecords",
           "createdAt",
           "updatedAt"
         ]
@@ -3741,6 +3879,63 @@
           "members"
         ]
       },
+      "UnitOwnershipPeriodResponseDto": {
+        "type": "object",
+        "properties": {
+          "validFrom": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "validTo": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "SCHEDULED",
+              "ACTIVE",
+              "CLOSED"
+            ]
+          },
+          "parties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnitOwnershipResponseDto"
+            }
+          }
+        },
+        "required": [
+          "validFrom",
+          "validTo",
+          "status",
+          "parties"
+        ]
+      },
+      "UnitOwnershipHistoryResponseDto": {
+        "type": "object",
+        "properties": {
+          "unitId": {
+            "type": "string"
+          },
+          "unitNo": {
+            "type": "string"
+          },
+          "periods": {
+            "description": "Ownership periods, newest first",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnitOwnershipPeriodResponseDto"
+            }
+          }
+        },
+        "required": [
+          "unitId",
+          "unitNo",
+          "periods"
+        ]
+      },
       "UnitDetailResponseDto": {
         "type": "object",
         "properties": {
@@ -3826,6 +4021,11 @@
       "ReplaceOwnershipsDto": {
         "type": "object",
         "properties": {
+          "effectiveFrom": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "description": "Calendar date (association time zone) from which the new ownership applies. Past, today or future."
+          },
           "ownerships": {
             "minItems": 1,
             "type": "array",
@@ -3871,6 +4071,7 @@
           }
         },
         "required": [
+          "effectiveFrom",
           "ownerships"
         ]
       },

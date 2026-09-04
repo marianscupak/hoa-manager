@@ -37,6 +37,14 @@ export default {
         "An owner appears more than once in the ownership split.",
     OWNER_ASSOCIATION_ALREADY_EXISTS:
         "An association owner already exists in this association.",
+    OWNERSHIP_TRANSFER_ALREADY_SCHEDULED:
+        "An ownership change is already scheduled for this unit. Cancel it first.",
+    OWNERSHIP_EFFECTIVE_DATE_TOO_EARLY:
+        "The date cannot be before the start of the current ownership.",
+    OWNERSHIP_NO_SCHEDULED_TRANSFER:
+        "No ownership change is scheduled for this unit.",
+    OWNER_HAS_OWNERSHIP_RECORDS:
+        "This owner has unit ownership records and cannot be deleted.",
     UNKNOWN: "An unexpected error occurred. Please try again later.",
     VOTE_NOT_FOUND: "Vote not found.",
     VOTE_NOT_DRAFT:

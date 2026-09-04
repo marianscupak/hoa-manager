@@ -7,9 +7,12 @@ import { replaceOwnershipSchema } from "./schema";
 // care about which key fired, so the identity function stands in for it.
 const t = ((key: string) => key) as never;
 
+const EFFECTIVE = { effectiveFrom: new Date(2026, 9, 1) };
+
 describe("replaceOwnershipSchema", () => {
     it("accepts three sole owners splitting a unit exactly into thirds", () => {
         const result = replaceOwnershipSchema(t).safeParse({
+            ...EFFECTIVE,
             ownerships: [
                 {
                     partyType: "SOLE",
@@ -34,6 +37,7 @@ describe("replaceOwnershipSchema", () => {
 
     it("accepts a single SJM party holding the whole unit", () => {
         const result = replaceOwnershipSchema(t).safeParse({
+            ...EFFECTIVE,
             ownerships: [
                 {
                     partyType: "SJM",
@@ -57,6 +61,7 @@ describe("replaceOwnershipSchema", () => {
 
         const result = await resolver(
             {
+                ...EFFECTIVE,
                 ownerships: [
                     {
                         partyType: "SJM",
@@ -76,6 +81,7 @@ describe("replaceOwnershipSchema", () => {
 
     it("rejects a SOLE party with two members", () => {
         const result = replaceOwnershipSchema(t).safeParse({
+            ...EFFECTIVE,
             ownerships: [
                 {
                     partyType: "SOLE",
@@ -90,6 +96,7 @@ describe("replaceOwnershipSchema", () => {
 
     it("rejects a plan whose shares do not sum to exactly 1/1", () => {
         const result = replaceOwnershipSchema(t).safeParse({
+            ...EFFECTIVE,
             ownerships: [
                 {
                     partyType: "SOLE",
@@ -114,6 +121,7 @@ describe("replaceOwnershipSchema", () => {
 
     it("rejects the same owner appearing in two different parties", () => {
         const result = replaceOwnershipSchema(t).safeParse({
+            ...EFFECTIVE,
             ownerships: [
                 {
                     partyType: "SOLE",
@@ -149,6 +157,7 @@ describe("replaceOwnershipSchema", () => {
 
         const result = await resolver(
             {
+                ...EFFECTIVE,
                 ownerships: [
                     {
                         partyType: "SOLE",
@@ -174,6 +183,7 @@ describe("replaceOwnershipSchema", () => {
 
         const result = await resolver(
             {
+                ...EFFECTIVE,
                 ownerships: [
                     {
                         partyType: "SOLE",
@@ -192,5 +202,70 @@ describe("replaceOwnershipSchema", () => {
         // The sum refine must not also fire a confusing second error for a
         // row that's simply incomplete.
         expect(result.errors.ownerships?.root).toBeUndefined();
+    });
+
+    it("requires an effective date", () => {
+        const result = replaceOwnershipSchema(t).safeParse({
+            ownerships: [
+                {
+                    partyType: "SOLE",
+                    share: { num: 1, den: 1 },
+                    memberOwnerIds: ["p1"],
+                },
+            ],
+        });
+
+        expect(result.success).toBe(false);
+        expect(
+            result.error?.issues.some(
+                (issue) =>
+                    issue.path[0] === "effectiveFrom" &&
+                    issue.message ===
+                        "units.ownershipEditor.effectiveFromRequired",
+            ),
+        ).toBe(true);
+    });
+
+    it("rejects an effective date before the start of the current period", () => {
+        const result = replaceOwnershipSchema(
+            t,
+            new Date(2026, 9, 5),
+        ).safeParse({
+            effectiveFrom: new Date(2026, 9, 4),
+            ownerships: [
+                {
+                    partyType: "SOLE",
+                    share: { num: 1, den: 1 },
+                    memberOwnerIds: ["p1"],
+                },
+            ],
+        });
+
+        expect(result.success).toBe(false);
+        expect(
+            result.error?.issues.some(
+                (issue) =>
+                    issue.message ===
+                    "units.ownershipEditor.effectiveFromTooEarly",
+            ),
+        ).toBe(true);
+    });
+
+    it("accepts an effective date equal to the current period start (same-day correction)", () => {
+        const result = replaceOwnershipSchema(
+            t,
+            new Date(2026, 9, 5, 0, 0),
+        ).safeParse({
+            effectiveFrom: new Date(2026, 9, 5, 23, 59),
+            ownerships: [
+                {
+                    partyType: "SOLE",
+                    share: { num: 1, den: 1 },
+                    memberOwnerIds: ["p1"],
+                },
+            ],
+        });
+
+        expect(result.success).toBe(true);
     });
 });

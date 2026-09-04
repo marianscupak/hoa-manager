@@ -71,6 +71,8 @@ export default {
             cancel: "Cancel",
             success: "Owner deleted successfully",
             error: "Failed to delete owner",
+            blockedHint:
+                "This owner has unit ownership records and cannot be deleted.",
         },
     },
     units: {
@@ -121,7 +123,24 @@ export default {
                 title: "Ownership History",
                 owner: "Owner",
                 share: "Share",
+                period: "Period",
+                status: "Status",
+                from: "from",
                 active: "Active",
+                scheduled: "Scheduled",
+                closed: "Ended",
+                scheduledBanner:
+                    "An ownership change is scheduled from {{date}}.",
+                cancelScheduled: "Cancel scheduled change",
+                editBlockedHint: "Cancel the scheduled change first.",
+                cancelDialog: {
+                    title: "Cancel scheduled change",
+                    description:
+                        "The ownership change scheduled from {{date}} will be cancelled and the current ownership stays in force.",
+                    confirm: "Cancel scheduled change",
+                    cancel: "Back",
+                    success: "The scheduled ownership change was cancelled",
+                },
                 edit: "Edit Ownership",
                 empty: "No ownership records found.",
                 count_one: "{{count}} record",
@@ -133,6 +152,12 @@ export default {
             description:
                 "Assign owners and their shares for this unit. The total share must equal 1/1.",
             addOwner: "Add Owner",
+            effectiveFromLabel: "Effective from",
+            effectiveFromHint:
+                "The date the new ownership takes effect. It may lie in the future.",
+            effectiveFromRequired: "Enter a date",
+            effectiveFromTooEarly:
+                "The date cannot be before the start of the current ownership.",
             partyType: {
                 label: "Ownership Type",
                 sole: "Sole Ownership",

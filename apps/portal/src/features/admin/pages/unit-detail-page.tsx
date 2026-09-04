@@ -5,8 +5,17 @@ import { Link, useParams } from "react-router";
 
 import { Button, PageLoading } from "@hoa-mngr/ui";
 
-import { useUnitControllerGetUnitDetail } from "@/api/generated/property-units/property-units";
+import {
+    useUnitControllerGetOwnershipHistory,
+    useUnitControllerGetUnitDetail,
+} from "@/api/generated/property-units/property-units";
 
+import { CancelScheduledTransferDialog } from "../components/ownership-history/cancel-scheduled-transfer-dialog";
+import {
+    findScheduledPeriod,
+    latestPeriodStart,
+} from "../components/ownership-history/rows";
+import { ScheduledTransferBanner } from "../components/ownership-history/scheduled-transfer-banner";
 import { ReplaceOwnershipDialog } from "../components/replace-ownership-dialog/dialog";
 import { UnitInfoCard } from "../components/unit-info-card";
 import { UnitOwnershipsTable } from "../components/unit-ownerships-table";
@@ -17,6 +26,7 @@ export function UnitDetailPage() {
     const { t } = useTranslation(["admin", "common"]);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isUnitEditOpen, setIsUnitEditOpen] = useState(false);
+    const [isCancelOpen, setIsCancelOpen] = useState(false);
 
     if (!id) {
         throw new Error("No unit id provided");
@@ -27,6 +37,17 @@ export function UnitDetailPage() {
         isLoading,
         refetch,
     } = useUnitControllerGetUnitDetail(id);
+    const {
+        data: history,
+        isLoading: isHistoryLoading,
+        refetch: refetchHistory,
+    } = useUnitControllerGetOwnershipHistory(id);
+
+    const scheduled = findScheduledPeriod(history?.periods);
+    const refetchAll = () => {
+        refetch();
+        refetchHistory();
+    };
 
     if (isLoading) {
         return <PageLoading label={t("common:loading")} />;
@@ -66,23 +87,40 @@ export function UnitDetailPage() {
             </div>
 
             <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-start justify-between gap-4">
                     <h2 className="text-foreground text-lg font-semibold">
                         {t("admin:units.details.ownership.title")}
                     </h2>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setIsEditOpen(true)}
-                    >
-                        <PencilIcon />
-                        {t("admin:units.details.ownership.edit")}
-                    </Button>
+                    <div className="flex flex-col items-end gap-1">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setIsEditOpen(true)}
+                            disabled={scheduled !== undefined}
+                        >
+                            <PencilIcon />
+                            {t("admin:units.details.ownership.edit")}
+                        </Button>
+                        {scheduled && (
+                            <span className="text-muted-foreground text-detail">
+                                {t(
+                                    "admin:units.details.ownership.editBlockedHint",
+                                )}
+                            </span>
+                        )}
+                    </div>
                 </div>
 
+                {scheduled && (
+                    <ScheduledTransferBanner
+                        effectiveFrom={scheduled.validFrom}
+                        onCancel={() => setIsCancelOpen(true)}
+                    />
+                )}
+
                 <UnitOwnershipsTable
-                    ownerships={unit?.ownerships}
-                    isLoading={isLoading}
+                    periods={history?.periods}
+                    isLoading={isHistoryLoading}
                     t={t}
                 />
             </div>
@@ -92,14 +130,23 @@ export function UnitDetailPage() {
                 open={isEditOpen}
                 onOpenChange={setIsEditOpen}
                 currentOwnerships={unit?.ownerships}
-                onSuccess={() => refetch()}
+                minEffectiveFrom={latestPeriodStart(history?.periods)}
+                onSuccess={refetchAll}
+            />
+
+            <CancelScheduledTransferDialog
+                unitId={id}
+                effectiveFrom={scheduled?.validFrom}
+                open={isCancelOpen}
+                onOpenChange={setIsCancelOpen}
+                onSuccess={refetchAll}
             />
 
             <UpdateUnitDialog
                 unit={unit}
                 open={isUnitEditOpen}
                 onOpenChange={setIsUnitEditOpen}
-                onSuccess={() => refetch()}
+                onSuccess={refetchAll}
             />
         </div>
     );

@@ -2,7 +2,14 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Trash2Icon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Button, toast } from "@hoa-mngr/ui";
+import {
+    Button,
+    toast,
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@hoa-mngr/ui";
 
 import { showApiError } from "@/api/error-utils";
 import type { OwnerResponseDto } from "@/api/generated/model";
@@ -127,14 +134,39 @@ export function OwnerRowActions({
                     )}
                 </>
             )}
-            <Button
-                variant="tableActionDanger"
-                size="tableIcon"
-                aria-label={t("owners.delete.title")}
-                onClick={() => onDelete(row)}
-            >
-                <Trash2Icon />
-            </Button>
+            {row.hasOwnershipRecords ? (
+                <TooltipProvider>
+                    <Tooltip>
+                        {/* A disabled control fires no pointer events, so the
+                            span carries the tooltip (same trick as the
+                            last-admin guard in user-row-actions). */}
+                        <TooltipTrigger asChild>
+                            <span className="inline-flex">
+                                <Button
+                                    variant="tableActionDanger"
+                                    size="tableIcon"
+                                    aria-label={t("owners.delete.title")}
+                                    disabled
+                                >
+                                    <Trash2Icon />
+                                </Button>
+                            </span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            {t("owners.delete.blockedHint")}
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            ) : (
+                <Button
+                    variant="tableActionDanger"
+                    size="tableIcon"
+                    aria-label={t("owners.delete.title")}
+                    onClick={() => onDelete(row)}
+                >
+                    <Trash2Icon />
+                </Button>
+            )}
         </div>
     );
 }

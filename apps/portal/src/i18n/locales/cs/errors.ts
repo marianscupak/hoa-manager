@@ -39,6 +39,14 @@ export default {
     OWNERSHIP_DUPLICATE_OWNER: "Vlastník se v rozdělení podílů opakuje.",
     OWNER_ASSOCIATION_ALREADY_EXISTS:
         "Vlastník typu společenství v tomto společenství již existuje.",
+    OWNERSHIP_TRANSFER_ALREADY_SCHEDULED:
+        "Pro tuto jednotku je už naplánována změna vlastnictví. Nejdříve ji zrušte.",
+    OWNERSHIP_EFFECTIVE_DATE_TOO_EARLY:
+        "Datum nemůže předcházet začátku současného vlastnictví.",
+    OWNERSHIP_NO_SCHEDULED_TRANSFER:
+        "Pro tuto jednotku není naplánována žádná změna vlastnictví.",
+    OWNER_HAS_OWNERSHIP_RECORDS:
+        "Vlastník má záznamy o vlastnictví jednotek a nelze ho odstranit.",
     UNKNOWN: "Došlo k neočekávané chybě. Zkuste to prosím později.",
     VOTE_NOT_FOUND: "Hlasování nebylo nalezeno.",
     VOTE_NOT_DRAFT: "Hlasování již není v režimu konceptu a nelze jej měnit.",

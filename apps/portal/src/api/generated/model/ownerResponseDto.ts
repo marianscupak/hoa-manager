@@ -27,6 +27,8 @@ export interface OwnerResponseDto {
      * @nullable
      */
     inviteCreatedAt: string | null;
+    /** True when the owner appears in any ownership period; such owners cannot be deleted */
+    hasOwnershipRecords: boolean;
     createdAt: string;
     updatedAt: string;
 }

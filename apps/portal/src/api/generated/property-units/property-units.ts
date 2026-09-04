@@ -28,6 +28,7 @@ import type {
     OwnedUnitResponseDto,
     ReplaceOwnershipsDto,
     UnitDetailResponseDto,
+    UnitOwnershipHistoryResponseDto,
     UnitResponseDto,
     UpdateUnitDto,
 } from ".././model";
@@ -418,6 +419,180 @@ export const useUnitControllerCreateUnit = <
         queryClient,
     );
 };
+export const unitControllerGetOwnershipHistory = (
+    id: string,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<UnitOwnershipHistoryResponseDto>(
+        { url: `/api/units/${id}/ownership/history`, method: "GET", signal },
+        options,
+    );
+};
+
+export const getUnitControllerGetOwnershipHistoryQueryKey = (id: string) => {
+    return [`/api/units/${id}/ownership/history`] as const;
+};
+
+export const getUnitControllerGetOwnershipHistoryQueryOptions = <
+    TData = Awaited<ReturnType<typeof unitControllerGetOwnershipHistory>>,
+    TError = ErrorType<ErrorResponseDto>,
+>(
+    id: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof unitControllerGetOwnershipHistory>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getUnitControllerGetOwnershipHistoryQueryKey(id);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof unitControllerGetOwnershipHistory>>
+    > = ({ signal }) =>
+        unitControllerGetOwnershipHistory(id, requestOptions, signal);
+
+    return {
+        queryKey,
+        queryFn,
+        enabled: !!id,
+        ...queryOptions,
+    } as UseQueryOptions<
+        Awaited<ReturnType<typeof unitControllerGetOwnershipHistory>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type UnitControllerGetOwnershipHistoryQueryResult = NonNullable<
+    Awaited<ReturnType<typeof unitControllerGetOwnershipHistory>>
+>;
+export type UnitControllerGetOwnershipHistoryQueryError =
+    ErrorType<ErrorResponseDto>;
+
+export function useUnitControllerGetOwnershipHistory<
+    TData = Awaited<ReturnType<typeof unitControllerGetOwnershipHistory>>,
+    TError = ErrorType<ErrorResponseDto>,
+>(
+    id: string,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof unitControllerGetOwnershipHistory>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof unitControllerGetOwnershipHistory>
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<typeof unitControllerGetOwnershipHistory>
+                    >
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useUnitControllerGetOwnershipHistory<
+    TData = Awaited<ReturnType<typeof unitControllerGetOwnershipHistory>>,
+    TError = ErrorType<ErrorResponseDto>,
+>(
+    id: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof unitControllerGetOwnershipHistory>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof unitControllerGetOwnershipHistory>
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<typeof unitControllerGetOwnershipHistory>
+                    >
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useUnitControllerGetOwnershipHistory<
+    TData = Awaited<ReturnType<typeof unitControllerGetOwnershipHistory>>,
+    TError = ErrorType<ErrorResponseDto>,
+>(
+    id: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof unitControllerGetOwnershipHistory>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useUnitControllerGetOwnershipHistory<
+    TData = Awaited<ReturnType<typeof unitControllerGetOwnershipHistory>>,
+    TError = ErrorType<ErrorResponseDto>,
+>(
+    id: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof unitControllerGetOwnershipHistory>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
+    const queryOptions = getUnitControllerGetOwnershipHistoryQueryOptions(
+        id,
+        options,
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+        TData,
+        TError
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+    return { ...query, queryKey: queryOptions.queryKey };
+}
+
 export const unitControllerGetUnitDetail = (
     id: string,
     options?: SecondParameter<typeof customInstance>,
@@ -834,6 +1009,111 @@ export const useUnitControllerReplaceUnitOwnership = <
 > => {
     return useMutation(
         getUnitControllerReplaceUnitOwnershipMutationOptions(options),
+        queryClient,
+    );
+};
+export const unitControllerCancelScheduledOwnershipTransfer = (
+    id: string,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<void>(
+        {
+            url: `/api/units/${id}/ownership/scheduled`,
+            method: "DELETE",
+            signal,
+        },
+        options,
+    );
+};
+
+export const getUnitControllerCancelScheduledOwnershipTransferMutationOptions =
+    <TError = ErrorType<ErrorResponseDto>, TContext = unknown>(options?: {
+        mutation?: UseMutationOptions<
+            Awaited<
+                ReturnType<
+                    typeof unitControllerCancelScheduledOwnershipTransfer
+                >
+            >,
+            TError,
+            { id: string },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    }): UseMutationOptions<
+        Awaited<
+            ReturnType<typeof unitControllerCancelScheduledOwnershipTransfer>
+        >,
+        TError,
+        { id: string },
+        TContext
+    > => {
+        const mutationKey = ["unitControllerCancelScheduledOwnershipTransfer"];
+        const { mutation: mutationOptions, request: requestOptions } = options
+            ? options.mutation &&
+              "mutationKey" in options.mutation &&
+              options.mutation.mutationKey
+                ? options
+                : { ...options, mutation: { ...options.mutation, mutationKey } }
+            : { mutation: { mutationKey }, request: undefined };
+
+        const mutationFn: MutationFunction<
+            Awaited<
+                ReturnType<
+                    typeof unitControllerCancelScheduledOwnershipTransfer
+                >
+            >,
+            { id: string }
+        > = (props) => {
+            const { id } = props ?? {};
+
+            return unitControllerCancelScheduledOwnershipTransfer(
+                id,
+                requestOptions,
+            );
+        };
+
+        return { mutationFn, ...mutationOptions };
+    };
+
+export type UnitControllerCancelScheduledOwnershipTransferMutationResult =
+    NonNullable<
+        Awaited<
+            ReturnType<typeof unitControllerCancelScheduledOwnershipTransfer>
+        >
+    >;
+
+export type UnitControllerCancelScheduledOwnershipTransferMutationError =
+    ErrorType<ErrorResponseDto>;
+
+export const useUnitControllerCancelScheduledOwnershipTransfer = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<
+                ReturnType<
+                    typeof unitControllerCancelScheduledOwnershipTransfer
+                >
+            >,
+            TError,
+            { id: string },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof unitControllerCancelScheduledOwnershipTransfer>>,
+    TError,
+    { id: string },
+    TContext
+> => {
+    return useMutation(
+        getUnitControllerCancelScheduledOwnershipTransferMutationOptions(
+            options,
+        ),
         queryClient,
     );
 };

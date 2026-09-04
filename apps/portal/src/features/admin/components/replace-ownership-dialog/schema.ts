@@ -1,3 +1,4 @@
+import { startOfDay } from "date-fns";
 import { TFunction } from "i18next";
 import { z } from "zod";
 
@@ -22,8 +23,21 @@ const fractionSchema = (t: TFunction<"admin">) =>
             message: t("units.ownershipEditor.invalidShareError"),
         });
 
-export const replaceOwnershipSchema = (t: TFunction<"admin">) =>
+export const replaceOwnershipSchema = (
+    t: TFunction<"admin">,
+    /** Start of the unit's latest period; the picker must not go before it. */
+    minEffectiveFrom?: Date,
+) =>
     z.object({
+        effectiveFrom: z
+            .date({ message: t("units.ownershipEditor.effectiveFromRequired") })
+            .refine(
+                (d) =>
+                    !minEffectiveFrom ||
+                    startOfDay(d).getTime() >=
+                        startOfDay(minEffectiveFrom).getTime(),
+                { message: t("units.ownershipEditor.effectiveFromTooEarly") },
+            ),
         ownerships: z
             .array(
                 z

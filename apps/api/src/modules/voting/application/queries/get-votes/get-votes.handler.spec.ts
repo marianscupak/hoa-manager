@@ -15,7 +15,9 @@ describe('GetVotesHandler', () => {
       findVoterSummariesForVotes: jest.fn(),
       findQuestionOutcomesForVotes: jest.fn(),
     } as unknown as jest.Mocked<VoteReadRepository>;
-    handler = new GetVotesHandler(voteReadRepository);
+    handler = new GetVotesHandler(voteReadRepository, {
+      now: () => new Date('2026-09-04T10:00:00Z'),
+    });
   });
 
   it('attaches questionOutcomes from the map to a CLOSED vote', async () => {

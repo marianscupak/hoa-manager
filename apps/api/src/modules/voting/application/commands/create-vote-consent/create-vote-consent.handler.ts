@@ -86,6 +86,7 @@ export class CreateVoteConsentHandler
         command.tenantId,
         command.unitId,
         command.fromOwnerId,
+        this.clock.now(),
       );
       if (!isOwner) {
         throw new NotAUnitOwnerException();
@@ -98,6 +99,7 @@ export class CreateVoteConsentHandler
         command.tenantId,
         command.voteId,
         command.membershipId,
+        this.clock.now(),
       );
 
       const isOwner = statuses.owningUnits.some((u) => u.id === command.unitId);

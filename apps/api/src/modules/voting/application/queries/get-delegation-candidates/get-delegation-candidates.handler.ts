@@ -6,6 +6,7 @@ import {
   VOTE_READ_REPOSITORY,
   type VoteReadRepository,
 } from '@/modules/voting/application/ports/vote-read.repository.port';
+import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 
 import { GetDelegationCandidatesQuery } from './get-delegation-candidates.query';
 
@@ -16,6 +17,8 @@ export class GetDelegationCandidatesHandler
   constructor(
     @Inject(VOTE_READ_REPOSITORY)
     private readonly voteReadRepo: VoteReadRepository,
+    @Inject(CLOCK)
+    private readonly clock: Clock,
   ) {}
 
   async execute(
@@ -27,6 +30,7 @@ export class GetDelegationCandidatesHandler
       query.unitId,
       query.forMembershipId,
       query.requesterMembershipId,
+      this.clock.now(),
     );
   }
 }

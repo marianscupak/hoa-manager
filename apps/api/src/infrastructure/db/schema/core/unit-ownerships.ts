@@ -1,3 +1,4 @@
+import { and, gt, isNull, lte, or, sql, type SQL } from 'drizzle-orm';
 import {
   pgTable,
   timestamp,
@@ -71,3 +72,25 @@ export const unitOwnershipMembers = pgTable(
     ),
   }),
 );
+
+/**
+ * Parties that hold the unit at `now`: the period [valid_from, valid_to)
+ * contains the instant. Excludes scheduled parties (valid_from in the future)
+ * and closed ones (valid_to already reached). Every "current ownership"
+ * reader must use this instead of `valid_to IS NULL`.
+ */
+export const ownershipActiveAt = (now: Date): SQL =>
+  and(
+    lte(unitOwnerships.validFrom, sql.param(now)),
+    or(
+      isNull(unitOwnerships.validTo),
+      gt(unitOwnerships.validTo, sql.param(now)),
+    ),
+  ) as SQL;
+
+/**
+ * Raw-SQL twin for correlated subqueries, where Drizzle's `${table.column}`
+ * drops the table prefix (see `DrizzleUnitReadRepository.getOverview`).
+ */
+export const ownershipActiveAtSql = (now: Date): SQL =>
+  sql`${unitOwnerships}.valid_from <= ${now} AND (${unitOwnerships}.valid_to IS NULL OR ${unitOwnerships}.valid_to > ${now})`;

@@ -27,6 +27,7 @@ describe('ElectorateDomainService', () => {
 
   const defaultTenantId = 'tenant-1';
   const defaultVoteId = 'vote-1';
+  const NOW = new Date('2026-09-04T10:00:00Z');
 
   const voteWith = (ruleset?: { weightBasis: VoteWeightBasis }) =>
     ({
@@ -72,10 +73,14 @@ describe('ElectorateDomainService', () => {
 
     const result = await service.resolveElectorate(
       voteWith({ weightBasis: VoteWeightBasis.ONE_UNIT_ONE_VOTE }),
+      NOW,
     );
 
     expect(dataRepo.findAllUnits).toHaveBeenCalledWith(defaultTenantId);
-    expect(dataRepo.findOwnershipParties).toHaveBeenCalledWith(defaultTenantId);
+    expect(dataRepo.findOwnershipParties).toHaveBeenCalledWith(
+      defaultTenantId,
+      NOW,
+    );
     expect(dataRepo.findValidConsents).toHaveBeenCalledWith(
       defaultTenantId,
       defaultVoteId,
@@ -99,7 +104,7 @@ describe('ElectorateDomainService', () => {
     dataRepo.findOwnershipParties.mockResolvedValue([]);
     dataRepo.findValidConsents.mockResolvedValue([]);
 
-    const result = await service.resolveElectorate(voteWith());
+    const result = await service.resolveElectorate(voteWith(), NOW);
 
     expect(result[0].weightNum).toBe(25);
     expect(result[0].weightDen).toBe(148);

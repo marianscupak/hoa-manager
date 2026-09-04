@@ -5,6 +5,7 @@ import { DrizzleService } from '@/infrastructure/db/drizzle.service';
 import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
 import {
   owners,
+  ownershipActiveAt,
   unitOwnershipMembers,
   unitOwnerships,
   units,
@@ -199,19 +200,24 @@ export class DrizzleUnitOwnershipRepository implements UnitOwnershipRepository {
   async listActiveByUnit(
     tenantId: string,
     unitId: string,
+    now: Date,
   ): Promise<UnitOwnershipParty[]> {
     const parties = await this.db.query.unitOwnerships.findMany({
       where: and(
         eq(unitOwnerships.tenantId, tenantId),
         eq(unitOwnerships.unitId, unitId),
-        isNull(unitOwnerships.validTo),
+        ownershipActiveAt(now),
       ),
     });
+    return this.attachMembers(parties);
+  }
+
+  private async attachMembers(
+    parties: (typeof unitOwnerships.$inferSelect)[],
+  ): Promise<UnitOwnershipParty[]> {
     if (parties.length === 0) return [];
 
-    const partyIds = parties.map(
-      (p: typeof unitOwnerships.$inferSelect) => p.id,
-    );
+    const partyIds = parties.map((p) => p.id);
     const memberRows = await this.db
       .select({
         ownershipId: unitOwnershipMembers.ownershipId,
@@ -227,7 +233,7 @@ export class DrizzleUnitOwnershipRepository implements UnitOwnershipRepository {
       membersByParty.set(row.ownershipId, existing);
     }
 
-    return parties.map((party: typeof unitOwnerships.$inferSelect) => ({
+    return parties.map((party) => ({
       id: party.id,
       tenantId: party.tenantId,
       unitId: party.unitId,

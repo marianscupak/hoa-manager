@@ -9,6 +9,7 @@ import {
 } from '@/modules/voting/application/ports/vote-read.repository.port';
 import { GetVotesQuery } from '@/modules/voting/application/queries/get-votes/get-votes.query';
 import { VoteStatus } from '@/modules/voting/domain/vote/vote.types';
+import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 
 @QueryHandler(GetVotesQuery)
 export class GetVotesHandler
@@ -17,6 +18,8 @@ export class GetVotesHandler
   constructor(
     @Inject(VOTE_READ_REPOSITORY)
     private readonly voteReadRepository: VoteReadRepository,
+    @Inject(CLOCK)
+    private readonly clock: Clock,
   ) {}
 
   async execute(query: GetVotesQuery): Promise<VoteListItemResponseDto[]> {
@@ -53,6 +56,7 @@ export class GetVotesHandler
           tenantId,
           voteIdsForSummary,
           membershipId,
+          this.clock.now(),
         );
 
       for (const vote of votes) {

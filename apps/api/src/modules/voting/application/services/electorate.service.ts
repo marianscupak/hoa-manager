@@ -24,10 +24,13 @@ export class ElectorateDomainService implements ElectorateService {
     private readonly electorateDataRepository: ElectorateDataRepository,
   ) {}
 
-  async resolveElectorate(vote: VoteAggregate): Promise<ElectorateUnit[]> {
+  async resolveElectorate(
+    vote: VoteAggregate,
+    now: Date,
+  ): Promise<ElectorateUnit[]> {
     const [units, parties, consents] = await Promise.all([
       this.electorateDataRepository.findAllUnits(vote.tenantId),
-      this.electorateDataRepository.findOwnershipParties(vote.tenantId),
+      this.electorateDataRepository.findOwnershipParties(vote.tenantId, now),
       this.electorateDataRepository.findValidConsents(vote.tenantId, vote.id),
     ]);
 

@@ -22,13 +22,15 @@ export interface VoteReadRepository {
   ): Promise<string | null>;
   /**
    * Whether `ownerId` is currently an active (non-association) member of a
-   * unit's ownership party — used to validate a POA grantor supplied
-   * directly by an admin/board member, who may have no user account.
+   * unit's ownership party at `now` — used to validate a POA grantor
+   * supplied directly by an admin/board member, who may have no user
+   * account.
    */
   isActiveUnitOwner(
     tenantId: string,
     unitId: string,
     ownerId: string,
+    now: Date,
   ): Promise<boolean>;
   getMembershipByOwnerId(
     tenantId: string,
@@ -51,11 +53,13 @@ export interface VoteReadRepository {
     tenantId: string,
     voteId: string,
     membershipId: string,
+    now: Date,
   ): Promise<VoterStatusResponseDto>;
   findVoterSummariesForVotes(
     tenantId: string,
     voteIds: string[],
     membershipId: string,
+    now: Date,
   ): Promise<Map<string, VoterSummaryDto>>;
   findDelegationCandidates(
     tenantId: string,
@@ -63,6 +67,7 @@ export interface VoteReadRepository {
     unitId: string,
     forMembershipId: string | undefined,
     requesterMembershipId: string,
+    now: Date,
   ): Promise<DelegationCandidateDto[]>;
   findResultsByVoteId(
     tenantId: string,

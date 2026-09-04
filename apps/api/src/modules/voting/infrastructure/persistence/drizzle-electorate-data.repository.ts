@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { and, eq, inArray, isNull } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
 import {
+  ownershipActiveAt,
   owners,
   tenantMemberships,
   unitOwnershipMembers,
@@ -41,6 +42,7 @@ export class DrizzleElectorateDataRepository
 
   async findOwnershipParties(
     tenantId: string,
+    now: Date,
   ): Promise<ElectorateOwnershipPartyData[]> {
     const partyRows = await this.drizzle.db
       .select({
@@ -52,10 +54,7 @@ export class DrizzleElectorateDataRepository
       })
       .from(unitOwnerships)
       .where(
-        and(
-          eq(unitOwnerships.tenantId, tenantId),
-          isNull(unitOwnerships.validTo),
-        ),
+        and(eq(unitOwnerships.tenantId, tenantId), ownershipActiveAt(now)),
       );
 
     if (partyRows.length === 0) return [];

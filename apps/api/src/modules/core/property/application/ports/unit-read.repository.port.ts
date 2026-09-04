@@ -5,8 +5,8 @@
  * `(numerator / denominator) * 100`, and the sum is rounded to two
  * decimal places. A perfectly configured building sums to exactly 100.
  *
- * `withoutOwnersCount` counts units that have no currently active
- * ownership row (i.e. no `unit_ownerships` row with `valid_to IS NULL`).
+ * `withoutOwnersCount` counts units that have no party active at `now`
+ * (see `ownershipActiveAt`).
  */
 export interface UnitOverview {
   total: number;
@@ -29,10 +29,11 @@ export interface OwnedUnitRow {
 }
 
 export interface UnitReadRepository {
-  getOverview(tenantId: string): Promise<UnitOverview>;
+  getOverview(tenantId: string, now: Date): Promise<UnitOverview>;
   findOwnedByMembership(params: {
     tenantId: string;
     membershipId: string;
+    now: Date;
   }): Promise<OwnedUnitRow[]>;
 }
 

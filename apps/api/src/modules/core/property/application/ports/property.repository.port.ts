@@ -50,9 +50,11 @@ export interface OwnerRepository {
 export const OWNER_REPOSITORY = Symbol('OWNER_REPOSITORY');
 
 export interface UnitOwnershipRepository {
+  /** Parties holding the unit at `now` (see `ownershipActiveAt`). */
   listActiveByUnit(
     tenantId: string,
     unitId: string,
+    now: Date,
   ): Promise<UnitOwnershipParty[]>;
   closeActiveByUnit(tenantId: string, unitId: string, now: Date): Promise<void>;
   createMany(

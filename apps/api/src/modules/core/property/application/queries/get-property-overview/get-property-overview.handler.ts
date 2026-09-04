@@ -52,7 +52,7 @@ export class GetPropertyOverviewHandler
   ): Promise<PropertyOverviewResponseDto> {
     const now = this.clock.now();
     const [unitOverview, ownerCount, invitesSummary] = await Promise.all([
-      this.units.getOverview(query.tenantId),
+      this.units.getOverview(query.tenantId, now),
       this.owners.countActive(query.tenantId, now),
       this.invites.getPendingSummary(query.tenantId, now),
     ]);

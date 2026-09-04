@@ -56,12 +56,14 @@ export class OpenVoteCommandHandler
     const { tenantId, voteId, openedByMembershipId } = command;
 
     await this.uow.execute(async () => {
+      const now = this.clock.now();
+
       const vote = await this.voteRepository.findById(tenantId, voteId);
       if (!vote) {
         throw new VoteNotFoundException();
       }
 
-      vote.open(openedByMembershipId, this.clock.now());
+      vote.open(openedByMembershipId, now);
 
       // Share-weighted votes need a complete building-share plan; a partial
       // plan would silently shrink every denominator (DOM-009).
@@ -80,7 +82,10 @@ export class OpenVoteCommandHandler
         }
       }
 
-      const electorate = await this.electorateService.resolveElectorate(vote);
+      const electorate = await this.electorateService.resolveElectorate(
+        vote,
+        now,
+      );
 
       await this.voteRepository.save(vote);
       await this.voteRepository.saveElectorateUnits(
@@ -92,7 +97,7 @@ export class OpenVoteCommandHandler
       const actor = this.auditContext.requireActor();
       const openedByLabel = await this.labelResolver.resolveActorLabel(actor);
 
-      const openedAt = this.clock.now();
+      const openedAt = now;
       const totalWeight = Rational.sum(
         electorate.map((u) => Rational.from(u.weightNum, u.weightDen)),
       );

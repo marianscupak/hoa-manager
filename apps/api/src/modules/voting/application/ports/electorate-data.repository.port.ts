@@ -30,8 +30,10 @@ export interface ElectorateConsentData {
 
 export interface ElectorateDataRepository {
   findAllUnits(tenantId: string): Promise<ElectorateUnitData[]>;
+  /** Parties active at `now` — pass the same instant stored as `snapshottedAt`. */
   findOwnershipParties(
     tenantId: string,
+    now: Date,
   ): Promise<ElectorateOwnershipPartyData[]>;
   findValidConsents(
     tenantId: string,

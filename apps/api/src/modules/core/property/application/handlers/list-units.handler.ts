@@ -11,6 +11,7 @@ import {
 } from '@/modules/core/property/application/ports/property.repository.port';
 import { ListUnitsQuery } from '@/modules/core/property/application/queries/list-units.query';
 import { Unit } from '@/modules/core/property/domain/property.entity';
+import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 import { Rational } from '@/shared/domain/rational';
 
 export interface UnitWithStatus extends Unit {
@@ -29,6 +30,8 @@ export class ListUnitsHandler
     private readonly ownershipRepo: UnitOwnershipRepository,
     @Inject(OWNER_REPOSITORY)
     private readonly ownerRepo: OwnerRepository,
+    @Inject(CLOCK)
+    private readonly clock: Clock,
   ) {}
 
   async execute(query: ListUnitsQuery): Promise<UnitWithStatus[]> {
@@ -37,6 +40,7 @@ export class ListUnitsHandler
       this.ownerRepo.listByTenant(query.tenantId),
     ]);
     const namesById = new Map(tenantOwners.map((o) => [o.id, o.displayName]));
+    const now = this.clock.now();
 
     // TODO: In a real app with many units, this N+1 query should be optimized
     // with a join in the repository or a dataloader, but for MVP it's OK.
@@ -46,6 +50,7 @@ export class ListUnitsHandler
       const ownerships = await this.ownershipRepo.listActiveByUnit(
         query.tenantId,
         unit.id,
+        now,
       );
 
       const sum = Rational.sum(

@@ -102,6 +102,7 @@ describe('CreateVoteConsentHandler', () => {
       TENANT,
       UNIT,
       'owner-accountless-1',
+      expect.any(Date),
     );
     // No membership lookup for the grantor on the admin path.
     expect(voteReadRepo.findVoterStatus).not.toHaveBeenCalled();
@@ -181,6 +182,7 @@ describe('CreateVoteConsentHandler', () => {
       TENANT,
       VOTE,
       RECORDER_MEMBERSHIP,
+      expect.any(Date),
     );
     expect(voteReadRepo.getOwnerIdByMembership).toHaveBeenCalledWith(
       TENANT,

@@ -7,12 +7,11 @@ describe('GetOwnedUnitsHandler', () => {
   let handler: GetOwnedUnitsHandler;
   let repo: jest.Mocked<UnitReadRepository>;
 
+  const fixedNow = new Date('2026-09-04T10:00:00Z');
+
   beforeEach(() => {
-    repo = {
-      getOverview: jest.fn(),
-      findOwnedByMembership: jest.fn(),
-    };
-    handler = new GetOwnedUnitsHandler(repo);
+    repo = { getOverview: jest.fn(), findOwnedByMembership: jest.fn() };
+    handler = new GetOwnedUnitsHandler(repo, { now: () => fixedNow });
   });
 
   it('returns units owned by the caller, sorted ascending by unitNo', async () => {
@@ -46,6 +45,7 @@ describe('GetOwnedUnitsHandler', () => {
     expect(repo.findOwnedByMembership).toHaveBeenCalledWith({
       tenantId: 't-1',
       membershipId: 'm-1',
+      now: fixedNow,
     });
   });
 

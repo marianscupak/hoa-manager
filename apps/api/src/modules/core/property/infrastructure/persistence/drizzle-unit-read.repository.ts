@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { and, eq, isNull, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
 import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
 import {
   owners,
+  ownershipActiveAt,
+  ownershipActiveAtSql,
   tenantMemberships,
   unitOwnershipMembers,
   unitOwnerships,
@@ -24,7 +26,7 @@ export class DrizzleUnitReadRepository implements UnitReadRepository {
     return DRIZZLE_TX_STORAGE.getStore() ?? this.drizzle.db;
   }
 
-  async getOverview(tenantId: string): Promise<UnitOverview> {
+  async getOverview(tenantId: string, now: Date): Promise<UnitOverview> {
     // Inside the correlated subquery, column refs need explicit table
     // prefixes — Drizzle's `${table.column}` drops the table name, which
     // makes the inner WHERE resolve both sides to `unit_ownerships`.
@@ -37,7 +39,7 @@ export class DrizzleUnitReadRepository implements UnitReadRepository {
             FROM ${unitOwnerships}
             WHERE ${unitOwnerships}.tenant_id = ${units}.tenant_id
               AND ${unitOwnerships}.unit_id = ${units}.id
-              AND ${unitOwnerships}.valid_to IS NULL
+              AND ${ownershipActiveAtSql(now)}
           )
         )::int`,
         buildingShareSum: sql<number>`COALESCE(
@@ -64,6 +66,7 @@ export class DrizzleUnitReadRepository implements UnitReadRepository {
   async findOwnedByMembership(params: {
     tenantId: string;
     membershipId: string;
+    now: Date;
   }): Promise<OwnedUnitRow[]> {
     // `unit_ownerships` no longer has an `owner_id` column — a party's
     // members live in `unit_ownership_members`, and owners link to a
@@ -77,14 +80,15 @@ export class DrizzleUnitReadRepository implements UnitReadRepository {
     // `owners_tenant_user_unique` guarantees at most one owner per
     // (tenant, user), and `closeActiveByUnit` + `createMany` +
     // `validateOwnershipPlan`'s DUPLICATE_OWNER check guarantee an owner
-    // is a member of at most one active party per unit at a time — so
-    // this join yields at most one row per unit per membership and no
-    // aggregation is needed. `shareNumerator / shareDenominator` is the
-    // party's full undivided share (an SJM party isn't split between its
-    // two member-owners), converted to a percentage the same way
-    // `buildingShareNumerator / buildingShareDenominator * 100` is in
-    // `getOverview`'s `buildingShareSum` — both rounded to two decimal
-    // places for consistency.
+    // is a member of at most one party matching `ownershipActiveAt` per
+    // unit at a time — so this join yields at most one row per unit per
+    // membership and no aggregation is needed. `shareNumerator /
+    // shareDenominator` is the party's full undivided share (an SJM
+    // party isn't split between its two member-owners), converted to a
+    // percentage the same way `buildingShareNumerator /
+    // buildingShareDenominator * 100` is in `getOverview`'s
+    // `buildingShareSum` — both rounded to two decimal places for
+    // consistency.
     const rows = await this.db
       .select({
         id: units.id,
@@ -111,7 +115,7 @@ export class DrizzleUnitReadRepository implements UnitReadRepository {
         and(
           eq(unitOwnerships.unitId, units.id),
           eq(unitOwnerships.tenantId, units.tenantId),
-          isNull(unitOwnerships.validTo),
+          ownershipActiveAt(params.now),
         ),
       )
       .innerJoin(

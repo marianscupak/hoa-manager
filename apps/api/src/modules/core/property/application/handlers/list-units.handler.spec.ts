@@ -30,10 +30,12 @@ function buildHandler(overrides?: {
       ],
     ),
   };
+  const clock = { now: () => new Date('2026-09-04T10:00:00Z') };
   const handler = new ListUnitsHandler(
     unitRepo as never,
     ownershipRepo as never,
     ownerRepo as never,
+    clock as never,
   );
   return { handler };
 }
@@ -68,5 +70,31 @@ describe('ListUnitsHandler', () => {
 
     expect(unit.owners).toEqual([]);
     expect(unit.isOwnershipComplete).toBe(false);
+  });
+
+  it('evaluates every unit against the same `now`, read once per call', async () => {
+    const unitRepo = {
+      listByTenant: jest
+        .fn()
+        .mockResolvedValue([UNIT, { ...UNIT, id: 'u2', unitNo: '2' }]),
+    };
+    const ownershipRepo = {
+      listActiveByUnit: jest.fn().mockResolvedValue([]),
+    };
+    const ownerRepo = { listByTenant: jest.fn().mockResolvedValue([]) };
+    const clock = { now: jest.fn(() => new Date('2026-09-04T10:00:00Z')) };
+    const handler = new ListUnitsHandler(
+      unitRepo as never,
+      ownershipRepo as never,
+      ownerRepo as never,
+      clock as never,
+    );
+
+    await handler.execute(new ListUnitsQuery(TENANT));
+
+    expect(clock.now).toHaveBeenCalledTimes(1);
+    const [firstCall, secondCall] = ownershipRepo.listActiveByUnit.mock.calls;
+    expect(firstCall).toEqual([TENANT, 'u1', firstCall[2]]);
+    expect(secondCall).toEqual([TENANT, 'u2', firstCall[2]]);
   });
 });

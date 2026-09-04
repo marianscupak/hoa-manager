@@ -21,6 +21,7 @@ import {
   voteQuestionResults,
   voteOptionResults,
   voteDocuments,
+  ownershipActiveAt,
 } from '@/infrastructure/db/schema';
 import {
   OwnerKind,
@@ -266,6 +267,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
   private async findOwnedUnitIds(
     tenantId: string,
     ownerId: string,
+    now: Date,
   ): Promise<string[]> {
     const rows = await this.drizzle.db
       .select({ unitId: unitOwnerships.unitId })
@@ -278,7 +280,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
         and(
           eq(unitOwnerships.tenantId, tenantId),
           eq(unitOwnershipMembers.ownerId, ownerId),
-          isNull(unitOwnerships.validTo),
+          ownershipActiveAt(now),
         ),
       );
 
@@ -292,6 +294,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
   private async loadOwnershipPlan(
     tenantId: string,
     unitIds: string[],
+    now: Date,
   ): Promise<{
     units: ElectorateUnitInput[];
     parties: ElectoratePartyInput[];
@@ -335,7 +338,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
         and(
           eq(unitOwnerships.tenantId, tenantId),
           inArray(unitOwnerships.unitId, unitIds),
-          isNull(unitOwnerships.validTo),
+          ownershipActiveAt(now),
         ),
       );
 
@@ -415,10 +418,11 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
     tenantId: string,
     voteId: string,
     unitIds: string[],
+    now: Date,
     plan?: { units: ElectorateUnitInput[]; parties: ElectoratePartyInput[] },
   ): Promise<ElectorateUnit[]> {
     const ownershipPlan =
-      plan ?? (await this.loadOwnershipPlan(tenantId, unitIds));
+      plan ?? (await this.loadOwnershipPlan(tenantId, unitIds, now));
     const [consents, weightBasis] = await Promise.all([
       this.loadValidConsents(tenantId, voteId, unitIds),
       this.getWeightBasis(tenantId, voteId),
@@ -459,6 +463,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
     tenantId: string,
     voteId: string,
     membershipId: string,
+    now: Date,
   ): Promise<VoterStatusResponseDto> {
     const emptyResult: VoterStatusResponseDto = {
       canVote: false,
@@ -490,7 +495,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
         and(
           eq(unitOwnerships.tenantId, tenantId),
           eq(unitOwnershipMembers.ownerId, ownerId),
-          isNull(unitOwnerships.validTo),
+          ownershipActiveAt(now),
         ),
       );
 
@@ -598,7 +603,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
     // Not opened yet: preview the electorate with the same domain function
     // that will snapshot it at open, so the two never disagree.
     const [preview, votedUnits, totalMaximum] = await Promise.all([
-      this.previewElectorate(tenantId, voteId, uniqueUnitIds),
+      this.previewElectorate(tenantId, voteId, uniqueUnitIds, now),
       this.getVotedUnits(tenantId, voteId, uniqueUnitIds),
       this.getTenantTotalShare(tenantId),
     ]);
@@ -671,6 +676,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
     tenantId: string,
     voteIds: string[],
     membershipId: string,
+    now: Date,
   ): Promise<Map<string, VoterSummaryDto>> {
     const result = new Map<string, VoterSummaryDto>();
     if (voteIds.length === 0) return result;
@@ -688,7 +694,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       return result;
     }
 
-    const unitIds = await this.findOwnedUnitIds(tenantId, ownerId);
+    const unitIds = await this.findOwnedUnitIds(tenantId, ownerId, now);
     if (unitIds.length === 0) {
       for (const id of voteIds) result.set(id, noVoteSummary);
       return result;
@@ -748,9 +754,9 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
         continue;
       }
 
-      ownershipPlan ??= await this.loadOwnershipPlan(tenantId, unitIds);
+      ownershipPlan ??= await this.loadOwnershipPlan(tenantId, unitIds, now);
       const [preview, votedUnits] = await Promise.all([
-        this.previewElectorate(tenantId, voteId, unitIds, ownershipPlan),
+        this.previewElectorate(tenantId, voteId, unitIds, now, ownershipPlan),
         this.getVotedUnits(tenantId, voteId, unitIds),
       ]);
 
@@ -800,6 +806,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
     unitId: string,
     forMembershipId: string | undefined,
     requesterMembershipId: string,
+    now: Date,
   ): Promise<DelegationCandidateDto[]> {
     // Any active member of the association may be designated — a consent is
     // a power of attorney, not a co-ownership matter (DOM-012). Co-owners of
@@ -830,7 +837,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
         and(
           eq(unitOwnerships.id, unitOwnershipMembers.ownershipId),
           eq(unitOwnerships.unitId, unitId),
-          isNull(unitOwnerships.validTo),
+          ownershipActiveAt(now),
         ),
       )
       .leftJoin(
@@ -971,6 +978,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
     tenantId: string,
     unitId: string,
     ownerId: string,
+    now: Date,
   ): Promise<boolean> {
     const rows = await this.drizzle.db
       .select({ id: unitOwnershipMembers.id })
@@ -985,7 +993,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
           eq(unitOwnerships.tenantId, tenantId),
           eq(unitOwnerships.unitId, unitId),
           eq(unitOwnershipMembers.ownerId, ownerId),
-          isNull(unitOwnerships.validTo),
+          ownershipActiveAt(now),
           ne(owners.kind, OwnerKind.ASSOCIATION),
         ),
       )

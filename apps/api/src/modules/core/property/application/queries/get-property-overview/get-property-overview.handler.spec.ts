@@ -45,6 +45,7 @@ describe('GetPropertyOverviewHandler', () => {
         oldestPendingCreatedAt: '2026-05-01T00:00:00.000Z',
       },
     });
+    expect(units.getOverview).toHaveBeenCalledWith('t-1', fixedNow);
   });
 
   it('reports buildingShareSum exactly as 100 when shares add up perfectly', async () => {
@@ -97,7 +98,7 @@ describe('GetPropertyOverviewHandler', () => {
 
     await handler.execute(new GetPropertyOverviewQuery('t-42'));
 
-    expect(units.getOverview).toHaveBeenCalledWith('t-42');
+    expect(units.getOverview).toHaveBeenCalledWith('t-42', fixedNow);
     expect(owners.countActive).toHaveBeenCalledWith('t-42', fixedNow);
     expect(invites.getPendingSummary).toHaveBeenCalledWith('t-42', fixedNow);
   });

@@ -16,6 +16,7 @@ import type {
 } from '@/modules/core/property/domain/ownership-plan';
 import { Unit } from '@/modules/core/property/domain/property.entity';
 import { UnitNotFoundException } from '@/shared/application/exceptions/property.exceptions';
+import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 import { Rational } from '@/shared/domain/rational';
 
 export interface UnitOwnershipDetailMember {
@@ -49,6 +50,8 @@ export class GetUnitDetailHandler
     private readonly ownershipRepo: UnitOwnershipRepository,
     @Inject(OWNER_REPOSITORY)
     private readonly ownerRepo: OwnerRepository,
+    @Inject(CLOCK)
+    private readonly clock: Clock,
   ) {}
 
   async execute(query: GetUnitDetailQuery): Promise<UnitDetail> {
@@ -59,7 +62,11 @@ export class GetUnitDetailHandler
     }
 
     const [ownerships, tenantOwners] = await Promise.all([
-      this.ownershipRepo.listActiveByUnit(query.tenantId, query.unitId),
+      this.ownershipRepo.listActiveByUnit(
+        query.tenantId,
+        query.unitId,
+        this.clock.now(),
+      ),
       this.ownerRepo.listByTenant(query.tenantId),
     ]);
 

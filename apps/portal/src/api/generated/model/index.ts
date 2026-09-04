@@ -100,6 +100,7 @@ export * from "./successResponseDto";
 export * from "./switchTenantDto";
 export * from "./tenantActivityEntryDto";
 export * from "./tenantActivityResponseDto";
+export * from "./tenantContactResponseDto";
 export * from "./tenantResponseDto";
 export * from "./tenantResponseDtoRole";
 export * from "./tenantResponseDtoStatus";

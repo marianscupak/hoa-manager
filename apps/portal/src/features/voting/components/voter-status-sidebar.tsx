@@ -24,8 +24,10 @@ import {
     type VoteDetailResponseDto,
 } from "@/api/generated/model";
 import { useUnitControllerGetMyOwnedUnits } from "@/api/generated/property-units/property-units";
+import { useMemberControllerGetContacts } from "@/api/generated/tenant-members/tenant-members";
 import { useVotesControllerGetVoterStatus } from "@/api/generated/votes/votes";
 
+import { buildContactMailto } from "../utils/contact-mailto";
 import { delegationPrompt } from "../utils/delegation-eligibility";
 import { formatTotalVotingPower } from "../utils/total-voting-power";
 
@@ -81,6 +83,14 @@ export function VoterStatusSidebar({ vote }: VoterStatusSidebarProps) {
     // hint), so an unrelated failure/slow load here must not blank the
     // whole status card. `.data` is read optionally further down instead.
     const ownedUnitsQuery = useUnitControllerGetMyOwnedUnits();
+    // Active admins' addresses for the "contact the chair" link below the
+    // card. Optional in the same way: while loading or when nobody
+    // qualifies the link is simply omitted, never rendered dead.
+    const contactsQuery = useMemberControllerGetContacts();
+    const contactHref = buildContactMailto(
+        (contactsQuery.data ?? []).map((c) => c.email),
+        vote.title,
+    );
 
     if (statusQuery.isLoading) {
         return <Skeleton className="rounded-card h-64 w-full" />;
@@ -255,13 +265,18 @@ export function VoterStatusSidebar({ vote }: VoterStatusSidebarProps) {
             </Card>
 
             <p className="text-muted-foreground px-1 text-sm">
-                {t("detail.statusSidebar.help.description")}{" "}
-                <a
-                    href="#"
-                    className="text-primary focus-visible:ring-ring rounded-sm font-medium hover:underline focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-                >
-                    {t("detail.statusSidebar.help.contact")}
-                </a>
+                {t("detail.statusSidebar.help.description")}
+                {contactHref && (
+                    <>
+                        {" "}
+                        <a
+                            href={contactHref}
+                            className="text-primary focus-visible:ring-ring rounded-sm font-medium hover:underline focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                        >
+                            {t("detail.statusSidebar.help.contact")}
+                        </a>
+                    </>
+                )}
             </p>
         </div>
     );

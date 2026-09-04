@@ -13,6 +13,7 @@ import { GetMembershipByTenantAndUserHandler } from '@/modules/core/tenancy/appl
 import { GetMembershipsByUserIdHandler } from '@/modules/core/tenancy/application/handlers/get-memberships-by-user-id.handler';
 import { GetTenantByIdHandler } from '@/modules/core/tenancy/application/handlers/get-tenant-by-id.handler';
 import { GetUserTenantsHandler } from '@/modules/core/tenancy/application/handlers/get-user-tenants.handler';
+import { ListTenantContactsHandler } from '@/modules/core/tenancy/application/handlers/list-tenant-contacts.handler';
 import { ListTenantMembersHandler } from '@/modules/core/tenancy/application/handlers/list-tenant-members.handler';
 import { UpdateMemberRoleHandler } from '@/modules/core/tenancy/application/handlers/update-member-role.handler';
 import { UpdateMembershipStatusHandler } from '@/modules/core/tenancy/application/handlers/update-membership-status.handler';
@@ -38,6 +39,7 @@ const QueryHandlers = [
   GetTenantByIdHandler,
   GetMembershipsByUserIdHandler,
   ListTenantMembersHandler,
+  ListTenantContactsHandler,
 ];
 
 @Module({

@@ -24,6 +24,7 @@ import type {
 import type {
     ErrorResponseDto,
     MemberResponseDto,
+    TenantContactResponseDto,
     UpdateMemberRoleDto,
 } from ".././model";
 
@@ -170,6 +171,153 @@ export function useMemberControllerGetMembers<
     queryKey: DataTag<QueryKey, TData, TError>;
 } {
     const queryOptions = getMemberControllerGetMembersQueryOptions(options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+        TData,
+        TError
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+    return { ...query, queryKey: queryOptions.queryKey };
+}
+
+export const memberControllerGetContacts = (
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<TenantContactResponseDto[]>(
+        { url: `/api/members/contacts`, method: "GET", signal },
+        options,
+    );
+};
+
+export const getMemberControllerGetContactsQueryKey = () => {
+    return [`/api/members/contacts`] as const;
+};
+
+export const getMemberControllerGetContactsQueryOptions = <
+    TData = Awaited<ReturnType<typeof memberControllerGetContacts>>,
+    TError = ErrorType<ErrorResponseDto>,
+>(options?: {
+    query?: Partial<
+        UseQueryOptions<
+            Awaited<ReturnType<typeof memberControllerGetContacts>>,
+            TError,
+            TData
+        >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ?? getMemberControllerGetContactsQueryKey();
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof memberControllerGetContacts>>
+    > = ({ signal }) => memberControllerGetContacts(requestOptions, signal);
+
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof memberControllerGetContacts>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type MemberControllerGetContactsQueryResult = NonNullable<
+    Awaited<ReturnType<typeof memberControllerGetContacts>>
+>;
+export type MemberControllerGetContactsQueryError = ErrorType<ErrorResponseDto>;
+
+export function useMemberControllerGetContacts<
+    TData = Awaited<ReturnType<typeof memberControllerGetContacts>>,
+    TError = ErrorType<ErrorResponseDto>,
+>(
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof memberControllerGetContacts>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof memberControllerGetContacts>>,
+                    TError,
+                    Awaited<ReturnType<typeof memberControllerGetContacts>>
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useMemberControllerGetContacts<
+    TData = Awaited<ReturnType<typeof memberControllerGetContacts>>,
+    TError = ErrorType<ErrorResponseDto>,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof memberControllerGetContacts>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof memberControllerGetContacts>>,
+                    TError,
+                    Awaited<ReturnType<typeof memberControllerGetContacts>>
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useMemberControllerGetContacts<
+    TData = Awaited<ReturnType<typeof memberControllerGetContacts>>,
+    TError = ErrorType<ErrorResponseDto>,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof memberControllerGetContacts>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useMemberControllerGetContacts<
+    TData = Awaited<ReturnType<typeof memberControllerGetContacts>>,
+    TError = ErrorType<ErrorResponseDto>,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof memberControllerGetContacts>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
+    const queryOptions = getMemberControllerGetContactsQueryOptions(options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<
         TData,

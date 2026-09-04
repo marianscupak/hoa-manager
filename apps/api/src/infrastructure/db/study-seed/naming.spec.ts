@@ -34,19 +34,19 @@ describe('naming', () => {
   });
 
   it('builds study emails under the study domain', () => {
-    expect(studyEmail('P3', 'vybor')).toBe('p3.vybor@study.hoa.local');
-    expect(personaEmail('P10')).toBe('p10.vybor@study.hoa.local');
+    expect(studyEmail('P3', 'vybor')).toBe('p3.vybor@study.hoa');
+    expect(personaEmail('P10')).toBe('p10.vybor@study.hoa');
   });
 
   it('builds a LIKE pattern that cannot match another participant', () => {
-    expect(studyEmailLikePattern('P1')).toBe('p1.%@study.hoa.local');
+    expect(studyEmailLikePattern('P1')).toBe('p1.%@study.hoa');
     // "p10.x@…" must not match "p1.%@…" — the dot after the id guarantees it
-    expect('p10.milan@study.hoa.local'.startsWith('p1.')).toBe(false);
+    expect('p10.milan@study.hoa'.startsWith('p1.')).toBe(false);
   });
 
   it('recognizes study addresses and rejects real ones', () => {
-    expect(isStudyEmail('p3.milan@study.hoa.local')).toBe(true);
-    expect(isStudyEmail('P3.MILAN@STUDY.HOA.LOCAL')).toBe(true);
+    expect(isStudyEmail('p3.milan@study.hoa')).toBe(true);
+    expect(isStudyEmail('P3.MILAN@STUDY.HOA')).toBe(true);
     expect(isStudyEmail('jan.novak@gmail.com')).toBe(false);
   });
 

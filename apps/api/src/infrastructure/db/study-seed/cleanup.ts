@@ -17,7 +17,7 @@ export interface CleanupSummary {
  * 1. every tenant the persona is a member of (includes the tenant the
  *    participant created by hand in task A1, because the persona created it);
  *    FK cascades take units, owners, votes, ballots, memberships, invites;
- * 2. every user whose email is `pn.<slug>@study.hoa.local` (persona included;
+ * 2. every user whose email is `pn.<slug>@study.hoa` (persona included;
  *    cascades take identities and sessions);
  * 3. the participant's own account, if given and now without memberships.
  * Audit events have no FK to tenants and are append-only; they stay.

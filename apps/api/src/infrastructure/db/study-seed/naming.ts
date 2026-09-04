@@ -1,6 +1,6 @@
 import * as crypto from 'node:crypto';
 
-export const STUDY_EMAIL_DOMAIN = 'study.hoa.local';
+export const STUDY_EMAIL_DOMAIN = 'study.hoa';
 const PARTICIPANT_ID_PATTERN = /^P\d{1,2}$/;
 
 export function normalizeParticipantId(raw: string): string {

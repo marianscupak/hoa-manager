@@ -257,7 +257,7 @@ export async function loadBuiltTenant(
   }
 
   // The participant's real email is the one owner row not under the study
-  // domain; every fictional/persona account is seeded under @study.hoa.local.
+  // domain; every fictional/persona account is seeded under @study.hoa.
   const nonStudyOwners = ownerRows.filter(
     (r) => r.email !== null && !isStudyEmail(r.email),
   );

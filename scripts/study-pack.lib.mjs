@@ -7,7 +7,7 @@
 
 const PARTICIPANT_ID_PATTERN = /^P\d{1,2}$/;
 const PLACEHOLDER_PATTERN = /<<([^<>]+)>>/g;
-const STUDY_EMAIL_DOMAIN = "study.hoa.local";
+const STUDY_EMAIL_DOMAIN = "study.hoa";
 
 /** Mirrors normalizeParticipantId in apps/api/.../study-seed/naming.ts. */
 export function normalizeParticipantId(raw) {

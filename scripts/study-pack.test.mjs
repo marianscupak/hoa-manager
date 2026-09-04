@@ -19,8 +19,8 @@ test("normalizeParticipantId upper-cases and validates", () => {
 });
 
 test("personaEmail mirrors the seed naming rule", () => {
-    assert.equal(personaEmail("P3"), "p3.vybor@study.hoa.local");
-    assert.equal(personaEmail("P10"), "p10.vybor@study.hoa.local");
+    assert.equal(personaEmail("P3"), "p3.vybor@study.hoa");
+    assert.equal(personaEmail("P10"), "p10.vybor@study.hoa");
 });
 
 test("substitute replaces known placeholders and reports the rest", () => {
@@ -87,7 +87,7 @@ test("parseCard splits the card into a title, sections, rows and notes", () => {
         "Karta účastníka P3",
         "",
         "ČÁST 1 — jste Karel Malý, předseda výboru",
-        "Přihlášení:   p3.vybor@study.hoa.local",
+        "Přihlášení:   p3.vybor@study.hoa",
         "Heslo:        Svj-abcd-efgh",
         "",
         "Jednotka 1:  podíl 3200/10000  — manželé Jana a Petr",
@@ -104,7 +104,7 @@ test("parseCard splits the card into a title, sections, rows and notes", () => {
     const [first, second] = card.sections;
     assert.equal(first.heading, "ČÁST 1 — jste Karel Malý, předseda výboru");
     assert.deepEqual(first.rows.slice(0, 2), [
-        { label: "Přihlášení", value: "p3.vybor@study.hoa.local" },
+        { label: "Přihlášení", value: "p3.vybor@study.hoa" },
         { label: "Heslo", value: "Svj-abcd-efgh" },
     ]);
     assert.deepEqual(first.rows[2], {

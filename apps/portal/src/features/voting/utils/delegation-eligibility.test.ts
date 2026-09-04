@@ -6,6 +6,7 @@ import type {
 } from "@/api/generated/model";
 
 import {
+    consentRisk,
     delegationPrompt,
     votesOpenForDelegation,
 } from "./delegation-eligibility";
@@ -69,5 +70,31 @@ describe("votesOpenForDelegation", () => {
             "SCHEDULED",
         ]);
         expect(votesOpenForDelegation(undefined)).toEqual([]);
+    });
+});
+
+describe("consentRisk", () => {
+    it("flags a consent that would leave the unit with no representative", () => {
+        expect(
+            consentRisk({ wouldLeaveUnitWithoutRepresentative: true }, false),
+        ).toBe("noRepresentative");
+    });
+
+    it("stays silent when the consent leaves a representative in place", () => {
+        expect(
+            consentRisk({ wouldLeaveUnitWithoutRepresentative: false }, false),
+        ).toBeNull();
+    });
+
+    it("stays silent before any preview has arrived", () => {
+        expect(consentRisk(undefined, false)).toBeNull();
+    });
+
+    it("stays silent while a preview for a new selection is in flight", () => {
+        // Whatever is in hand describes the previous choice, so it must not be
+        // shown against the one the member is looking at now.
+        expect(
+            consentRisk({ wouldLeaveUnitWithoutRepresentative: true }, true),
+        ).toBeNull();
     });
 });

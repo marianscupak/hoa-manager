@@ -8,7 +8,15 @@ import {
   type VoteResultsResponseDto,
   type QuestionOutcomeDto,
 } from '@/modules/voting/api/dto/vote.dto';
-import { VoteStatus } from '@/modules/voting/domain/vote/vote.types';
+import type {
+  ElectorateConsentInput,
+  ElectoratePartyInput,
+  ElectorateUnitInput,
+} from '@/modules/voting/domain/vote/electorate-resolution';
+import {
+  VoteStatus,
+  VoteWeightBasis,
+} from '@/modules/voting/domain/vote/vote.types';
 
 export interface VoteReadRepository {
   findConsents(
@@ -26,6 +34,22 @@ export interface VoteReadRepository {
    * supplied directly by an admin/board member, who may have no user
    * account.
    */
+  /**
+   * Everything `resolveElectorateUnits` needs for the given units, so callers
+   * can resolve hypothetical electorates (e.g. previewing a consent) with the
+   * same inputs the real snapshot is built from.
+   */
+  loadElectorateInputs(
+    tenantId: string,
+    voteId: string,
+    unitIds: string[],
+    now: Date,
+  ): Promise<{
+    units: ElectorateUnitInput[];
+    parties: ElectoratePartyInput[];
+    consents: ElectorateConsentInput[];
+    weightBasis: VoteWeightBasis;
+  }>;
   isActiveUnitOwner(
     tenantId: string,
     unitId: string,

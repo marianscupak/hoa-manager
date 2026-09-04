@@ -37,6 +37,29 @@ export interface ElectorateConsentInput {
 
 const HALF = Rational.from(1, 2);
 
+/**
+ * The consent list as it would look if `consent` were recorded, used to
+ * preview the outcome before actually saving one.
+ *
+ * The grantor's existing consent for that unit is REPLACED rather than added
+ * to: an owner can only ever back one candidate (a partial unique index keeps
+ * one VALID consent per vote/unit/owner), and `resolveElectorateUnits` reads
+ * consents into a per-owner set, so appending would silently give the owner
+ * two votes' worth of support.
+ */
+export function applyHypotheticalConsent(
+  consents: ElectorateConsentInput[],
+  consent: ElectorateConsentInput,
+): ElectorateConsentInput[] {
+  return [
+    ...consents.filter(
+      (c) =>
+        !(c.unitId === consent.unitId && c.fromOwnerId === consent.fromOwnerId),
+    ),
+    consent,
+  ];
+}
+
 export function resolveElectorateUnits(
   units: ElectorateUnitInput[],
   parties: ElectoratePartyInput[],

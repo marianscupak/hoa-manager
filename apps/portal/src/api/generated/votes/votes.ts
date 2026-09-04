@@ -22,6 +22,7 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+    ConsentPreviewResponseDto,
     CreateVoteConsentDto,
     CreateVoteDto,
     CreateVoteQuestionDto,
@@ -46,6 +47,7 @@ import type {
     VoterStatusResponseDto,
     VotesControllerGetDelegationCandidatesParams,
     VotesControllerGetVotesParams,
+    VotesControllerPreviewConsentOutcomeParams,
 } from ".././model";
 
 import { customInstance } from "../../axios";
@@ -1674,6 +1676,212 @@ export function useVotesControllerGetDelegationCandidates<
     queryKey: DataTag<QueryKey, TData, TError>;
 } {
     const queryOptions = getVotesControllerGetDelegationCandidatesQueryOptions(
+        id,
+        params,
+        options,
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+        TData,
+        TError
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+    return { ...query, queryKey: queryOptions.queryKey };
+}
+
+export const votesControllerPreviewConsentOutcome = (
+    id: string,
+    params: VotesControllerPreviewConsentOutcomeParams,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<ConsentPreviewResponseDto>(
+        {
+            url: `/api/votes/${id}/consents/preview`,
+            method: "GET",
+            params,
+            signal,
+        },
+        options,
+    );
+};
+
+export const getVotesControllerPreviewConsentOutcomeQueryKey = (
+    id: string,
+    params?: VotesControllerPreviewConsentOutcomeParams,
+) => {
+    return [
+        `/api/votes/${id}/consents/preview`,
+        ...(params ? [params] : []),
+    ] as const;
+};
+
+export const getVotesControllerPreviewConsentOutcomeQueryOptions = <
+    TData = Awaited<ReturnType<typeof votesControllerPreviewConsentOutcome>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    params: VotesControllerPreviewConsentOutcomeParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof votesControllerPreviewConsentOutcome>
+                >,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getVotesControllerPreviewConsentOutcomeQueryKey(id, params);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof votesControllerPreviewConsentOutcome>>
+    > = ({ signal }) =>
+        votesControllerPreviewConsentOutcome(
+            id,
+            params,
+            requestOptions,
+            signal,
+        );
+
+    return {
+        queryKey,
+        queryFn,
+        enabled: !!id,
+        ...queryOptions,
+    } as UseQueryOptions<
+        Awaited<ReturnType<typeof votesControllerPreviewConsentOutcome>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type VotesControllerPreviewConsentOutcomeQueryResult = NonNullable<
+    Awaited<ReturnType<typeof votesControllerPreviewConsentOutcome>>
+>;
+export type VotesControllerPreviewConsentOutcomeQueryError = ErrorType<unknown>;
+
+export function useVotesControllerPreviewConsentOutcome<
+    TData = Awaited<ReturnType<typeof votesControllerPreviewConsentOutcome>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    params: VotesControllerPreviewConsentOutcomeParams,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof votesControllerPreviewConsentOutcome>
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof votesControllerPreviewConsentOutcome>
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<typeof votesControllerPreviewConsentOutcome>
+                    >
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useVotesControllerPreviewConsentOutcome<
+    TData = Awaited<ReturnType<typeof votesControllerPreviewConsentOutcome>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    params: VotesControllerPreviewConsentOutcomeParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof votesControllerPreviewConsentOutcome>
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof votesControllerPreviewConsentOutcome>
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<typeof votesControllerPreviewConsentOutcome>
+                    >
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useVotesControllerPreviewConsentOutcome<
+    TData = Awaited<ReturnType<typeof votesControllerPreviewConsentOutcome>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    params: VotesControllerPreviewConsentOutcomeParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof votesControllerPreviewConsentOutcome>
+                >,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useVotesControllerPreviewConsentOutcome<
+    TData = Awaited<ReturnType<typeof votesControllerPreviewConsentOutcome>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    params: VotesControllerPreviewConsentOutcomeParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof votesControllerPreviewConsentOutcome>
+                >,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
+    const queryOptions = getVotesControllerPreviewConsentOutcomeQueryOptions(
         id,
         params,
         options,

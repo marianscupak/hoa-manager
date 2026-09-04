@@ -469,6 +469,13 @@ export const voting = {
         },
     },
     delegate: {
+        risk: {
+            noRepresentative: {
+                title: "Jednotka by zůstala bez zástupce",
+                description:
+                    "Na stejné osobě se musí shodnout vlastníci s více než polovinou podílu a po této změně by ji nikdo neměl. Pokud jednotku vlastní manželé, musí stejnou osobu potvrdit i váš manžel nebo manželka, než hlasování začne.",
+            },
+        },
         title: "Delegovat hlas",
         backToVote: "Zpět na detail hlasování",
         votingEvent: "Hlasování",

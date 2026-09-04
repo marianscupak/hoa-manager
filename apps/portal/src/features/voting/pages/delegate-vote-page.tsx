@@ -11,6 +11,7 @@ import {
     useVotesControllerGetVoteDetail,
     useVotesControllerGetVoterStatus,
     useVotesControllerGetDelegationCandidates,
+    useVotesControllerPreviewConsentOutcome,
     useVotesControllerCreateVoteConsent,
     getVotesControllerGetVoterStatusQueryKey,
     getVotesControllerGetVotesQueryKey,
@@ -23,6 +24,7 @@ import { DelegationHeader } from "../components/delegation/delegation-header";
 import { DelegationNotice } from "../components/delegation/delegation-notice";
 import { DelegationSummary } from "../components/delegation/delegation-summary";
 import { UnitSelection } from "../components/delegation/unit-selection";
+import { consentRisk } from "../utils/delegation-eligibility";
 
 export const DelegateVotePage = () => {
     const { id = "" } = useParams();
@@ -52,6 +54,21 @@ export const DelegateVotePage = () => {
             },
         },
     );
+
+    // What this consent would do to the unit, asked of the server because the
+    // answer depends on the other owners' shares and consents, which the
+    // portal never sees.
+    const { data: preview, isPending: isPreviewPending } =
+        useVotesControllerPreviewConsentOutcome(
+            id,
+            {
+                unitId: selectedUnitId || "",
+                delegateMembershipId: selectedDelegateId || "",
+            },
+            {
+                query: { enabled: !!selectedUnitId && !!selectedDelegateId },
+            },
+        );
 
     const createConsent = useVotesControllerCreateVoteConsent();
 
@@ -105,6 +122,8 @@ export const DelegateVotePage = () => {
             (u) => u.status === "REQUIRES_DELEGATION" || u.status === "READY",
         ) || [];
 
+    const risk = consentRisk(preview, isPreviewPending);
+
     if (!vote || !voterStatus) return null;
 
     return (
@@ -142,6 +161,7 @@ export const DelegateVotePage = () => {
                     <DelegationSummary
                         selectedUnit={selectedUnit}
                         selectedDelegate={selectedDelegate}
+                        risk={risk}
                         isPending={createConsent.isPending}
                         onConfirm={() => setIsConfirmModalOpen(true)}
                         isValid={!!selectedUnitId && !!selectedDelegateId}
@@ -155,6 +175,7 @@ export const DelegateVotePage = () => {
                 onConfirm={handleConfirm}
                 unitName={selectedUnit?.name || ""}
                 delegateName={selectedDelegate?.name || ""}
+                risk={risk}
                 voteTitle={vote.title}
                 scheduledFrom={vote.scheduledFrom}
                 isPending={createConsent.isPending}

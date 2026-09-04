@@ -11,12 +11,16 @@ import {
     DialogTitle,
 } from "@hoa-mngr/ui";
 
+import type { ConsentRisk } from "../utils/delegation-eligibility";
+import { ConsentRiskNotice } from "./delegation/consent-risk-notice";
+
 interface ConfirmDelegationModalProps {
     isOpen: boolean;
     onClose: () => void;
     onConfirm: () => void;
     unitName: string;
     delegateName: string;
+    risk: ConsentRisk | null;
     voteTitle: string;
     scheduledFrom?: string | Date | null;
     isPending: boolean;
@@ -28,6 +32,7 @@ export const ConfirmDelegationModal = ({
     onConfirm,
     unitName,
     delegateName,
+    risk,
     voteTitle,
     scheduledFrom,
     isPending,
@@ -104,6 +109,8 @@ export const ConfirmDelegationModal = ({
                             </div>
                         </div>
                     </div>
+
+                    <ConsentRiskNotice risk={risk} />
 
                     <div className="border-primary-tint-border bg-primary-tint flex gap-4 rounded-xl border p-5">
                         <div className="bg-primary text-primary-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-full">

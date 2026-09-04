@@ -467,6 +467,13 @@ export const voting = {
         },
     },
     delegate: {
+        risk: {
+            noRepresentative: {
+                title: "This would leave the unit without a representative",
+                description:
+                    "Owners of more than half the unit have to agree on the same person, and after this change nobody would have that. If the unit is owned by a married couple, your spouse needs to confirm the same person before the vote opens.",
+            },
+        },
         title: "Delegate Your Vote",
         backToVote: "Back to vote detail",
         votingEvent: "Voting Event",

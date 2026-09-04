@@ -40,6 +40,7 @@ import {
   VoterStatusResponseDto,
   UpdateVoteDto,
   DelegationCandidateDto,
+  ConsentPreviewResponseDto,
   CreateVoteConsentDto,
   VoteConsentResponseDto,
   SubmitBallotDto,
@@ -83,6 +84,7 @@ import { GetVoteResultsQuery } from '../application/queries/get-vote-results/get
 import { GetVoteTurnoutQuery } from '../application/queries/get-vote-turnout/get-vote-turnout.query';
 import { GetVoterStatusQuery } from '../application/queries/get-voter-status/get-voter-status.query';
 import { GetVotesQuery } from '../application/queries/get-votes/get-votes.query';
+import { PreviewConsentOutcomeQuery } from '../application/queries/preview-consent-outcome/preview-consent-outcome.query';
 
 function parsePrimaryLanguage(header: string | undefined): string | undefined {
   if (!header) return undefined;
@@ -353,6 +355,32 @@ export class VotesController {
         unitId,
         tenantCtx.membershipId,
         forMembershipId,
+      ),
+    );
+  }
+
+  @Get(':id/consents/preview')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description:
+      'Previews what recording this consent would do to the unit, so the ' +
+      'delegation flow can warn before it is saved',
+    type: ConsentPreviewResponseDto,
+  })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard)
+  previewConsentOutcome(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Query('unitId', ParseUUIDPipe) unitId: string,
+    @Query('delegateMembershipId', ParseUUIDPipe) delegateMembershipId: string,
+    @Tenant() tenantCtx: TenantContext,
+  ) {
+    return this.queryBus.execute(
+      new PreviewConsentOutcomeQuery(
+        tenantCtx.tenantId,
+        id,
+        unitId,
+        delegateMembershipId,
+        tenantCtx.membershipId,
       ),
     );
   }

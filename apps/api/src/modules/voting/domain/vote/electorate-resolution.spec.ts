@@ -4,6 +4,7 @@ import {
 } from '@/modules/core/property/domain/ownership-plan';
 
 import {
+  applyHypotheticalConsent,
   resolveElectorateUnits,
   type ElectoratePartyInput,
 } from './electorate-resolution';
@@ -196,5 +197,72 @@ describe('resolveElectorateUnits', () => {
     )[0];
     expect(row.weightNum).toBe(1);
     expect(row.weightDen).toBe(1);
+  });
+});
+
+describe('applyHypotheticalConsent', () => {
+  const existing = [
+    { unitId: 'u1', fromOwnerId: 'wife', toMembershipId: 'mh' },
+    { unitId: 'u1', fromOwnerId: 'neighbour', toMembershipId: 'board' },
+    { unitId: 'u2', fromOwnerId: 'wife', toMembershipId: 'board' },
+  ];
+
+  it('replaces the consent the owner already recorded for that unit', () => {
+    expect(
+      applyHypotheticalConsent(existing, {
+        unitId: 'u1',
+        fromOwnerId: 'wife',
+        toMembershipId: 'board',
+      }),
+    ).toEqual([
+      { unitId: 'u1', fromOwnerId: 'neighbour', toMembershipId: 'board' },
+      { unitId: 'u2', fromOwnerId: 'wife', toMembershipId: 'board' },
+      { unitId: 'u1', fromOwnerId: 'wife', toMembershipId: 'board' },
+    ]);
+  });
+
+  it('adds the consent when the owner has none for that unit', () => {
+    expect(
+      applyHypotheticalConsent(existing, {
+        unitId: 'u1',
+        fromOwnerId: 'husband',
+        toMembershipId: 'board',
+      }),
+    ).toHaveLength(4);
+  });
+
+  it('leaves the caller-supplied list untouched', () => {
+    const before = [...existing];
+    applyHypotheticalConsent(existing, {
+      unitId: 'u1',
+      fromOwnerId: 'wife',
+      toMembershipId: 'board',
+    });
+    expect(existing).toEqual(before);
+  });
+
+  it('a replaced consent does not let one owner back two candidates', () => {
+    const sjm: ElectoratePartyInput = {
+      unitId: 'u1',
+      partyType: OwnershipPartyType.SJM,
+      shareNumerator: 1,
+      shareDenominator: 1,
+      members: [member('wife', 'mw'), member('husband', 'mh')],
+    };
+    // The husband has designated his wife, so the unit can vote. If she now
+    // consents to the board, her self-support is gone and the husband still
+    // backs only her: the unit ends up with nobody.
+    const row = resolveElectorateUnits(
+      [UNIT],
+      [sjm],
+      applyHypotheticalConsent(
+        [{ unitId: 'u1', fromOwnerId: 'husband', toMembershipId: 'mw' }],
+        { unitId: 'u1', fromOwnerId: 'wife', toMembershipId: 'board' },
+      ),
+      VoteWeightBasis.UNIT_SHARE,
+    )[0];
+    expect(row.ineligibleReason).toBe(
+      ElectorateIneligibleReason.NO_REPRESENTATIVE,
+    );
   });
 });

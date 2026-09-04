@@ -452,6 +452,26 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
     );
   }
 
+  async loadElectorateInputs(
+    tenantId: string,
+    voteId: string,
+    unitIds: string[],
+    now: Date,
+  ): Promise<{
+    units: ElectorateUnitInput[];
+    parties: ElectoratePartyInput[];
+    consents: ElectorateConsentInput[];
+    weightBasis: VoteWeightBasis;
+  }> {
+    const [plan, consents, weightBasis] = await Promise.all([
+      this.loadOwnershipPlan(tenantId, unitIds, now),
+      this.loadValidConsents(tenantId, voteId, unitIds),
+      this.getWeightBasis(tenantId, voteId),
+    ]);
+
+    return { ...plan, consents, weightBasis };
+  }
+
   /**
    * Loads the units and their active ownership parties in the shape the
    * `resolveElectorateUnits` domain function consumes.

@@ -2831,6 +2831,52 @@
         ]
       }
     },
+    "/api/votes/{id}/consents/preview": {
+      "get": {
+        "operationId": "VotesController_previewConsentOutcome",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "unitId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "delegateMembershipId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Previews what recording this consent would do to the unit, so the delegation flow can warn before it is saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentPreviewResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Votes"
+        ]
+      }
+    },
     "/api/votes/{id}/consents": {
       "post": {
         "operationId": "VotesController_createVoteConsent",
@@ -5268,6 +5314,18 @@
           "hasDelegatedToRequester",
           "isEligible",
           "isUnitOwner"
+        ]
+      },
+      "ConsentPreviewResponseDto": {
+        "type": "object",
+        "properties": {
+          "wouldLeaveUnitWithoutRepresentative": {
+            "type": "boolean",
+            "description": "Whether recording this consent would leave the unit with nobody authorised to vote it, because no candidate would hold a share majority afterwards."
+          }
+        },
+        "required": [
+          "wouldLeaveUnitWithoutRepresentative"
         ]
       },
       "CreateVoteConsentDto": {

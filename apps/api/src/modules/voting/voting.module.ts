@@ -48,6 +48,7 @@ import { GetVoteResultsHandler } from './application/queries/get-vote-results/ge
 import { GetVoteTurnoutHandler } from './application/queries/get-vote-turnout/get-vote-turnout.handler';
 import { GetVoterStatusHandler } from './application/queries/get-voter-status/get-voter-status.handler';
 import { GetVotesHandler } from './application/queries/get-votes/get-votes.handler';
+import { PreviewConsentOutcomeHandler } from './application/queries/preview-consent-outcome/preview-consent-outcome.handler';
 import { ElectorateDomainService } from './application/services/electorate.service';
 import { ResultCalculationDomainService } from './application/services/result-calculation.service';
 import { TenantLookup } from './audit/exporter/tenant.lookup';
@@ -86,6 +87,7 @@ const QUERY_HANDLERS = [
   GetVotesHandler,
   GetVoterStatusHandler,
   GetDelegationCandidatesHandler,
+  PreviewConsentOutcomeHandler,
   GetConsentsHandler,
   GetVoteResultsHandler,
   GetVoteActivityHandler,

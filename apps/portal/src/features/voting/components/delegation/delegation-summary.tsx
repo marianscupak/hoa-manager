@@ -8,9 +8,13 @@ import {
     OwningUnitStatusDto,
 } from "@/api/generated/model";
 
+import type { ConsentRisk } from "../../utils/delegation-eligibility";
+import { ConsentRiskNotice } from "./consent-risk-notice";
+
 interface DelegationSummaryProps {
     selectedUnit: OwningUnitStatusDto | null | undefined;
     selectedDelegate: DelegationCandidateDto | null | undefined;
+    risk: ConsentRisk | null;
     isPending: boolean;
     onConfirm: () => void;
     isValid: boolean;
@@ -19,6 +23,7 @@ interface DelegationSummaryProps {
 export const DelegationSummary = ({
     selectedUnit,
     selectedDelegate,
+    risk,
     isPending,
     onConfirm,
     isValid,
@@ -79,6 +84,8 @@ export const DelegationSummary = ({
                         </span>
                     </div>
                 </div>
+
+                <ConsentRiskNotice risk={risk} />
 
                 <Button
                     className="h-12 w-full text-lg font-semibold shadow-lg"

@@ -421,6 +421,16 @@ export class VoterStatusResponseDto {
   owningUnits!: OwningUnitStatusDto[];
 }
 
+export class ConsentPreviewResponseDto {
+  @ApiProperty({
+    description:
+      'Whether recording this consent would leave the unit with nobody ' +
+      'authorised to vote it, because no candidate would hold a share ' +
+      'majority afterwards.',
+  })
+  wouldLeaveUnitWithoutRepresentative!: boolean;
+}
+
 export class DelegationCandidateDto {
   @ApiProperty()
   membershipId!: string;

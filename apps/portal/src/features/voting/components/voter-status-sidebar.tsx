@@ -20,6 +20,7 @@ import { cn } from "@hoa-mngr/ui/lib/utils";
 
 import {
     OwnedUnitResponseDtoPartyType,
+    type OwningUnitStatusDto,
     type OwningUnitStatusDtoStatus,
     type VoteDetailResponseDto,
 } from "@/api/generated/model";
@@ -35,12 +36,14 @@ interface VoterStatusSidebarProps {
     vote: VoteDetailResponseDto;
 }
 
-// Icon tile tone: READY/VOTED read as "good", REQUIRES_DELEGATION/DELEGATED
-// as "needs attention" (even once delegated, the unit isn't voting directly),
+// Icon tile tone: READY/VOTED read as "good", PROXY as a unit that is this
+// member's to cast but not theirs to own, REQUIRES_DELEGATION/DELEGATED as
+// "needs attention" (even once delegated, the unit isn't voting directly),
 // INELIGIBLE fades out.
 const STATUS_ICON_TILE: Record<OwningUnitStatusDtoStatus, string> = {
     READY: "bg-success-muted text-success-tint-foreground",
     VOTED: "bg-success-muted text-success-tint-foreground",
+    PROXY: "bg-primary-tint text-primary-tint-foreground",
     REQUIRES_DELEGATION: "bg-warning-muted text-warning-tint-foreground",
     DELEGATED: "bg-warning-muted text-warning-tint-foreground",
     INELIGIBLE: "bg-muted text-faint",
@@ -52,6 +55,7 @@ const STATUS_BADGE_VARIANT: Record<
 > = {
     READY: "success",
     VOTED: "success",
+    PROXY: "primary",
     REQUIRES_DELEGATION: "warning",
     DELEGATED: "neutral",
     INELIGIBLE: "neutral",
@@ -60,10 +64,51 @@ const STATUS_BADGE_VARIANT: Record<
 const STATUS_LABEL_KEY = {
     READY: "detail.statusSidebar.statusReady",
     VOTED: "detail.statusSidebar.statusVoted",
+    PROXY: "detail.statusSidebar.statusProxy",
     REQUIRES_DELEGATION: "detail.statusSidebar.statusDelegation",
     DELEGATED: "detail.statusSidebar.statusDelegated",
     INELIGIBLE: "detail.statusSidebar.statusIneligible",
 } as const satisfies Record<OwningUnitStatusDtoStatus, string>;
+
+/**
+ * A unit's status chip, with an explanation on the statuses that need one:
+ * why a unit cannot vote, and — for a unit held on someone else's behalf —
+ * where the right to cast it came from.
+ */
+function UnitStatusChip({ unit }: { unit: OwningUnitStatusDto }) {
+    const { t } = useTranslation(["voting"]);
+
+    const explanation =
+        unit.status === "INELIGIBLE"
+            ? unit.ineligibleReason &&
+              t(
+                  `detail.statusSidebar.ineligibleReasons.${unit.ineligibleReason}`,
+              )
+            : unit.status === "PROXY"
+              ? t("detail.statusSidebar.statusProxyHint")
+              : null;
+
+    const chip = (
+        <StatusChip
+            variant={STATUS_BADGE_VARIANT[unit.status]}
+            className={cn("shrink-0", explanation && "cursor-help")}
+        >
+            {t(STATUS_LABEL_KEY[unit.status])}
+            {explanation && <Info className="h-3.5 w-3.5 opacity-70" />}
+        </StatusChip>
+    );
+
+    if (!explanation) return chip;
+
+    return (
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <span className="shrink-0">{chip}</span>
+            </TooltipTrigger>
+            <TooltipContent>{explanation}</TooltipContent>
+        </Tooltip>
+    );
+}
 
 export function VoterStatusSidebar({ vote }: VoterStatusSidebarProps) {
     const { t } = useTranslation(["voting"]);
@@ -160,45 +205,7 @@ export function VoterStatusSidebar({ vote }: VoterStatusSidebarProps) {
                                     {unit.share}
                                 </p>
                             </div>
-                            {unit.status === "INELIGIBLE" ? (
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <span className="shrink-0">
-                                            <StatusChip
-                                                variant={
-                                                    STATUS_BADGE_VARIANT[
-                                                        unit.status
-                                                    ]
-                                                }
-                                                className="cursor-help"
-                                            >
-                                                {t(
-                                                    STATUS_LABEL_KEY[
-                                                        unit.status
-                                                    ],
-                                                )}
-                                                {unit.ineligibleReason && (
-                                                    <Info className="h-3.5 w-3.5 opacity-70" />
-                                                )}
-                                            </StatusChip>
-                                        </span>
-                                    </TooltipTrigger>
-                                    {unit.ineligibleReason && (
-                                        <TooltipContent>
-                                            {t(
-                                                `detail.statusSidebar.ineligibleReasons.${unit.ineligibleReason}`,
-                                            )}
-                                        </TooltipContent>
-                                    )}
-                                </Tooltip>
-                            ) : (
-                                <StatusChip
-                                    variant={STATUS_BADGE_VARIANT[unit.status]}
-                                    className="shrink-0"
-                                >
-                                    {t(STATUS_LABEL_KEY[unit.status])}
-                                </StatusChip>
-                            )}
+                            <UnitStatusChip unit={unit} />
                         </div>
                     ))}
 

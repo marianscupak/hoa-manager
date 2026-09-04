@@ -54,6 +54,10 @@ describe("delegationPrompt", () => {
         ).toBeNull();
         expect(delegationPrompt("SCHEDULED", [])).toBeNull();
     });
+
+    it("offers nothing for a unit held on someone else's behalf — it is not theirs to pass on", () => {
+        expect(delegationPrompt("SCHEDULED", [unit("PROXY")])).toBeNull();
+    });
 });
 
 describe("votesOpenForDelegation", () => {

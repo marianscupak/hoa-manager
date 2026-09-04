@@ -14,7 +14,8 @@ export type DelegationPrompt = "required" | "available";
  * - `"required"`: a co-owned unit has no common representative yet and will
  *   be ineligible unless one is agreed.
  * - `"available"`: the member can vote in person but may still appoint a
- *   proxy, e.g. because they will be away.
+ *   proxy, e.g. because they will be away. Only their own READY units count —
+ *   a unit they hold for someone else is not theirs to pass on.
  */
 export function delegationPrompt(
     voteStatus: string,

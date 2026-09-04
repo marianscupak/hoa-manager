@@ -98,6 +98,8 @@ export const DelegateVotePage = () => {
         c.name.toLowerCase().includes(searchQuery.toLowerCase()),
     );
 
+    // Only the member's own units can be handed to someone else — a PROXY
+    // unit is one they already hold on an owner's behalf.
     const selectableUnits =
         voterStatus?.owningUnits.filter(
             (u) => u.status === "REQUIRES_DELEGATION" || u.status === "READY",

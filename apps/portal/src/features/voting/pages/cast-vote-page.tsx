@@ -91,10 +91,13 @@ export function CastVotePage() {
     const [showSuccess, setShowSuccess] = useState(false);
     const [submittedAt, setSubmittedAt] = useState<string | null>(null);
 
-    // Compute ready units from voter status
-    const readyUnits = useMemo(() => {
+    // Units this member still has a ballot to cast for — their own ready
+    // units plus any they were chosen to vote for on an owner's behalf.
+    const votableUnits = useMemo(() => {
         if (!statusQuery.data) return [];
-        return statusQuery.data.owningUnits.filter((u) => u.status === "READY");
+        return statusQuery.data.owningUnits.filter(
+            (u) => u.status === "READY" || u.status === "PROXY",
+        );
     }, [statusQuery.data]);
 
     const questions = useMemo(
@@ -106,17 +109,17 @@ export function CastVotePage() {
 
     // Calculate completion percentage based on answered questions
     const completedQuestions = useMemo(() => {
-        if (readyUnits.length === 0 || totalQuestions === 0) return 0;
+        if (votableUnits.length === 0 || totalQuestions === 0) return 0;
         let count = 0;
         for (let qi = 0; qi < totalQuestions; qi++) {
             const q = questions[qi];
-            const allAnswered = readyUnits.every(
+            const allAnswered = votableUnits.every(
                 (u) => answers[u.id]?.[q.id] !== undefined,
             );
             if (allAnswered) count++;
         }
         return count;
-    }, [answers, readyUnits, questions, totalQuestions]);
+    }, [answers, votableUnits, questions, totalQuestions]);
 
     const completionPct =
         totalQuestions > 0
@@ -152,7 +155,7 @@ export function CastVotePage() {
 
     const handleSubmit = useCallback(() => {
         const ballotData: SubmitBallotBody = {
-            ballots: readyUnits.map((unit) => ({
+            ballots: votableUnits.map((unit) => ({
                 unitId: unit.id,
                 answers: questions.map((q) => ({
                     questionId: q.id,
@@ -167,7 +170,7 @@ export function CastVotePage() {
                 setShowSuccess(true);
             },
         });
-    }, [readyUnits, questions, answers, submitMutation]);
+    }, [votableUnits, questions, answers, submitMutation]);
 
     const hasAlreadyVoted = useMemo(() => {
         if (!statusQuery.data) return false;
@@ -199,7 +202,7 @@ export function CastVotePage() {
         );
     }
 
-    if (readyUnits.length === 0) {
+    if (votableUnits.length === 0) {
         return (
             <div className="mx-auto flex max-w-lg flex-col items-center justify-center py-20 text-center">
                 <div className="bg-success-muted mb-6 flex h-20 w-20 items-center justify-center rounded-full">
@@ -244,7 +247,7 @@ export function CastVotePage() {
                     </h3>
 
                     <div className="space-y-6">
-                        {readyUnits.map((unit) => (
+                        {votableUnits.map((unit) => (
                             <div
                                 key={unit.id}
                                 className="rounded-panel border-hairline border p-4"
@@ -347,7 +350,7 @@ export function CastVotePage() {
     if (!currentQuestion) return null;
 
     // Check if all units have answered current question
-    const allCurrentAnswered = readyUnits.every(
+    const allCurrentAnswered = votableUnits.every(
         (u) => answers[u.id]?.[currentQuestion.id] !== undefined,
     );
 
@@ -395,7 +398,7 @@ export function CastVotePage() {
             </Card>
 
             {/* Per-unit voting sections */}
-            {readyUnits.map((unit) => (
+            {votableUnits.map((unit) => (
                 <div key={unit.id} className="space-y-3">
                     {/* Unit header */}
                     <Card className="p-4 text-center">

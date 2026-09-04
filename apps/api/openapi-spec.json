@@ -4667,7 +4667,8 @@
               "REQUIRES_DELEGATION",
               "DELEGATED",
               "INELIGIBLE",
-              "VOTED"
+              "VOTED",
+              "PROXY"
             ]
           },
           "ineligibleReason": {

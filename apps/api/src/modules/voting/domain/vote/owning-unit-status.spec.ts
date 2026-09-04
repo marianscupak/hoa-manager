@@ -44,6 +44,7 @@ describe('deriveOwningUnitStatus', () => {
     parties: ElectoratePartyInput[],
     consents: { unitId: string; fromOwnerId: string; toMembershipId: string }[],
     membershipId: string,
+    isOwner = true,
   ) => {
     const [resolved] = resolveElectorateUnits(
       [UNIT],
@@ -56,6 +57,7 @@ describe('deriveOwningUnitStatus', () => {
       status: deriveOwningUnitStatus({
         resolved,
         membershipId,
+        isOwner,
         hasVoted: false,
         phase: 'PREVIEW' as const,
       }),
@@ -128,8 +130,70 @@ describe('deriveOwningUnitStatus', () => {
     expect(resolved.representativeMembershipId).toBe('m-x');
     expect(status).toBe(OwningUnitStatus.DELEGATED);
 
-    // ...and the delegate genuinely holds the unit at open.
-    expect(preview([party('own-a', 'm-a', 1, 1)], consents, 'm-x').status).toBe(
+    // ...and the delegate genuinely holds the unit at open, but as a proxy —
+    // they own no share of it.
+    expect(
+      preview([party('own-a', 'm-a', 1, 1)], consents, 'm-x', false).status,
+    ).toBe(OwningUnitStatus.PROXY);
+  });
+
+  describe('a member who represents a unit they do not own', () => {
+    const parties = [party('own-a', 'm-a', 1, 1)];
+    const consents = [
+      { unitId: 'u1', fromOwnerId: 'own-a', toMembershipId: 'm-x' },
+    ];
+
+    it('previews PROXY, so the unit reaches the delegate at all', () => {
+      expect(preview(parties, consents, 'm-x', false).status).toBe(
+        OwningUnitStatus.PROXY,
+      );
+    });
+
+    it('reports VOTED once the proxy ballot is cast', () => {
+      const [resolved] = resolveElectorateUnits(
+        [UNIT],
+        parties,
+        consents,
+        VoteWeightBasis.UNIT_SHARE,
+      );
+
+      expect(
+        deriveOwningUnitStatus({
+          resolved,
+          membershipId: 'm-x',
+          isOwner: false,
+          hasVoted: true,
+          phase: 'PREVIEW',
+        }),
+      ).toBe(OwningUnitStatus.VOTED);
+    });
+
+    it('stays PROXY in the SNAPSHOT phase', () => {
+      expect(
+        deriveOwningUnitStatus({
+          resolved: {
+            representativeMembershipId: 'm-x',
+            eligibilityStatus: ElectorateEligibilityStatus.ELIGIBLE,
+            ineligibleReason: null,
+          },
+          membershipId: 'm-x',
+          isOwner: false,
+          hasVoted: false,
+          phase: 'SNAPSHOT',
+        }),
+      ).toBe(OwningUnitStatus.PROXY);
+    });
+  });
+
+  it('keeps READY for a co-owner who was handed the unit by consent', () => {
+    // Half-and-half deadlock broken by the other co-owner's consent: m-a owns
+    // the unit, so it is theirs to vote — not a proxy for someone else.
+    const parties = [party('own-a', 'm-a', 1, 2), party('own-b', 'm-b', 1, 2)];
+    const consents = [
+      { unitId: 'u1', fromOwnerId: 'own-b', toMembershipId: 'm-a' },
+    ];
+
+    expect(preview(parties, consents, 'm-a').status).toBe(
       OwningUnitStatus.READY,
     );
   });
@@ -155,6 +219,7 @@ describe('deriveOwningUnitStatus', () => {
       deriveOwningUnitStatus({
         resolved,
         membershipId: 'm-a',
+        isOwner: true,
         hasVoted: true,
         phase: 'PREVIEW',
       }),
@@ -173,6 +238,7 @@ describe('deriveOwningUnitStatus', () => {
         deriveOwningUnitStatus({
           resolved: frozen,
           membershipId: 'm-a',
+          isOwner: true,
           hasVoted: false,
           phase: 'SNAPSHOT',
         }),

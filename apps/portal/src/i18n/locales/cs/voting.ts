@@ -436,6 +436,9 @@ export const voting = {
             statusReady: "Připraveno",
             statusDelegation: "Vyžaduje delegaci",
             statusVoted: "Odhlasováno",
+            statusProxy: "Zastupujete",
+            statusProxyHint:
+                "Majitel jednotky vás vybral, abyste za ni hlasovali.",
             statusDelegated: "Delegováno",
             statusIneligible: "Nepovolaný",
             ineligibleReasons: {

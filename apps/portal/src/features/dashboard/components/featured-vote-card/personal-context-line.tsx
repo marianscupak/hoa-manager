@@ -11,10 +11,14 @@ export function PersonalContextLine({ voterStatus }: PersonalContextLineProps) {
     const units = voterStatus.owningUnits ?? [];
 
     // Priority order — first match wins (per spec section 6.1).
-    // 1. Outstanding action — any unit READY or REQUIRES_DELEGATION.
+    // 1. Outstanding action — any unit READY, PROXY (one this member votes on
+    //    an owner's behalf) or REQUIRES_DELEGATION.
     if (
         units.some(
-            (u) => u.status === "READY" || u.status === "REQUIRES_DELEGATION",
+            (u) =>
+                u.status === "READY" ||
+                u.status === "PROXY" ||
+                u.status === "REQUIRES_DELEGATION",
         )
     ) {
         return (

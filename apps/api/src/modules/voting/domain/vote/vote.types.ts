@@ -99,6 +99,8 @@ export enum OwningUnitStatus {
   DELEGATED = 'DELEGATED',
   INELIGIBLE = 'INELIGIBLE',
   VOTED = 'VOTED',
+  /** Represented by this member on an owner's behalf — they do not own it. */
+  PROXY = 'PROXY',
 }
 
 export enum ElectorateEligibilityStatus {

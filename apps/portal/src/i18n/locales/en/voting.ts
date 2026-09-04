@@ -436,6 +436,8 @@ export const voting = {
             statusReady: "Ready",
             statusDelegation: "Requires delegation",
             statusVoted: "Voted",
+            statusProxy: "Representing",
+            statusProxyHint: "An owner chose you to vote for this unit.",
             statusDelegated: "Delegated",
             statusIneligible: "Ineligible",
             ineligibleReasons: {

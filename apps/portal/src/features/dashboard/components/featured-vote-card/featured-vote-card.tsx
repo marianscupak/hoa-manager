@@ -168,7 +168,10 @@ export function FeaturedVoteCard() {
     }
 
     const hasUncastBallot = (voterStatusQuery.data?.owningUnits ?? []).some(
-        (u) => u.status === "READY" || u.status === "REQUIRES_DELEGATION",
+        (u) =>
+            u.status === "READY" ||
+            u.status === "PROXY" ||
+            u.status === "REQUIRES_DELEGATION",
     );
     const showCastCta = !adminView && isOpen && hasUncastBallot;
     const ctaLabel = showCastCta

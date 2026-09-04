@@ -1,4 +1,4 @@
-import { Button } from "./button";
+import { Button, type ButtonProps } from "./button";
 import {
     Dialog,
     DialogContent,
@@ -19,11 +19,14 @@ export interface ConfirmDialogProps {
     confirmingLabel?: string;
     /** Disables both buttons and swaps the confirm label. */
     confirming?: boolean;
+    /** Confirm button variant; defaults to destructive. */
+    confirmVariant?: ButtonProps["variant"];
     onConfirm: () => void;
 }
 
-/** Destructive confirmation dialog. Call sites own the mutation, toast,
- *  and query invalidation; this component is purely presentational. */
+/** Confirmation dialog, destructive unless `confirmVariant` says otherwise.
+ *  Call sites own the mutation, toast, and query invalidation; this
+ *  component is purely presentational. */
 export function ConfirmDialog({
     open,
     onOpenChange,
@@ -33,6 +36,7 @@ export function ConfirmDialog({
     cancelLabel,
     confirmingLabel,
     confirming = false,
+    confirmVariant = "destructive",
     onConfirm,
 }: ConfirmDialogProps) {
     return (
@@ -51,7 +55,7 @@ export function ConfirmDialog({
                         {cancelLabel}
                     </Button>
                     <Button
-                        variant="destructive"
+                        variant={confirmVariant}
                         onClick={onConfirm}
                         disabled={confirming}
                     >

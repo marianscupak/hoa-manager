@@ -1,0 +1,193 @@
+/* Print styles for the study pack (scripts/study-pack.mjs).
+   Deliberately uses system fonts only: the generated HTML has to stay
+   printable offline, minutes before a session, with no network fetch. */
+
+@page {
+    size: A4;
+}
+
+:root {
+    --ink: #1f2328;
+    --muted: #5b6570;
+    --rule: #d8dde3;
+    --wash: #f4f6f8;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+body {
+    margin: 0;
+    color: var(--ink);
+    font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, "Segoe UI",
+        sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.55;
+    orphans: 3;
+    widows: 3;
+}
+
+h1,
+h2,
+h3 {
+    break-after: avoid-page;
+    margin: 0 0 0.35em;
+    line-height: 1.25;
+}
+
+h1 {
+    padding-bottom: 2.5mm;
+    border-bottom: 0.6mm solid var(--ink);
+    font-size: 19pt;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+h2 {
+    margin-top: 1.5em;
+    font-size: 12.5pt;
+    font-weight: 700;
+}
+
+h3 {
+    margin-top: 1.2em;
+    font-size: 11pt;
+    font-weight: 700;
+    color: var(--muted);
+}
+
+p,
+ul,
+ol,
+dl {
+    margin: 0 0 0.7em;
+}
+
+ul,
+ol {
+    padding-left: 5mm;
+}
+
+li {
+    margin-bottom: 0.25em;
+    break-inside: avoid;
+}
+
+li.check {
+    list-style: none;
+    margin-left: -5mm;
+}
+
+strong {
+    font-weight: 700;
+}
+
+code {
+    padding: 0.5mm 1.2mm;
+    border-radius: 1mm;
+    background: var(--wash);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.92em;
+}
+
+/* The version/date/author line that opens every material. */
+p.meta {
+    margin-bottom: 1.4em;
+    color: var(--muted);
+    font-size: 8.5pt;
+}
+
+p.lede {
+    margin-bottom: 1.2em;
+    font-size: 11pt;
+    color: var(--muted);
+}
+
+p.note {
+    color: var(--muted);
+    font-size: 9.5pt;
+}
+
+p.foot {
+    margin-top: 1.6em;
+    padding-top: 2mm;
+    border-top: 0.3mm solid var(--rule);
+}
+
+table {
+    width: 100%;
+    margin: 0 0 1em;
+    border-collapse: collapse;
+    font-size: 9pt;
+}
+
+th,
+td {
+    padding: 1.6mm 2mm;
+    border: 0.3mm solid var(--rule);
+    text-align: left;
+    vertical-align: top;
+}
+
+th {
+    background: var(--wash);
+    font-weight: 700;
+}
+
+tr {
+    break-inside: avoid;
+}
+
+/* One source document inside a pack; each starts on a fresh sheet. */
+section.doc-part + section.doc-part {
+    break-before: page;
+}
+
+/* Sections that must not be split across sheets, such as a signature block. */
+section.keep {
+    break-inside: avoid-page;
+}
+
+/* Participant card */
+dl.card-rows {
+    display: grid;
+    grid-template-columns: 52mm 1fr;
+    gap: 1.6mm 6mm;
+    margin: 0 0 0.4em;
+}
+
+dl.card-rows dt {
+    color: var(--muted);
+    font-weight: 700;
+}
+
+dl.card-rows dd {
+    margin: 0;
+}
+
+dl.card-rows dd.cred {
+    padding: 0.6mm 2mm;
+    border-radius: 1mm;
+    background: var(--wash);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 10pt;
+}
+
+section.card-section {
+    break-inside: avoid-page;
+    margin-bottom: 1.4em;
+}
+
+section.card-section h2 {
+    margin-top: 0;
+    padding-bottom: 1.2mm;
+    border-bottom: 0.3mm solid var(--rule);
+    font-size: 11pt;
+    text-transform: none;
+}

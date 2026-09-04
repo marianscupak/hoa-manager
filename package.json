@@ -6,7 +6,8 @@
         "typecheck": "turbo run typecheck",
         "dev": "turbo run dev",
         "lint": "turbo run lint",
-        "test": "turbo run test",
+        "test": "turbo run test && node --test scripts/study-pack.test.mjs",
+        "study:pack": "node scripts/study-pack.mjs",
         "format": "prettier --write \"**/*.{ts,tsx,md,json,css,html}\"",
         "format:check": "prettier --check \"**/*.{ts,tsx,md,json,css,html}\""
     },
@@ -14,8 +15,10 @@
         "@eslint/js": "10.0.1",
         "@hoa-mngr/eslint-config": "workspace:*",
         "eslint": "^10.0.2",
+        "marked": "^18.0.11",
         "prettier": "^3.2.5",
         "prettier-plugin-tailwindcss": "0.7.2",
+        "puppeteer-core": "^25.10.0",
         "turbo": "^2.8.10",
         "typescript-eslint": "8.57.0"
     },

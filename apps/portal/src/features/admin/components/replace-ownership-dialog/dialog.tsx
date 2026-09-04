@@ -103,15 +103,15 @@ export function ReplaceOwnershipDialog({
         );
     };
 
+    // Deliberately not memoised: react-hook-form mutates the watched array in
+    // place when a share changes, so its reference only changes when a row is
+    // added or removed. A memo keyed on it froze this sum between those
+    // events, which is exactly the "sum doesn't update live" report.
     const watchedOwnerships = form.watch("ownerships");
-    const sum = useMemo(
-        () =>
-            sumFractions(
-                watchedOwnerships
-                    .map((o) => o.share)
-                    .filter((s): s is Fraction => s !== null),
-            ),
-        [watchedOwnerships],
+    const sum = sumFractions(
+        watchedOwnerships
+            .map((o) => o.share)
+            .filter((s): s is Fraction => s !== null),
     );
     const sumIsExact = fractionEqualsOne(sum);
 

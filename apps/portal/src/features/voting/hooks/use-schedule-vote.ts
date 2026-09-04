@@ -1,7 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
+
+import { toast } from "@hoa-mngr/ui";
 
 import { showApiError } from "@/api/error-utils";
 import {

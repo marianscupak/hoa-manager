@@ -3,9 +3,8 @@ import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
-import { toast } from "sonner";
 
-import { Button, ConfirmDialog } from "@hoa-mngr/ui";
+import { Button, ConfirmDialog, toast } from "@hoa-mngr/ui";
 
 import { showApiError } from "@/api/error-utils";
 import {

@@ -336,44 +336,26 @@ export function RulesetFormFields({
                     ]}
                 />
 
-                <div className="space-y-2">
-                    <p className="text-sm font-semibold">
-                        {t(
-                            "voting:create.fields.majorityDenominatorBasis.label",
-                        )}
-                    </p>
-                    {derivedBasis ? (
-                        <p className="border-input bg-muted/40 text-muted-foreground flex h-10 items-center rounded-[9px] border px-3 text-sm">
-                            {basisLabel(derivedBasis)}
-                        </p>
-                    ) : (
-                        <Select
-                            value={majorityDenominatorBasis}
-                            onValueChange={(next) =>
-                                form.setValue(
-                                    "majorityDenominatorBasis",
-                                    next,
-                                    {
-                                        shouldDirty: true,
-                                        shouldValidate: true,
-                                    },
-                                )
-                            }
-                        >
-                            <SelectTrigger>
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="VOTES_CAST">
-                                    {basisLabel("VOTES_CAST")}
-                                </SelectItem>
-                                <SelectItem value="ALL_VOTES">
-                                    {basisLabel("ALL_VOTES")}
-                                </SelectItem>
-                            </SelectContent>
-                        </Select>
+                {/* Rendered through the same FormSelect as "Typ většiny" so the two
+                    cells share one label/trigger structure; when the statute
+                    derives the basis the select is simply disabled. */}
+                <FormSelect
+                    name="majorityDenominatorBasis"
+                    label={t(
+                        "voting:create.fields.majorityDenominatorBasis.label",
                     )}
-                </div>
+                    disabled={!!derivedBasis}
+                    options={[
+                        {
+                            label: basisLabel("VOTES_CAST"),
+                            value: "VOTES_CAST",
+                        },
+                        {
+                            label: basisLabel("ALL_VOTES"),
+                            value: "ALL_VOTES",
+                        },
+                    ]}
+                />
             </div>
 
             {majorityRuleType === "QUALIFIED_MAJORITY" && (

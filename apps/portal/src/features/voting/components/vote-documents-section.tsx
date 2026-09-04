@@ -2,9 +2,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { File, Loader2, Plus, X } from "lucide-react";
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 
-import { Button } from "@hoa-mngr/ui";
+import { Button, toast } from "@hoa-mngr/ui";
 
 import { showApiError } from "@/api/error-utils";
 import { VoteDocumentResponseDto } from "@/api/generated/model";

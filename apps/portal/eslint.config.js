@@ -8,15 +8,32 @@ export default [
     {
         files: ["**/*.{ts,tsx}"],
         plugins: {
-            react: reactPlugin,
+            "react": reactPlugin,
             "react-hooks": reactHooksPlugin,
             "react-refresh": reactRefreshPlugin,
         },
         rules: {
             ...reactPlugin.configs.recommended.rules,
             ...reactHooksPlugin.configs.recommended.rules,
-            "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
+            "react-refresh/only-export-components": [
+                "warn",
+                { allowConstantExport: true },
+            ],
             "react/react-in-jsx-scope": "off",
+            // The UI package mounts the one <Toaster/>; a `toast` imported from
+            // a second sonner copy has no subscriber and silently shows nothing.
+            "no-restricted-imports": [
+                "error",
+                {
+                    paths: [
+                        {
+                            name: "sonner",
+                            message:
+                                'Import { toast } from "@hoa-mngr/ui" instead.',
+                        },
+                    ],
+                },
+            ],
         },
         languageOptions: {
             globals: {

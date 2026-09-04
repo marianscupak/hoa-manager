@@ -4,7 +4,6 @@ import { Building2, Check, UserPlus, Vote as VoteIcon } from "lucide-react";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 
 import {
     Button,
@@ -24,6 +23,7 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
+    toast,
 } from "@hoa-mngr/ui";
 
 import { showApiError } from "@/api/error-utils";

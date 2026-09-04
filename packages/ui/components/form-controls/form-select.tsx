@@ -53,7 +53,7 @@ export const FormSelect = ({
                             field.onChange(value);
                             onValueChange?.(value);
                         }}
-                        defaultValue={field.value}
+                        value={field.value}
                         disabled={disabled}
                     >
                         <FormControl>

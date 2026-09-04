@@ -3,7 +3,6 @@ import { Loader2, Send } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
-import { toast } from "sonner";
 
 import {
     Button,
@@ -13,6 +12,7 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
+    toast,
 } from "@hoa-mngr/ui";
 
 import { VoteDetailResponseDto } from "@/api/generated/model";

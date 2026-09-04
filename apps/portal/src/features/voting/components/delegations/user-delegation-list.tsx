@@ -2,7 +2,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 
 import {
     Button,
@@ -14,6 +13,7 @@ import {
     SelectTrigger,
     SelectValue,
     type ColumnDef,
+    toast,
 } from "@hoa-mngr/ui";
 
 import { showApiError } from "@/api/error-utils";

@@ -1,10 +1,9 @@
 import { Download, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 
 import { votesControllerGetAuditExport } from "@/api/generated/votes/votes";
-import { Button } from "@hoa-mngr/ui";
+import { Button, toast } from "@hoa-mngr/ui";
 
 interface AuditExportButtonProps {
     voteId: string;

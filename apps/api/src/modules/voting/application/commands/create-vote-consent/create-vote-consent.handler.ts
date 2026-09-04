@@ -95,18 +95,6 @@ export class CreateVoteConsentHandler
       ownerId = command.fromOwnerId;
       ownerMembershipIdForAudit = null;
     } else {
-      const statuses = await this.voteReadRepo.findVoterStatus(
-        command.tenantId,
-        command.voteId,
-        command.membershipId,
-        this.clock.now(),
-      );
-
-      const isOwner = statuses.owningUnits.some((u) => u.id === command.unitId);
-      if (!isOwner) {
-        throw new NotAUnitOwnerException();
-      }
-
       const resolvedOwnerId = await this.voteReadRepo.getOwnerIdByMembership(
         command.tenantId,
         command.membershipId,
@@ -114,6 +102,19 @@ export class CreateVoteConsentHandler
 
       if (!resolvedOwnerId) {
         throw new MembershipHasNoAssociatedOwnerException();
+      }
+
+      // Ownership of the unit itself, checked exactly as on the admin path —
+      // being able to vote for a unit is not enough, or a member chosen to
+      // represent someone else's unit could pass it on again.
+      const isOwner = await this.voteReadRepo.isActiveUnitOwner(
+        command.tenantId,
+        command.unitId,
+        resolvedOwnerId,
+        this.clock.now(),
+      );
+      if (!isOwner) {
+        throw new NotAUnitOwnerException();
       }
 
       ownerId = resolvedOwnerId;

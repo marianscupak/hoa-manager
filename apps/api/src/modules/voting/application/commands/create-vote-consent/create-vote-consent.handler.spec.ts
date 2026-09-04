@@ -15,7 +15,6 @@ const DELEGATE_MEMBERSHIP = 'delegate-m1';
 
 function buildHandler(overrides?: {
   isActiveUnitOwner?: boolean;
-  owningUnits?: { id: string }[];
   ownerIdByMembership?: string | null;
   saveImpl?: () => Promise<string>;
 }) {
@@ -31,8 +30,10 @@ function buildHandler(overrides?: {
     save: jest.fn(overrides?.saveImpl ?? (() => Promise.resolve('consent-1'))),
   };
   const voteReadRepo = {
+    // Says the member may vote for the unit — which they can do as someone
+    // else's proxy, so it must never stand in for owning it.
     findVoterStatus: jest.fn().mockResolvedValue({
-      owningUnits: overrides?.owningUnits ?? [{ id: UNIT }],
+      owningUnits: [{ id: UNIT }],
     }),
     getOwnerIdByMembership: jest
       .fn()
@@ -160,10 +161,10 @@ describe('CreateVoteConsentHandler', () => {
     ).rejects.toMatchObject({ code: 'FORBIDDEN' });
   });
 
-  it('keeps the self-service path unchanged when fromOwnerId is omitted', async () => {
+  it('records a self-service consent for a unit the caller owns', async () => {
     const { handler, consentWriteRepo, voteReadRepo } = buildHandler({
       ownerIdByMembership: 'owner-self-1',
-      owningUnits: [{ id: UNIT }],
+      isActiveUnitOwner: true,
     });
 
     await handler.execute(
@@ -177,16 +178,15 @@ describe('CreateVoteConsentHandler', () => {
       ),
     );
 
-    expect(voteReadRepo.isActiveUnitOwner).not.toHaveBeenCalled();
-    expect(voteReadRepo.findVoterStatus).toHaveBeenCalledWith(
-      TENANT,
-      VOTE,
-      RECORDER_MEMBERSHIP,
-      expect.any(Date),
-    );
     expect(voteReadRepo.getOwnerIdByMembership).toHaveBeenCalledWith(
       TENANT,
       RECORDER_MEMBERSHIP,
+    );
+    expect(voteReadRepo.isActiveUnitOwner).toHaveBeenCalledWith(
+      TENANT,
+      UNIT,
+      'owner-self-1',
+      expect.any(Date),
     );
     expect(consentWriteRepo.save).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -194,6 +194,31 @@ describe('CreateVoteConsentHandler', () => {
         recordedByMembershipId: RECORDER_MEMBERSHIP,
       }),
     );
+  });
+
+  it('rejects a self-service consent for a unit the caller does not own', async () => {
+    // The caller may still be able to vote for the unit — they were chosen to
+    // represent its owner — but a unit held for someone else is not theirs to
+    // pass on.
+    const { handler, voteReadRepo } = buildHandler({
+      ownerIdByMembership: 'owner-self-1',
+      isActiveUnitOwner: false,
+    });
+
+    await expect(
+      handler.execute(
+        new CreateVoteConsentCommand(
+          TENANT,
+          VOTE,
+          UNIT,
+          RECORDER_MEMBERSHIP,
+          DELEGATE_MEMBERSHIP,
+          ['UNIT_OWNER'],
+        ),
+      ),
+    ).rejects.toMatchObject({ code: 'NOT_A_UNIT_OWNER' });
+
+    expect(voteReadRepo.findVoterStatus).not.toHaveBeenCalled();
   });
 
   it('propagates CONSENT_ALREADY_RECORDED when the write repository rejects a duplicate', async () => {

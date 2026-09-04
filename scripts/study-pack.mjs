@@ -4,12 +4,13 @@
  * Czech materials in docs/user-testing/materialy, and prints them to PDF with
  * the Chrome that Puppeteer has already cached on this machine.
  *
- *   pnpm study:pack --participant P1 --name "Jan Novak" --email jan@example.com \
- *       --password Svj-abcd-efgh --moderator-email schranka@example.com \
- *       --form-intake https://forms.gle/xxxx
+ *   pnpm study:pack --participant P1 --email jan@example.com \
+ *       --password Svj-abcd-efgh --moderator-email schranka@example.com
  *   pnpm study:pack --appendix
  *
  * The values come from the output of the study seed (scripts/study-seed.sh).
+ * Links to the online questionnaires are content of the materials
+ * themselves (00 for the intake form, 03 for SUS), not run parameters.
  * Nothing is written if a placeholder is left unfilled.
  */
 import { execFileSync } from "node:child_process";
@@ -39,8 +40,8 @@ const PACK_ROOT = path.join(REPO, "docs", "user-testing", "pack");
 const USAGE = `Usage:
   study-pack --participant <Pn> --email <participant email>
              --password <persona password> --moderator-email <mailbox for task A4>
-             --form-intake <url of the intake form> [--contact-email <author email>]
-             [--name "<vocative first name, e.g. Jane>"] [--out <dir>] [--html-only]
+             [--contact-email <author email>] [--name "<vocative first name, e.g. Jane>"]
+             [--out <dir>] [--html-only]
       Writes the invitation pack (what to expect + informed consent) and the
       participant card for one session.
 
@@ -354,7 +355,6 @@ function parseInput(argv) {
             "password": { type: "string" },
             "moderator-email": { type: "string" },
             "contact-email": { type: "string" },
-            "form-intake": { type: "string" },
             "out": { type: "string" },
             "appendix": { type: "boolean", default: false },
             "html-only": { type: "boolean", default: false },
@@ -391,7 +391,6 @@ async function main() {
             "--email": values.email,
             "--password": values.password,
             "--moderator-email": values["moderator-email"],
-            "--form-intake": values["form-intake"],
             "--contact-email": contactEmail,
         };
         const missing = Object.entries(required)
@@ -414,7 +413,6 @@ async function main() {
             "heslo": values.password,
             "e-mail schránky moderátora": values["moderator-email"],
             "e-mail": contactEmail,
-            "odkaz na vstupní dotazník": values["form-intake"],
         };
 
         documents = [

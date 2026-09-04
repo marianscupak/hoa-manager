@@ -10,15 +10,16 @@ import {
     useUnitControllerGetUnitDetail,
 } from "@/api/generated/property-units/property-units";
 
-import { CancelScheduledTransferDialog } from "../components/ownership-history/cancel-scheduled-transfer-dialog";
 import {
     findScheduledPeriod,
     latestPeriodStart,
-} from "../components/ownership-history/rows";
-import { ScheduledTransferBanner } from "../components/ownership-history/scheduled-transfer-banner";
+} from "@/components/ownership-history/rows";
+import { ScheduledTransferBanner } from "@/components/ownership-history/scheduled-transfer-banner";
+import { UnitOwnershipsTable } from "@/components/ownership-history/unit-ownerships-table";
+
+import { CancelScheduledTransferDialog } from "../components/ownership-history/cancel-scheduled-transfer-dialog";
 import { ReplaceOwnershipDialog } from "../components/replace-ownership-dialog/dialog";
 import { UnitInfoCard } from "../components/unit-info-card";
-import { UnitOwnershipsTable } from "../components/unit-ownerships-table";
 import { UpdateUnitDialog } from "../components/update-unit-dialog";
 
 export function UnitDetailPage() {
@@ -127,7 +128,6 @@ export function UnitDetailPage() {
                 <UnitOwnershipsTable
                     periods={history?.periods}
                     isLoading={isHistoryLoading}
-                    t={t}
                 />
             </div>
 

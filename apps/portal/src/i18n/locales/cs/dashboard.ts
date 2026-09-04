@@ -46,13 +46,14 @@ export const dashboard = {
     },
 
     ownedUnits: {
-        sectionTitle: "Vaše jednotky",
+        sectionTitle: "Moje jednotky",
         columnUnit: "Jednotka",
         columnOwnerShare: "Váš podíl",
-        columnBuildingShare: "Podíl v domě",
+        columnBuildingShare: "Podíl na společných částech",
         emptyTitle: "Zatím vám nejsou přiřazeny žádné jednotky",
         errorMessage: "Nepodařilo se načíst vaše jednotky.",
         coOwned: "spoluvlastnictví",
+        viewAll: "Zobrazit vše",
     },
 
     activityFeed: {

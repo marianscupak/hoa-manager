@@ -11,7 +11,7 @@ import {
     useUnitControllerCancelScheduledOwnershipTransfer,
 } from "@/api/generated/property-units/property-units";
 
-import { formatPeriodDate } from "./rows";
+import { formatPeriodDate } from "@/components/ownership-history/rows";
 
 interface CancelScheduledTransferDialogProps {
     unitId: string;

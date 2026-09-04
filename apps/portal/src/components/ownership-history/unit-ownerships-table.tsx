@@ -1,5 +1,6 @@
 import { TFunction } from "i18next";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 import {
     CellNumeric,
@@ -10,11 +11,7 @@ import {
 
 import type { UnitOwnershipPeriodResponseDto } from "@/api/generated/model";
 
-import {
-    flattenPeriods,
-    periodLabel,
-    type OwnershipHistoryRow,
-} from "./ownership-history/rows";
+import { flattenPeriods, periodLabel, type OwnershipHistoryRow } from "./rows";
 
 const STATUS_CHIP: Record<
     OwnershipHistoryRow["status"],
@@ -99,14 +96,18 @@ export function getUnitOwnershipColumns(
 interface UnitOwnershipsTableProps {
     periods: UnitOwnershipPeriodResponseDto[] | undefined;
     isLoading: boolean;
-    t: TFunction<"admin" | "common">;
 }
 
+/**
+ * Every ownership period of one unit, newest first. Shared by the admin
+ * unit detail page and the owner-facing unit page — the two audiences
+ * read the same record, so they read it through the same table.
+ */
 export function UnitOwnershipsTable({
     periods,
     isLoading,
-    t,
 }: UnitOwnershipsTableProps) {
+    const { t } = useTranslation(["admin", "common"]);
     const columns = getUnitOwnershipColumns(t);
     const rows = useMemo(() => flattenPeriods(periods), [periods]);
 

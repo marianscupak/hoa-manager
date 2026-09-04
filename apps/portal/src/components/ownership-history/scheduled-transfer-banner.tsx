@@ -8,7 +8,8 @@ import { formatPeriodDate } from "./rows";
 interface ScheduledTransferBannerProps {
     /** ISO instant of the scheduled period's start. */
     effectiveFrom: string;
-    onCancel: () => void;
+    /** Omitted on the owner-facing page, where the notice is read-only. */
+    onCancel?: () => void;
 }
 
 export function ScheduledTransferBanner({
@@ -28,9 +29,11 @@ export function ScheduledTransferBanner({
                     date: formatPeriodDate(effectiveFrom),
                 })}
             </span>
-            <Button variant="outline" size="sm" onClick={onCancel}>
-                {t("units.details.ownership.cancelScheduled")}
-            </Button>
+            {onCancel && (
+                <Button variant="outline" size="sm" onClick={onCancel}>
+                    {t("units.details.ownership.cancelScheduled")}
+                </Button>
+            )}
         </div>
     );
 }

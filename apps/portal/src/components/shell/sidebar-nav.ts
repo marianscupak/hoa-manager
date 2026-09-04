@@ -1,6 +1,7 @@
 import {
     Building2,
     FileText,
+    House,
     LayoutDashboard,
     type LucideIcon,
     Users,
@@ -28,6 +29,12 @@ export const MAIN_NAV: SidebarNavItem[] = [
         to: "/",
         icon: LayoutDashboard,
         end: true,
+    },
+    {
+        labelKey: "common:nav.myUnits",
+        to: "/units",
+        icon: House,
+        isActive: (p) => p.startsWith("/units"),
     },
     { labelKey: "common:nav.voting", to: "/voting", icon: Vote },
 ];

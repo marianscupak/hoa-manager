@@ -16,6 +16,7 @@ export default {
     },
     nav: {
         dashboard: "Přehled",
+        myUnits: "Moje jednotky",
         voting: "Hlasování",
         property: "Nemovitost",
         members: "Členové",
@@ -31,6 +32,32 @@ export default {
         closeMenu: "Zavřít menu",
     },
     menu: "Menu",
+    myUnits: {
+        title: "Moje jednotky",
+        description: "Jednotky, které v tomto domě vlastníte.",
+        empty: "Zatím vám nejsou přiřazeny žádné jednotky. Pokud v domě jednotku vlastníte, obraťte se na výbor.",
+        loadError: "Nepodařilo se načíst vaše jednotky.",
+        table: {
+            unitNumber: "Číslo jednotky",
+            ownerShare: "Váš podíl na jednotce",
+            buildingShare: "Podíl na společných částech domu",
+            coOwned: "spoluvlastnictví",
+            openDetail: "Zobrazit jednotku",
+            count_one: "{{count}} jednotka",
+            count_few: "{{count}} jednotky",
+            count_other: "{{count}} jednotek",
+        },
+        detail: {
+            back: "Zpět na moje jednotky",
+            title: "Jednotka {{unitNo}}",
+            subtitle: "Údaje o jednotce a její vlastníci.",
+            shareCardTitle: "Údaje o jednotce",
+            ownershipTitle: "Vlastníci jednotky",
+            ownershipDescription:
+                "Kdo jednotku vlastní a od kdy. Zahrnuje i dřívější vlastníky a chystané změny.",
+            loadError: "Nepodařilo se načíst údaje o jednotce.",
+        },
+    },
     pagination: {
         previous: "Předchozí stránka",
         next: "Další stránka",

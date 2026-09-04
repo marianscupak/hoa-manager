@@ -17,6 +17,8 @@ import { DashboardPage } from "@/features/dashboard/pages/dashboard-page";
 import { OwnerInvitePage } from "@/features/invite/pages/owner-invite-page";
 import { ProfilePage } from "@/features/profile/pages/profile-page";
 import { CreateTenantPage } from "@/features/tenants/pages/create-tenant-page";
+import { MyUnitDetailPage } from "@/features/units/pages/my-unit-detail-page";
+import { MyUnitsPage } from "@/features/units/pages/my-units-page";
 import { VotingAdminGuard } from "@/features/voting/guards/voting-admin-guard";
 import { CastVotePage } from "@/features/voting/pages/cast-vote-page";
 import { CreateVotePage } from "@/features/voting/pages/create-vote-page";
@@ -46,6 +48,22 @@ export const router = createBrowserRouter([
                     {
                         path: "profile",
                         element: <ProfilePage />,
+                    },
+                    {
+                        // Owner-facing; every member may open it. The
+                        // admin views of the same units live under
+                        // /admin/units.
+                        path: "units",
+                        children: [
+                            {
+                                index: true,
+                                element: <MyUnitsPage />,
+                            },
+                            {
+                                path: ":id",
+                                element: <MyUnitDetailPage />,
+                            },
+                        ],
                     },
                     {
                         path: "voting",

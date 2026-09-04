@@ -16,6 +16,7 @@ export default {
     },
     nav: {
         dashboard: "Overview",
+        myUnits: "My units",
         voting: "Voting",
         property: "Property",
         members: "Members",
@@ -31,6 +32,31 @@ export default {
         closeMenu: "Close menu",
     },
     menu: "Menu",
+    myUnits: {
+        title: "My units",
+        description: "The units you own in this building.",
+        empty: "No units are assigned to you yet. If you own a unit in this building, contact the board.",
+        loadError: "Couldn't load your units.",
+        table: {
+            unitNumber: "Unit number",
+            ownerShare: "Your share of the unit",
+            buildingShare: "Share of the building's common parts",
+            coOwned: "co-owned",
+            openDetail: "Open unit",
+            count_one: "{{count}} unit",
+            count_other: "{{count}} units",
+        },
+        detail: {
+            back: "Back to my units",
+            title: "Unit {{unitNo}}",
+            subtitle: "Unit details and its owners.",
+            shareCardTitle: "Unit details",
+            ownershipTitle: "Owners of the unit",
+            ownershipDescription:
+                "Who owns the unit and since when, including previous owners and upcoming changes.",
+            loadError: "Couldn't load the unit details.",
+        },
+    },
     pagination: {
         previous: "Previous page",
         next: "Next page",

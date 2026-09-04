@@ -40,11 +40,11 @@ export function DashboardPage() {
 
             <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(300px,360px)]">
                 <div className="flex flex-col gap-6">
-                    {adminView ? (
-                        <BuildingOverviewSection />
-                    ) : (
-                        <OwnedUnitsSection />
-                    )}
+                    {adminView && <BuildingOverviewSection />}
+                    {/* Every role sees its own units: an administrator or
+                        board member who owns a unit has the same need as
+                        any other owner. */}
+                    <OwnedUnitsSection hideWhenEmpty={adminView} />
                     {adminView && <NeedsAttentionSection />}
                 </div>
                 <div className="flex flex-col gap-6">

@@ -46,13 +46,14 @@ export const dashboard = {
     },
 
     ownedUnits: {
-        sectionTitle: "Your units",
+        sectionTitle: "My units",
         columnUnit: "Unit",
         columnOwnerShare: "Your share",
-        columnBuildingShare: "Share of building",
+        columnBuildingShare: "Share of common parts",
         emptyTitle: "No units assigned to you yet",
         errorMessage: "Couldn't load your units.",
         coOwned: "co-owned",
+        viewAll: "View all",
     },
 
     activityFeed: {

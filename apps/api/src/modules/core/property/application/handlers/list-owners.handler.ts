@@ -4,7 +4,9 @@ import { IQueryHandler, QueryHandler, QueryBus } from '@nestjs/cqrs';
 import { GetPendingInviteByOwnerIdQuery } from '@/modules/core/invitation/application/queries/get-pending-invite-by-owner-id.query';
 import {
   OWNER_REPOSITORY,
+  UNIT_OWNERSHIP_REPOSITORY,
   type OwnerRepository,
+  type UnitOwnershipRepository,
 } from '@/modules/core/property/application/ports/property.repository.port';
 import { ListOwnersQuery } from '@/modules/core/property/application/queries/list-owners.query';
 import type { OwnerKind } from '@/modules/core/property/domain/ownership-plan';
@@ -19,6 +21,7 @@ export interface OwnerWithInviteStatus {
   kind: OwnerKind;
   inviteStatus: 'pending' | 'expired' | null;
   inviteCreatedAt: Date | null;
+  hasOwnershipRecords: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -32,11 +35,16 @@ export class ListOwnersHandler
     private readonly ownerRepo: OwnerRepository,
     private readonly queryBus: QueryBus,
     @Inject(CLOCK) private readonly clock: Clock,
+    @Inject(UNIT_OWNERSHIP_REPOSITORY)
+    private readonly ownershipRepo: UnitOwnershipRepository,
   ) {}
 
   async execute(query: ListOwnersQuery): Promise<OwnerWithInviteStatus[]> {
     const owners = await this.ownerRepo.listByTenant(query.tenantId);
     const now = this.clock.now();
+    const referenced = await this.ownershipRepo.listReferencedOwnerIds(
+      query.tenantId,
+    );
 
     return Promise.all(
       owners.map(async (owner) => {
@@ -55,7 +63,12 @@ export class ListOwnersHandler
           }
         }
 
-        return { ...owner, inviteStatus, inviteCreatedAt };
+        return {
+          ...owner,
+          inviteStatus,
+          inviteCreatedAt,
+          hasOwnershipRecords: referenced.has(owner.id),
+        };
       }),
     );
   }

@@ -17,16 +17,20 @@ import {
 import { UnitOwnershipReplacedAuditEvent } from '@/modules/core/property/audit/events/unit-ownership-replaced.event';
 import { validateOwnershipPlan } from '@/modules/core/property/domain/ownership-plan';
 import type { OwnerRef } from '@/modules/core/property/domain/ownership-plan';
+import { planOwnershipTransition } from '@/modules/core/property/domain/ownership-transition';
 import {
   InvalidOwnershipShareException,
   InvalidOwnershipSumException,
   OwnerNotFoundException,
   OwnershipDuplicateOwnerException,
+  OwnershipEffectiveDateTooEarlyException,
   OwnershipMixedAssociationUnsupportedException,
   OwnershipSjmMembersInvalidException,
+  OwnershipTransferAlreadyScheduledException,
   UnitNotFoundException,
 } from '@/shared/application/exceptions/property.exceptions';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
+import { formatAssociationDate } from '@/shared/domain/association-date';
 
 @CommandHandler(ReplaceUnitOwnershipCommand)
 export class ReplaceUnitOwnershipHandler
@@ -48,7 +52,7 @@ export class ReplaceUnitOwnershipHandler
   ) {}
 
   async execute(command: ReplaceUnitOwnershipCommand): Promise<void> {
-    const { tenantId, unitId, ownerships } = command;
+    const { tenantId, unitId, ownerships, effectiveAt } = command;
 
     const unit = await this.unitRepo.findById(tenantId, unitId);
     if (!unit) throw new UnitNotFoundException();
@@ -80,11 +84,32 @@ export class ReplaceUnitOwnershipHandler
       }
     }
 
-    await this.unitOfWork.execute(async () => {
-      const now = this.clock.now();
+    const now = this.clock.now();
+    const existing = await this.ownershipRepo.listByUnit(tenantId, unitId);
+    const plan = planOwnershipTransition(existing, effectiveAt, now);
+    if (plan.kind === 'REJECT') {
+      throw plan.code === 'TRANSFER_ALREADY_SCHEDULED'
+        ? new OwnershipTransferAlreadyScheduledException()
+        : new OwnershipEffectiveDateTooEarlyException();
+    }
 
-      await this.ownershipRepo.closeActiveByUnit(tenantId, unitId, now);
-      await this.ownershipRepo.createMany(tenantId, unitId, ownerships, now);
+    await this.unitOfWork.execute(async () => {
+      if (plan.deletePartyIds.length > 0) {
+        await this.ownershipRepo.deleteParties(tenantId, plan.deletePartyIds);
+      }
+      if (plan.closePartyIds.length > 0) {
+        await this.ownershipRepo.closeParties(
+          tenantId,
+          plan.closePartyIds,
+          effectiveAt,
+        );
+      }
+      await this.ownershipRepo.createMany(
+        tenantId,
+        unitId,
+        ownerships,
+        effectiveAt,
+      );
 
       const actor = this.auditContext.requireActor();
       const actorLabel = await this.labelResolver.resolveActorLabel(actor);
@@ -104,6 +129,7 @@ export class ReplaceUnitOwnershipHandler
             share: `${p.shareNumerator}/${p.shareDenominator}`,
             memberOwnerIds: p.memberOwnerIds,
           })),
+          effectiveFrom: formatAssociationDate(effectiveAt),
           actor,
           unitLabel,
           changedByLabel: actorLabel,

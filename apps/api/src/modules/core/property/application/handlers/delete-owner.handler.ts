@@ -8,10 +8,15 @@ import { CoreAuditLabelResolver } from '@/modules/core/audit-projections/core-au
 import { DeleteOwnerCommand } from '@/modules/core/property/application/commands/delete-owner.command';
 import {
   OWNER_REPOSITORY,
+  UNIT_OWNERSHIP_REPOSITORY,
   type OwnerRepository,
+  type UnitOwnershipRepository,
 } from '@/modules/core/property/application/ports/property.repository.port';
 import { OwnerDeletedAuditEvent } from '@/modules/core/property/audit/events/owner-deleted.event';
-import { OwnerNotFoundException } from '@/shared/application/exceptions/property.exceptions';
+import {
+  OwnerHasOwnershipRecordsException,
+  OwnerNotFoundException,
+} from '@/shared/application/exceptions/property.exceptions';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 
 @CommandHandler(DeleteOwnerCommand)
@@ -19,6 +24,8 @@ export class DeleteOwnerHandler implements ICommandHandler<DeleteOwnerCommand> {
   constructor(
     @Inject(OWNER_REPOSITORY)
     private readonly ownerRepository: OwnerRepository,
+    @Inject(UNIT_OWNERSHIP_REPOSITORY)
+    private readonly ownershipRepository: UnitOwnershipRepository,
     @Inject(CLOCK)
     private readonly clock: Clock,
     private readonly uow: DrizzleUnitOfWork,
@@ -34,6 +41,15 @@ export class DeleteOwnerHandler implements ICommandHandler<DeleteOwnerCommand> {
     );
     if (!existing) {
       throw new OwnerNotFoundException();
+    }
+
+    // Ownership history must survive: an owner who ever held a unit stays.
+    const referenced = await this.ownershipRepository.existsMemberRowForOwner(
+      command.tenantId,
+      command.ownerId,
+    );
+    if (referenced) {
+      throw new OwnerHasOwnershipRecordsException();
     }
 
     await this.uow.execute(async () => {

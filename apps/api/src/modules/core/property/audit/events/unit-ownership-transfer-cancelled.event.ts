@@ -6,6 +6,7 @@ import { Visibility } from '@/modules/core/audit/domain/visibility';
 import { CoreEventType } from '@/modules/core/audit-projections/core-event-types';
 
 const PayloadSchema = z.object({
+  effectiveFrom: z.string(),
   ownerships: z.array(
     z.object({
       partyType: z.enum(['SOLE', 'SJM']),
@@ -13,16 +14,15 @@ const PayloadSchema = z.object({
       memberOwnerIds: z.array(z.string()),
     }),
   ),
-  effectiveFrom: z.string(),
   labels: z.object({
     unitLabel: z.string(),
-    changedBy: z.string(),
+    cancelledBy: z.string(),
     owners: z.array(z.string()),
   }),
 });
 
-export const UnitOwnershipReplacedAuditEvent = defineAuditEvent({
-  eventType: CoreEventType.UNIT_OWNERSHIP_REPLACED,
+export const UnitOwnershipTransferCancelledAuditEvent = defineAuditEvent({
+  eventType: CoreEventType.UNIT_OWNERSHIP_TRANSFER_CANCELLED,
   module: 'CORE',
   payloadSchema: PayloadSchema,
   visibility: Visibility.TENANT_PRIVILEGED,
@@ -32,15 +32,15 @@ export const UnitOwnershipReplacedAuditEvent = defineAuditEvent({
   build(input: {
     tenantId: string;
     unitId: string;
+    effectiveFrom: string;
     ownerships: {
       partyType: 'SOLE' | 'SJM';
       share: string;
       memberOwnerIds: string[];
     }[];
-    effectiveFrom: string;
     actor: AuditActor;
     unitLabel: string;
-    changedByLabel: string;
+    cancelledByLabel: string;
     ownerLabels: string[];
     occurredAt: Date;
   }) {
@@ -51,11 +51,11 @@ export const UnitOwnershipReplacedAuditEvent = defineAuditEvent({
       aggregateId: input.unitId,
       entityId: null,
       payload: {
-        ownerships: input.ownerships,
         effectiveFrom: input.effectiveFrom,
+        ownerships: input.ownerships,
         labels: {
           unitLabel: input.unitLabel,
-          changedBy: input.changedByLabel,
+          cancelledBy: input.cancelledByLabel,
           owners: input.ownerLabels,
         },
       },

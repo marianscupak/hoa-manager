@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Controller,
   Get,
   Post,
@@ -27,13 +28,16 @@ import {
   ReplaceOwnershipsDto,
   UnitResponseDto,
   UnitDetailResponseDto,
+  UnitOwnershipHistoryResponseDto,
 } from '@/modules/core/property/api/dto/unit.dto';
+import { CancelScheduledOwnershipTransferCommand } from '@/modules/core/property/application/commands/cancel-scheduled-ownership-transfer.command';
 import { CreateUnitCommand } from '@/modules/core/property/application/commands/create-unit.command';
 import { DeleteUnitCommand } from '@/modules/core/property/application/commands/delete-unit.command';
 import { ReplaceUnitOwnershipCommand } from '@/modules/core/property/application/commands/replace-unit-ownership.command';
 import { UpdateUnitCommand } from '@/modules/core/property/application/commands/update-unit.command';
 import { GetOwnedUnitsQuery } from '@/modules/core/property/application/queries/get-owned-units/get-owned-units.query';
 import { GetUnitDetailQuery } from '@/modules/core/property/application/queries/get-unit-detail.query';
+import { GetUnitOwnershipHistoryQuery } from '@/modules/core/property/application/queries/get-unit-ownership-history.query';
 import { ListUnitsQuery } from '@/modules/core/property/application/queries/list-units.query';
 import type { OwnershipPartyType } from '@/modules/core/property/domain/ownership-plan';
 import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
@@ -42,6 +46,7 @@ import { ApiErrorResponses } from '@/shared/api/decorators/error.decorators';
 import { AccessTokenAuthGuard } from '@/shared/api/guards/access-token-auth.guard';
 import { RolesGuard } from '@/shared/api/guards/roles.guard';
 import { TenantContextGuard } from '@/shared/api/guards/tenant-context.guard';
+import { parseAssociationDate } from '@/shared/domain/association-date';
 import type { TenantContext } from '@/shared/domain/tenant-context';
 
 @ApiTags('Property Units')
@@ -106,6 +111,29 @@ export class UnitController {
     );
   }
 
+  // No `@Roles`: admins/board read any unit, other members only units they
+  // have ever owned — decided in GetUnitOwnershipHistoryHandler.
+  @Get(':id/ownership/history')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description:
+      'Every ownership period of the unit (scheduled, active, closed), newest first',
+    type: UnitOwnershipHistoryResponseDto,
+  })
+  async getOwnershipHistory(
+    @Tenant() tenantCtx: TenantContext,
+    @Param('id') unitId: string,
+  ): Promise<UnitOwnershipHistoryResponseDto> {
+    return this.queryBus.execute(
+      new GetUnitOwnershipHistoryQuery(
+        tenantCtx.tenantId,
+        unitId,
+        tenantCtx.membershipId,
+        tenantCtx.roles,
+      ),
+    );
+  }
+
   @Get(':id')
   @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
   @HttpCode(HttpStatus.OK)
@@ -155,6 +183,11 @@ export class UnitController {
     @Param('id') unitId: string,
     @Body() dto: ReplaceOwnershipsDto,
   ): Promise<void> {
+    const effectiveAt = parseAssociationDate(dto.effectiveFrom);
+    if (!effectiveAt) {
+      // Unreachable after the zod refine; keeps the command strictly typed.
+      throw new BadRequestException('effectiveFrom must be a calendar date');
+    }
     await this.commandBus.execute(
       new ReplaceUnitOwnershipCommand(
         tenantCtx.tenantId,
@@ -163,7 +196,24 @@ export class UnitController {
           ...o,
           partyType: o.partyType as OwnershipPartyType,
         })),
+        effectiveAt,
       ),
+    );
+  }
+
+  @Delete(':id/ownership/scheduled')
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({
+    description:
+      'Scheduled ownership transfer cancelled; the current ownership stays in force',
+  })
+  async cancelScheduledOwnershipTransfer(
+    @Tenant() tenantCtx: TenantContext,
+    @Param('id') unitId: string,
+  ): Promise<void> {
+    await this.commandBus.execute(
+      new CancelScheduledOwnershipTransferCommand(tenantCtx.tenantId, unitId),
     );
   }
 

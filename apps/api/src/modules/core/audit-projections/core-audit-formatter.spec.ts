@@ -97,9 +97,21 @@ const PAYLOADS: Record<CoreEventType, Record<string, unknown>> = {
     ownerships: [
       { ownerId: '22222222-2222-2222-2222-222222222222', share: '1.0' },
     ],
+    effectiveFrom: '2026-10-01',
     labels: {
       unitLabel: '12',
       changedBy: 'Alice Admin',
+      owners: ['Bob Owner'],
+    },
+  },
+  [CoreEventType.UNIT_OWNERSHIP_TRANSFER_CANCELLED]: {
+    effectiveFrom: '2026-10-01',
+    ownerships: [
+      { partyType: 'SOLE', share: '1/1', memberOwnerIds: ['22222222-2222-2222-2222-222222222222'] },
+    ],
+    labels: {
+      unitLabel: '12',
+      cancelledBy: 'Alice Admin',
       owners: ['Bob Owner'],
     },
   },
@@ -276,5 +288,16 @@ describe('CoreAuditFormatter', () => {
       VIEWER_OWNER,
     );
     expect(entry.navigateTo).toBeNull();
+  });
+
+  it('renders UNIT_OWNERSHIP_REPLACED with the effective date in Czech', () => {
+    const entry = formatter.format(
+      ev({
+        eventType: CoreEventType.UNIT_OWNERSHIP_REPLACED,
+        payload: PAYLOADS[CoreEventType.UNIT_OWNERSHIP_REPLACED],
+      }),
+      { ...VIEWER_ADMIN, viewerLanguage: 'cs' },
+    );
+    expect(entry.message).toContain('s účinností od 1. 10. 2026');
   });
 });

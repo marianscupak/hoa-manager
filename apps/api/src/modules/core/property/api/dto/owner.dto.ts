@@ -72,6 +72,12 @@ export class OwnerResponseDto {
   })
   inviteCreatedAt!: Date | null;
 
+  @ApiProperty({
+    description:
+      'True when the owner appears in any ownership period; such owners cannot be deleted',
+  })
+  hasOwnershipRecords!: boolean;
+
   @ApiProperty()
   createdAt!: Date;
 

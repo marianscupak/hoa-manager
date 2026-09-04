@@ -21,6 +21,10 @@ const STRINGS: Record<
       `${v.actor} removed owner record ${v.owner}.`,
     'unit.ownership.replaced.privileged': (v) =>
       `${v.actor} changed ownership of unit ${v.unit} (now: ${v.owners}).`,
+    'unit.ownership.replaced.effective.privileged': (v) =>
+      `${v.actor} changed ownership of unit ${v.unit} effective ${v.effectiveFrom} (now: ${v.owners}).`,
+    'unit.ownership.transferCancelled.privileged': (v) =>
+      `${v.actor} cancelled the ownership change of unit ${v.unit} scheduled for ${v.effectiveFrom}.`,
     'owner.email.added.privileged': (v) =>
       `${v.actor} added an email address for owner ${v.owner}.`,
     'owner.user.linked.privileged': (v) =>
@@ -51,6 +55,10 @@ const STRINGS: Record<
       `${v.actor} odstranil/a vlastníka ${v.owner}.`,
     'unit.ownership.replaced.privileged': (v) =>
       `${v.actor} změnil/a vlastnictví jednotky ${v.unit} (nyní: ${v.owners}).`,
+    'unit.ownership.replaced.effective.privileged': (v) =>
+      `${v.actor} změnil/a vlastnictví jednotky ${v.unit} s účinností od ${v.effectiveFrom} (nyní: ${v.owners}).`,
+    'unit.ownership.transferCancelled.privileged': (v) =>
+      `${v.actor} zrušil/a naplánovanou změnu vlastnictví jednotky ${v.unit} k ${v.effectiveFrom}.`,
     'owner.email.added.privileged': (v) =>
       `${v.actor} přidal/a e-mail vlastníkovi ${v.owner}.`,
     'owner.user.linked.privileged': (v) =>

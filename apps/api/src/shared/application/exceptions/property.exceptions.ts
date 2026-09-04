@@ -71,3 +71,27 @@ export class OwnerAssociationAlreadyExistsException extends DomainException {
     super(ErrorCode.OWNER_ASSOCIATION_ALREADY_EXISTS);
   }
 }
+
+export class OwnershipTransferAlreadyScheduledException extends DomainException {
+  constructor() {
+    super(ErrorCode.OWNERSHIP_TRANSFER_ALREADY_SCHEDULED);
+  }
+}
+
+export class OwnershipEffectiveDateTooEarlyException extends DomainException {
+  constructor() {
+    super(ErrorCode.OWNERSHIP_EFFECTIVE_DATE_TOO_EARLY);
+  }
+}
+
+export class OwnershipNoScheduledTransferException extends DomainException {
+  constructor() {
+    super(ErrorCode.OWNERSHIP_NO_SCHEDULED_TRANSFER);
+  }
+}
+
+export class OwnerHasOwnershipRecordsException extends DomainException {
+  constructor() {
+    super(ErrorCode.OWNER_HAS_OWNERSHIP_RECORDS);
+  }
+}

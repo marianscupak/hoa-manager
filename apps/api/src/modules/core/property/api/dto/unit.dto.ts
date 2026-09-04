@@ -2,6 +2,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
+import { parseAssociationDate } from '@/shared/domain/association-date';
+
 export const createUnitSchema = z.object({
   unitNo: z
     .string()
@@ -58,6 +60,15 @@ const ownershipPartySchema = z.object({
 });
 
 export const replaceOwnershipsSchema = z.object({
+  effectiveFrom: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be a YYYY-MM-DD calendar date')
+    .refine((v) => parseAssociationDate(v) !== null, {
+      message: 'Must be a real calendar date',
+    })
+    .describe(
+      'Calendar date (association time zone) from which the new ownership applies. Past, today or future.',
+    ),
   ownerships: z
     .array(ownershipPartySchema)
     .min(1, 'At least one ownership is required')
@@ -124,4 +135,27 @@ export class UnitOwnershipResponseDto {
 export class UnitDetailResponseDto extends UnitResponseDto {
   @ApiProperty({ type: [UnitOwnershipResponseDto] })
   ownerships!: UnitOwnershipResponseDto[];
+}
+
+export class UnitOwnershipPeriodResponseDto {
+  @ApiProperty({ type: String, format: 'date-time' })
+  validFrom!: Date;
+  @ApiProperty({ type: String, format: 'date-time', nullable: true })
+  validTo!: Date | null;
+  @ApiProperty({ enum: ['SCHEDULED', 'ACTIVE', 'CLOSED'] })
+  status!: 'SCHEDULED' | 'ACTIVE' | 'CLOSED';
+  @ApiProperty({ type: [UnitOwnershipResponseDto] })
+  parties!: UnitOwnershipResponseDto[];
+}
+
+export class UnitOwnershipHistoryResponseDto {
+  @ApiProperty()
+  unitId!: string;
+  @ApiProperty()
+  unitNo!: string;
+  @ApiProperty({
+    type: [UnitOwnershipPeriodResponseDto],
+    description: 'Ownership periods, newest first',
+  })
+  periods!: UnitOwnershipPeriodResponseDto[];
 }

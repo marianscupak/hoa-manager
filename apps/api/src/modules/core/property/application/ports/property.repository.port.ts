@@ -56,12 +56,26 @@ export interface UnitOwnershipRepository {
     unitId: string,
     now: Date,
   ): Promise<UnitOwnershipParty[]>;
-  closeActiveByUnit(tenantId: string, unitId: string, now: Date): Promise<void>;
+  /** Every party of the unit, past, current and scheduled, oldest first. */
+  listByUnit(tenantId: string, unitId: string): Promise<UnitOwnershipParty[]>;
+  /** True when the membership's owner record appears in any party of the unit. */
+  hasEverOwnedUnit(
+    tenantId: string,
+    unitId: string,
+    membershipId: string,
+  ): Promise<boolean>;
+  /** Any `unit_ownership_members` row for the owner, in any period. */
+  existsMemberRowForOwner(tenantId: string, ownerId: string): Promise<boolean>;
+  /** Ids of every owner referenced by at least one party, for list flags. */
+  listReferencedOwnerIds(tenantId: string): Promise<Set<string>>;
+  closeParties(tenantId: string, partyIds: string[], at: Date): Promise<void>;
+  reopenParties(tenantId: string, partyIds: string[]): Promise<void>;
+  deleteParties(tenantId: string, partyIds: string[]): Promise<void>;
   createMany(
     tenantId: string,
     unitId: string,
     parties: OwnershipPartyInput[],
-    now: Date,
+    validFrom: Date,
   ): Promise<void>;
 }
 

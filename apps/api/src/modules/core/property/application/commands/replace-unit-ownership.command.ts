@@ -5,5 +5,7 @@ export class ReplaceUnitOwnershipCommand {
     public readonly tenantId: string,
     public readonly unitId: string,
     public readonly ownerships: OwnershipPartyInput[],
+    /** Instant the new ownership takes effect (association-zone midnight). */
+    public readonly effectiveAt: Date,
   ) {}
 }

@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { and, eq, inArray, isNull } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
 import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
 import {
   owners,
   ownershipActiveAt,
+  tenantMemberships,
   unitOwnershipMembers,
   unitOwnerships,
   units,
@@ -246,19 +247,118 @@ export class DrizzleUnitOwnershipRepository implements UnitOwnershipRepository {
     }));
   }
 
-  async closeActiveByUnit(
+  /** Every party of the unit, past, current and scheduled, oldest first. */
+  async listByUnit(
     tenantId: string,
     unitId: string,
-    now: Date,
-  ): Promise<void> {
-    await this.db
-      .update(unitOwnerships)
-      .set({ validTo: now })
+  ): Promise<UnitOwnershipParty[]> {
+    const parties = await this.db.query.unitOwnerships.findMany({
+      where: and(
+        eq(unitOwnerships.tenantId, tenantId),
+        eq(unitOwnerships.unitId, unitId),
+      ),
+      orderBy: (t: typeof unitOwnerships.$inferSelect, { asc }: any) => [
+        asc(t.validFrom),
+      ],
+    });
+    return this.attachMembers(parties);
+  }
+
+  async hasEverOwnedUnit(
+    tenantId: string,
+    unitId: string,
+    membershipId: string,
+  ): Promise<boolean> {
+    const rows = await this.db
+      .select({ id: unitOwnershipMembers.id })
+      .from(unitOwnershipMembers)
+      .innerJoin(
+        unitOwnerships,
+        eq(unitOwnershipMembers.ownershipId, unitOwnerships.id),
+      )
+      .innerJoin(owners, eq(unitOwnershipMembers.ownerId, owners.id))
+      .innerJoin(
+        tenantMemberships,
+        and(
+          eq(tenantMemberships.userId, owners.userId),
+          eq(tenantMemberships.tenantId, owners.tenantId),
+        ),
+      )
       .where(
         and(
           eq(unitOwnerships.tenantId, tenantId),
           eq(unitOwnerships.unitId, unitId),
-          isNull(unitOwnerships.validTo),
+          eq(tenantMemberships.id, membershipId),
+        ),
+      )
+      .limit(1);
+    return rows.length > 0;
+  }
+
+  async existsMemberRowForOwner(
+    tenantId: string,
+    ownerId: string,
+  ): Promise<boolean> {
+    const rows = await this.db
+      .select({ id: unitOwnershipMembers.id })
+      .from(unitOwnershipMembers)
+      .where(
+        and(
+          eq(unitOwnershipMembers.tenantId, tenantId),
+          eq(unitOwnershipMembers.ownerId, ownerId),
+        ),
+      )
+      .limit(1);
+    return rows.length > 0;
+  }
+
+  async listReferencedOwnerIds(tenantId: string): Promise<Set<string>> {
+    const rows = await this.db
+      .selectDistinct({ ownerId: unitOwnershipMembers.ownerId })
+      .from(unitOwnershipMembers)
+      .where(eq(unitOwnershipMembers.tenantId, tenantId));
+    return new Set(rows.map((r: { ownerId: string }) => r.ownerId));
+  }
+
+  async closeParties(
+    tenantId: string,
+    partyIds: string[],
+    at: Date,
+  ): Promise<void> {
+    if (partyIds.length === 0) return;
+    await this.db
+      .update(unitOwnerships)
+      .set({ validTo: at })
+      .where(
+        and(
+          eq(unitOwnerships.tenantId, tenantId),
+          inArray(unitOwnerships.id, partyIds),
+        ),
+      );
+  }
+
+  async reopenParties(tenantId: string, partyIds: string[]): Promise<void> {
+    if (partyIds.length === 0) return;
+    await this.db
+      .update(unitOwnerships)
+      .set({ validTo: null })
+      .where(
+        and(
+          eq(unitOwnerships.tenantId, tenantId),
+          inArray(unitOwnerships.id, partyIds),
+        ),
+      );
+  }
+
+  /** Member rows go with the party (`unit_ownership_members.ownership_id` cascades). */
+  async deleteParties(tenantId: string, partyIds: string[]): Promise<void> {
+    if (partyIds.length === 0) return;
+    await this.db
+      .delete(unitOwnerships)
+      .where(
+        and(
+          eq(unitOwnerships.tenantId, tenantId),
+          inArray(unitOwnerships.id, partyIds),
         ),
       );
   }
@@ -267,7 +367,7 @@ export class DrizzleUnitOwnershipRepository implements UnitOwnershipRepository {
     tenantId: string,
     unitId: string,
     parties: OwnershipPartyInput[],
-    now: Date,
+    validFrom: Date,
   ): Promise<void> {
     for (const party of parties) {
       const [row] = await this.db
@@ -278,7 +378,7 @@ export class DrizzleUnitOwnershipRepository implements UnitOwnershipRepository {
           partyType: party.partyType,
           shareNumerator: party.shareNumerator,
           shareDenominator: party.shareDenominator,
-          validFrom: now,
+          validFrom,
         })
         .returning({ id: unitOwnerships.id });
       await this.db.insert(unitOwnershipMembers).values(

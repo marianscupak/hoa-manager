@@ -8,6 +8,7 @@ const NOW = new Date('2026-08-31T10:00:00Z');
 function buildHandler(overrides?: {
   owners?: unknown[];
   invite?: { expiresAt: Date; createdAt: Date } | null;
+  referenced?: string[];
 }) {
   const owners = overrides?.owners ?? [
     {
@@ -26,10 +27,16 @@ function buildHandler(overrides?: {
     execute: jest.fn().mockResolvedValue(overrides?.invite ?? null),
   };
   const clock = { now: () => NOW };
+  const ownershipRepo = {
+    listReferencedOwnerIds: jest
+      .fn()
+      .mockResolvedValue(new Set(overrides?.referenced ?? [])),
+  };
   const handler = new ListOwnersHandler(
     ownerRepo as never,
     queryBus as never,
     clock as never,
+    ownershipRepo as never,
   );
   return { handler, queryBus };
 }
@@ -80,5 +87,21 @@ describe('ListOwnersHandler', () => {
     expect(owner.inviteStatus).toBeNull();
     expect(owner.inviteCreatedAt).toBeNull();
     expect(queryBus.execute).not.toHaveBeenCalled();
+  });
+
+  it('flags owners that appear in any ownership period', async () => {
+    const { handler } = buildHandler({ referenced: ['o1'] });
+
+    const [owner] = await handler.execute(new ListOwnersQuery(TENANT));
+
+    expect(owner.hasOwnershipRecords).toBe(true);
+  });
+
+  it('leaves never-assigned owners deletable', async () => {
+    const { handler } = buildHandler({ referenced: [] });
+
+    const [owner] = await handler.execute(new ListOwnersQuery(TENANT));
+
+    expect(owner.hasOwnershipRecords).toBe(false);
   });
 });

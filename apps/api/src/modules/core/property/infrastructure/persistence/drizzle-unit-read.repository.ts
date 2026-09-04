@@ -78,7 +78,7 @@ export class DrizzleUnitReadRepository implements UnitReadRepository {
     // user_id)` pair.
     //
     // `owners_tenant_user_unique` guarantees at most one owner per
-    // (tenant, user), and `closeActiveByUnit` + `createMany` +
+    // (tenant, user), and `closeParties`/`deleteParties` + `createMany` +
     // `validateOwnershipPlan`'s DUPLICATE_OWNER check guarantee an owner
     // is a member of at most one party matching `ownershipActiveAt` per
     // unit at a time — so this join yields at most one row per unit per

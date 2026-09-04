@@ -150,14 +150,35 @@ export class CoreAuditFormatter implements AuditEventFormatter, OnModuleInit {
       }
       case CoreEventType.UNIT_OWNERSHIP_REPLACED: {
         const p = event.payload as {
+          effectiveFrom?: string;
           labels: { unitLabel: string; changedBy: string; owners: string[] };
+        };
+        const vars = {
+          actor: p.labels.changedBy,
+          unit: p.labels.unitLabel,
+          owners: p.labels.owners.join(', '),
         };
         return {
           ...base,
-          message: t(lang, 'unit.ownership.replaced.privileged', {
-            actor: p.labels.changedBy,
+          message: p.effectiveFrom
+            ? t(lang, 'unit.ownership.replaced.effective.privileged', {
+                ...vars,
+                effectiveFrom: displayDate(p.effectiveFrom, lang),
+              })
+            : t(lang, 'unit.ownership.replaced.privileged', vars),
+        };
+      }
+      case CoreEventType.UNIT_OWNERSHIP_TRANSFER_CANCELLED: {
+        const p = event.payload as {
+          effectiveFrom: string;
+          labels: { unitLabel: string; cancelledBy: string };
+        };
+        return {
+          ...base,
+          message: t(lang, 'unit.ownership.transferCancelled.privileged', {
+            actor: p.labels.cancelledBy,
             unit: p.labels.unitLabel,
-            owners: p.labels.owners.join(', '),
+            effectiveFrom: displayDate(p.effectiveFrom, lang),
           }),
         };
       }
@@ -244,4 +265,10 @@ export class CoreAuditFormatter implements AuditEventFormatter, OnModuleInit {
         return null;
     }
   }
+}
+
+/** `YYYY-MM-DD` → `1. 10. 2026` for Czech readers, unchanged otherwise. */
+function displayDate(isoDate: string, lang: string | undefined): string {
+  const [y, m, d] = isoDate.split('-').map(Number);
+  return lang === 'cs' ? `${d}. ${m}. ${y}` : isoDate;
 }

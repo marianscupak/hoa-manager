@@ -31,6 +31,7 @@ function party(
 function buildHandler(existing: UnitOwnershipParty[]) {
   const unitRepo = {
     findById: jest.fn().mockResolvedValue({ id: UNIT, tenantId: TENANT }),
+    lockForUpdate: jest.fn(),
   };
   const ownershipRepo = {
     listByUnit: jest.fn().mockResolvedValue(existing),
@@ -57,7 +58,7 @@ function buildHandler(existing: UnitOwnershipParty[]) {
     auditContext as never,
     labelResolver as never,
   );
-  return { handler, ownershipRepo, auditService };
+  return { handler, unitRepo, ownershipRepo, auditService };
 }
 
 describe('CancelScheduledOwnershipTransferHandler', () => {
@@ -67,7 +68,9 @@ describe('CancelScheduledOwnershipTransferHandler', () => {
     ]);
 
     await expect(
-      handler.execute(new CancelScheduledOwnershipTransferCommand(TENANT, UNIT)),
+      handler.execute(
+        new CancelScheduledOwnershipTransferCommand(TENANT, UNIT),
+      ),
     ).rejects.toMatchObject({ code: 'OWNERSHIP_NO_SCHEDULED_TRANSFER' });
     expect(ownershipRepo.deleteParties).not.toHaveBeenCalled();
   });
@@ -89,6 +92,30 @@ describe('CancelScheduledOwnershipTransferHandler', () => {
       'next-b',
     ]);
     expect(ownershipRepo.reopenParties).toHaveBeenCalledWith(TENANT, ['cur']);
+  });
+
+  it('reopens every period whose end matches any scheduled start, not just the earliest', async () => {
+    const NOV_2026 = new Date('2026-10-31T23:00:00Z');
+    const { handler, ownershipRepo, auditService } = buildHandler([
+      party('cur', START_2020, OCT_2026),
+      party('s1', OCT_2026, null),
+      party('s2', NOV_2026, null),
+    ]);
+
+    await handler.execute(
+      new CancelScheduledOwnershipTransferCommand(TENANT, UNIT),
+    );
+
+    expect(ownershipRepo.deleteParties).toHaveBeenCalledWith(TENANT, [
+      's1',
+      's2',
+    ]);
+    expect(ownershipRepo.reopenParties).toHaveBeenCalledWith(TENANT, ['cur']);
+    expect(auditService.append).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({ effectiveFrom: '2026-10-01' }),
+      }),
+    );
   });
 
   it('records the cancelled effective date in the audit event', async () => {

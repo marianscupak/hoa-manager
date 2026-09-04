@@ -91,6 +91,14 @@ export class DrizzleUnitRepository implements UnitRepository {
       .delete(units)
       .where(and(eq(units.tenantId, tenantId), eq(units.id, unitId)));
   }
+
+  async lockForUpdate(tenantId: string, unitId: string): Promise<void> {
+    await this.db
+      .select({ id: units.id })
+      .from(units)
+      .where(and(eq(units.tenantId, tenantId), eq(units.id, unitId)))
+      .for('update');
+  }
 }
 
 @Injectable()

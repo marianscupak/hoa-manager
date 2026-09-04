@@ -25,6 +25,12 @@ export interface UnitRepository {
   findById(tenantId: string, unitId: string): Promise<Unit | null>;
   listByTenant(tenantId: string): Promise<Unit[]>;
   delete(tenantId: string, unitId: string): Promise<void>;
+  /**
+   * Row lock on the unit for the current transaction (SELECT … FOR UPDATE).
+   * Serialises concurrent ownership writes so the one-scheduled-period rule
+   * cannot be raced by two admins saving at once.
+   */
+  lockForUpdate(tenantId: string, unitId: string): Promise<void>;
 }
 
 export const UNIT_REPOSITORY = Symbol('UNIT_REPOSITORY');

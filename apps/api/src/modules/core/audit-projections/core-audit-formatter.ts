@@ -163,7 +163,7 @@ export class CoreAuditFormatter implements AuditEventFormatter, OnModuleInit {
           message: p.effectiveFrom
             ? t(lang, 'unit.ownership.replaced.effective.privileged', {
                 ...vars,
-                effectiveFrom: displayDate(p.effectiveFrom, lang),
+                effectiveFrom: displayDate(p.effectiveFrom),
               })
             : t(lang, 'unit.ownership.replaced.privileged', vars),
         };
@@ -178,7 +178,7 @@ export class CoreAuditFormatter implements AuditEventFormatter, OnModuleInit {
           message: t(lang, 'unit.ownership.transferCancelled.privileged', {
             actor: p.labels.cancelledBy,
             unit: p.labels.unitLabel,
-            effectiveFrom: displayDate(p.effectiveFrom, lang),
+            effectiveFrom: displayDate(p.effectiveFrom),
           }),
         };
       }
@@ -267,8 +267,8 @@ export class CoreAuditFormatter implements AuditEventFormatter, OnModuleInit {
   }
 }
 
-/** `YYYY-MM-DD` → `1. 10. 2026` for Czech readers, unchanged otherwise. */
-function displayDate(isoDate: string, lang: string | undefined): string {
+/** `YYYY-MM-DD` → `1. 10. 2026`, the same format in every language. */
+function displayDate(isoDate: string): string {
   const [y, m, d] = isoDate.split('-').map(Number);
-  return lang === 'cs' ? `${d}. ${m}. ${y}` : isoDate;
+  return `${d}. ${m}. ${y}`;
 }

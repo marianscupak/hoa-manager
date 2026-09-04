@@ -49,6 +49,7 @@ function buildHandler(overrides?: {
   ];
   const unitRepo = {
     findById: jest.fn().mockResolvedValue({ id: UNIT, tenantId: TENANT }),
+    lockForUpdate: jest.fn(),
   };
   const ownerRepo = {
     listByTenant: jest.fn().mockResolvedValue(
@@ -88,7 +89,7 @@ function buildHandler(overrides?: {
     auditContext as never,
     labelResolver as never,
   );
-  return { handler, ownershipRepo, auditService };
+  return { handler, unitRepo, ownershipRepo, auditService };
 }
 
 describe('ReplaceUnitOwnershipHandler (plan validation)', () => {
@@ -191,13 +192,38 @@ describe('ReplaceUnitOwnershipHandler (plan validation)', () => {
 });
 
 describe('ReplaceUnitOwnershipHandler (effective date)', () => {
+  it('locks the unit row before reading the periods', async () => {
+    const { handler, unitRepo, ownershipRepo } = buildHandler({
+      existing: [party('cur', START_2020, null)],
+    });
+
+    await handler.execute(
+      new ReplaceUnitOwnershipCommand(
+        TENANT,
+        UNIT,
+        [soleParty('p2')],
+        OCT_2026,
+      ),
+    );
+
+    expect(unitRepo.lockForUpdate).toHaveBeenCalledWith(TENANT, UNIT);
+    expect(unitRepo.lockForUpdate.mock.invocationCallOrder[0]).toBeLessThan(
+      ownershipRepo.listByUnit.mock.invocationCallOrder[0],
+    );
+  });
+
   it('closes the current party at a future effective date and inserts the new plan from it', async () => {
     const { handler, ownershipRepo } = buildHandler({
       existing: [party('cur', START_2020, null)],
     });
 
     await handler.execute(
-      new ReplaceUnitOwnershipCommand(TENANT, UNIT, [soleParty('p2')], OCT_2026),
+      new ReplaceUnitOwnershipCommand(
+        TENANT,
+        UNIT,
+        [soleParty('p2')],
+        OCT_2026,
+      ),
     );
 
     expect(ownershipRepo.closeParties).toHaveBeenCalledWith(
@@ -216,7 +242,10 @@ describe('ReplaceUnitOwnershipHandler (effective date)', () => {
 
   it('refuses while a transfer is already scheduled', async () => {
     const { handler, ownershipRepo } = buildHandler({
-      existing: [party('cur', START_2020, OCT_2026), party('next', OCT_2026, null)],
+      existing: [
+        party('cur', START_2020, OCT_2026),
+        party('next', OCT_2026, null),
+      ],
     });
 
     await expect(
@@ -267,7 +296,12 @@ describe('ReplaceUnitOwnershipHandler (effective date)', () => {
     const { handler, auditService } = buildHandler();
 
     await handler.execute(
-      new ReplaceUnitOwnershipCommand(TENANT, UNIT, [soleParty('p1')], OCT_2026),
+      new ReplaceUnitOwnershipCommand(
+        TENANT,
+        UNIT,
+        [soleParty('p1')],
+        OCT_2026,
+      ),
     );
 
     expect(auditService.append).toHaveBeenCalledWith(

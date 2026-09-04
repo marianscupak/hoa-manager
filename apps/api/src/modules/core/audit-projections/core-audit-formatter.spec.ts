@@ -107,7 +107,11 @@ const PAYLOADS: Record<CoreEventType, Record<string, unknown>> = {
   [CoreEventType.UNIT_OWNERSHIP_TRANSFER_CANCELLED]: {
     effectiveFrom: '2026-10-01',
     ownerships: [
-      { partyType: 'SOLE', share: '1/1', memberOwnerIds: ['22222222-2222-2222-2222-222222222222'] },
+      {
+        partyType: 'SOLE',
+        share: '1/1',
+        memberOwnerIds: ['22222222-2222-2222-2222-222222222222'],
+      },
     ],
     labels: {
       unitLabel: '12',
@@ -299,5 +303,56 @@ describe('CoreAuditFormatter', () => {
       { ...VIEWER_ADMIN, viewerLanguage: 'cs' },
     );
     expect(entry.message).toContain('s účinností od 1. 10. 2026');
+  });
+
+  it('renders UNIT_OWNERSHIP_REPLACED with the effective date in English using the d. M. yyyy format', () => {
+    const entry = formatter.format(
+      ev({
+        eventType: CoreEventType.UNIT_OWNERSHIP_REPLACED,
+        payload: PAYLOADS[CoreEventType.UNIT_OWNERSHIP_REPLACED],
+      }),
+      { ...VIEWER_ADMIN, viewerLanguage: 'en' },
+    );
+    expect(entry.message).toContain('effective 1. 10. 2026');
+  });
+
+  it('renders UNIT_OWNERSHIP_TRANSFER_CANCELLED with the effective date in English using the d. M. yyyy format', () => {
+    const entry = formatter.format(
+      ev({
+        eventType: CoreEventType.UNIT_OWNERSHIP_TRANSFER_CANCELLED,
+        payload: PAYLOADS[CoreEventType.UNIT_OWNERSHIP_TRANSFER_CANCELLED],
+      }),
+      { ...VIEWER_ADMIN, viewerLanguage: 'en' },
+    );
+    expect(entry.message).toContain('scheduled for 1. 10. 2026');
+  });
+
+  it('falls back to the non-effective message when a pre-feature payload has no effectiveFrom', () => {
+    const { effectiveFrom, ...payloadWithoutEffectiveFrom } = PAYLOADS[
+      CoreEventType.UNIT_OWNERSHIP_REPLACED
+    ] as { effectiveFrom: string } & Record<string, unknown>;
+    void effectiveFrom;
+
+    const csEntry = formatter.format(
+      ev({
+        eventType: CoreEventType.UNIT_OWNERSHIP_REPLACED,
+        payload: payloadWithoutEffectiveFrom,
+      }),
+      { ...VIEWER_ADMIN, viewerLanguage: 'cs' },
+    );
+    expect(csEntry.message).toContain('12');
+    expect(csEntry.message).toContain('Bob Owner');
+    expect(csEntry.message).not.toContain('účinností');
+
+    const enEntry = formatter.format(
+      ev({
+        eventType: CoreEventType.UNIT_OWNERSHIP_REPLACED,
+        payload: payloadWithoutEffectiveFrom,
+      }),
+      { ...VIEWER_ADMIN, viewerLanguage: 'en' },
+    );
+    expect(enEntry.message).toContain('12');
+    expect(enEntry.message).toContain('Bob Owner');
+    expect(enEntry.message).not.toContain('effective');
   });
 });

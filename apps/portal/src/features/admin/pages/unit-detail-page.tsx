@@ -1,5 +1,5 @@
 import { ArrowLeftIcon, PencilIcon } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router";
 
@@ -44,6 +44,10 @@ export function UnitDetailPage() {
     } = useUnitControllerGetOwnershipHistory(id);
 
     const scheduled = findScheduledPeriod(history?.periods);
+    const minEffectiveFrom = useMemo(
+        () => latestPeriodStart(history?.periods),
+        [history?.periods],
+    );
     const refetchAll = () => {
         refetch();
         refetchHistory();
@@ -96,7 +100,9 @@ export function UnitDetailPage() {
                             variant="outline"
                             size="sm"
                             onClick={() => setIsEditOpen(true)}
-                            disabled={scheduled !== undefined}
+                            disabled={
+                                isHistoryLoading || scheduled !== undefined
+                            }
                         >
                             <PencilIcon />
                             {t("admin:units.details.ownership.edit")}
@@ -130,7 +136,7 @@ export function UnitDetailPage() {
                 open={isEditOpen}
                 onOpenChange={setIsEditOpen}
                 currentOwnerships={unit?.ownerships}
-                minEffectiveFrom={latestPeriodStart(history?.periods)}
+                minEffectiveFrom={minEffectiveFrom}
                 onSuccess={refetchAll}
             />
 

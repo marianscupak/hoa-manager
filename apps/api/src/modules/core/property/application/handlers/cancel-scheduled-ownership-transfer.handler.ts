@@ -44,25 +44,35 @@ export class CancelScheduledOwnershipTransferHandler
     private readonly labelResolver: CoreAuditLabelResolver,
   ) {}
 
-  async execute(command: CancelScheduledOwnershipTransferCommand): Promise<void> {
+  async execute(
+    command: CancelScheduledOwnershipTransferCommand,
+  ): Promise<void> {
     const { tenantId, unitId } = command;
 
     const unit = await this.unitRepo.findById(tenantId, unitId);
     if (!unit) throw new UnitNotFoundException();
 
-    const now = this.clock.now();
-    const parties = await this.ownershipRepo.listByUnit(tenantId, unitId);
-    const scheduled = scheduledParties(parties, now);
-    if (scheduled.length === 0) {
-      throw new OwnershipNoScheduledTransferException();
-    }
-
-    const scheduledFrom = scheduled[0].validFrom.getTime();
-    const toReopen = parties
-      .filter((p) => p.validTo !== null && p.validTo.getTime() === scheduledFrom)
-      .map((p) => p.id);
-
     await this.unitOfWork.execute(async () => {
+      await this.unitRepo.lockForUpdate(tenantId, unitId);
+
+      const now = this.clock.now();
+      const parties = await this.ownershipRepo.listByUnit(tenantId, unitId);
+      const scheduled = scheduledParties(parties, now).sort(
+        (a, b) => a.validFrom.getTime() - b.validFrom.getTime(),
+      );
+      if (scheduled.length === 0) {
+        throw new OwnershipNoScheduledTransferException();
+      }
+
+      const scheduledStarts = new Set(
+        scheduled.map((p) => p.validFrom.getTime()),
+      );
+      const toReopen = parties
+        .filter(
+          (p) => p.validTo !== null && scheduledStarts.has(p.validTo.getTime()),
+        )
+        .map((p) => p.id);
+
       await this.ownershipRepo.deleteParties(
         tenantId,
         scheduled.map((p) => p.id),

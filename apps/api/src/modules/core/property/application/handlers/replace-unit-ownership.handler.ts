@@ -84,16 +84,18 @@ export class ReplaceUnitOwnershipHandler
       }
     }
 
-    const now = this.clock.now();
-    const existing = await this.ownershipRepo.listByUnit(tenantId, unitId);
-    const plan = planOwnershipTransition(existing, effectiveAt, now);
-    if (plan.kind === 'REJECT') {
-      throw plan.code === 'TRANSFER_ALREADY_SCHEDULED'
-        ? new OwnershipTransferAlreadyScheduledException()
-        : new OwnershipEffectiveDateTooEarlyException();
-    }
-
     await this.unitOfWork.execute(async () => {
+      await this.unitRepo.lockForUpdate(tenantId, unitId);
+
+      const now = this.clock.now();
+      const existing = await this.ownershipRepo.listByUnit(tenantId, unitId);
+      const plan = planOwnershipTransition(existing, effectiveAt, now);
+      if (plan.kind === 'REJECT') {
+        throw plan.code === 'TRANSFER_ALREADY_SCHEDULED'
+          ? new OwnershipTransferAlreadyScheduledException()
+          : new OwnershipEffectiveDateTooEarlyException();
+      }
+
       if (plan.deletePartyIds.length > 0) {
         await this.ownershipRepo.deleteParties(tenantId, plan.deletePartyIds);
       }

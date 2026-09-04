@@ -44,7 +44,9 @@ describe('periodStatus', () => {
   });
 
   it('is CLOSED once valid_to has been reached (exclusive end)', () => {
-    expect(periodStatus({ validFrom: T2020, validTo: NOW }, NOW)).toBe('CLOSED');
+    expect(periodStatus({ validFrom: T2020, validTo: NOW }, NOW)).toBe(
+      'CLOSED',
+    );
   });
 });
 

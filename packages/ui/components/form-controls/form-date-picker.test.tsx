@@ -51,7 +51,9 @@ describe("FormDatePicker", () => {
         await user.click(screen.getByRole("button", { name: /Platné od/ }));
         await user.click(screen.getByText("15"));
 
-        const last = onChange.mock.calls[onChange.mock.calls.length - 1]?.[0] as Date;
+        const last = onChange.mock.calls[
+            onChange.mock.calls.length - 1
+        ]?.[0] as Date;
         expect(last).toEqual(new Date(2026, 9, 15));
     });
 
@@ -63,7 +65,9 @@ describe("FormDatePicker", () => {
         await user.click(screen.getByRole("button", { name: /Platné od/ }));
         await user.click(screen.getByText("3"));
 
-        const last = onChange.mock.calls[onChange.mock.calls.length - 1]?.[0] as Date;
+        const last = onChange.mock.calls[
+            onChange.mock.calls.length - 1
+        ]?.[0] as Date;
         expect(last).toEqual(new Date(2026, 9, 10));
     });
 });

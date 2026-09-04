@@ -97,7 +97,11 @@ describe('PreviewConsentOutcomeHandler', () => {
   it('warns when a spouse hands the unit on and the other spouse still backs them', async () => {
     const { handler } = buildHandler({
       consents: [
-        { unitId: UNIT, fromOwnerId: 'husband', toMembershipId: WIFE_MEMBERSHIP },
+        {
+          unitId: UNIT,
+          fromOwnerId: 'husband',
+          toMembershipId: WIFE_MEMBERSHIP,
+        },
       ],
     });
 

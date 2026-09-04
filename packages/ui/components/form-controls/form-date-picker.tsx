@@ -54,7 +54,10 @@ export const FormDatePicker = React.forwardRef<
                 ];
 
                 return (
-                    <FormItem className={cn("flex flex-col", className)} ref={ref}>
+                    <FormItem
+                        className={cn("flex flex-col", className)}
+                        ref={ref}
+                    >
                         {label && <FormLabel>{label}</FormLabel>}
                         <Popover open={open} onOpenChange={setOpen}>
                             <PopoverTrigger asChild>
@@ -86,7 +89,9 @@ export const FormDatePicker = React.forwardRef<
                                     defaultMonth={value}
                                     disabled={disabled}
                                     onSelect={(day) => {
-                                        field.onChange(day ? startOfDay(day) : null);
+                                        field.onChange(
+                                            day ? startOfDay(day) : null,
+                                        );
                                         if (day) setOpen(false);
                                     }}
                                     initialFocus

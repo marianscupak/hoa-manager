@@ -33,7 +33,8 @@ import { PreviewConsentOutcomeQuery } from './preview-consent-outcome.query';
  */
 @QueryHandler(PreviewConsentOutcomeQuery)
 export class PreviewConsentOutcomeHandler
-  implements IQueryHandler<PreviewConsentOutcomeQuery, ConsentPreviewResponseDto>
+  implements
+    IQueryHandler<PreviewConsentOutcomeQuery, ConsentPreviewResponseDto>
 {
   constructor(
     @Inject(VOTE_READ_REPOSITORY)

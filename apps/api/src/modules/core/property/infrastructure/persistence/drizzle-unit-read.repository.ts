@@ -94,6 +94,10 @@ export class DrizzleUnitReadRepository implements UnitReadRepository {
         id: units.id,
         unitNo: units.unitNo,
         partyType: unitOwnerships.partyType,
+        shareNumerator: unitOwnerships.shareNumerator,
+        shareDenominator: unitOwnerships.shareDenominator,
+        buildingShareNumerator: units.buildingShareNumerator,
+        buildingShareDenominator: units.buildingShareDenominator,
         ownerSharePct: sql<number>`ROUND(
           (
             ${unitOwnerships.shareNumerator}::numeric
@@ -142,12 +146,20 @@ export class DrizzleUnitReadRepository implements UnitReadRepository {
         id: string;
         unitNo: string;
         partyType: 'SOLE' | 'SJM';
+        shareNumerator: number;
+        shareDenominator: number;
+        buildingShareNumerator: number;
+        buildingShareDenominator: number;
         ownerSharePct: number | null;
         buildingSharePct: number | null;
       }) => ({
         id: r.id,
         unitNo: r.unitNo,
         partyType: r.partyType,
+        shareNumerator: r.shareNumerator,
+        shareDenominator: r.shareDenominator,
+        buildingShareNumerator: r.buildingShareNumerator,
+        buildingShareDenominator: r.buildingShareDenominator,
         ownerSharePct: Number(r.ownerSharePct ?? 0),
         buildingSharePct: Number(r.buildingSharePct ?? 0),
       }),

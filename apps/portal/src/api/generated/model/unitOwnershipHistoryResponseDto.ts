@@ -10,6 +10,10 @@ import type { UnitOwnershipPeriodResponseDto } from "./unitOwnershipPeriodRespon
 export interface UnitOwnershipHistoryResponseDto {
     unitId: string;
     unitNo: string;
+    /** Numerator of the building share fraction */
+    buildingShareNumerator: number;
+    /** Denominator of the building share fraction */
+    buildingShareDenominator: number;
     /** Ownership periods, newest first */
     periods: UnitOwnershipPeriodResponseDto[];
 }

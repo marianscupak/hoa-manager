@@ -153,6 +153,10 @@ export class UnitOwnershipHistoryResponseDto {
   unitId!: string;
   @ApiProperty()
   unitNo!: string;
+  @ApiProperty({ description: 'Numerator of the building share fraction' })
+  buildingShareNumerator!: number;
+  @ApiProperty({ description: 'Denominator of the building share fraction' })
+  buildingShareDenominator!: number;
   @ApiProperty({
     type: [UnitOwnershipPeriodResponseDto],
     description: 'Ownership periods, newest first',

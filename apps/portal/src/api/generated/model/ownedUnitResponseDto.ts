@@ -12,8 +12,16 @@ export interface OwnedUnitResponseDto {
     unitNo: string;
     /** Caller's share of the unit, as a percentage */
     ownerSharePct: number;
+    /** Numerator of the caller's share of the unit */
+    shareNumerator: number;
+    /** Denominator of the caller's share of the unit */
+    shareDenominator: number;
     /** The party type through which the caller holds the unit */
     partyType: OwnedUnitResponseDtoPartyType;
     /** Unit's share of the building, as a percentage */
     buildingSharePct: number;
+    /** Numerator of the unit's share of the building */
+    buildingShareNumerator: number;
+    /** Denominator of the unit's share of the building */
+    buildingShareDenominator: number;
 }

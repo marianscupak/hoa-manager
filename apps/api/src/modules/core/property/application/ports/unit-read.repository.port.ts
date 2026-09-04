@@ -15,16 +15,29 @@ export interface UnitOverview {
 }
 
 /**
- * One row per unit owned by the calling membership. Shares are
- * already converted to percentages (0..100) and rounded to two
- * decimal places, matching the rounding convention used by
- * `buildingShareSum` in `UnitOverview`.
+ * One row per unit owned by the calling membership.
+ *
+ * Every share is reported twice: as the stored fraction and as a
+ * percentage (0..100) rounded to two decimal places, matching the
+ * rounding convention used by `buildingShareSum` in `UnitOverview`.
+ * The fraction is what the cadastre and the association's documents
+ * state, so owner-facing pages lead with it; the percentage stays for
+ * the compact dashboard readout and for sorting.
+ *
+ * `shareNumerator / shareDenominator` is the party's undivided share of
+ * the unit (an SJM party is not split between its two member-owners);
+ * `buildingShareNumerator / buildingShareDenominator` is the unit's
+ * share of the building's common parts.
  */
 export interface OwnedUnitRow {
   id: string;
   unitNo: string;
   ownerSharePct: number;
+  shareNumerator: number;
+  shareDenominator: number;
   buildingSharePct: number;
+  buildingShareNumerator: number;
+  buildingShareDenominator: number;
   partyType: 'SOLE' | 'SJM';
 }
 

@@ -3707,6 +3707,14 @@
             "type": "number",
             "description": "Caller's share of the unit, as a percentage"
           },
+          "shareNumerator": {
+            "type": "number",
+            "description": "Numerator of the caller's share of the unit"
+          },
+          "shareDenominator": {
+            "type": "number",
+            "description": "Denominator of the caller's share of the unit"
+          },
           "partyType": {
             "type": "string",
             "enum": [
@@ -3718,14 +3726,26 @@
           "buildingSharePct": {
             "type": "number",
             "description": "Unit's share of the building, as a percentage"
+          },
+          "buildingShareNumerator": {
+            "type": "number",
+            "description": "Numerator of the unit's share of the building"
+          },
+          "buildingShareDenominator": {
+            "type": "number",
+            "description": "Denominator of the unit's share of the building"
           }
         },
         "required": [
           "id",
           "unitNo",
           "ownerSharePct",
+          "shareNumerator",
+          "shareDenominator",
           "partyType",
-          "buildingSharePct"
+          "buildingSharePct",
+          "buildingShareNumerator",
+          "buildingShareDenominator"
         ]
       },
       "UnitResponseDto": {
@@ -3922,6 +3942,14 @@
           "unitNo": {
             "type": "string"
           },
+          "buildingShareNumerator": {
+            "type": "number",
+            "description": "Numerator of the building share fraction"
+          },
+          "buildingShareDenominator": {
+            "type": "number",
+            "description": "Denominator of the building share fraction"
+          },
           "periods": {
             "description": "Ownership periods, newest first",
             "type": "array",
@@ -3933,6 +3961,8 @@
         "required": [
           "unitId",
           "unitNo",
+          "buildingShareNumerator",
+          "buildingShareDenominator",
           "periods"
         ]
       },

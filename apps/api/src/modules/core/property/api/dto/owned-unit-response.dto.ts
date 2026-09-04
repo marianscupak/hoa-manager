@@ -13,6 +13,16 @@ export class OwnedUnitResponseDto {
   ownerSharePct!: number;
 
   @ApiProperty({
+    description: "Numerator of the caller's share of the unit",
+  })
+  shareNumerator!: number;
+
+  @ApiProperty({
+    description: "Denominator of the caller's share of the unit",
+  })
+  shareDenominator!: number;
+
+  @ApiProperty({
     enum: ['SOLE', 'SJM'],
     description: 'The party type through which the caller holds the unit',
   })
@@ -22,4 +32,14 @@ export class OwnedUnitResponseDto {
     description: "Unit's share of the building, as a percentage",
   })
   buildingSharePct!: number;
+
+  @ApiProperty({
+    description: "Numerator of the unit's share of the building",
+  })
+  buildingShareNumerator!: number;
+
+  @ApiProperty({
+    description: "Denominator of the unit's share of the building",
+  })
+  buildingShareDenominator!: number;
 }

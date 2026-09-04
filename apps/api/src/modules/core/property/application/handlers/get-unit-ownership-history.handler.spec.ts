@@ -24,7 +24,10 @@ function party(
     id,
     tenantId: TENANT,
     unitId: UNIT,
-    partyType: memberOwnerIds.length === 2 ? OwnershipPartyType.SJM : OwnershipPartyType.SOLE,
+    partyType:
+      memberOwnerIds.length === 2
+        ? OwnershipPartyType.SJM
+        : OwnershipPartyType.SOLE,
     shareNumerator: 1,
     shareDenominator: 1,
     validFrom,
@@ -40,13 +43,17 @@ const PARTIES = [
 
 function buildHandler(overrides?: { hasEverOwned?: boolean; unit?: unknown }) {
   const unitRepo = {
-    findById: jest
-      .fn()
-      .mockResolvedValue(
-        overrides && 'unit' in overrides
-          ? overrides.unit
-          : { id: UNIT, tenantId: TENANT, unitNo: '12' },
-      ),
+    findById: jest.fn().mockResolvedValue(
+      overrides && 'unit' in overrides
+        ? overrides.unit
+        : {
+            id: UNIT,
+            tenantId: TENANT,
+            unitNo: '12',
+            buildingShareNumerator: 1650,
+            buildingShareDenominator: 10000,
+          },
+    ),
   };
   const ownershipRepo = {
     listByUnit: jest.fn().mockResolvedValue(PARTIES),
@@ -88,15 +95,30 @@ describe('GetUnitOwnershipHistoryHandler', () => {
 
     expect(result.unitId).toBe(UNIT);
     expect(result.unitNo).toBe('12');
-    expect(result.periods.map((p) => p.status)).toEqual(['SCHEDULED', 'ACTIVE']);
+    expect(result.periods.map((p) => p.status)).toEqual([
+      'SCHEDULED',
+      'ACTIVE',
+    ]);
     expect(result.periods[0].validFrom).toEqual(OCT_2026);
     expect(result.periods[0].validTo).toBeNull();
-    expect(result.periods[0].parties[0].members.map((m) => m.displayName)).toEqual([
-      'Jan Novák',
-      'Eva Nováková',
-    ]);
+    expect(
+      result.periods[0].parties[0].members.map((m) => m.displayName),
+    ).toEqual(['Jan Novák', 'Eva Nováková']);
     expect(result.periods[1].validTo).toEqual(OCT_2026);
     expect(result.periods[1].parties[0].shareDecimal).toBe('1.0000');
+  });
+
+  it("reports the unit's building share so the owner page needs one request", async () => {
+    // A former owner, and the incoming owner of a scheduled transfer,
+    // may read this history but have no row in `GET /units/mine` — that
+    // list only covers ownership active now. The unit header therefore
+    // cannot be sourced from the list, so the fraction travels here.
+    const { handler } = buildHandler();
+
+    const result = await handler.execute(adminQuery());
+
+    expect(result.buildingShareNumerator).toBe(1650);
+    expect(result.buildingShareDenominator).toBe(10000);
   });
 
   it('lets admins and board members through without an ownership check', async () => {

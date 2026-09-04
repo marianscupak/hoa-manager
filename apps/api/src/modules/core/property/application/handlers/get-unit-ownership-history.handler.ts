@@ -33,6 +33,15 @@ export interface UnitOwnershipHistoryPeriod {
 export interface UnitOwnershipHistory {
   unitId: string;
   unitNo: string;
+  /**
+   * The unit's share of the building's common parts, as the stored
+   * fraction. Carried here so an owner-facing unit page can be built
+   * from this one response: a former owner — and the incoming owner of
+   * a scheduled transfer — may read this history yet has no row in
+   * `GET /units/mine`, which only lists ownership active now.
+   */
+  buildingShareNumerator: number;
+  buildingShareDenominator: number;
   periods: UnitOwnershipHistoryPeriod[];
 }
 
@@ -84,6 +93,8 @@ export class GetUnitOwnershipHistoryHandler
     return {
       unitId: unit.id,
       unitNo: unit.unitNo,
+      buildingShareNumerator: unit.buildingShareNumerator,
+      buildingShareDenominator: unit.buildingShareDenominator,
       periods: groupIntoPeriods(parties, this.clock.now()).map((period) => ({
         validFrom: period.validFrom,
         validTo: period.validTo,

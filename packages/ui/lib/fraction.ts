@@ -16,6 +16,18 @@ export function reduceFraction(f: Fraction): Fraction {
     return fromBig(BigInt(f.num), BigInt(f.den));
 }
 
+/**
+ * Parses user input into a fraction. Accepted notations:
+ *
+ * - `"3200/10000"` — kept exactly as typed (not reduced), because cadastre
+ *   shares are conventionally written over the house's common denominator
+ *   and `8/25` would be unrecognisable to a committee member.
+ * - `"0.5"` / `"0,5"` — a terminating decimal, reduced (`1/2`).
+ * - `"75 %"` / `"75%"` — a percent, reduced (`3/4`).
+ * - `"1"` — a bare integer over 1.
+ *
+ * Returns `null` for anything else, including zero and negative values.
+ */
 export function parseFraction(input: string): Fraction | null {
     const text = input.trim().replace(",", ".");
     if (/^\d+\/\d+$/.test(text)) {
@@ -27,19 +39,36 @@ export function parseFraction(input: string): Fraction | null {
             !Number.isSafeInteger(den)
         )
             return null;
-        return reduceFraction({ num, den });
+        return { num, den };
+    }
+    const percent = /^(\d+(?:\.\d{1,8})?)\s*%$/.exec(text);
+    if (percent) {
+        const decimal = parseDecimal(percent[1]);
+        return decimal
+            ? reduceFraction({ num: decimal.num, den: decimal.den * 100 })
+            : null;
     }
     if (/^\d+$/.test(text)) {
         const num = Number(text);
         return num > 0 && Number.isSafeInteger(num) ? { num, den: 1 } : null;
     }
     if (/^\d*\.\d{1,8}$/.test(text)) {
-        const [whole, frac] = text.split(".");
-        const den = 10 ** frac.length;
-        const num = Number(whole || "0") * den + Number(frac);
-        return num > 0 ? reduceFraction({ num, den }) : null;
+        return parseDecimal(text);
     }
     return null;
+}
+
+/** `"0.375"` → `3/8`, `"12.5"` → `25/2`, `"7"` → `7/1`; `null` for zero. */
+function parseDecimal(text: string): Fraction | null {
+    const [whole, frac = ""] = text.split(".");
+    const den = 10 ** frac.length;
+    const num = Number(whole || "0") * den + Number(frac || "0");
+    return num > 0 ? reduceFraction({ num, den }) : null;
+}
+
+/** Value equality: `50/100` equals `1/2`. */
+export function fractionsEqual(a: Fraction, b: Fraction): boolean {
+    return BigInt(a.num) * BigInt(b.den) === BigInt(b.num) * BigInt(a.den);
 }
 
 export function formatFraction(f: Fraction): string {

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import {
     FractionInput,
     formatFraction,
-    Input,
+    fractionsEqual,
     Select,
     SelectContent,
     SelectItem,
@@ -30,7 +30,7 @@ const PRESETS: Fraction[] = [
 ];
 
 const isSamePreset = (a: Fraction | undefined, b: Fraction): boolean =>
-    !!a && a.num === b.num && a.den === b.den;
+    !!a && fractionsEqual(a, b);
 
 /**
  * Threshold picker shared by the majority (qualified majority) and quorum
@@ -65,7 +65,7 @@ export function ThresholdPicker({
                     </button>
                 ))}
             </div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_1fr_1fr]">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div className="space-y-1.5">
                     <label className="text-muted-foreground text-xs font-semibold">
                         {t("voting:create.thresholdPicker.customLabel")}
@@ -73,24 +73,9 @@ export function ThresholdPicker({
                     <FractionInput
                         value={value ?? null}
                         onChange={(next) => onChange(next ?? undefined)}
-                    />
-                </div>
-                <div className="space-y-1.5">
-                    <label className="text-muted-foreground text-xs font-semibold">
-                        {t("voting:create.thresholdPicker.percentLabel")}
-                    </label>
-                    <Input
-                        type="number"
-                        min={1}
-                        max={100}
-                        step={1}
-                        placeholder="75"
-                        onChange={(e) => {
-                            const percent = Number(e.target.value);
-                            if (Number.isFinite(percent) && percent > 0) {
-                                onChange({ num: percent, den: 100 });
-                            }
-                        }}
+                        placeholder={t(
+                            "voting:create.thresholdPicker.customPlaceholder",
+                        )}
                     />
                 </div>
                 <div className="space-y-1.5">

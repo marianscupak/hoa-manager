@@ -107,6 +107,9 @@ export function ReplaceOwnershipFieldItem({
                                 <FractionInput
                                     value={field.value}
                                     onChange={field.onChange}
+                                    placeholder={t(
+                                        "units.ownershipEditor.sharePlaceholder",
+                                    )}
                                     aria-invalid={!!fieldState.error}
                                 />
                                 <FormMessage />

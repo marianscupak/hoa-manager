@@ -31,6 +31,7 @@ import {
 } from "@/api/generated/property-units/property-units";
 
 import { ReplaceOwnershipFieldItem } from "./field-item";
+import { emptyRow, initialRows } from "./rows";
 import { replaceOwnershipSchema, ReplaceOwnershipValues } from "./schema";
 
 interface ReplaceOwnershipDialogProps {
@@ -40,12 +41,6 @@ interface ReplaceOwnershipDialogProps {
     currentOwnerships?: UnitOwnershipResponseDto[];
     onSuccess?: () => void;
 }
-
-const emptyRow = (): ReplaceOwnershipValues["ownerships"][number] => ({
-    partyType: "SOLE",
-    share: null,
-    memberOwnerIds: [""],
-});
 
 export function ReplaceOwnershipDialog({
     unitId,
@@ -64,7 +59,7 @@ export function ReplaceOwnershipDialog({
     const form = useForm<ReplaceOwnershipValues>({
         resolver: zodResolver(schema),
         defaultValues: {
-            ownerships: [emptyRow()],
+            ownerships: initialRows(currentOwnerships),
         },
     });
 
@@ -74,19 +69,7 @@ export function ReplaceOwnershipDialog({
     });
 
     useEffect(() => {
-        if (open && currentOwnerships && currentOwnerships.length > 0) {
-            form.reset({
-                ownerships: currentOwnerships.map((o) => ({
-                    partyType: o.partyType,
-                    share: { num: o.shareNumerator, den: o.shareDenominator },
-                    memberOwnerIds: o.members.map((m) => m.ownerId),
-                })),
-            });
-        } else if (open) {
-            form.reset({
-                ownerships: [emptyRow()],
-            });
-        }
+        if (open) form.reset({ ownerships: initialRows(currentOwnerships) });
     }, [open, currentOwnerships, form]);
 
     const onSubmit = (values: ReplaceOwnershipValues) => {

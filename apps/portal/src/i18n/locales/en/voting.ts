@@ -213,7 +213,7 @@ export const voting = {
         },
         thresholdPicker: {
             customLabel: "Custom fraction",
-            percentLabel: "Percent",
+            customPlaceholder: "E.g. 3/5 or 60 %",
             comparatorLabel: "Comparator",
             comparator: {
                 AT_LEAST: "at least",

@@ -1,9 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { Resolver, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { z } from "zod";
 
 import {
     Button,
@@ -19,8 +18,10 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
+    FractionInput,
     Input,
     toast,
+    type Fraction,
 } from "@hoa-mngr/ui";
 
 import { showApiError } from "@/api/error-utils";
@@ -31,25 +32,7 @@ import {
     useUnitControllerUpdateUnit,
 } from "@/api/generated/property-units/property-units";
 
-const updateUnitSchema = z.object({
-    unitNo: z.string().min(1, "units.create.unitNoRequired").max(50),
-    buildingShareNumerator: z.preprocess(
-        (v) => (v === "" ? undefined : Number(v)),
-        z
-            .number()
-            .int("units.create.shareMustBePositive")
-            .positive("units.create.shareMustBePositive"),
-    ),
-    buildingShareDenominator: z.preprocess(
-        (v) => (v === "" ? undefined : Number(v)),
-        z
-            .number()
-            .int("units.create.shareMustBePositive")
-            .positive("units.create.shareMustBePositive"),
-    ),
-});
-
-type UpdateUnitValues = z.infer<typeof updateUnitSchema>;
+import { unitFormSchema, type UnitFormValues } from "./unit-form-schema";
 
 interface UpdateUnitDialogProps {
     unit?: UnitResponseDto | null;
@@ -88,15 +71,11 @@ export function UpdateUnitDialog({
         },
     });
 
-    const form = useForm<UpdateUnitValues>({
-        resolver: zodResolver(updateUnitSchema) as unknown as Resolver<
-            UpdateUnitValues,
-            unknown
-        >,
+    const form = useForm<UnitFormValues>({
+        resolver: zodResolver(unitFormSchema),
         defaultValues: {
             unitNo: "",
-            buildingShareNumerator: 1,
-            buildingShareDenominator: 1,
+            buildingShare: { num: 1, den: 1 },
         },
     });
 
@@ -104,20 +83,23 @@ export function UpdateUnitDialog({
         if (unit) {
             form.reset({
                 unitNo: unit.unitNo,
-                buildingShareNumerator: unit.buildingShareNumerator,
-                buildingShareDenominator: unit.buildingShareDenominator,
+                buildingShare: {
+                    num: unit.buildingShareNumerator,
+                    den: unit.buildingShareDenominator,
+                },
             });
         }
     }, [unit, form]);
 
-    const onSubmit = (values: UpdateUnitValues) => {
+    const onSubmit = (values: UnitFormValues) => {
         if (!unit) return;
+        const share = values.buildingShare as Fraction;
         updateUnit.mutate({
             id: unit.id,
             data: {
                 unitNo: values.unitNo,
-                buildingShareNumerator: values.buildingShareNumerator,
-                buildingShareDenominator: values.buildingShareDenominator,
+                buildingShareNumerator: share.num,
+                buildingShareDenominator: share.den,
             },
         });
     };
@@ -137,7 +119,7 @@ export function UpdateUnitDialog({
                         onSubmit={form.handleSubmit(onSubmit)}
                         className="space-y-4"
                     >
-                        <FormField<UpdateUnitValues>
+                        <FormField
                             control={form.control}
                             name="unitNo"
                             render={({ field }) => (
@@ -157,56 +139,26 @@ export function UpdateUnitDialog({
                                 </FormItem>
                             )}
                         />
-                        <div>
-                            <FormLabel>
-                                {t("units.create.buildingShareLabel")}
-                            </FormLabel>
-                            <div className="mt-2 flex items-center gap-2">
-                                <FormField<UpdateUnitValues>
-                                    control={form.control}
-                                    name="buildingShareNumerator"
-                                    render={({ field }) => (
-                                        <FormItem className="flex-1">
-                                            <FormControl>
-                                                <Input
-                                                    type="number"
-                                                    min={1}
-                                                    step={1}
-                                                    placeholder={t(
-                                                        "units.create.numeratorPlaceholder",
-                                                    )}
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <span className="text-muted-foreground text-lg font-semibold">
-                                    /
-                                </span>
-                                <FormField<UpdateUnitValues>
-                                    control={form.control}
-                                    name="buildingShareDenominator"
-                                    render={({ field }) => (
-                                        <FormItem className="flex-1">
-                                            <FormControl>
-                                                <Input
-                                                    type="number"
-                                                    min={1}
-                                                    step={1}
-                                                    placeholder={t(
-                                                        "units.create.denominatorPlaceholder",
-                                                    )}
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
-                        </div>
+                        <FormField
+                            control={form.control}
+                            name="buildingShare"
+                            render={({ field, fieldState }) => (
+                                <FormItem>
+                                    <FormLabel>
+                                        {t("units.create.buildingShareLabel")}
+                                    </FormLabel>
+                                    <FractionInput
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                        placeholder={t(
+                                            "units.create.buildingSharePlaceholder",
+                                        )}
+                                        aria-invalid={!!fieldState.error}
+                                    />
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
                         <DialogFooter>
                             <Button
                                 type="submit"

@@ -366,6 +366,8 @@ export const voting = {
             "To vote for this unit, a common representative must be authorized (by co-owners holding a majority of shares).",
         requiresDelegationSjm:
             "For a unit held in marital community property, the other spouse must also confirm the representative.",
+        readyCanDelegate:
+            "Can't vote in person? Arrange a proxy before the vote opens.",
     },
     detail: {
         backToVoting: "Voting",
@@ -444,6 +446,7 @@ export const voting = {
                     "The unit is owned by the association and has no voting right.",
             },
             manageDelegation: "Manage Delegation",
+            arrangeDelegation: "Arrange a proxy",
             totalPower: "Total Voting Power:",
             totalPowerVotes_one: "{{count}} vote",
             totalPowerVotes_other: "{{count}} votes",
@@ -537,7 +540,7 @@ export const voting = {
             title: "No delegations found",
             description:
                 "You haven't delegated your vote to anyone yet, and no one has delegated their vote to you.",
-            all: "No active delegations found.",
+            all: "You have no proxies yet. Arrange one from the detail of a scheduled vote before it opens.",
             filtered: "No delegations for the selected vote.",
             search: "No delegations match your search.",
         },

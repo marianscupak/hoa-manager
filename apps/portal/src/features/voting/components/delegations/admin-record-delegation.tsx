@@ -39,6 +39,8 @@ import {
     getVotesControllerGetVoterStatusQueryKey,
 } from "@/api/generated/votes/votes";
 
+import { votesOpenForDelegation } from "@/features/voting/utils/delegation-eligibility";
+
 import {
     adminRecordDelegationSchema,
     AdminRecordDelegationFormValues,
@@ -66,7 +68,7 @@ export function AdminRecordDelegation() {
     const { data: votes } = useVotesControllerGetVotes();
     const { data: units } = useUnitControllerGetUnits();
 
-    const filteredVotes = votes?.filter((v) => v.status !== "CLOSED") || [];
+    const filteredVotes = votesOpenForDelegation(votes);
 
     // The Zmocnitel (grantor) list comes from the selected unit's actual
     // owners — including owners without a user account (e.g. an SJM spouse)

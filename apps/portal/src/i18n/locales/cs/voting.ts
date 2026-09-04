@@ -365,6 +365,8 @@ export const voting = {
             "K hlasování za jednotku je potřeba zmocnit společného zástupce (souhlasem spoluvlastníků s nadpoloviční většinou podílů).",
         requiresDelegationSjm:
             "U jednotky ve společném jmění manželů musí zástupce potvrdit i druhý z manželů.",
+        readyCanDelegate:
+            "Nemůžete hlasovat osobně? Zařiďte si zastoupení, dokud hlasování nezačne.",
     },
     detail: {
         backToVoting: "Hlasování",
@@ -444,6 +446,7 @@ export const voting = {
                     "Jednotka je ve vlastnictví společenství a nemá hlasovací právo.",
             },
             manageDelegation: "Spravovat delegaci",
+            arrangeDelegation: "Zařídit zastoupení",
             totalPower: "Celková síla hlasu:",
             totalPowerVotes_one: "{{count}} hlas",
             totalPowerVotes_few: "{{count}} hlasy",
@@ -539,7 +542,7 @@ export const voting = {
             title: "Žádné delegace nebyly nalezeny",
             description:
                 "Zatím jste nikomu svůj hlas nedelegovali a nikdo nedelegoval hlas vám.",
-            all: "Nebyly nalezeny žádné aktivní delegace.",
+            all: "Zatím nemáte žádné zastoupení. Zařídíte ho v detailu naplánovaného hlasování, dokud hlasování nezačne.",
             filtered: "Pro vybrané hlasování nebyly nalezeny žádné delegace.",
             search: "Vašemu hledání neodpovídají žádné delegace.",
         },

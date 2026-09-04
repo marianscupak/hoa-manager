@@ -26,6 +26,7 @@ import {
 import { useUnitControllerGetMyOwnedUnits } from "@/api/generated/property-units/property-units";
 import { useVotesControllerGetVoterStatus } from "@/api/generated/votes/votes";
 
+import { delegationPrompt } from "../utils/delegation-eligibility";
 import { formatTotalVotingPower } from "../utils/total-voting-power";
 
 interface VoterStatusSidebarProps {
@@ -98,6 +99,7 @@ export function VoterStatusSidebar({ vote }: VoterStatusSidebarProps) {
     const statusData = statusQuery.data;
     const isVoteOpen = vote.status === "OPEN";
 
+    const prompt = delegationPrompt(vote.status, statusData.owningUnits);
     const unitRequiringDelegation = statusData.owningUnits.find(
         (u) => u.status === "REQUIRES_DELEGATION",
     );
@@ -190,7 +192,7 @@ export function VoterStatusSidebar({ vote }: VoterStatusSidebarProps) {
                         </div>
                     ))}
 
-                    {unitRequiringDelegation && (
+                    {prompt === "required" && (
                         <div className="rounded-panel border-warning-tint-border bg-warning-muted border p-3">
                             <p className="text-warning-deep text-sm leading-[19px]">
                                 {t("status.requiresDelegation")}
@@ -205,6 +207,20 @@ export function VoterStatusSidebar({ vote }: VoterStatusSidebarProps) {
                                 className="text-primary-tint-foreground mt-1.5 inline-block text-sm font-semibold hover:underline"
                             >
                                 {t("detail.statusSidebar.manageDelegation")} →
+                            </Link>
+                        </div>
+                    )}
+
+                    {prompt === "available" && (
+                        <div className="rounded-panel border-hairline bg-muted/40 border p-3">
+                            <p className="text-muted-foreground text-sm leading-[19px]">
+                                {t("status.readyCanDelegate")}
+                            </p>
+                            <Link
+                                to={`/voting/${voteId}/delegate`}
+                                className="text-primary-tint-foreground mt-1.5 inline-block text-sm font-semibold hover:underline"
+                            >
+                                {t("detail.statusSidebar.arrangeDelegation")} →
                             </Link>
                         </div>
                     )}

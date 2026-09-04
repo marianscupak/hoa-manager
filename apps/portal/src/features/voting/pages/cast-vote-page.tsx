@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 import { TFunction } from "i18next";
 import {
     Check,
@@ -187,6 +187,7 @@ export function CastVotePage() {
     // Terminal state, deliberately above every other guard: submitting
     // invalidates the voter status, and the refetch empties `votableUnits`.
     if (submittedAt) {
+        const submittedDate = new Date(submittedAt);
         return (
             <div className="mx-auto flex max-w-lg flex-col items-center justify-center py-20 text-center">
                 <div className="bg-success-muted mb-6 flex h-20 w-20 items-center justify-center rounded-full">
@@ -198,14 +199,16 @@ export function CastVotePage() {
                 <p className="text-muted-foreground mb-6">
                     {t("castVote.success.subtitle")}
                 </p>
-                <div className="border-hairline rounded-panel bg-muted/50 mb-8 flex w-full items-center justify-between border px-4 py-3">
-                    <span className="text-secondary-foreground text-sm font-medium">
-                        {t("castVote.success.timestamp")}
-                    </span>
-                    <span className="text-foreground text-sm font-bold">
-                        {format(new Date(submittedAt), "d. M. yyyy HH:mm")}
-                    </span>
-                </div>
+                {isValid(submittedDate) && (
+                    <div className="border-hairline rounded-panel bg-muted/50 mb-8 flex w-full items-center justify-between border px-4 py-3">
+                        <span className="text-secondary-foreground text-sm font-medium">
+                            {t("castVote.success.timestamp")}
+                        </span>
+                        <span className="text-foreground text-sm font-bold">
+                            {format(submittedDate, "d. M. yyyy HH:mm")}
+                        </span>
+                    </div>
+                )}
                 <Button onClick={() => navigate(`/voting/${voteId}`)}>
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     {t("castVote.backToDetail")}

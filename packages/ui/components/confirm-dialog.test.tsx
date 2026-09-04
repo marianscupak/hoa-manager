@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ConfirmDialog, type ConfirmDialogProps } from "./confirm-dialog";
@@ -54,5 +55,43 @@ describe("ConfirmDialog", () => {
         setup({ confirming: true, confirmingLabel: "Submitting…" });
         expect(button("Submitting…").disabled).toBe(true);
         expect(button("Cancel").disabled).toBe(true);
+    });
+
+    // Call sites such as the cast-vote page swap the whole subtree out on
+    // confirm, so the dialog is torn down in the same commit that closes it.
+    // The body pointer-events lock has to come off anyway, or whatever
+    // replaces it is unclickable.
+    it("unlocks the body when confirming unmounts it in the same commit", async () => {
+        function Page() {
+            const [open, setOpen] = useState(false);
+            const [done, setDone] = useState(false);
+            if (done) return <button>Done</button>;
+            return (
+                <>
+                    <button onClick={() => setOpen(true)}>Open</button>
+                    <ConfirmDialog
+                        open={open}
+                        onOpenChange={setOpen}
+                        title="Submit your vote?"
+                        description="Ballots cannot be changed afterwards."
+                        confirmLabel="Submit vote"
+                        cancelLabel="Cancel"
+                        onConfirm={() => {
+                            setOpen(false);
+                            setDone(true);
+                        }}
+                    />
+                </>
+            );
+        }
+
+        const user = userEvent.setup();
+        render(<Page />);
+        await user.click(button("Open"));
+        expect(document.body.style.pointerEvents).toBe("none");
+
+        await user.click(button("Submit vote"));
+        button("Done");
+        expect(document.body.style.pointerEvents).not.toBe("none");
     });
 });

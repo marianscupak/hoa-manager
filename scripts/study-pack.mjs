@@ -40,8 +40,7 @@ const PACK_ROOT = path.join(REPO, "docs", "user-testing", "pack");
 const USAGE = `Usage:
   study-pack --participant <Pn> --email <participant email>
              --password <persona password> --moderator-email <mailbox for task A4>
-             [--contact-email <author email>] [--name "<vocative first name, e.g. Jane>"]
-             [--out <dir>] [--html-only]
+             [--contact-email <author email>] [--out <dir>] [--html-only]
       Writes the invitation pack (what to expect + informed consent) and the
       participant card for one session.
 
@@ -350,7 +349,6 @@ function parseInput(argv) {
         strict: true,
         options: {
             "participant": { type: "string" },
-            "name": { type: "string" },
             "email": { type: "string" },
             "password": { type: "string" },
             "moderator-email": { type: "string" },
@@ -404,10 +402,6 @@ async function main() {
 
         const substitutions = {
             "ID účastníka": participantId,
-            // Czech needs the vocative after a greeting, so the caller supplies it.
-            "oslovení": values.name
-                ? `Dobrý den, ${values.name},`
-                : "Dobrý den,",
             "e-mail účastníka": values.email,
             "persona e-mail": personaEmail(participantId),
             "heslo": values.password,

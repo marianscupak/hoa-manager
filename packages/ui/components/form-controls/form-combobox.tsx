@@ -31,9 +31,11 @@ export interface FormComboboxProps {
     disabled?: boolean;
     onValueChange?: (value: string) => void;
     /**
-     * Label for an action at the foot of the list that creates what is being
-     * searched for, e.g. ``(q) => `Create "${q}"` ``. Supply it together with
-     * `onCreate`; omit both for a plain searchable select.
+     * Label for the action pinned to the foot of the list. It is shown from
+     * the moment the list opens, so it receives the current query — which is
+     * `""` until something is typed — and has to read sensibly either way,
+     * e.g. ``(q) => (q ? `Create "${q}"` : "Create a new owner")``. Supply it
+     * together with `onCreate`; omit both for a plain searchable select.
      */
     createLabel?: (query: string) => string;
     onCreate?: (query: string) => void;
@@ -87,9 +89,9 @@ export const FormCombobox = ({
     }, [options, query]);
 
     // The create action is the last row, so the arrow keys reach it like any
-    // other. Offered whenever something is typed, not only when nothing
-    // matches — a new owner may well share a prefix with an existing one.
-    const canCreate = !!onCreate && !!createLabel && query.trim().length > 0;
+    // other. Offered from the moment the list opens: someone who cannot find a
+    // name needs to see the way out before they have worked out what to type.
+    const canCreate = !!onCreate && !!createLabel;
     const createIndex = canCreate ? filtered.length : -1;
     const rowCount = filtered.length + (canCreate ? 1 : 0);
 
@@ -218,7 +220,13 @@ export const FormCombobox = ({
                                 <ul
                                     id={listId}
                                     role="listbox"
-                                    className="max-h-60 overflow-y-auto p-1"
+                                    className={cn(
+                                        "max-h-60 overflow-y-auto p-1",
+                                        // No bottom padding under a pinned
+                                        // create row, or options scroll
+                                        // through the gap beneath it.
+                                        canCreate && "pb-0",
+                                    )}
                                 >
                                     {filtered.map((option, index) => (
                                         <li
@@ -267,8 +275,11 @@ export const FormCombobox = ({
                                             onMouseEnter={() =>
                                                 setActiveIndex(createIndex)
                                             }
+                                            // Pinned to the bottom of the
+                                            // scroll area so a long owner list
+                                            // never hides it.
                                             className={cn(
-                                                "text-primary border-border mt-1 flex cursor-pointer items-center gap-2 rounded-sm border-t px-2 py-2 text-sm font-medium",
+                                                "text-primary border-border bg-popover sticky bottom-0 mt-1 flex cursor-pointer items-center gap-2 rounded-sm border-t px-2 py-2 text-sm font-medium",
                                                 activeIndex === createIndex &&
                                                     "bg-accent",
                                             )}

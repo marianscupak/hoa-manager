@@ -552,7 +552,7 @@ export const voting = {
             title: "Žádné delegace nebyly nalezeny",
             description:
                 "Zatím jste nikomu svůj hlas nedelegovali a nikdo nedelegoval hlas vám.",
-            all: "Zatím nemáte žádné zastoupení. Zařídíte ho v detailu naplánovaného hlasování, dokud hlasování nezačne.",
+            all: "Zatím nemáte žádné zastoupení. Novou plnou moc udělíte tlačítkem nahoře, dokud hlasování nezačne.",
             filtered: "Pro vybrané hlasování nebyly nalezeny žádné delegace.",
             search: "Vašemu hledání neodpovídají žádné delegace.",
         },

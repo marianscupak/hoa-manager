@@ -1,10 +1,11 @@
 import { Trash2Icon } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 import {
     Button,
+    FormCombobox,
     FormField,
     FormItem,
     FormLabel,
@@ -13,9 +14,21 @@ import {
     FractionInput,
 } from "@hoa-mngr/ui";
 
-import type { OwnerResponseDto } from "@/api/generated/model";
+import type {
+    CreateOwnerDtoKind,
+    OwnerResponseDto,
+} from "@/api/generated/model";
+
+import { CreateOwnerDialog } from "../create-owner-dialog";
 
 import type { ReplaceOwnershipValues } from "./schema";
+
+/** Which member slot asked for a new owner, and what kind it may be. */
+interface PendingOwner {
+    slot: 0 | 1;
+    name: string;
+    lockedKind?: CreateOwnerDtoKind;
+}
 
 interface ReplaceOwnershipFieldItemProps {
     index: number;
@@ -33,6 +46,16 @@ export function ReplaceOwnershipFieldItem({
     const { t } = useTranslation(["admin"]);
     const { control, setValue, getValues, formState } =
         useFormContext<ReplaceOwnershipValues>();
+    const [pendingOwner, setPendingOwner] = useState<PendingOwner | null>(null);
+    // Which slot is waiting for the new owner. Kept in a ref as well as in
+    // state because the answer is needed after a round-trip to the server, by
+    // which point a re-render may already have closed the dialog.
+    const pendingSlot = useRef<0 | 1 | null>(null);
+
+    const startCreatingOwner = (pending: PendingOwner) => {
+        pendingSlot.current = pending.slot;
+        setPendingOwner(pending);
+    };
 
     const partyType = useWatch({
         control,
@@ -44,7 +67,7 @@ export function ReplaceOwnershipFieldItem({
     // `ownerships` field-array, whose own custom-refine errors nest under
     // `.root` — `memberOwnerIds` isn't itself a `useFieldArray`, just a plain
     // array value, so it doesn't get that treatment). Neither the `share`
-    // FormField nor the `memberOwnerIds.0`/`.1` FormSelects read this path,
+    // FormField nor the `memberOwnerIds.0`/`.1` pickers read this path,
     // so without reading it explicitly here, a duplicate/invalid member
     // selection fails validation with no visible feedback at all.
     const membersError =
@@ -133,31 +156,33 @@ export function ReplaceOwnershipFieldItem({
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {partyType === "SJM" ? (
                     <>
-                        <FormSelect
-                            name={`ownerships.${index}.memberOwnerIds.0`}
+                        <OwnerPicker
+                            index={index}
+                            slot={0}
                             label={t("units.ownershipEditor.spouseOne")}
-                            placeholder={t(
-                                "units.ownershipEditor.ownerPlaceholder",
-                            )}
                             options={personOptions}
+                            // Only people may hold a unit in SJM, so a legal
+                            // entity created here would never appear in this
+                            // field's options.
+                            lockedKind="PERSON"
+                            onCreate={startCreatingOwner}
                         />
-                        <FormSelect
-                            name={`ownerships.${index}.memberOwnerIds.1`}
+                        <OwnerPicker
+                            index={index}
+                            slot={1}
                             label={t("units.ownershipEditor.spouseTwo")}
-                            placeholder={t(
-                                "units.ownershipEditor.ownerPlaceholder",
-                            )}
                             options={personOptions}
+                            lockedKind="PERSON"
+                            onCreate={startCreatingOwner}
                         />
                     </>
                 ) : (
-                    <FormSelect
-                        name={`ownerships.${index}.memberOwnerIds.0`}
+                    <OwnerPicker
+                        index={index}
+                        slot={0}
                         label={t("units.ownershipEditor.ownerLabel")}
-                        placeholder={t(
-                            "units.ownershipEditor.ownerPlaceholder",
-                        )}
                         options={ownerOptions}
+                        onCreate={startCreatingOwner}
                     />
                 )}
             </div>
@@ -167,6 +192,68 @@ export function ReplaceOwnershipFieldItem({
                     {membersError}
                 </p>
             )}
+
+            <CreateOwnerDialog
+                open={!!pendingOwner}
+                onOpenChange={(open) => !open && setPendingOwner(null)}
+                defaultName={pendingOwner?.name}
+                lockedKind={pendingOwner?.lockedKind}
+                onCreated={(ownerId) => {
+                    const slot = pendingSlot.current;
+                    if (slot === null) return;
+                    setValue(
+                        `ownerships.${index}.memberOwnerIds.${slot}`,
+                        ownerId,
+                        { shouldValidate: true },
+                    );
+                    pendingSlot.current = null;
+                    setPendingOwner(null);
+                }}
+            />
         </div>
+    );
+}
+
+interface OwnerPickerProps {
+    index: number;
+    slot: 0 | 1;
+    label: string;
+    options: { label: string; value: string }[];
+    lockedKind?: CreateOwnerDtoKind;
+    onCreate: (pending: PendingOwner) => void;
+}
+
+/**
+ * One owner slot. Searchable because associations run to hundreds of owners,
+ * and able to add one because a name missing from the list used to leave the
+ * form with nowhere to go.
+ */
+function OwnerPicker({
+    index,
+    slot,
+    label,
+    options,
+    lockedKind,
+    onCreate,
+}: OwnerPickerProps) {
+    const { t } = useTranslation(["admin"]);
+
+    return (
+        <FormCombobox
+            name={`ownerships.${index}.memberOwnerIds.${slot}`}
+            label={label}
+            placeholder={t("units.ownershipEditor.ownerPlaceholder")}
+            searchPlaceholder={t(
+                "units.ownershipEditor.ownerSearchPlaceholder",
+            )}
+            emptyMessage={t("units.ownershipEditor.ownerNotFound")}
+            options={options}
+            createLabel={(name) =>
+                name
+                    ? t("units.ownershipEditor.createOwnerOption", { name })
+                    : t("units.ownershipEditor.createOwnerBlank")
+            }
+            onCreate={(name) => onCreate({ slot, name, lockedKind })}
+        />
     );
 }

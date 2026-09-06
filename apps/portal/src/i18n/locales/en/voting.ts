@@ -549,7 +549,7 @@ export const voting = {
             title: "No delegations found",
             description:
                 "You haven't delegated your vote to anyone yet, and no one has delegated their vote to you.",
-            all: "You have no proxies yet. Arrange one from the detail of a scheduled vote before it opens.",
+            all: "You have no proxies yet. Use the button above to grant one before the vote opens.",
             filtered: "No delegations for the selected vote.",
             search: "No delegations match your search.",
         },

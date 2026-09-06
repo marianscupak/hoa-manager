@@ -26,7 +26,9 @@ function Harness({ onCreate }: { onCreate?: (query: string) => void }) {
                 searchPlaceholder="Search owners"
                 emptyMessage="No owner found"
                 options={OPTIONS}
-                createLabel={(q) => `Create "${q}"`}
+                createLabel={(q) =>
+                    q ? `Create "${q}"` : "Create someone new"
+                }
                 onCreate={onCreate}
             />
             <output>{form.watch("owner")}</output>
@@ -91,6 +93,24 @@ describe("FormCombobox", () => {
         expect(screen.getByRole("status").textContent).toBe("");
     });
 
+    it("shows the create row before anything is typed", async () => {
+        const onCreate = vi.fn();
+        const user = userEvent.setup();
+        render(<Harness onCreate={onCreate} />);
+        await user.click(trigger());
+
+        const options = screen.getAllByRole("option");
+        expect(options).toHaveLength(OPTIONS.length + 1);
+        expect(options[options.length - 1].textContent).toContain(
+            "Create someone new",
+        );
+
+        await user.click(
+            screen.getByRole("option", { name: /Create someone new/ }),
+        );
+        expect(onCreate).toHaveBeenCalledWith("");
+    });
+
     it("offers to create even while the query still matches something", async () => {
         const onCreate = vi.fn();
         const user = userEvent.setup();
@@ -101,6 +121,22 @@ describe("FormCombobox", () => {
 
         expect(screen.getByRole("option", { name: /Nováková/ })).toBeDefined();
         expect(screen.getByRole("option", { name: /^Create/ })).toBeDefined();
+    });
+
+    it("offers only the create row when the search finds nobody", async () => {
+        // The state the create action exists for: someone looked for an owner
+        // who isn't there yet.
+        const onCreate = vi.fn();
+        const user = userEvent.setup();
+        render(<Harness onCreate={onCreate} />);
+        await user.click(trigger());
+
+        await user.type(screen.getByRole("combobox"), "Petr");
+
+        const options = screen.getAllByRole("option");
+        expect(options).toHaveLength(1);
+        expect(options[0].textContent).toContain('Create "Petr"');
+        expect(screen.queryByText("No owner found")).toBeNull();
     });
 
     it("says so when nothing matches and there is nothing to create", async () => {

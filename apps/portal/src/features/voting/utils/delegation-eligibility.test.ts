@@ -8,6 +8,7 @@ import type {
 import {
     consentRisk,
     delegationPrompt,
+    votesDelegableByMember,
     votesOpenForDelegation,
 } from "./delegation-eligibility";
 
@@ -70,6 +71,50 @@ describe("votesOpenForDelegation", () => {
             "SCHEDULED",
         ]);
         expect(votesOpenForDelegation(undefined)).toEqual([]);
+    });
+});
+
+describe("votesDelegableByMember", () => {
+    const scheduled = (id: string) =>
+        ({ id, status: "SCHEDULED" }) as VoteListItemResponseDto;
+
+    it("keeps the scheduled votes where the member still holds a unit of their own", () => {
+        const votes = [scheduled("ready"), scheduled("requires")];
+        const statuses = new Map([
+            ["ready", [unit("READY")]],
+            ["requires", [unit("REQUIRES_DELEGATION")]],
+        ]);
+        expect(
+            votesDelegableByMember(votes, statuses).map((v) => v.id),
+        ).toEqual(["ready", "requires"]);
+    });
+
+    it("drops votes where nothing is left to hand over", () => {
+        const votes = [scheduled("spent"), scheduled("proxy")];
+        const statuses = new Map([
+            ["spent", [unit("VOTED"), unit("DELEGATED"), unit("INELIGIBLE")]],
+            // Held on someone else's behalf — not theirs to pass on.
+            ["proxy", [unit("PROXY")]],
+        ]);
+        expect(votesDelegableByMember(votes, statuses)).toEqual([]);
+    });
+
+    it("drops a vote whose voter status has not arrived, rather than guessing", () => {
+        expect(votesDelegableByMember([scheduled("v1")], new Map())).toEqual(
+            [],
+        );
+    });
+
+    it("drops votes that are not scheduled even when a unit could be delegated", () => {
+        const votes = [
+            { id: "open", status: "OPEN" } as VoteListItemResponseDto,
+        ];
+        const statuses = new Map([["open", [unit("READY")]]]);
+        expect(votesDelegableByMember(votes, statuses)).toEqual([]);
+    });
+
+    it("has nothing to offer before the vote list has loaded", () => {
+        expect(votesDelegableByMember(undefined, new Map())).toEqual([]);
     });
 });
 

@@ -24,7 +24,7 @@ import { DelegationHeader } from "../components/delegation/delegation-header";
 import { DelegationNotice } from "../components/delegation/delegation-notice";
 import { DelegationSummary } from "../components/delegation/delegation-summary";
 import { UnitSelection } from "../components/delegation/unit-selection";
-import { consentRisk } from "../utils/delegation-eligibility";
+import { consentRisk, isDelegableUnit } from "../utils/delegation-eligibility";
 
 export const DelegateVotePage = () => {
     const { id = "" } = useParams();
@@ -115,12 +115,8 @@ export const DelegateVotePage = () => {
         c.name.toLowerCase().includes(searchQuery.toLowerCase()),
     );
 
-    // Only the member's own units can be handed to someone else — a PROXY
-    // unit is one they already hold on an owner's behalf.
     const selectableUnits =
-        voterStatus?.owningUnits.filter(
-            (u) => u.status === "REQUIRES_DELEGATION" || u.status === "READY",
-        ) || [];
+        voterStatus?.owningUnits.filter(isDelegableUnit) || [];
 
     const risk = consentRisk(preview, isPreviewPending);
 

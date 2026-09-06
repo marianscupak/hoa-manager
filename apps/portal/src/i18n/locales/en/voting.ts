@@ -553,6 +553,10 @@ export const voting = {
             filtered: "No delegations for the selected vote.",
             search: "No delegations match your search.",
         },
+        create: {
+            button: "Grant a Proxy",
+            noVotes: "No vote is open for a proxy right now",
+        },
         filter: {
             vote: "Filter by Vote",
             allVotes: "All Scheduled Votes",

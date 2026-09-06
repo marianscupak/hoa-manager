@@ -30,11 +30,40 @@ export function delegationPrompt(
     return null;
 }
 
+/**
+ * Whether the member may hand this unit to someone else. Only their own units
+ * qualify — a PROXY unit is one they already hold on an owner's behalf, and a
+ * unit that has voted, is already delegated or is ineligible has nothing left
+ * to pass on.
+ */
+export function isDelegableUnit(unit: OwningUnitStatusDto): boolean {
+    return unit.status === "REQUIRES_DELEGATION" || unit.status === "READY";
+}
+
 /** Votes an admin may record a paper power of attorney against. */
 export function votesOpenForDelegation(
     votes: VoteListItemResponseDto[] | undefined,
 ): VoteListItemResponseDto[] {
     return votes?.filter((v) => v.status === "SCHEDULED") ?? [];
+}
+
+/**
+ * The votes the member can start a delegation on right now: scheduled ones
+ * where they still hold a unit of their own to hand over.
+ *
+ * `owningUnitsByVoteId` carries the voter status already fetched per vote; a
+ * vote missing from it (still loading, or failed) is left out rather than
+ * offered on a guess — the delegation screen it leads to selects units with
+ * the same `isDelegableUnit` predicate, so an entry here always has something
+ * to choose there.
+ */
+export function votesDelegableByMember(
+    votes: VoteListItemResponseDto[] | undefined,
+    owningUnitsByVoteId: Map<string, OwningUnitStatusDto[]>,
+): VoteListItemResponseDto[] {
+    return votesOpenForDelegation(votes).filter((vote) =>
+        (owningUnitsByVoteId.get(vote.id) ?? []).some(isDelegableUnit),
+    );
 }
 
 export type ConsentRisk = "noRepresentative";

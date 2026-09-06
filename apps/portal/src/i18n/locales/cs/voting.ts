@@ -556,6 +556,10 @@ export const voting = {
             filtered: "Pro vybrané hlasování nebyly nalezeny žádné delegace.",
             search: "Vašemu hledání neodpovídají žádné delegace.",
         },
+        create: {
+            button: "Udělit plnou moc",
+            noVotes: "Nyní nemáte hlasování, ke kterému lze plnou moc udělit",
+        },
         filter: {
             vote: "Filtrovat podle hlasování",
             allVotes: "Všechna naplánovaná hlasování",

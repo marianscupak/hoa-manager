@@ -1,3 +1,4 @@
+import { VoteStatus } from '@/modules/voting/domain/vote/vote.types';
 import {
   BallotAlreadyCastException,
   InvalidBallotAnswersException,
@@ -8,7 +9,6 @@ import {
   VoteNotFoundException,
   VoteNotOpenException,
 } from '@/shared/application/exceptions/vote.exceptions';
-import { VoteStatus } from '@/modules/voting/domain/vote/vote.types';
 
 import { RecordPaperBallotCommand } from './record-paper-ballot.command';
 import { RecordPaperBallotHandler } from './record-paper-ballot.handler';

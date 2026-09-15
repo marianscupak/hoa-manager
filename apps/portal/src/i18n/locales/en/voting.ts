@@ -696,8 +696,10 @@ export const voting = {
             representative: "Common representative",
             coOwnedHint:
                 "This unit is co-owned — the ballot should be signed by the common representative.",
+            noOwners:
+                "No current owner is on record for this unit, so a paper ballot can't be recorded. Check the unit's ownership.",
             auditNote:
-                "This is recorded in the activity log as a ballot recorded on the owner's behalf — with your name, the signer and the attached scan. Owners can see it in the vote's activity.",
+                "This is recorded in the activity log as a ballot recorded on the owner's behalf — with your name, the signer and the attached scan. The board can see it in the vote's activity.",
             continue: "Continue to answers",
             tooLarge: "That file is larger than 20 MB.",
             wrongType: "Attach a PDF, JPG or PNG.",
@@ -731,7 +733,7 @@ export const voting = {
         },
         done: {
             title: "Ballot for {{unit}} recorded",
-            body: "Its share now counts toward quorum. The activity log shows the ballot as recorded on the owner's behalf — by {{actor}}, signed by {{signer}}, with the scan attached.",
+            body: "Its share now counts toward quorum. The activity log shows the ballot as recorded on the owner's behalf — by {{actor}}, signed by {{signer}}.",
             recordedAt: "Recorded at",
             another: "Record another",
             backToVote: "Back to vote",

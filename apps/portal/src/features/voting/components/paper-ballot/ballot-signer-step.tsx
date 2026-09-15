@@ -149,6 +149,14 @@ export function BallotSignerStep({
                 <p className="mb-2 text-sm font-semibold">
                     {t("paperBallot.ballot.signerLabel")}
                 </p>
+                {unit.owners.length === 0 && (
+                    <Card className="bg-muted/50 flex items-start gap-3 p-4">
+                        <Info className="text-muted-foreground mt-0.5 h-4 w-4 shrink-0" />
+                        <p className="text-secondary-foreground text-sm">
+                            {t("paperBallot.ballot.noOwners")}
+                        </p>
+                    </Card>
+                )}
                 <div className="space-y-2">
                     {unit.owners.map((owner) => {
                         const selected = owner.ownerId === signerOwnerId;

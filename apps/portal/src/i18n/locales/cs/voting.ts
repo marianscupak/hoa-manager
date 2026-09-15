@@ -701,8 +701,10 @@ export const voting = {
             representative: "Společný zástupce",
             coOwnedHint:
                 "Jednotka má více spoluvlastníků — lístek by měl podepsat společný zástupce.",
+            noOwners:
+                "U této jednotky není evidován žádný současný vlastník, listinný hlas proto nelze zaznamenat. Zkontrolujte vlastnictví jednotky.",
             auditNote:
-                "Zápis se uloží do historie jako hlas zaznamenaný za vlastníka — s vaším jménem, podepsanou osobou a přiloženým skenem. Vlastníci ho uvidí v historii hlasování.",
+                "Zápis se uloží do historie jako hlas zaznamenaný za vlastníka — s vaším jménem, podepsanou osobou a přiloženým skenem. Výbor ho uvidí v historii hlasování.",
             continue: "Pokračovat k odpovědím",
             tooLarge: "Soubor je větší než 20 MB.",
             wrongType: "Přiložte PDF, JPG nebo PNG.",
@@ -736,7 +738,7 @@ export const voting = {
         },
         done: {
             title: "Hlas jednotky {{unit}} byl zaznamenán",
-            body: "Její podíl se nyní počítá do usnášeníschopnosti. V historii je hlas veden jako zaznamenaný za vlastníka — zapsal(a) {{actor}}, podepsal(a) {{signer}}, se přiloženým skenem.",
+            body: "Její podíl se nyní počítá do usnášeníschopnosti. V historii je hlas veden jako zaznamenaný za vlastníka — zapsal(a) {{actor}}, podepsal(a) {{signer}}.",
             recordedAt: "Zaznamenáno",
             another: "Zaznamenat další",
             backToVote: "Zpět na hlasování",

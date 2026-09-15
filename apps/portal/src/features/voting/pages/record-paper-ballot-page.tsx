@@ -292,10 +292,19 @@ export function RecordPaperBallotPage() {
                         attachment={attachment}
                         isUploading={isUploading}
                         progress={progress}
-                        onUpload={(file) => void upload(file)}
-                        onRemove={() => void remove()}
+                        onUpload={(file) => {
+                            void upload(file);
+                            setConfirmed(false);
+                        }}
+                        onRemove={() => {
+                            void remove();
+                            setConfirmed(false);
+                        }}
                         signerOwnerId={signerOwnerId}
-                        onSignerChange={setSignerOwnerId}
+                        onSignerChange={(ownerId) => {
+                            setSignerOwnerId(ownerId);
+                            setConfirmed(false);
+                        }}
                     />
                 )}
                 {step === "answers" && selectedUnit && currentQuestion && (

@@ -68,6 +68,13 @@ export class DeleteVoteDocumentHandler
     if (!document) {
       throw new VoteDocumentNotFoundException();
     }
+    // Ballot scans have their own dedicated routes and must never be
+    // reachable here. Until now that held only incidentally — ballot scans
+    // exist only on OPEN votes and this handler requires DRAFT — so this
+    // check makes the guarantee explicit rather than accidental.
+    if (document.kind !== 'VOTE') {
+      throw new VoteDocumentNotFoundException();
+    }
 
     await this.unitOfWork.execute(async () => {
       await this.documentRepository.deleteById(tenantId, documentId);

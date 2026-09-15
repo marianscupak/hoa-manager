@@ -69,6 +69,13 @@ export class ConfirmDocumentUploadHandler
     if (!document) {
       throw new VoteDocumentNotFoundException();
     }
+    // Ballot scans have their own dedicated routes and must never be
+    // reachable here. Until now that held only incidentally — ballot scans
+    // exist only on OPEN votes and this handler requires DRAFT — so this
+    // check makes the guarantee explicit rather than accidental.
+    if (document.kind !== 'VOTE') {
+      throw new VoteDocumentNotFoundException();
+    }
     if (document.status === 'UPLOADED') {
       return; // idempotent — a retried confirm is not an error
     }

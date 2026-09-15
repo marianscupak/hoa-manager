@@ -161,6 +161,11 @@ export class RecordPaperBallotHandler
         ],
       );
       const record = inserted[0];
+      if (!record) {
+        throw new Error(
+          `Internal: saved ballot record for unit ${unitId} not found`,
+        );
+      }
 
       const actor = this.auditContext.requireActor();
       const [castByLabel, unitLabel, signerLabel] = await Promise.all([

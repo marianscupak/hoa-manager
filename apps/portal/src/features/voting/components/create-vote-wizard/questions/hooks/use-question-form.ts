@@ -17,9 +17,14 @@ import { useVotesControllerUpdateVoteQuestion } from "@/api/generated/votes/vote
 import { rulesetFieldSchemas } from "../../shared/ruleset-schema";
 import { mapQuestionToUpdateDto } from "../../shared/voting-wizard.utils";
 
-const questionSchema = z
+export const questionSchema = z
     .object({
-        title: z.string().min(1),
+        title: z
+            .string()
+            .min(
+                1,
+                "voting:create.steps.questions.fields.title.errors.required",
+            ),
         description: z.string().optional(),
         type: z.nativeEnum(CreateVoteQuestionDtoType),
         useCustomRuleset: z.boolean(),
@@ -30,13 +35,33 @@ const questionSchema = z
         options: z.array(
             z.object({
                 id: z.string().optional(),
-                label: z.string().min(1),
+                label: z
+                    .string()
+                    .min(
+                        1,
+                        "voting:create.steps.questions.options.errors.required",
+                    ),
                 sortOrder: z.number(),
                 optionKey: z.string().optional(),
             }),
         ),
     })
     .superRefine((data, ctx) => {
+        // `options-list.tsx` lets the chair delete every option, and the
+        // review checklist no longer carries this, so the schema is what
+        // keeps a choice question answerable.
+        if (
+            data.type === CreateVoteQuestionDtoType.SINGLE_CHOICE &&
+            data.options.length < 2
+        ) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message:
+                    "voting:create.steps.questions.options.errors.atLeastTwo",
+                path: ["options"],
+            });
+        }
+
         if (
             data.useCustomRuleset &&
             data.majorityRuleType === "QUALIFIED_MAJORITY" &&

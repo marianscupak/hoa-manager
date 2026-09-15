@@ -32,15 +32,28 @@ type CreateVoteFormValues = z.infer<typeof createVoteFormSchema>;
 const PER_ROLLAM_MIN_DAYS = 15;
 
 /**
- * The server refuses to schedule a per-rollam vote with a window under 15
- * days, so the wizard blocks it here rather than letting the chair reach the
- * review step and be rejected on submit. An assembly record has no such
- * floor.
+ * Both date rules live here rather than in the review checklist, so the chair
+ * finds out on the step where the dates are entered. The server stays
+ * authoritative — `assertSchedulable` re-checks both.
+ *
+ * The ordering rule applies to every mode. The 15-day floor is per rollam
+ * only: an assembly record captures when a meeting happened, not how long
+ * owners had to respond.
  */
-function buildFormSchema(mode: "PER_ROLLAM" | "ASSEMBLY_RECORD") {
+export function buildFormSchema(mode: "PER_ROLLAM" | "ASSEMBLY_RECORD") {
     return createVoteFormSchema.superRefine((values, ctx) => {
-        if (mode !== "PER_ROLLAM") return;
         if (!values.scheduledFrom || !values.scheduledTo) return;
+
+        if (new Date(values.scheduledTo) <= new Date(values.scheduledFrom)) {
+            ctx.addIssue({
+                code: "custom",
+                path: ["scheduledTo"],
+                message: "voting:create.fields.scheduledTo.errors.beforeStart",
+            });
+            return;
+        }
+
+        if (mode !== "PER_ROLLAM") return;
 
         const days = differenceInDays(
             new Date(values.scheduledTo),

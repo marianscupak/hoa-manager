@@ -93,6 +93,9 @@ export const voting = {
                     title: {
                         label: "Znění otázky",
                         placeholder: "Zadejte text otázky...",
+                        errors: {
+                            required: "Znění otázky je vyžadováno",
+                        },
                     },
                     description: {
                         label: "Doplňující popis",
@@ -108,6 +111,11 @@ export const voting = {
                 },
                 options: {
                     title: "Možnosti",
+                    errors: {
+                        required: "Text možnosti je vyžadován",
+                        atLeastTwo:
+                            "Výběr z možností potřebuje alespoň dvě možnosti.",
+                    },
                     addOption: "Přidat možnost",
                     placeholder: "Text možnosti...",
                     defaultLabel: "Možnost",
@@ -152,6 +160,8 @@ export const voting = {
                 label: "Konec hlasování",
                 description: "Kdy se má hlasování automaticky uzavřít?",
                 errors: {
+                    beforeStart:
+                        "Konec hlasování musí být až po jeho začátku.",
                     tooShortPerRollam:
                         "Hlasování per rollam musí trvat nejméně 15 dní. Posuňte konec hlasování dál.",
                 },
@@ -311,14 +321,8 @@ export const voting = {
                 VOTE_SCHEDULE_MISSING_DATES:
                     "Datum zahájení a ukončení je vyplněno",
                 VOTE_SCHEDULE_IN_PAST: "Zahájení je v budoucnosti",
-                VOTE_SCHEDULE_INVALID_RANGE: "Ukončení následuje po zahájení",
                 VOTE_RULESET_REQUIRED: "Pravidla hlasování jsou nastavena",
                 VOTE_MISSING_QUESTIONS: "Existuje alespoň jedna otázka",
-                VOTE_QUESTION_MISSING_TITLE: "Každá otázka má znění",
-                VOTE_QUESTION_MISSING_OPTIONS:
-                    "Každá otázka má možnosti odpovědí",
-                VOTE_WINDOW_TOO_SHORT_PER_ROLLAM:
-                    "Hlasování per rollam trvá alespoň 15 dní",
             },
         },
     },

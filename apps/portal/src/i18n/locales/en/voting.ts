@@ -93,6 +93,9 @@ export const voting = {
                     title: {
                         label: "Question Text",
                         placeholder: "e.g. Do you agree with the 2026 budget?",
+                        errors: {
+                            required: "Question wording is required",
+                        },
                     },
                     description: {
                         label: "Explanatory Note (Optional)",
@@ -108,6 +111,11 @@ export const voting = {
                 },
                 options: {
                     title: "Answer Options",
+                    errors: {
+                        required: "Option text is required",
+                        atLeastTwo:
+                            "A multiple-choice question needs at least two options.",
+                    },
                     addOption: "Add Option",
                     placeholder: "Enter option text...",
                     defaultLabel: "Option",
@@ -152,6 +160,8 @@ export const voting = {
                 label: "Scheduled To",
                 description: "When should the vote automatically close?",
                 errors: {
+                    beforeStart:
+                        "The closing date must come after the opening date.",
                     tooShortPerRollam:
                         "A per rollam vote must run for at least 15 days. Move the closing date further out.",
                 },
@@ -310,14 +320,8 @@ export const voting = {
                 VOTE_SCHEDULE_MISSING_DATES:
                     "Opening and closing dates are set",
                 VOTE_SCHEDULE_IN_PAST: "Opening date is in the future",
-                VOTE_SCHEDULE_INVALID_RANGE: "Closing date is after opening",
                 VOTE_RULESET_REQUIRED: "Voting rules are configured",
                 VOTE_MISSING_QUESTIONS: "At least one question exists",
-                VOTE_QUESTION_MISSING_TITLE: "Every question has wording",
-                VOTE_QUESTION_MISSING_OPTIONS:
-                    "Every question has answer options",
-                VOTE_WINDOW_TOO_SHORT_PER_ROLLAM:
-                    "Per rollam voting period is at least 15 days",
             },
         },
     },

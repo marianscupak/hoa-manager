@@ -1,4 +1,3 @@
-import { differenceInDays } from "date-fns";
 import { AlertTriangle, Check, Send, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
@@ -18,17 +17,18 @@ export interface ReviewCheck {
 }
 
 /**
- * Drives the review checklist so owners see problems before submitting. Every
- * check mirrors a server `INCOMPLETE_VOTE` code (see
+ * Drives the review checklist so the chair sees problems before submitting,
+ * and gates the schedule button via `scheduleDisabled` in the wizard shell.
+ * Every check mirrors a server `INCOMPLETE_VOTE` code (see
  * `voting:detail.validation.errors.*`); the server remains the source of
  * truth — `useScheduleVote` + `ScheduleValidationModal` still handle any
  * mismatch.
  *
- * The 15-day window check is per rollam only, and it is an error rather than
- * advice: `vote.aggregate.ts` refuses to schedule a shorter per-rollam vote.
- * An assembly record has no such floor — it captures when a meeting happened,
- * not how long owners had to respond — so the check is left out for it
- * entirely rather than shown as a warning nobody needs to act on.
+ * Only conditions that no single wizard step can catch belong here. Date
+ * ordering and the per-rollam floor are enforced by `buildFormSchema` on the
+ * details step, question wording and answer options by `questionSchema` on
+ * the questions step; repeating them made the list a wall of green ticks
+ * that said nothing.
  */
 export function buildReviewChecks(vote: VoteDetailResponseDto): ReviewCheck[] {
     const from = vote.scheduledFrom ? new Date(vote.scheduledFrom) : null;
@@ -47,12 +47,6 @@ export function buildReviewChecks(vote: VoteDetailResponseDto): ReviewCheck[] {
             step: "details",
         },
         {
-            code: "VOTE_SCHEDULE_INVALID_RANGE",
-            ok: !from || !to || from.getTime() < to.getTime(),
-            severity: "error",
-            step: "details",
-        },
-        {
             code: "VOTE_RULESET_REQUIRED",
             ok: !!vote.ruleset,
             severity: "error",
@@ -64,30 +58,7 @@ export function buildReviewChecks(vote: VoteDetailResponseDto): ReviewCheck[] {
             severity: "error",
             step: "questions",
         },
-        {
-            code: "VOTE_QUESTION_MISSING_TITLE",
-            ok: vote.questions.every((q) => q.title.trim().length > 0),
-            severity: "error",
-            step: "questions",
-        },
-        {
-            code: "VOTE_QUESTION_MISSING_OPTIONS",
-            ok: vote.questions.every(
-                (q) => q.type === "YES_NO" || q.options.length >= 2,
-            ),
-            severity: "error",
-            step: "questions",
-        },
     ];
-
-    if (vote.mode === "PER_ROLLAM") {
-        checks.push({
-            code: "VOTE_WINDOW_TOO_SHORT_PER_ROLLAM",
-            ok: !from || !to || differenceInDays(to, from) >= 15,
-            severity: "error",
-            step: "details",
-        });
-    }
 
     return checks;
 }

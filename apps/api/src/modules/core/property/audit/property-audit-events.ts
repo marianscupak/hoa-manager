@@ -1,3 +1,4 @@
+import { KatastrDataImportedAuditEvent } from './events/katastr-data-imported.event';
 import { OwnerCreatedAuditEvent } from './events/owner-created.event';
 import { OwnerDeletedAuditEvent } from './events/owner-deleted.event';
 import { OwnerEmailAddedAuditEvent } from './events/owner-email-added.event';
@@ -18,4 +19,5 @@ export const PROPERTY_AUDIT_EVENTS = [
   UnitOwnershipTransferCancelledAuditEvent,
   OwnerUserLinkedAuditEvent,
   OwnerEmailAddedAuditEvent,
+  KatastrDataImportedAuditEvent,
 ];

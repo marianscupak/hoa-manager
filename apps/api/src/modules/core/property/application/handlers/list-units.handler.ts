@@ -10,12 +10,22 @@ import {
   type UnitRepository,
 } from '@/modules/core/property/application/ports/property.repository.port';
 import { ListUnitsQuery } from '@/modules/core/property/application/queries/list-units.query';
-import { Unit } from '@/modules/core/property/domain/property.entity';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
-import { Rational } from '@/shared/domain/rational';
 
-export interface UnitWithStatus extends Unit {
-  isOwnershipComplete: boolean;
+// Named explicitly rather than `extends Unit`: `katastr_unit_id` is an
+// internal matching key with no screen to appear on, and listing the
+// fields here means a future column on `units` does not silently join
+// this response.
+export interface UnitWithStatus {
+  id: string;
+  tenantId: string;
+  unitNo: string;
+  buildingShareNumerator: number;
+  buildingShareDenominator: number;
+  usageCode: string | null;
+  usageName: string | null;
+  createdAt: Date;
+  updatedAt: Date;
   owners: string[];
 }
 
@@ -53,13 +63,6 @@ export class ListUnitsHandler
         now,
       );
 
-      const sum = Rational.sum(
-        ownerships.map((o) =>
-          Rational.from(o.shareNumerator, o.shareDenominator),
-        ),
-      );
-      const isComplete = sum.eq(Rational.one());
-
       const owners = [
         ...new Set(
           ownerships
@@ -70,8 +73,15 @@ export class ListUnitsHandler
       ];
 
       result.push({
-        ...unit,
-        isOwnershipComplete: isComplete,
+        id: unit.id,
+        tenantId: unit.tenantId,
+        unitNo: unit.unitNo,
+        buildingShareNumerator: unit.buildingShareNumerator,
+        buildingShareDenominator: unit.buildingShareDenominator,
+        usageCode: unit.usageCode,
+        usageName: unit.usageName,
+        createdAt: unit.createdAt,
+        updatedAt: unit.updatedAt,
         owners,
       });
     }

@@ -14,7 +14,6 @@ import {
   type UnitRepository,
 } from '@/modules/core/property/application/ports/property.repository.port';
 import { GetUnitDetailQuery } from '@/modules/core/property/application/queries/get-unit-detail.query';
-import { Unit } from '@/modules/core/property/domain/property.entity';
 import { UnitNotFoundException } from '@/shared/application/exceptions/property.exceptions';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 
@@ -23,7 +22,20 @@ export type {
   UnitOwnershipDetailMember,
 } from '@/modules/core/property/application/handlers/ownership-party.mapper';
 
-export interface UnitDetail extends Unit {
+// Named explicitly rather than `extends Unit`: `katastr_unit_id` is an
+// internal matching key with no screen to appear on, and listing the
+// fields here means a future column on `units` does not silently join
+// this response.
+export interface UnitDetail {
+  id: string;
+  tenantId: string;
+  unitNo: string;
+  buildingShareNumerator: number;
+  buildingShareDenominator: number;
+  usageCode: string | null;
+  usageName: string | null;
+  createdAt: Date;
+  updatedAt: Date;
   ownerships: UnitOwnershipDetailItem[];
   owners: string[];
 }
@@ -71,7 +83,15 @@ export class GetUnitDetailHandler
     ];
 
     return {
-      ...unit,
+      id: unit.id,
+      tenantId: unit.tenantId,
+      unitNo: unit.unitNo,
+      buildingShareNumerator: unit.buildingShareNumerator,
+      buildingShareDenominator: unit.buildingShareDenominator,
+      usageCode: unit.usageCode,
+      usageName: unit.usageName,
+      createdAt: unit.createdAt,
+      updatedAt: unit.updatedAt,
       ownerships: ownerships.map((party) =>
         toOwnershipPartyItem(party, ownersById),
       ),

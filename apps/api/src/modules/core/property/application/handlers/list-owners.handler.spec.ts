@@ -18,6 +18,8 @@ function buildHandler(overrides?: {
       email: 'jana@example.com',
       userId: null,
       kind: 'PERSON',
+      katastrPersonId: 'k-person-1',
+      ico: '250830',
       createdAt: NOW,
       updatedAt: NOW,
     },
@@ -103,5 +105,14 @@ describe('ListOwnersHandler', () => {
     const [owner] = await handler.execute(new ListOwnersQuery(TENANT));
 
     expect(owner.hasOwnershipRecords).toBe(false);
+  });
+
+  it('exposes ico but never the cadastre person id', async () => {
+    const { handler } = buildHandler();
+
+    const [owner] = await handler.execute(new ListOwnersQuery(TENANT));
+
+    expect(owner.ico).toBe('250830');
+    expect(owner).not.toHaveProperty('katastrPersonId');
   });
 });

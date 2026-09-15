@@ -19,6 +19,9 @@ export const units = pgTable(
     unitNo: text('unit_no').notNull(),
     buildingShareNumerator: integer('building_share_numerator').notNull(),
     buildingShareDenominator: integer('building_share_denominator').notNull(),
+    katastrUnitId: text('katastr_unit_id'),
+    usageCode: text('usage_code'),
+    usageName: text('usage_name'),
     createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' })
       .defaultNow()
       .notNull(),
@@ -31,6 +34,10 @@ export const units = pgTable(
     uniqueTenantUnit: unique('units_tenant_unit_no_unique').on(
       table.tenantId,
       table.unitNo,
+    ),
+    uniqueTenantKatastrUnit: unique('units_tenant_katastr_unit_id_unique').on(
+      table.tenantId,
+      table.katastrUnitId,
     ),
   }),
 );

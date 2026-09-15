@@ -61,6 +61,7 @@ export default {
     INVALID_VOTE_STATUS_FOR_DELEGATION:
         "Delegation is only allowed when the vote is in scheduled status.",
     NOT_A_UNIT_OWNER: "You are not an owner of this unit.",
+    UNIT_NOT_ELIGIBLE: "This unit has no vote to cast in this ballot.",
     MEMBERSHIP_HAS_NO_ASSOCIATED_OWNER:
         "Your membership is not correctly linked to an owner profile.",
     LAST_ADMIN_CANNOT_BE_REMOVED:

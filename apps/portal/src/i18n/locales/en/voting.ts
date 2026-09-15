@@ -634,6 +634,110 @@ export const voting = {
         },
         backToDetail: "Back to Vote Detail",
     },
+    paperBallot: {
+        exit: "Exit",
+        headerTitle: "Record paper ballot",
+        headerSubtitle: "On behalf of an owner, from a signed paper ballot",
+        closesOn: "closes {{date}}",
+        railTitle: "Record in 4 steps",
+        railNote:
+            "The signed paper ballot stays the authoritative document. Attach the scan here and file the original with the association records.",
+        steps: {
+            unit: "Choose unit",
+            ballot: "Ballot & voter",
+            answers: "Enter answers",
+            review: "Review & record",
+        },
+        back: "Back",
+        chooseUnit: {
+            title: "Whose ballot are you recording?",
+            subtitle:
+                "Only units that haven't voted yet can have a paper ballot recorded. Owners can still vote in the app until you record theirs.",
+            turnout: "{{voted}} of {{total}} units have voted",
+            searchPlaceholder: "Search unit or owner…",
+            columns: {
+                unit: "Unit",
+                share: "Share",
+                status: "Status",
+                action: "Action",
+            },
+            status: {
+                votedInApp: "In app · {{date}}",
+                votedOnPaper: "Paper · {{date}}",
+                voted: "Voted",
+                notVoted: "Not voted",
+                ineligible: "Not eligible",
+            },
+            ineligibleReason: {
+                NO_REPRESENTATIVE: "No common representative",
+                MISSING_OWNERSHIP: "No registered owner",
+                ASSOCIATION_OWNED: "Owned by the association",
+            },
+            record: "Record paper ballot",
+            castInApp: "Cast in app",
+            range: "Showing {{from}}–{{to}} of {{total}} units",
+            count: "Showing {{count}} units",
+            empty: "This vote has no units.",
+            noMatch: "No unit matches your search.",
+            footnote:
+                "Recording a paper ballot is final for the unit — the owner can no longer vote in the app. Every recording is visible in the vote's audit log.",
+        },
+        ballot: {
+            title: "Attach the ballot for {{unit}}",
+            subtitle: "{{owners}} · share {{share}}",
+            uploadLabel: "Scanned ballot",
+            dropzone: "Drop the scanned ballot here or browse",
+            dropzoneHint: "PDF, JPG or PNG · max 20 MB",
+            uploading: "Uploading…",
+            attached: "Attached",
+            remove: "Remove",
+            signerLabel: "Who signed the ballot?",
+            ownerRole: "Owner · owns {{share}}",
+            representative: "Common representative",
+            coOwnedHint:
+                "This unit is co-owned — the ballot should be signed by the common representative.",
+            auditNote:
+                "This is recorded in the activity log as a ballot recorded on the owner's behalf — with your name, the signer and the attached scan. Owners can see it in the vote's activity.",
+            continue: "Continue to answers",
+            tooLarge: "That file is larger than 20 MB.",
+            wrongType: "Attach a PDF, JPG or PNG.",
+        },
+        answers: {
+            context:
+                "Transcribing the paper ballot for {{unit}} · signed by {{signer}}",
+            change: "Change",
+            progress: "Question {{current}} of {{total}}",
+            done: "{{percent}}% done",
+            caption: "Enter exactly what is marked on the paper ballot.",
+            next: "Next question",
+            review: "Review ballot",
+        },
+        exitConfirm: {
+            title: "Discard this recording?",
+            description:
+                "The attached scan and any answers you entered will be discarded. The ballot will not be recorded.",
+            confirm: "Discard",
+        },
+        review: {
+            title: "Review before recording",
+            subtitle:
+                "Check every answer against the paper ballot one more time.",
+            signedBy: "Signed by {{signer}}",
+            warning:
+                "Recorded ballots are final and cannot be changed. If an answer doesn't match the paper, go back and correct it now.",
+            confirm:
+                "I checked that the answers above match the signed paper ballot for {{unit}}.",
+            submit: "Record ballot for {{unit}}",
+        },
+        done: {
+            title: "Ballot for {{unit}} recorded",
+            body: "Its share now counts toward quorum. The activity log shows the ballot as recorded on the owner's behalf — by {{actor}}, signed by {{signer}}, with the scan attached.",
+            recordedAt: "Recorded at",
+            another: "Record another",
+            backToVote: "Back to vote",
+        },
+        alreadyCast: "This unit has already voted — nothing was recorded.",
+    },
     results: {
         breadcrumbVoting: "Voting",
         viewResults: "View Results",

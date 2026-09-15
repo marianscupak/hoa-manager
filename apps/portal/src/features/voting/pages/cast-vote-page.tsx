@@ -1,9 +1,5 @@
 import { format, isValid } from "date-fns";
-import { TFunction } from "i18next";
 import {
-    Check,
-    X,
-    Minus,
     ArrowLeft,
     ArrowRight,
     Home,
@@ -22,7 +18,6 @@ import {
     formatPercent,
     PageLoading,
 } from "@hoa-mngr/ui";
-import { cn } from "@hoa-mngr/ui/lib/utils";
 
 import { showApiError } from "@/api/error-utils";
 import {
@@ -30,6 +25,11 @@ import {
     useVotesControllerGetVoterStatus,
 } from "@/api/generated/votes/votes";
 
+import {
+    OptionIcon,
+    getOptionLabel,
+    QuestionOptionGrid,
+} from "../components/shared/question-options";
 import {
     useSubmitBallot,
     type SubmitBallotBody,
@@ -43,34 +43,6 @@ interface BallotAnswers {
 }
 
 type CastVoteStep = "questions" | "review";
-
-// ── Option Icon ────────────────────────────────────────────
-function OptionIcon({
-    optionKey,
-    className,
-}: {
-    optionKey: string;
-    className?: string;
-}) {
-    if (optionKey === "YES")
-        return <Check className={cn("text-success h-6 w-6", className)} />;
-    if (optionKey === "NO")
-        return <X className={cn("text-destructive h-6 w-6", className)} />;
-    if (optionKey === "ABSTAIN")
-        return <Minus className={cn("text-faint h-6 w-6", className)} />;
-    return null;
-}
-
-function getOptionLabel(
-    optionKey: string,
-    label: string,
-    t: TFunction<"voting">,
-) {
-    if (optionKey === "YES") return t("castVote.options.yes");
-    if (optionKey === "NO") return t("castVote.options.no");
-    if (optionKey === "ABSTAIN") return t("castVote.options.abstain");
-    return label;
-}
 
 // ── Main Page ──────────────────────────────────────────────
 export function CastVotePage() {
@@ -468,50 +440,15 @@ export function CastVotePage() {
                     </Card>
 
                     {/* Option Cards */}
-                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                        {currentQuestion.options.map((option) => {
-                            const isSelected =
-                                answers[unit.id]?.[currentQuestion.id] ===
-                                option.id;
-                            return (
-                                <button
-                                    key={option.id}
-                                    type="button"
-                                    onClick={() =>
-                                        selectAnswer(
-                                            unit.id,
-                                            currentQuestion.id,
-                                            option.id,
-                                        )
-                                    }
-                                    className={cn(
-                                        "focus-visible:ring-ring flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 p-5 transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
-                                        isSelected
-                                            ? "border-primary bg-primary/5 ring-primary/20 ring-2"
-                                            : "border-border bg-card hover:bg-muted/50",
-                                    )}
-                                >
-                                    {option.optionKey === "CUSTOM" ? (
-                                        <span className="bg-muted text-secondary-foreground flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold">
-                                            {option.sortOrder}
-                                        </span>
-                                    ) : (
-                                        <OptionIcon
-                                            optionKey={option.optionKey}
-                                            className="h-7 w-7"
-                                        />
-                                    )}
-                                    <span className="text-secondary-foreground text-sm font-medium">
-                                        {getOptionLabel(
-                                            option.optionKey,
-                                            option.label,
-                                            t,
-                                        )}
-                                    </span>
-                                </button>
-                            );
-                        })}
-                    </div>
+                    <QuestionOptionGrid
+                        options={currentQuestion.options}
+                        selectedOptionId={
+                            answers[unit.id]?.[currentQuestion.id]
+                        }
+                        onSelect={(optionId) =>
+                            selectAnswer(unit.id, currentQuestion.id, optionId)
+                        }
+                    />
                 </div>
             ))}
 

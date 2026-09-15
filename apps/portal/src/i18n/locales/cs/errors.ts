@@ -62,6 +62,7 @@ export default {
     INVALID_VOTE_STATUS_FOR_DELEGATION:
         "Delegování je povoleno pouze pokud je hlasování v naplánovaném stavu.",
     NOT_A_UNIT_OWNER: "Nejste vlastníkem této jednotky.",
+    UNIT_NOT_ELIGIBLE: "Tato jednotka v tomto hlasování nemá hlas.",
     MEMBERSHIP_HAS_NO_ASSOCIATED_OWNER:
         "Vaše členství není správně propojeno s profilem vlastníka.",
     LAST_ADMIN_CANNOT_BE_REMOVED:

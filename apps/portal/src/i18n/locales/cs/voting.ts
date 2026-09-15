@@ -638,6 +638,111 @@ export const voting = {
         },
         backToDetail: "Zpět na detail hlasování",
     },
+    paperBallot: {
+        exit: "Zavřít",
+        headerTitle: "Zaznamenat listinný hlas",
+        headerSubtitle:
+            "Za vlastníka, z podepsaného listinného hlasovacího lístku",
+        closesOn: "končí {{date}}",
+        railTitle: "Zaznamenání ve 4 krocích",
+        railNote:
+            "Závazným dokumentem zůstává podepsaný listinný hlas. Sem přiložte sken a originál založte k dokumentům společenství.",
+        steps: {
+            unit: "Výběr jednotky",
+            ballot: "Lístek a podpis",
+            answers: "Zadání odpovědí",
+            review: "Kontrola a zápis",
+        },
+        back: "Zpět",
+        chooseUnit: {
+            title: "Čí hlas zaznamenáváte?",
+            subtitle:
+                "Listinný hlas lze zaznamenat jen u jednotek, které dosud nehlasovaly. Dokud hlas nezaznamenáte, může vlastník hlasovat v aplikaci.",
+            turnout: "Hlasovalo {{voted}} z {{total}} jednotek",
+            searchPlaceholder: "Hledat jednotku nebo vlastníka…",
+            columns: {
+                unit: "Jednotka",
+                share: "Podíl",
+                status: "Stav",
+                action: "Akce",
+            },
+            status: {
+                votedInApp: "V aplikaci · {{date}}",
+                votedOnPaper: "Listinně · {{date}}",
+                voted: "Hlasováno",
+                notVoted: "Nehlasováno",
+                ineligible: "Nemá hlas",
+            },
+            ineligibleReason: {
+                NO_REPRESENTATIVE: "Není zvolen společný zástupce",
+                MISSING_OWNERSHIP: "Není evidován vlastník",
+                ASSOCIATION_OWNED: "Ve vlastnictví společenství",
+            },
+            record: "Zaznamenat listinný hlas",
+            castInApp: "Hlasovat v aplikaci",
+            range: "Zobrazeno {{from}}–{{to}} z {{total}} jednotek",
+            count: "Zobrazeno {{count}} jednotek",
+            empty: "Toto hlasování nemá žádné jednotky.",
+            noMatch: "Vašemu hledání neodpovídá žádná jednotka.",
+            footnote:
+                "Zaznamenaný listinný hlas je pro jednotku konečný — vlastník už nemůže hlasovat v aplikaci. Každý zápis je vidět v historii hlasování.",
+        },
+        ballot: {
+            title: "Přiložte lístek k jednotce {{unit}}",
+            subtitle: "{{owners}} · podíl {{share}}",
+            uploadLabel: "Sken hlasovacího lístku",
+            dropzone: "Přetáhněte sem sken nebo vyberte soubor",
+            dropzoneHint: "PDF, JPG nebo PNG · max 20 MB",
+            uploading: "Nahrávání…",
+            attached: "Přiloženo",
+            remove: "Odebrat",
+            signerLabel: "Kdo lístek podepsal?",
+            ownerRole: "Vlastník · podíl {{share}}",
+            representative: "Společný zástupce",
+            coOwnedHint:
+                "Jednotka má více spoluvlastníků — lístek by měl podepsat společný zástupce.",
+            auditNote:
+                "Zápis se uloží do historie jako hlas zaznamenaný za vlastníka — s vaším jménem, podepsanou osobou a přiloženým skenem. Vlastníci ho uvidí v historii hlasování.",
+            continue: "Pokračovat k odpovědím",
+            tooLarge: "Soubor je větší než 20 MB.",
+            wrongType: "Přiložte PDF, JPG nebo PNG.",
+        },
+        answers: {
+            context:
+                "Přepis listinného hlasu za jednotku {{unit}} · podepsal(a) {{signer}}",
+            change: "Změnit",
+            progress: "Otázka {{current}} z {{total}}",
+            done: "Hotovo {{percent}} %",
+            caption: "Zadejte přesně to, co je vyznačeno na listinném lístku.",
+            next: "Další otázka",
+            review: "Zkontrolovat lístek",
+        },
+        exitConfirm: {
+            title: "Zahodit rozepsaný zápis?",
+            description:
+                "Přiložený sken i zadané odpovědi se zahodí. Hlas nebude zaznamenán.",
+            confirm: "Zahodit",
+        },
+        review: {
+            title: "Kontrola před zápisem",
+            subtitle:
+                "Ještě jednou porovnejte každou odpověď s listinným lístkem.",
+            signedBy: "Podepsal(a) {{signer}}",
+            warning:
+                "Zaznamenaný hlas je konečný a nelze ho změnit. Pokud některá odpověď neodpovídá lístku, vraťte se a opravte ji teď.",
+            confirm:
+                "Ověřil(a) jsem, že odpovědi výše odpovídají podepsanému listinnému lístku jednotky {{unit}}.",
+            submit: "Zaznamenat hlas jednotky {{unit}}",
+        },
+        done: {
+            title: "Hlas jednotky {{unit}} byl zaznamenán",
+            body: "Její podíl se nyní počítá do usnášeníschopnosti. V historii je hlas veden jako zaznamenaný za vlastníka — zapsal(a) {{actor}}, podepsal(a) {{signer}}, se přiloženým skenem.",
+            recordedAt: "Zaznamenáno",
+            another: "Zaznamenat další",
+            backToVote: "Zpět na hlasování",
+        },
+        alreadyCast: "Tato jednotka už hlasovala — nic nebylo zaznamenáno.",
+    },
     results: {
         breadcrumbVoting: "Hlasování",
         viewResults: "Zobrazit výsledky",

@@ -7,7 +7,7 @@ import { useLogin } from "../hooks/use-login";
 
 export function LoginPage() {
     const { t } = useTranslation("auth");
-    const { form, handleLogin, isPending, isError } = useLogin();
+    const { form, handleLogin, isPending } = useLogin();
 
     return (
         <div className="bg-card w-full rounded-xl border p-8 px-6 shadow-sm sm:px-10">
@@ -51,11 +51,6 @@ export function LoginPage() {
                                 ? t("loginPage.submitting")
                                 : t("loginPage.submit")}
                         </Button>
-                        {isError && (
-                            <p className="text-destructive mt-2 text-center text-sm">
-                                {t("loginPage.error")}
-                            </p>
-                        )}
                     </div>
                 </form>
             </Form>

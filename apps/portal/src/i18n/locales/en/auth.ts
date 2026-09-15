@@ -27,7 +27,6 @@ export default {
         passwordHide: "Hide password",
         submit: "Sign in",
         submitting: "Signing in...",
-        error: "Login failed. Please check your credentials.",
         dividerOauth: "Or continue with",
         googleSignIn: "Sign in with Google",
     },

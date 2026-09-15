@@ -27,7 +27,6 @@ export default {
         passwordHide: "Skrýt heslo",
         submit: "Přihlásit se",
         submitting: "Přihlašuji...",
-        error: "Přihlášení se nezdařilo. Zkontrolujte prosím své údaje.",
         dividerOauth: "Nebo pokračujte pomocí",
         googleSignIn: "Přihlásit se přes Google",
     },

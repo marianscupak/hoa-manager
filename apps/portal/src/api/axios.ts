@@ -16,6 +16,7 @@ import { env } from "@/config/env";
 import i18n from "@/i18n";
 import { StorageService } from "@/storage/storage";
 
+import { shouldAttemptRefresh } from "./refresh-policy";
 import { ApiError } from "./types";
 
 export const AXIOS_INSTANCE = Axios.create({
@@ -56,6 +57,13 @@ AXIOS_INSTANCE.interceptors.response.use(
                 store.set(userAtom, null);
                 StorageService.clearAuthHints();
 
+                return Promise.reject(error);
+            }
+
+            // Credentials were rejected, not a token — retrying behind a
+            // refresh would swap the real error for the refresh endpoint's
+            // own UNAUTHORIZED before the caller ever sees it.
+            if (!shouldAttemptRefresh(originalRequest.url)) {
                 return Promise.reject(error);
             }
 

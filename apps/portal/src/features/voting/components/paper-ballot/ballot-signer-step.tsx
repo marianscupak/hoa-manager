@@ -1,15 +1,15 @@
-import { Check, FileText, Info, Upload, X } from "lucide-react";
-import { useRef, useState } from "react";
+import { Check, FileText, Info, X } from "lucide-react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { Button, Card, StatusChip } from "@hoa-mngr/ui";
+import { Button, Card, FileDropzone, StatusChip } from "@hoa-mngr/ui";
 import { cn } from "@hoa-mngr/ui/lib/utils";
 
 import type { VoteParticipationUnitDto } from "@/api/generated/model";
 
 import { formatFileSize } from "../../utils/format-file-size";
 import {
-    BALLOT_SCAN_ACCEPT,
+    BALLOT_SCAN_ACCEPTED_TYPES,
     BALLOT_SCAN_MAX_SIZE_BYTES,
     type BallotAttachment,
 } from "../../hooks/use-ballot-attachment";
@@ -36,23 +36,7 @@ export function BallotSignerStep({
     onSignerChange,
 }: BallotSignerStepProps) {
     const { t } = useTranslation("voting");
-    const inputRef = useRef<HTMLInputElement>(null);
-    const [isDragging, setIsDragging] = useState(false);
     const [localError, setLocalError] = useState<string | null>(null);
-
-    const accept = (file: File | undefined) => {
-        if (!file) return;
-        if (!BALLOT_SCAN_ACCEPT.split(",").includes(file.type)) {
-            setLocalError(t("paperBallot.ballot.wrongType"));
-            return;
-        }
-        if (file.size > BALLOT_SCAN_MAX_SIZE_BYTES) {
-            setLocalError(t("paperBallot.ballot.tooLarge"));
-            return;
-        }
-        setLocalError(null);
-        onUpload(file);
-    };
 
     return (
         <div className="space-y-6">
@@ -94,48 +78,30 @@ export function BallotSignerStep({
                         </Button>
                     </Card>
                 ) : (
-                    <div
-                        onDragOver={(e) => {
-                            e.preventDefault();
-                            setIsDragging(true);
+                    <FileDropzone
+                        accept={BALLOT_SCAN_ACCEPTED_TYPES}
+                        maxSizeBytes={BALLOT_SCAN_MAX_SIZE_BYTES}
+                        disabled={isUploading}
+                        onFiles={([file]) => {
+                            setLocalError(null);
+                            onUpload(file);
                         }}
-                        onDragLeave={() => setIsDragging(false)}
-                        onDrop={(e) => {
-                            e.preventDefault();
-                            setIsDragging(false);
-                            accept(e.dataTransfer.files[0]);
-                        }}
-                        className={cn(
-                            "rounded-card flex flex-col items-center gap-2 border-2 border-dashed px-5 py-8 text-center transition-colors",
-                            isDragging
-                                ? "border-primary bg-primary-tint/40"
-                                : "border-border bg-card",
-                        )}
-                    >
-                        <div className="bg-primary-tint flex h-10 w-10 items-center justify-center rounded-full">
-                            <Upload className="text-primary-tint-foreground h-4 w-4" />
-                        </div>
-                        <button
-                            type="button"
-                            onClick={() => inputRef.current?.click()}
-                            disabled={isUploading}
-                            className="text-primary-tint-foreground cursor-pointer text-sm font-medium hover:underline"
-                        >
-                            {isUploading
+                        onReject={({ reason }) =>
+                            setLocalError(
+                                t(
+                                    reason === "size"
+                                        ? "paperBallot.ballot.tooLarge"
+                                        : "paperBallot.ballot.wrongType",
+                                ),
+                            )
+                        }
+                        label={
+                            isUploading
                                 ? `${t("paperBallot.ballot.uploading")} ${progress}%`
-                                : t("paperBallot.ballot.dropzone")}
-                        </button>
-                        <p className="text-muted-foreground text-xs">
-                            {t("paperBallot.ballot.dropzoneHint")}
-                        </p>
-                        <input
-                            ref={inputRef}
-                            type="file"
-                            accept={BALLOT_SCAN_ACCEPT}
-                            className="hidden"
-                            onChange={(e) => accept(e.target.files?.[0])}
-                        />
-                    </div>
+                                : t("paperBallot.ballot.dropzone")
+                        }
+                        hint={t("paperBallot.ballot.dropzoneHint")}
+                    />
                 )}
 
                 {localError && (

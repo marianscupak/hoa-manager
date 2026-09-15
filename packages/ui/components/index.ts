@@ -25,6 +25,7 @@ export * from "./tooltip";
 export * from "./fraction-input";
 export * from "./confirm-dialog";
 export * from "./empty-state";
+export * from "./file-dropzone";
 export * from "./error-state";
 export * from "./page-header";
 export * from "./page-loading";

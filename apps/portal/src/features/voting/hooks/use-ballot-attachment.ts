@@ -14,7 +14,11 @@ export interface BallotAttachment {
 }
 
 export const BALLOT_SCAN_MAX_SIZE_BYTES = 20 * 1024 * 1024;
-export const BALLOT_SCAN_ACCEPT = "application/pdf,image/png,image/jpeg";
+export const BALLOT_SCAN_ACCEPTED_TYPES: readonly string[] = [
+    "application/pdf",
+    "image/png",
+    "image/jpeg",
+];
 
 export function useBallotAttachment(voteId: string) {
     const [attachment, setAttachment] = useState<BallotAttachment | null>(null);

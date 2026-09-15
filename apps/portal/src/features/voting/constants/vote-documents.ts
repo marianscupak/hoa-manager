@@ -12,6 +12,3 @@ export const VOTE_DOCUMENT_ALLOWED_CONTENT_TYPES: readonly string[] = [
     "image/jpeg",
     "image/webp",
 ];
-
-export const VOTE_DOCUMENT_ACCEPT_ATTRIBUTE =
-    VOTE_DOCUMENT_ALLOWED_CONTENT_TYPES.join(",");

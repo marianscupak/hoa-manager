@@ -1,9 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { File, Loader2, Plus, X } from "lucide-react";
-import { useRef } from "react";
+import { File, Loader2, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Button, toast } from "@hoa-mngr/ui";
+import { Button, FileDropzone, type FileRejection, toast } from "@hoa-mngr/ui";
 
 import { showApiError } from "@/api/error-utils";
 import { VoteDocumentResponseDto } from "@/api/generated/model";
@@ -13,7 +12,6 @@ import {
 } from "@/api/generated/votes/votes";
 
 import {
-    VOTE_DOCUMENT_ACCEPT_ATTRIBUTE,
     VOTE_DOCUMENT_ALLOWED_CONTENT_TYPES,
     VOTE_DOCUMENT_MAX_COUNT,
     VOTE_DOCUMENT_MAX_SIZE_BYTES,
@@ -39,23 +37,15 @@ export function VoteDocumentsSection({
 }: VoteDocumentsSectionProps) {
     const { t } = useTranslation(["voting"]);
     const queryClient = useQueryClient();
-    const inputRef = useRef<HTMLInputElement>(null);
     const deleteMutation = useVotesControllerDeleteVoteDocument();
 
-    const handleFiles = (files: FileList | null) => {
-        if (!files) return;
-        // Tracked locally (not derived from render-scope state) so a single
-        // multi-select batch enforces the cap across the files it contains.
+    // The dropzone has already applied the type and size limits; the per-vote
+    // count cap lives here because it depends on what is already attached.
+    // Tracked locally (not derived from render-scope state) so a single
+    // multi-select batch enforces the cap across the files it contains.
+    const handleFiles = (files: File[]) => {
         let projectedCount = documents.length + Object.keys(uploads).length;
-        for (const file of Array.from(files)) {
-            if (!VOTE_DOCUMENT_ALLOWED_CONTENT_TYPES.includes(file.type)) {
-                toast.error(t("voting:create.documents.typeNotAllowed"));
-                continue;
-            }
-            if (file.size > VOTE_DOCUMENT_MAX_SIZE_BYTES) {
-                toast.error(t("voting:create.documents.tooLarge"));
-                continue;
-            }
+        for (const file of files) {
             if (projectedCount >= VOTE_DOCUMENT_MAX_COUNT) {
                 toast.error(t("voting:create.documents.limitReached"));
                 break;
@@ -63,8 +53,16 @@ export function VoteDocumentsSection({
             projectedCount += 1;
             addFile(file);
         }
-        if (inputRef.current) inputRef.current.value = "";
     };
+
+    const handleReject = ({ reason }: FileRejection) =>
+        toast.error(
+            t(
+                reason === "size"
+                    ? "voting:create.documents.tooLarge"
+                    : "voting:create.documents.typeNotAllowed",
+            ),
+        );
 
     const handleDelete = (documentId: string) => {
         if (!voteId) return;
@@ -83,38 +81,29 @@ export function VoteDocumentsSection({
 
     return (
         <div className="space-y-3">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h2 className="text-sm font-semibold">
-                        {t("voting:create.documents.title")}
-                    </h2>
+            <div>
+                <h2 className="text-sm font-semibold">
+                    {t("voting:create.documents.title")}
+                </h2>
+                <p className="text-muted-foreground mt-0.5 text-xs">
+                    {t("voting:create.documents.description")}
+                </p>
+                {!voteId && (
                     <p className="text-muted-foreground mt-0.5 text-xs">
-                        {t("voting:create.documents.description")}
+                        {t("voting:create.documents.queuedHint")}
                     </p>
-                    {!voteId && (
-                        <p className="text-muted-foreground mt-0.5 text-xs">
-                            {t("voting:create.documents.queuedHint")}
-                        </p>
-                    )}
-                </div>
-                <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => inputRef.current?.click()}
-                >
-                    <Plus />
-                    {t("voting:create.documents.add")}
-                </Button>
-                <input
-                    ref={inputRef}
-                    type="file"
-                    multiple
-                    accept={VOTE_DOCUMENT_ACCEPT_ATTRIBUTE}
-                    className="hidden"
-                    onChange={(e) => handleFiles(e.target.files)}
-                />
+                )}
             </div>
+
+            <FileDropzone
+                multiple
+                accept={VOTE_DOCUMENT_ALLOWED_CONTENT_TYPES}
+                maxSizeBytes={VOTE_DOCUMENT_MAX_SIZE_BYTES}
+                onFiles={handleFiles}
+                onReject={handleReject}
+                label={t("voting:create.documents.dropzone")}
+                hint={t("voting:create.documents.dropzoneHint")}
+            />
 
             <div className="flex flex-col gap-2">
                 {documents.map((doc) => (

@@ -244,9 +244,9 @@ export const voting = {
         },
         documents: {
             title: "Documents",
-            description:
-                "Attach supporting documents (PDF, Word, Excel, images). Max 50 MB per file.",
-            add: "Add document",
+            description: "Attach anything owners should read before they vote.",
+            dropzone: "Drop documents here or browse",
+            dropzoneHint: "PDF, Word, Excel or images · max 50 MB per file",
             uploading: "Uploading…",
             retry: "Retry",
             dismiss: "Dismiss",

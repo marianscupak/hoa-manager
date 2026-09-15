@@ -245,8 +245,10 @@ export const voting = {
         documents: {
             title: "Dokumenty",
             description:
-                "Přiložte podpůrné dokumenty (PDF, Word, Excel, obrázky). Max. 50 MB na soubor.",
-            add: "Přidat dokument",
+                "Přiložte vše, co si vlastníci mají přečíst před hlasováním.",
+            dropzone: "Přetáhněte sem dokumenty nebo je vyberte",
+            dropzoneHint:
+                "PDF, Word, Excel nebo obrázky · max. 50 MB na soubor",
             uploading: "Nahrávání…",
             retry: "Zkusit znovu",
             dismiss: "Zavřít",

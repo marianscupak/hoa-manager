@@ -737,6 +737,12 @@ export const voting = {
             backToVote: "Back to vote",
         },
         alreadyCast: "This unit has already voted — nothing was recorded.",
+        boardTools: {
+            title: "Board tools",
+            context:
+                "{{voted}} of {{total}} units have voted. Received a signed ballot on paper? Record it on the owner's behalf.",
+            action: "Record paper ballot",
+        },
     },
     results: {
         breadcrumbVoting: "Voting",

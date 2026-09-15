@@ -1,4 +1,5 @@
-import { ArrowRight, Home, Info } from "lucide-react";
+import { useAtomValue } from "jotai";
+import { ArrowRight, FileText, Home, Info } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
@@ -26,7 +27,12 @@ import {
 } from "@/api/generated/model";
 import { useUnitControllerGetMyOwnedUnits } from "@/api/generated/property-units/property-units";
 import { useMemberControllerGetContacts } from "@/api/generated/tenant-members/tenant-members";
-import { useVotesControllerGetVoterStatus } from "@/api/generated/votes/votes";
+import {
+    useVotesControllerGetVoterStatus,
+    useVotesControllerGetVoteTurnout,
+} from "@/api/generated/votes/votes";
+import { tenantContextAtom } from "@/auth/atoms";
+import { isAdminOrBoard } from "@/auth/role-checks";
 
 import { buildContactMailto } from "../utils/contact-mailto";
 import { delegationPrompt } from "../utils/delegation-eligibility";
@@ -113,11 +119,22 @@ function UnitStatusChip({ unit }: { unit: OwningUnitStatusDto }) {
 export function VoterStatusSidebar({ vote }: VoterStatusSidebarProps) {
     const { t } = useTranslation(["voting"]);
     const voteId = vote.id;
+    const tenantCtx = useAtomValue(tenantContextAtom);
+    const isAdmin = isAdminOrBoard(tenantCtx?.roles);
 
     const statusQuery = useVotesControllerGetVoterStatus(voteId, {
         query: {
             // `vote.id` is always defined here; kept as a defensive guard.
             enabled: !!voteId,
+        },
+    });
+
+    // Board tools card (paper ballot recording) is admin/board-only and
+    // only relevant while the vote is open, so the turnout counts it needs
+    // are only fetched in that case.
+    const turnoutQuery = useVotesControllerGetVoteTurnout(voteId, {
+        query: {
+            enabled: isAdmin && vote.status === "OPEN",
         },
     });
 
@@ -270,6 +287,35 @@ export function VoterStatusSidebar({ vote }: VoterStatusSidebarProps) {
                     </CardFooter>
                 )}
             </Card>
+
+            {isAdmin && vote.status === "OPEN" && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-muted-foreground text-detail font-semibold tracking-wide uppercase">
+                            {t("voting:paperBallot.boardTools.title")}
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                        <p className="text-muted-foreground text-sm">
+                            {t("voting:paperBallot.boardTools.context", {
+                                voted:
+                                    turnoutQuery.data?.participationUnitCount ??
+                                    0,
+                                total:
+                                    turnoutQuery.data?.totalVotesUnitCount ?? 0,
+                            })}
+                        </p>
+                    </CardContent>
+                    <CardFooter>
+                        <Button variant="outline" size="sm" asChild>
+                            <Link to={`/voting/${voteId}/paper-ballot`}>
+                                <FileText />
+                                {t("voting:paperBallot.boardTools.action")}
+                            </Link>
+                        </Button>
+                    </CardFooter>
+                </Card>
+            )}
 
             <p className="text-muted-foreground px-1 text-sm">
                 {t("detail.statusSidebar.help.description")}

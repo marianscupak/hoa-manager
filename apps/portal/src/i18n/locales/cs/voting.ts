@@ -742,6 +742,12 @@ export const voting = {
             backToVote: "Zpět na hlasování",
         },
         alreadyCast: "Tato jednotka už hlasovala — nic nebylo zaznamenáno.",
+        boardTools: {
+            title: "Nástroje výboru",
+            context:
+                "Hlasovalo {{voted}} z {{total}} jednotek. Dostali jste podepsaný lístek na papíře? Zaznamenejte ho za vlastníka.",
+            action: "Zaznamenat listinný hlas",
+        },
     },
     results: {
         breadcrumbVoting: "Hlasování",

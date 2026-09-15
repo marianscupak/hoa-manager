@@ -19,6 +19,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "../popover";
 export interface FormDatetimePickerProps {
     name: string;
     label?: string;
+    /** Renders a muted "optional" marker next to the label. */
+    optional?: boolean;
     description?: string;
     placeholder?: string;
     timeLabel?: string;
@@ -33,6 +35,7 @@ export const FormDatetimePicker = React.forwardRef<
         {
             name,
             label,
+            optional,
             description,
             placeholder,
             timeLabel = "Time",
@@ -106,7 +109,11 @@ export const FormDatetimePicker = React.forwardRef<
                             className={cn("flex flex-col", className)}
                             ref={ref}
                         >
-                            {label && <FormLabel>{label}</FormLabel>}
+                            {label && (
+                        <FormLabel optional={optional}>
+                            {label}
+                        </FormLabel>
+                    )}
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <FormControl>

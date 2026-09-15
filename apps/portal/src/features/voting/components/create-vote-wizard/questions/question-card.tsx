@@ -178,6 +178,7 @@ export function QuestionCard({
                                 placeholder={t(
                                     "voting:create.steps.questions.fields.description.placeholder",
                                 )}
+                                optional
                                 rows={2}
                             />
 

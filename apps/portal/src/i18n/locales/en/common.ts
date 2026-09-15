@@ -1,4 +1,7 @@
 export default {
+    form: {
+        optional: "optional",
+    },
     loading: "Loading...",
     loadingApp: "Loading application…",
     save: "Save",

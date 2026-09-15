@@ -21,6 +21,8 @@ export interface FormComboboxOption {
 export interface FormComboboxProps {
     name: string;
     label?: string;
+    /** Renders a muted "optional" marker next to the label. */
+    optional?: boolean;
     description?: string;
     /** Shown on the trigger while nothing is selected. */
     placeholder?: string;
@@ -63,6 +65,7 @@ function fold(value: string): string {
 export const FormCombobox = ({
     name,
     label,
+    optional,
     description,
     placeholder,
     searchPlaceholder,
@@ -146,7 +149,11 @@ export const FormCombobox = ({
 
                 return (
                     <FormItem>
-                        {label && <FormLabel>{label}</FormLabel>}
+                        {label && (
+                        <FormLabel optional={optional}>
+                            {label}
+                        </FormLabel>
+                    )}
                         <Popover
                             open={open}
                             onOpenChange={(next) => {

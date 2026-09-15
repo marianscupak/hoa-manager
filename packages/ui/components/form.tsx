@@ -85,11 +85,19 @@ const useFormField = () => {
     };
 };
 
+/**
+ * Most fields in this app are required, so an asterisk on each would mark
+ * nearly every row and say nothing. The few genuinely optional fields carry
+ * the marker instead.
+ */
 const FormLabel = React.forwardRef<
     React.ComponentRef<typeof LabelPrimitive.Root>,
-    React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
->(({ className, ...props }, ref) => {
+    React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & {
+        optional?: boolean;
+    }
+>(({ className, optional, children, ...props }, ref) => {
     const { error, formItemId } = useFormField();
+    const { t } = useTranslation();
 
     return (
         <Label
@@ -97,7 +105,15 @@ const FormLabel = React.forwardRef<
             className={cn(error && "text-destructive", className)}
             htmlFor={formItemId}
             {...props}
-        />
+        >
+            {children}
+            {optional && (
+                <span className="text-muted-foreground ml-1.5 text-xs font-normal">
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                    {t("common:form.optional" as any) as string}
+                </span>
+            )}
+        </Label>
     );
 });
 FormLabel.displayName = "FormLabel";

@@ -1,4 +1,7 @@
 export default {
+    form: {
+        optional: "nepovinné",
+    },
     loading: "Načítání...",
     loadingApp: "Načítání aplikace…",
     save: "Uložit",

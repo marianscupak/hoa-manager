@@ -16,6 +16,8 @@ import { Input, type InputProps } from "../input";
 export interface FormInputProps extends InputProps {
     name: string;
     label?: string;
+    /** Renders a muted "optional" marker next to the label. */
+    optional?: boolean;
     description?: string;
     suffix?: React.ReactNode;
     /** Accessible name for the reveal toggle on a `type="password"` field. */
@@ -99,6 +101,7 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
         {
             name,
             label,
+            optional,
             description,
             suffix,
             revealLabel = "Show password",
@@ -117,7 +120,11 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
                 name={name}
                 render={({ field }) => (
                     <FormItem>
-                        {label && <FormLabel>{label}</FormLabel>}
+                        {label && (
+                        <FormLabel optional={optional}>
+                            {label}
+                        </FormLabel>
+                    )}
                         {isPassword ? (
                             <InputWithReveal
                                 revealLabel={revealLabel}

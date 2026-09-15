@@ -214,6 +214,7 @@ export function CreateVoteBasicInfoStep({
                         placeholder={t(
                             "voting:create.fields.description.placeholder",
                         )}
+                        optional
                         rows={3}
                     />
 

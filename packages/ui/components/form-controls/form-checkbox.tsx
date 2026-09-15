@@ -14,13 +14,15 @@ export interface FormCheckboxProps
     extends React.ComponentPropsWithoutRef<typeof Checkbox> {
     name: string;
     label: string;
+    /** Renders a muted "optional" marker next to the label. */
+    optional?: boolean;
     description?: string;
 }
 
 export const FormCheckbox = React.forwardRef<
     React.ElementRef<typeof Checkbox>,
     FormCheckboxProps
->(({ name, label, description, ...props }, ref) => {
+>(({ name, label, optional, description, ...props }, ref) => {
     const { control } = useFormContext();
 
     return (
@@ -38,7 +40,7 @@ export const FormCheckbox = React.forwardRef<
                         />
                     </FormControl>
                     <div className="space-y-1">
-                        <FormLabel>{label}</FormLabel>
+                        <FormLabel optional={optional}>{label}</FormLabel>
                         {description && (
                             <FormDescription>{description}</FormDescription>
                         )}

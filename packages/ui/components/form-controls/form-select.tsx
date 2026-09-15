@@ -23,6 +23,8 @@ export interface FormSelectOption {
 export interface FormSelectProps {
     name: string;
     label?: string;
+    /** Renders a muted "optional" marker next to the label. */
+    optional?: boolean;
     description?: string;
     placeholder?: string;
     options: FormSelectOption[];
@@ -33,6 +35,7 @@ export interface FormSelectProps {
 export const FormSelect = ({
     name,
     label,
+    optional,
     description,
     placeholder,
     options,
@@ -47,7 +50,11 @@ export const FormSelect = ({
             name={name}
             render={({ field }) => (
                 <FormItem>
-                    {label && <FormLabel>{label}</FormLabel>}
+                    {label && (
+                        <FormLabel optional={optional}>
+                            {label}
+                        </FormLabel>
+                    )}
                     <Select
                         onValueChange={(value) => {
                             field.onChange(value);

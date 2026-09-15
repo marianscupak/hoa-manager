@@ -169,6 +169,7 @@ export function CreateOwnerDialog({
                             label={t("owners.create.emailLabel")}
                             type="email"
                             placeholder={t("owners.create.emailPlaceholder")}
+                            optional
                         />
                         <DialogFooter>
                             <Button

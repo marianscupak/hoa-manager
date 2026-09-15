@@ -18,6 +18,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "../popover";
 export interface FormDatePickerProps {
     name: string;
     label?: string;
+    /** Renders a muted "optional" marker next to the label. */
+    optional?: boolean;
     description?: string;
     placeholder?: string;
     /** Earliest selectable day, inclusive (compared by calendar day). */
@@ -35,7 +37,10 @@ export interface FormDatePickerProps {
 export const FormDatePicker = React.forwardRef<
     HTMLDivElement,
     FormDatePickerProps
->(({ name, label, description, placeholder, min, max, className }, ref) => {
+>((
+    { name, label, optional, description, placeholder, min, max, className },
+    ref,
+) => {
     const { control } = useFormContext();
     const [open, setOpen] = React.useState(false);
 
@@ -58,7 +63,11 @@ export const FormDatePicker = React.forwardRef<
                         className={cn("flex flex-col", className)}
                         ref={ref}
                     >
-                        {label && <FormLabel>{label}</FormLabel>}
+                        {label && (
+                        <FormLabel optional={optional}>
+                            {label}
+                        </FormLabel>
+                    )}
                         <Popover open={open} onOpenChange={setOpen}>
                             <PopoverTrigger asChild>
                                 <FormControl>

@@ -10,7 +10,7 @@ import { FormInput } from "./form-input";
 afterEach(cleanup);
 
 function Harness() {
-    const form = useForm({ defaultValues: { password: "" } });
+    const form = useForm({ defaultValues: { password: "", note: "" } });
     return (
         <Form {...form}>
             <FormInput
@@ -21,6 +21,7 @@ function Harness() {
                 hideLabel="Hide password"
             />
             <FormInput name="email" label="Email" type="email" />
+            <FormInput name="note" label="Note" optional />
         </Form>
     );
 }
@@ -40,6 +41,19 @@ describe("FormInput", () => {
 
         await user.click(screen.getByRole("button", { name: "Hide password" }));
         expect(password).toHaveProperty("type", "password");
+    });
+
+    it("marks an optional field on its label and leaves required ones bare", () => {
+        render(<Harness />);
+
+        // i18next is not initialised in this harness, so `t` echoes the key;
+        // asserting on it still proves the marker renders only where asked.
+        expect(screen.getByText("Note").textContent).toContain(
+            "common:form.optional",
+        );
+        expect(screen.getByText("Email").textContent).not.toContain(
+            "common:form.optional",
+        );
     });
 
     it("leaves other input types without a reveal toggle", () => {

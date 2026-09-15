@@ -13,12 +13,15 @@ import { Textarea, TextareaProps } from "../textarea";
 interface FormTextareaProps extends TextareaProps {
     name: string;
     label?: string;
+    /** Renders a muted "optional" marker next to the label. */
+    optional?: boolean;
     description?: string;
 }
 
 export function FormTextarea({
     name,
     label,
+    optional,
     description,
     ...props
 }: FormTextareaProps) {
@@ -30,7 +33,11 @@ export function FormTextarea({
             name={name}
             render={({ field }) => (
                 <FormItem>
-                    {label && <FormLabel>{label}</FormLabel>}
+                    {label && (
+                        <FormLabel optional={optional}>
+                            {label}
+                        </FormLabel>
+                    )}
                     <FormControl>
                         <Textarea {...field} {...props} />
                     </FormControl>

@@ -2166,6 +2166,148 @@
         ]
       }
     },
+    "/api/katastr-import/preview": {
+      "post": {
+        "operationId": "KatastrImportController_preview",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/PreviewKatastrImportDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "What the uploaded extract would change",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KatastrImportPreviewResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Validation or Domain logic error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Katastr Import"
+        ]
+      }
+    },
+    "/api/katastr-import/apply": {
+      "post": {
+        "operationId": "KatastrImportController_apply",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplyKatastrImportDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "What the confirmed import changed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KatastrImportResultResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Validation or Domain logic error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Katastr Import"
+        ]
+      }
+    },
     "/api/invites/owner/status": {
       "get": {
         "operationId": "InviteController_getInviteStatus",
@@ -3776,6 +3918,11 @@
               "ASSOCIATION"
             ]
           },
+          "ico": {
+            "type": "string",
+            "nullable": true,
+            "description": "IČO (Czech company identification number), for legal entities. Public register data"
+          },
           "inviteStatus": {
             "type": "string",
             "nullable": true,
@@ -3811,6 +3958,7 @@
           "email",
           "userId",
           "kind",
+          "ico",
           "inviteStatus",
           "inviteCreatedAt",
           "hasOwnershipRecords",
@@ -4030,6 +4178,16 @@
               "type": "string"
             }
           },
+          "usageCode": {
+            "type": "string",
+            "nullable": true,
+            "description": "Cadastre usage code, e.g. '1' for a flat. Null when unknown"
+          },
+          "usageName": {
+            "type": "string",
+            "nullable": true,
+            "description": "Cadastre usage name in Czech, e.g. \"byt\". Null when unknown"
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string"
@@ -4046,6 +4204,8 @@
           "buildingShareNumerator",
           "buildingShareDenominator",
           "owners",
+          "usageCode",
+          "usageName",
           "createdAt",
           "updatedAt"
         ]
@@ -4248,6 +4408,16 @@
               "type": "string"
             }
           },
+          "usageCode": {
+            "type": "string",
+            "nullable": true,
+            "description": "Cadastre usage code, e.g. '1' for a flat. Null when unknown"
+          },
+          "usageName": {
+            "type": "string",
+            "nullable": true,
+            "description": "Cadastre usage name in Czech, e.g. \"byt\". Null when unknown"
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string"
@@ -4270,6 +4440,8 @@
           "buildingShareNumerator",
           "buildingShareDenominator",
           "owners",
+          "usageCode",
+          "usageName",
           "createdAt",
           "updatedAt",
           "ownerships"
@@ -4358,6 +4530,427 @@
         "required": [
           "effectiveFrom",
           "ownerships"
+        ]
+      },
+      "PreviewKatastrImportDto": {
+        "type": "object",
+        "properties": {
+          "effectiveAt": {
+            "description": "Effective date for ownership changes; defaults to ct:platnost",
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          }
+        }
+      },
+      "KatastrImportPreviewResponseDto": {
+        "type": "object",
+        "properties": {
+          "planHash": {
+            "type": "string"
+          },
+          "effectiveAt": {
+            "type": "string"
+          },
+          "document": {
+            "type": "object",
+            "properties": {
+              "validAt": {
+                "type": "string"
+              },
+              "issuedAt": {
+                "type": "string"
+              },
+              "lvNumber": {
+                "type": "string"
+              },
+              "municipality": {
+                "type": "string"
+              },
+              "cadastralArea": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "validAt",
+              "issuedAt",
+              "lvNumber",
+              "municipality",
+              "cadastralArea"
+            ]
+          },
+          "counts": {
+            "type": "object",
+            "properties": {
+              "unitsCreated": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "unitsUpdated": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "unitsUnchanged": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "ownersCreated": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "ownersMatched": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "unitsCreated",
+              "unitsUpdated",
+              "unitsUnchanged",
+              "ownersCreated",
+              "ownersMatched"
+            ]
+          },
+          "units": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "unitNo": {
+                  "type": "string"
+                },
+                "action": {
+                  "type": "string",
+                  "enum": [
+                    "CREATE",
+                    "UPDATE",
+                    "UNCHANGED"
+                  ]
+                },
+                "unitNoChange": {
+                  "type": "object",
+                  "properties": {
+                    "from": {
+                      "type": "string"
+                    },
+                    "to": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "from",
+                    "to"
+                  ],
+                  "nullable": true
+                },
+                "shareChange": {
+                  "type": "object",
+                  "properties": {
+                    "from": {
+                      "type": "string"
+                    },
+                    "to": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "from",
+                    "to"
+                  ],
+                  "nullable": true
+                },
+                "usageChange": {
+                  "type": "object",
+                  "properties": {
+                    "from": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "to": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "from",
+                    "to"
+                  ],
+                  "nullable": true
+                },
+                "ownershipChange": {
+                  "type": "object",
+                  "properties": {
+                    "from": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "partyType": {
+                            "type": "string",
+                            "enum": [
+                              "SOLE",
+                              "SJM"
+                            ]
+                          },
+                          "share": {
+                            "type": "string"
+                          },
+                          "memberNames": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "required": [
+                          "partyType",
+                          "share",
+                          "memberNames"
+                        ]
+                      }
+                    },
+                    "to": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "partyType": {
+                            "type": "string",
+                            "enum": [
+                              "SOLE",
+                              "SJM"
+                            ]
+                          },
+                          "share": {
+                            "type": "string"
+                          },
+                          "memberNames": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "required": [
+                          "partyType",
+                          "share",
+                          "memberNames"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "from",
+                    "to"
+                  ],
+                  "nullable": true
+                }
+              },
+              "required": [
+                "unitNo",
+                "action",
+                "unitNoChange",
+                "shareChange",
+                "usageChange",
+                "ownershipChange"
+              ]
+            }
+          },
+          "owners": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "displayName": {
+                  "type": "string"
+                },
+                "ico": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "PERSON",
+                    "LEGAL_ENTITY",
+                    "ASSOCIATION"
+                  ]
+                },
+                "action": {
+                  "type": "string",
+                  "enum": [
+                    "CREATE",
+                    "MATCHED_BY_KATASTR_ID",
+                    "MATCHED_BY_ICO",
+                    "MATCHED_BY_NAME"
+                  ]
+                },
+                "existingDisplayName": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "existingEmail": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "existingHasAccount": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "displayName",
+                "ico",
+                "kind",
+                "action",
+                "existingDisplayName",
+                "existingEmail",
+                "existingHasAccount"
+              ]
+            }
+          },
+          "unitsNotInFile": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "unitNo": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "unitNo"
+              ]
+            }
+          },
+          "ownersNotInFile": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "displayName": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "displayName"
+              ]
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "code"
+              ],
+              "additionalProperties": {}
+            }
+          },
+          "blockers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "code"
+              ],
+              "additionalProperties": {}
+            }
+          }
+        },
+        "required": [
+          "planHash",
+          "effectiveAt",
+          "document",
+          "counts",
+          "units",
+          "owners",
+          "unitsNotInFile",
+          "ownersNotInFile",
+          "warnings",
+          "blockers"
+        ]
+      },
+      "ApplyKatastrImportDto": {
+        "type": "object",
+        "properties": {
+          "effectiveAt": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "planHash": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The planHash returned by the preview the admin confirmed"
+          }
+        },
+        "required": [
+          "effectiveAt",
+          "planHash"
+        ]
+      },
+      "KatastrImportResultResponseDto": {
+        "type": "object",
+        "properties": {
+          "counts": {
+            "type": "object",
+            "properties": {
+              "unitsCreated": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "unitsUpdated": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "unitsUnchanged": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "ownersCreated": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "ownersMatched": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "unitsCreated",
+              "unitsUpdated",
+              "unitsUnchanged",
+              "ownersCreated",
+              "ownersMatched"
+            ]
+          },
+          "effectiveAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "counts",
+          "effectiveAt"
         ]
       },
       "InviteStatusResponseDto": {

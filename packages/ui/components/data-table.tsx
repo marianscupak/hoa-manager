@@ -1,17 +1,24 @@
 import {
     flexRender,
     getCoreRowModel,
+    getExpandedRowModel,
     getFilteredRowModel,
     getPaginationRowModel,
     getSortedRowModel,
     useReactTable,
     type ColumnDef,
+    type ExpandedState,
     type Row,
     type RowData,
     type SortingFn,
     type SortingState,
 } from "@tanstack/react-table";
-import { ChevronLeftIcon, ChevronRightIcon, SearchIcon } from "lucide-react";
+import {
+    ChevronDownIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    SearchIcon,
+} from "lucide-react";
 import * as React from "react";
 
 import {
@@ -56,6 +63,16 @@ export interface DataTableProps<TData extends { id: string }> {
     countLabel: (info: FooterInfo) => string;
     /** Aria labels for the prev/next pager buttons. */
     paginationLabels?: { previous: string; next: string };
+    /** Enables per-row expansion. Omit (with renderSubRow) for the plain
+     *  table — behaviour is then unchanged. */
+    getRowCanExpand?: (row: TData) => boolean;
+    /** Content rendered beneath an expanded row, spanning the full width. */
+    renderSubRow?: (row: TData) => React.ReactNode;
+    /** Accessible label builder for the expander, e.g.
+     *  `(row) => t("expand", { unitNo: row.unitNo })`. */
+    expandRowLabel?: (row: TData) => string;
+    /** Accessible label builder for an expanded row's collapse action. */
+    collapseRowLabel?: (row: TData) => string;
 }
 
 function diacriticGlobalFilter<TData>(
@@ -86,6 +103,10 @@ export function DataTable<TData extends { id: string }>({
     initialSorting,
     countLabel,
     paginationLabels,
+    getRowCanExpand,
+    renderSubRow,
+    expandRowLabel,
+    collapseRowLabel,
 }: DataTableProps<TData>) {
     const [sorting, setSorting] = React.useState<SortingState>(
         initialSorting ?? [],
@@ -95,18 +116,24 @@ export function DataTable<TData extends { id: string }>({
         pageIndex: 0,
         pageSize,
     });
+    const [expanded, setExpanded] = React.useState<ExpandedState>({});
 
     const table = useReactTable({
         data: data.length === 0 ? (EMPTY_DATA as TData[]) : data,
         columns,
-        state: { sorting, globalFilter, pagination },
+        state: { sorting, globalFilter, pagination, expanded },
         onSortingChange: setSorting,
         onGlobalFilterChange: setGlobalFilter,
         onPaginationChange: setPagination,
+        onExpandedChange: setExpanded,
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
+        getExpandedRowModel: getExpandedRowModel(),
+        getRowCanExpand: getRowCanExpand
+            ? (row) => getRowCanExpand(row.original)
+            : undefined,
         globalFilterFn: diacriticGlobalFilter,
         getColumnCanGlobalFilter: (column) =>
             column.columnDef.enableGlobalFilter === true,
@@ -236,37 +263,87 @@ export function DataTable<TData extends { id: string }>({
                             : emptyMessage}
                     </div>
                 ) : (
-                    rows.map((row, rowIndex) => (
-                        <div
-                            role="row"
-                            key={row.id}
-                            className={cn(
-                                "border-hairline hover:bg-muted grid items-center gap-3 border-b px-5 py-[9px] text-sm last:border-b-0",
-                                zebra &&
-                                    rowIndex % 2 === 0 &&
-                                    "bg-surface-zebra",
-                            )}
-                            style={{ gridTemplateColumns: gridTemplate }}
-                        >
-                            {row.getVisibleCells().map((cell) => (
+                    rows.map((row, rowIndex) => {
+                        const canExpand = !!renderSubRow && row.getCanExpand();
+                        const isExpanded = canExpand && row.getIsExpanded();
+                        return (
+                            <React.Fragment key={row.id}>
                                 <div
-                                    role="cell"
-                                    key={cell.id}
+                                    role="row"
                                     className={cn(
-                                        "min-w-0",
-                                        cell.column.columnDef.meta?.align ===
-                                            "right" && "flex justify-end",
-                                        cell.column.columnDef.meta?.className,
+                                        "border-hairline hover:bg-muted grid items-center gap-3 border-b px-5 py-[9px] text-sm",
+                                        !isExpanded && "last:border-b-0",
+                                        zebra &&
+                                            rowIndex % 2 === 0 &&
+                                            "bg-surface-zebra",
                                     )}
+                                    style={{
+                                        gridTemplateColumns: gridTemplate,
+                                    }}
                                 >
-                                    {flexRender(
-                                        cell.column.columnDef.cell,
-                                        cell.getContext(),
+                                    {row.getVisibleCells().map((cell) => (
+                                        <div
+                                            role="cell"
+                                            key={cell.id}
+                                            className={cn(
+                                                "min-w-0",
+                                                cell.column.columnDef.meta
+                                                    ?.align === "right" &&
+                                                    "flex justify-end",
+                                                cell.column.columnDef.meta
+                                                    ?.className,
+                                            )}
+                                        >
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext(),
+                                            )}
+                                        </div>
+                                    ))}
+                                    {renderSubRow && (
+                                        <div
+                                            role="cell"
+                                            className="flex justify-end"
+                                        >
+                                            {canExpand && (
+                                                <button
+                                                    type="button"
+                                                    aria-expanded={isExpanded}
+                                                    aria-label={
+                                                        isExpanded
+                                                            ? collapseRowLabel?.(
+                                                                  row.original,
+                                                              )
+                                                            : expandRowLabel?.(
+                                                                  row.original,
+                                                              )
+                                                    }
+                                                    onClick={row.getToggleExpandedHandler()}
+                                                    className="text-muted-foreground hover:text-foreground focus-visible:ring-ring flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg focus-visible:ring-2 focus-visible:outline-none"
+                                                >
+                                                    <ChevronDownIcon
+                                                        className={cn(
+                                                            "h-4 w-4 motion-safe:transition-transform",
+                                                            isExpanded &&
+                                                                "rotate-180",
+                                                        )}
+                                                    />
+                                                </button>
+                                            )}
+                                        </div>
                                     )}
                                 </div>
-                            ))}
-                        </div>
-                    ))
+                                {isExpanded && (
+                                    <div
+                                        role="region"
+                                        className="border-hairline bg-background border-b px-5 py-3 last:border-b-0"
+                                    >
+                                        {renderSubRow(row.original)}
+                                    </div>
+                                )}
+                            </React.Fragment>
+                        );
+                    })
                 )}
             </div>
 

@@ -16,6 +16,7 @@ import {
   voteOptionResults,
 } from '@/infrastructure/db/schema';
 import { BallotAlreadyCastException } from '@/shared/application/exceptions/vote.exceptions';
+import { isUniqueViolation } from '@/shared/errors/pg-errors';
 
 import { mapRulesetColumns, mapRulesetRow } from './vote-ruleset.mapper';
 import {
@@ -546,11 +547,11 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
           );
         }
       }
-    } catch (error: any) {
+    } catch (error) {
       // Concurrent ballot submissions can both pass the prior
       // hasExistingBallots check under READ COMMITTED. Translate the
       // resulting unique-constraint violation into a clean domain error.
-      if (error?.code === '23505') {
+      if (isUniqueViolation(error)) {
         throw new BallotAlreadyCastException();
       }
       throw error;

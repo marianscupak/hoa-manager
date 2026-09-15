@@ -10,6 +10,7 @@ import {
 } from '@/modules/voting/application/ports/vote-consent-write.repository.port';
 import { VoteUnitConsentStatus } from '@/modules/voting/domain/vote/vote.types';
 import { ConsentAlreadyRecordedException } from '@/shared/application/exceptions/vote.exceptions';
+import { isUniqueViolation } from '@/shared/errors/pg-errors';
 
 @Injectable()
 export class DrizzleVoteConsentWriteRepository
@@ -59,12 +60,12 @@ export class DrizzleVoteConsentWriteRepository
         })
         .returning({ id: voteUnitConsents.id });
       return inserted.id;
-    } catch (error: any) {
+    } catch (error) {
       // Concurrent submissions can both pass the `existing` lookup above
       // under READ COMMITTED and both attempt an insert. The partial unique
       // index on (vote_id, unit_id, from_owner_id) WHERE status = 'VALID'
       // then rejects the loser — translate that into a clean domain error.
-      if (error?.code === '23505') {
+      if (isUniqueViolation(error)) {
         throw new ConsentAlreadyRecordedException();
       }
       throw error;

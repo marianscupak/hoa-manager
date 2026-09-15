@@ -17,6 +17,7 @@ import {
   UnitNotFoundException,
 } from '@/shared/application/exceptions/property.exceptions';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
+import { isUniqueViolation } from '@/shared/errors/pg-errors';
 
 @CommandHandler(UpdateUnitCommand)
 export class UpdateUnitHandler
@@ -67,8 +68,8 @@ export class UpdateUnitHandler
           buildingShareNumerator: command.buildingShareNumerator,
           buildingShareDenominator: command.buildingShareDenominator,
         });
-      } catch (error: any) {
-        if (error.code === '23505') {
+      } catch (error) {
+        if (isUniqueViolation(error)) {
           throw new DuplicateUnitNumberException();
         }
         throw error;

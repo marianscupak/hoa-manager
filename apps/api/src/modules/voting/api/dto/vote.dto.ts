@@ -682,6 +682,46 @@ export class VoteTurnoutResponseDto {
   quorumMet!: boolean | null;
 }
 
+// ── Vote Running Tally (board/admin/auditor only) ───────
+
+export class VoteTallyOptionDto {
+  @ApiProperty()
+  optionId!: string;
+
+  @ApiProperty()
+  voteUnitCount!: number;
+
+  @ApiProperty({ type: FractionDto })
+  voteWeight!: FractionDto;
+}
+
+export class VoteTallyQuestionDto {
+  @ApiProperty()
+  questionId!: string;
+
+  /**
+   * The denominator this question's majority will be measured against, so a
+   * provisional share is directly comparable to the threshold that will
+   * decide it. Zero when nothing countable has been cast yet.
+   */
+  @ApiProperty({ type: FractionDto })
+  majorityDenominator!: FractionDto;
+
+  @ApiProperty({ type: [VoteTallyOptionDto] })
+  options!: VoteTallyOptionDto[];
+}
+
+/**
+ * Provisional standings for an open vote. Gated to ADMIN, BOARD_MEMBER and
+ * AUDITOR as a whole resource rather than as conditional fields on a
+ * shared response — a board-only field on an all-roles endpoint is exactly
+ * the leak this split avoids.
+ */
+export class VoteTallyResponseDto {
+  @ApiProperty({ type: [VoteTallyQuestionDto] })
+  questions!: VoteTallyQuestionDto[];
+}
+
 // ── Vote Participation ──────────────────────────────────
 
 export class ParticipationOwnerDto {

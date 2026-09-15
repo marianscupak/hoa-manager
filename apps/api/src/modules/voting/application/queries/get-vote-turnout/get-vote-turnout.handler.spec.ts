@@ -59,9 +59,7 @@ describe('GetVoteTurnoutHandler', () => {
 
   it('passes a null quorumMet through for per-rollam votes', async () => {
     voteRepo.findById.mockResolvedValue(openVote);
-    resultCalculation.calculate.mockResolvedValue(
-      tally({ quorumMet: null }),
-    );
+    resultCalculation.calculate.mockResolvedValue(tally({ quorumMet: null }));
 
     const result = await handler.execute(
       new GetVoteTurnoutQuery('tenant-1', 'vote-1'),

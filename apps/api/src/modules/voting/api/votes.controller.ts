@@ -51,6 +51,7 @@ import {
   VoteResultsResponseDto,
   VoteTurnoutResponseDto,
   VoteParticipationResponseDto,
+  VoteTallyResponseDto,
 } from './dto/vote.dto';
 import {
   CurrentAuthUser,
@@ -90,6 +91,7 @@ import { GetVoteAuditExportQuery } from '../application/queries/get-vote-audit-e
 import { GetVoteDetailQuery } from '../application/queries/get-vote-detail/get-vote-detail.query';
 import { GetVoteParticipationQuery } from '../application/queries/get-vote-participation/get-vote-participation.query';
 import { GetVoteResultsQuery } from '../application/queries/get-vote-results/get-vote-results.query';
+import { GetVoteTallyQuery } from '../application/queries/get-vote-tally/get-vote-tally.query';
 import { GetVoteTurnoutQuery } from '../application/queries/get-vote-turnout/get-vote-turnout.query';
 import { GetVoterStatusQuery } from '../application/queries/get-voter-status/get-voter-status.query';
 import { GetVotesQuery } from '../application/queries/get-votes/get-votes.query';
@@ -519,6 +521,27 @@ export class VotesController {
     return this.queryBus.execute(
       new GetVoteTurnoutQuery(tenantCtx.tenantId, id),
     );
+  }
+
+  @Get(':id/tally')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description:
+      'Provisional per-question standings for an open vote. Board view ' +
+      'only — the whole resource is gated rather than individual fields.',
+    type: VoteTallyResponseDto,
+  })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
+  @Roles(
+    TenantMembershipRole.ADMIN,
+    TenantMembershipRole.BOARD_MEMBER,
+    TenantMembershipRole.AUDITOR,
+  )
+  getVoteTally(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Tenant() tenantCtx: TenantContext,
+  ): Promise<VoteTallyResponseDto> {
+    return this.queryBus.execute(new GetVoteTallyQuery(tenantCtx.tenantId, id));
   }
 
   @Get(':id/activity')

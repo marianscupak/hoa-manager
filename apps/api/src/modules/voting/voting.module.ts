@@ -50,6 +50,7 @@ import { GetVoteAuditExportHandler } from './application/queries/get-vote-audit-
 import { GetVoteDetailHandler } from './application/queries/get-vote-detail/get-vote-detail.handler';
 import { GetVoteParticipationHandler } from './application/queries/get-vote-participation/get-vote-participation.handler';
 import { GetVoteResultsHandler } from './application/queries/get-vote-results/get-vote-results.handler';
+import { GetVoteTallyHandler } from './application/queries/get-vote-tally/get-vote-tally.handler';
 import { GetVoteTurnoutHandler } from './application/queries/get-vote-turnout/get-vote-turnout.handler';
 import { GetVoterStatusHandler } from './application/queries/get-voter-status/get-voter-status.handler';
 import { GetVotesHandler } from './application/queries/get-votes/get-votes.handler';
@@ -101,6 +102,7 @@ const QUERY_HANDLERS = [
   GetVoteActivityHandler,
   GetVoteAuditExportHandler,
   GetVoteTurnoutHandler,
+  GetVoteTallyHandler,
   GetVoteParticipationHandler,
   GetDocumentDownloadUrlHandler,
   GetBallotAttachmentDownloadUrlHandler,

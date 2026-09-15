@@ -32,9 +32,7 @@ const BOARD_VIEW_ROLES: readonly TenantMembershipRole[] = [
  * (which owners must see as simply "not voted") from one with no owner on
  * record (which is genuinely outside the electorate).
  */
-function toOwnerView(
-  unit: VoteParticipationUnitDto,
-): VoteParticipationUnitDto {
+function toOwnerView(unit: VoteParticipationUnitDto): VoteParticipationUnitDto {
   return {
     unitId: unit.unitId,
     unitNo: unit.unitNo,

@@ -748,9 +748,82 @@ export const voting = {
         alreadyCast: "Tato jednotka už hlasovala — nic nebylo zaznamenáno.",
         boardTools: {
             title: "Nástroje výboru",
-            context:
-                "Hlasovalo {{voted}} z {{total}} jednotek. Dostali jste podepsaný lístek na papíře? Zaznamenejte ho za vlastníka.",
+            prompt: "Zapište hlas, který vlastník odevzdal na papíře.",
             action: "Zaznamenat listinný hlas",
+        },
+    },
+    liveResults: {
+        back: "Hlasování · {{title}}",
+        title: "Průběžné výsledky",
+        subtitle:
+            "Hlasování je otevřené do {{date}} · přehled se průběžně doplňuje",
+        roleChip: {
+            board: "Pohled výboru · úplné údaje",
+            owner: "Pohled vlastníka · pouze účast",
+        },
+        turnout: {
+            caption: "podílů hlasovalo",
+            captionUnits: "jednotek hlasovalo",
+            headline: "Hlasovalo {{voted}} z {{total}} jednotek",
+            quorumReached: "Usnášeníschopnost splněna",
+            quorumNotReached: "Usnášeníschopnost zatím nesplněna",
+            marker: "{{threshold}} % · kvórum",
+            excluded_one:
+                "{{count}} jednotku vlastní společenství, do celku se nepočítá.",
+            excluded_few:
+                "{{count}} jednotky vlastní společenství, do celku se nepočítají.",
+            excluded_other:
+                "{{count}} jednotek vlastní společenství, do celku se nepočítají.",
+        },
+        tally: {
+            title: "Průběžný součet",
+            note: "Pouze pro výbor · předběžné do uzavření",
+            empty: "Zatím nikdo nehlasoval.",
+            units_one: "{{count}} jednotka",
+            units_few: "{{count}} jednotky",
+            units_other: "{{count}} jednotek",
+        },
+        note: {
+            board: "Jednotlivé hlasy vidíte jako člen výboru. Vlastníci vidí pouze to, zda jednotka hlasovala.",
+            owner: "Jak která jednotka hlasovala zůstává skryté až do uzavření hlasování {{date}}. Do té doby vidíte pouze to, zda jednotka svůj hlas odevzdala.",
+        },
+        filters: { all: "Vše", voted: "Hlasovalo", notVoted: "Nehlasovalo" },
+        searchPlaceholder: {
+            board: "Hledat jednotku nebo vlastníka…",
+            owner: "Hledat jednotku…",
+        },
+        columns: { unit: "Jednotka", share: "Podíl", status: "Stav" },
+        status: {
+            voted: "Hlasovalo",
+            notVoted: "Nehlasovalo",
+            needsDelegation: "Chybí společný zástupce",
+            ineligible: "Nemůže hlasovat",
+            inApp: "V aplikaci · {{date}}",
+            onPaper: "Listinně · {{date}}",
+            onPaperRecordedBy: "Listinně · {{date}} · zapsal(a) {{name}}",
+            ineligibleReason: {
+                MISSING_OWNERSHIP: "Bez evidovaného vlastníka",
+                ASSOCIATION_OWNED: "Ve vlastnictví společenství",
+                NO_REPRESENTATIVE: "Bez společného zástupce",
+            },
+        },
+        pill: { yours: "Vaše", proxy: "V zastoupení" },
+        answers: {
+            none: "—",
+            expand: "Zobrazit odpovědi jednotky {{unitNo}}",
+            collapse: "Skrýt odpovědi jednotky {{unitNo}}",
+        },
+        showing: "Zobrazeno {{shown}} z {{total}} jednotek",
+        empty: "K tomuto hlasování nejsou žádné jednotky.",
+        noMatch: "Hledání neodpovídá žádná jednotka.",
+        entry: {
+            title: "Průběžné výsledky",
+            copy: "Zatím hlasovalo {{voted}} z {{total}} jednotek.",
+            copyQuorum:
+                "Zatím hlasovalo {{voted}} z {{total}} jednotek — usnášeníschopnost je splněna.",
+            copyQuorumNotReached:
+                "Zatím hlasovalo {{voted}} z {{total}} jednotek — usnášeníschopnost zatím není splněna.",
+            action: "Zobrazit, kdo hlasoval",
         },
     },
     results: {

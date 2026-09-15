@@ -21,7 +21,8 @@ export function getParticipationColumns(
             id: "unitNo",
             // Search spans the unit number and its owners' names; the cell
             // still renders only the unit number.
-            accessorFn: (unit) => `${unit.unitNo} ${unit.ownerNames.join(" ")}`,
+            accessorFn: (unit) =>
+                `${unit.unitNo} ${(unit.ownerNames ?? []).join(" ")}`,
             header: t("paperBallot.chooseUnit.columns.unit"),
             enableSorting: true,
             sortingFn: "localeNumeric",
@@ -29,7 +30,7 @@ export function getParticipationColumns(
             cell: ({ row }) => (
                 <CellPrimary
                     title={row.original.unitNo}
-                    subtitle={row.original.ownerNames.join(", ")}
+                    subtitle={(row.original.ownerNames ?? []).join(", ")}
                 />
             ),
         },

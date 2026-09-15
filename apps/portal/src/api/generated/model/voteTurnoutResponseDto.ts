@@ -15,4 +15,6 @@ export interface VoteTurnoutResponseDto {
     totalVotesUnitCount: number;
     totalVotesWeight: FractionDto;
     participationPercent: string;
+    /** @nullable */
+    quorumMet: boolean | null;
 }

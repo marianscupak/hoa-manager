@@ -10,6 +10,8 @@ import {
 } from "@/api/generated/votes/votes";
 import { customInstance } from "@/api/axios";
 
+import { invalidateVoteResultQueries } from "../utils/invalidate-vote-result-queries";
+
 export interface SubmitBallotAnswer {
     questionId: string;
     optionId: string;
@@ -49,6 +51,10 @@ export function useSubmitBallot(voteId: string) {
             void queryClient.invalidateQueries({
                 queryKey: getVotesControllerGetVotesQueryKey(),
             });
+            // The voter has just changed the live standings, so the results
+            // view must not still show their unit as not voted when they
+            // open it.
+            invalidateVoteResultQueries(queryClient, voteId);
         },
     });
 }

@@ -1,5 +1,5 @@
 import { useAtomValue } from "jotai";
-import { ArrowRight, FileText, Home, Info } from "lucide-react";
+import { ArrowRight, BarChart2, FileText, Home, Info } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
@@ -129,13 +129,11 @@ export function VoterStatusSidebar({ vote }: VoterStatusSidebarProps) {
         },
     });
 
-    // Board tools card (paper ballot recording) is admin/board-only and
-    // only relevant while the vote is open, so the turnout counts it needs
-    // are only fetched in that case.
+    // Turnout now feeds the all-roles Live results card as well as the
+    // board-only paper-ballot prompt, so it is fetched for every member of
+    // an open vote.
     const turnoutQuery = useVotesControllerGetVoteTurnout(voteId, {
-        query: {
-            enabled: isAdmin && vote.status === "OPEN",
-        },
+        query: { enabled: vote.status === "OPEN" },
     });
 
     // Separate, vote-independent endpoint (Task 3) that's the only place
@@ -288,6 +286,60 @@ export function VoterStatusSidebar({ vote }: VoterStatusSidebarProps) {
                 )}
             </Card>
 
+            {vote.status === "OPEN" && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-muted-foreground text-detail font-semibold tracking-wide uppercase">
+                            {t("voting:liveResults.entry.title")}
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                        {/* Turnout is a separate fetch from the vote itself, so
+                        it can still be loading (or have failed) when this
+                        card first paints — show a placeholder rather than
+                        the `?? 0` fallback presenting a guess as a real
+                        count. The title and link above/below don't depend on
+                        it and stay visible either way. */}
+                        {turnoutQuery.isLoading ? (
+                            <Skeleton className="h-4 w-48" />
+                        ) : (
+                            turnoutQuery.data && (
+                                <p className="text-muted-foreground text-sm">
+                                    {t(
+                                        // `quorumMet` is `boolean | null`:
+                                        // `null` means the vote has no quorum
+                                        // concept (PER_ROLLAM) and uses the
+                                        // quorum-agnostic copy; `true`/`false`
+                                        // are both worth stating explicitly —
+                                        // "not reached yet" is the case a
+                                        // board most wants surfaced here.
+                                        turnoutQuery.data.quorumMet === null
+                                            ? "voting:liveResults.entry.copy"
+                                            : turnoutQuery.data.quorumMet
+                                              ? "voting:liveResults.entry.copyQuorum"
+                                              : "voting:liveResults.entry.copyQuorumNotReached",
+                                        {
+                                            voted: turnoutQuery.data
+                                                .participationUnitCount,
+                                            total: turnoutQuery.data
+                                                .totalVotesUnitCount,
+                                        },
+                                    )}
+                                </p>
+                            )
+                        )}
+                    </CardContent>
+                    <CardFooter>
+                        <Button variant="outline" size="sm" asChild>
+                            <Link to={`/voting/${voteId}/live-results`}>
+                                <BarChart2 />
+                                {t("voting:liveResults.entry.action")}
+                            </Link>
+                        </Button>
+                    </CardFooter>
+                </Card>
+            )}
+
             {isAdmin && vote.status === "OPEN" && (
                 <Card>
                     <CardHeader>
@@ -297,13 +349,7 @@ export function VoterStatusSidebar({ vote }: VoterStatusSidebarProps) {
                     </CardHeader>
                     <CardContent className="pt-0">
                         <p className="text-muted-foreground text-sm">
-                            {t("voting:paperBallot.boardTools.context", {
-                                voted:
-                                    turnoutQuery.data?.participationUnitCount ??
-                                    0,
-                                total:
-                                    turnoutQuery.data?.totalVotesUnitCount ?? 0,
-                            })}
+                            {t("voting:paperBallot.boardTools.prompt")}
                         </p>
                     </CardContent>
                     <CardFooter>

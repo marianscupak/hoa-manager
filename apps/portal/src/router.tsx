@@ -24,6 +24,7 @@ import { CastVotePage } from "@/features/voting/pages/cast-vote-page";
 import { CreateVotePage } from "@/features/voting/pages/create-vote-page";
 import { DelegateVotePage } from "@/features/voting/pages/delegate-vote-page";
 import { EditVotePage } from "@/features/voting/pages/edit-vote-page";
+import { LiveResultsPage } from "@/features/voting/pages/live-results-page";
 import { RecordPaperBallotPage } from "@/features/voting/pages/record-paper-ballot-page";
 import { VoteDetailPage } from "@/features/voting/pages/vote-detail-page";
 import { VoteResultsPage } from "@/features/voting/pages/vote-results-page";
@@ -96,6 +97,10 @@ export const router = createBrowserRouter([
                             {
                                 path: ":id/cast",
                                 element: <CastVotePage />,
+                            },
+                            {
+                                path: ":id/live-results",
+                                element: <LiveResultsPage />,
                             },
                         ],
                     },

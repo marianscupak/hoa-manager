@@ -741,9 +741,79 @@ export const voting = {
         alreadyCast: "This unit has already voted — nothing was recorded.",
         boardTools: {
             title: "Board tools",
-            context:
-                "{{voted}} of {{total}} units have voted. Received a signed ballot on paper? Record it on the owner's behalf.",
+            prompt: "Record a ballot an owner handed in on paper.",
             action: "Record paper ballot",
+        },
+    },
+    liveResults: {
+        back: "Voting · {{title}}",
+        title: "Live results",
+        subtitle:
+            "Voting is open until {{date}} · standings update as ballots come in",
+        roleChip: {
+            board: "Board view · full detail",
+            owner: "Owner view · participation only",
+        },
+        turnout: {
+            caption: "of shares voted",
+            captionUnits: "of units voted",
+            headline: "{{voted}} of {{total}} units have cast a ballot",
+            quorumReached: "Quorum reached",
+            quorumNotReached: "Quorum not reached yet",
+            marker: "{{threshold}} % · quorum",
+            excluded_one:
+                "{{count}} unit is owned by the association and is not counted in the total.",
+            excluded_other:
+                "{{count}} units are owned by the association and are not counted in the total.",
+        },
+        tally: {
+            title: "Running tally",
+            note: "Board only · provisional until close",
+            empty: "No ballots yet.",
+            units_one: "{{count}} unit",
+            units_other: "{{count}} units",
+        },
+        note: {
+            board: "You can see individual ballots because you are a board member. Owners only see whether a unit has voted.",
+            owner: "How each unit voted stays sealed until voting closes on {{date}}. Until then you can only see whether a unit has cast its ballot.",
+        },
+        filters: { all: "All", voted: "Voted", notVoted: "Not voted" },
+        searchPlaceholder: {
+            board: "Search unit or owner…",
+            owner: "Search unit…",
+        },
+        columns: { unit: "Unit", share: "Share", status: "Status" },
+        status: {
+            voted: "Voted",
+            notVoted: "Not voted",
+            needsDelegation: "Needs delegation",
+            ineligible: "Not eligible",
+            inApp: "In app · {{date}}",
+            onPaper: "Paper ballot · {{date}}",
+            onPaperRecordedBy: "Paper ballot · {{date}} · recorded by {{name}}",
+            ineligibleReason: {
+                MISSING_OWNERSHIP: "No owner on record",
+                ASSOCIATION_OWNED: "Owned by the association",
+                NO_REPRESENTATIVE: "No common representative",
+            },
+        },
+        pill: { yours: "Yours", proxy: "Proxy" },
+        answers: {
+            none: "—",
+            expand: "Show answers for unit {{unitNo}}",
+            collapse: "Hide answers for unit {{unitNo}}",
+        },
+        showing: "Showing {{shown}} of {{total}} units",
+        empty: "This vote has no units.",
+        noMatch: "No units match your search.",
+        entry: {
+            title: "Live results",
+            copy: "{{voted}} of {{total}} units have cast a ballot so far.",
+            copyQuorum:
+                "{{voted}} of {{total}} units have cast a ballot so far — quorum reached.",
+            copyQuorumNotReached:
+                "{{voted}} of {{total}} units have cast a ballot so far — quorum not reached yet.",
+            action: "See who has voted",
         },
     },
     results: {

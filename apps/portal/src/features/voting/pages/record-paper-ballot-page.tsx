@@ -15,8 +15,6 @@ import {
 
 import { getApiErrorCode, showApiError } from "@/api/error-utils";
 import {
-    getVotesControllerGetVoteParticipationQueryKey,
-    getVotesControllerGetVoteTurnoutQueryKey,
     useVotesControllerGetVoteDetail,
     useVotesControllerGetVoteParticipation,
     useVotesControllerGetVoteTurnout,
@@ -35,6 +33,7 @@ import { PaperBallotFooter } from "../components/paper-ballot/paper-ballot-foote
 import { RecordedState } from "../components/paper-ballot/recorded-state";
 import { ReviewStep } from "../components/paper-ballot/review-step";
 import { useBallotAttachment } from "../hooks/use-ballot-attachment";
+import { invalidateVoteResultQueries } from "../utils/invalidate-vote-result-queries";
 
 export type PaperBallotStepId = "unit" | "ballot" | "answers" | "review";
 
@@ -142,13 +141,7 @@ export function RecordPaperBallotPage() {
             clear();
             setSubmittedAt(String(data.submittedAt));
             setStep("done");
-            void queryClient.invalidateQueries({
-                queryKey:
-                    getVotesControllerGetVoteParticipationQueryKey(voteId),
-            });
-            void queryClient.invalidateQueries({
-                queryKey: getVotesControllerGetVoteTurnoutQueryKey(voteId),
-            });
+            invalidateVoteResultQueries(queryClient, voteId);
         },
         onError: (error) => {
             // A ballot that arrived in the app mid-transcription is not a
@@ -156,10 +149,10 @@ export function RecordPaperBallotPage() {
             // refetched list where the row now reads "Voted".
             if (getApiErrorCode(error) === "BALLOT_ALREADY_CAST") {
                 toast.error(t("voting:paperBallot.alreadyCast"));
-                void queryClient.invalidateQueries({
-                    queryKey:
-                        getVotesControllerGetVoteParticipationQueryKey(voteId),
-                });
+                // The ballot landed while this was being transcribed, so the
+                // standings moved without this flow doing it — everything the
+                // results view shows is stale, not just the unit list.
+                invalidateVoteResultQueries(queryClient, voteId);
                 resetFlow();
                 return;
             }
@@ -182,7 +175,7 @@ export function RecordPaperBallotPage() {
     );
     const currentQuestion = vote.questions[qIndex];
     const signerName =
-        selectedUnit?.owners.find((o) => o.ownerId === signerOwnerId)
+        selectedUnit?.owners?.find((o) => o.ownerId === signerOwnerId)
             ?.displayName ?? "";
     const actorName = user?.fullName ?? user?.email ?? "";
 

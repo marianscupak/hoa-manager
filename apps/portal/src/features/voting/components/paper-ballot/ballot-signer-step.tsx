@@ -37,6 +37,7 @@ export function BallotSignerStep({
 }: BallotSignerStepProps) {
     const { t } = useTranslation("voting");
     const [localError, setLocalError] = useState<string | null>(null);
+    const unitOwners = unit.owners ?? [];
 
     return (
         <div className="space-y-6">
@@ -46,7 +47,7 @@ export function BallotSignerStep({
                 </h1>
                 <p className="text-muted-foreground mt-1 text-sm">
                     {t("paperBallot.ballot.subtitle", {
-                        owners: unit.ownerNames.join(", "),
+                        owners: (unit.ownerNames ?? []).join(", "),
                         share: unit.share,
                     })}
                 </p>
@@ -115,7 +116,7 @@ export function BallotSignerStep({
                 <p className="mb-2 text-sm font-semibold">
                     {t("paperBallot.ballot.signerLabel")}
                 </p>
-                {unit.owners.length === 0 && (
+                {unitOwners.length === 0 && (
                     <Card className="bg-muted/50 flex items-start gap-3 p-4">
                         <Info className="text-muted-foreground mt-0.5 h-4 w-4 shrink-0" />
                         <p className="text-secondary-foreground text-sm">
@@ -124,7 +125,7 @@ export function BallotSignerStep({
                     </Card>
                 )}
                 <div className="space-y-2">
-                    {unit.owners.map((owner) => {
+                    {unitOwners.map((owner) => {
                         const selected = owner.ownerId === signerOwnerId;
                         return (
                             <button
@@ -178,7 +179,7 @@ export function BallotSignerStep({
                         );
                     })}
                 </div>
-                {unit.owners.length > 1 && (
+                {unitOwners.length > 1 && (
                     <p className="text-muted-foreground mt-2 text-xs">
                         {t("paperBallot.ballot.coOwnedHint")}
                     </p>

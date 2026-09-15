@@ -24,10 +24,7 @@ import {
 } from "@hoa-mngr/ui";
 
 import { type VoteDetailResponseDto } from "@/api/generated/model";
-import {
-    useVotesControllerGetVoteDetail,
-    useVotesControllerGetVoteTurnout,
-} from "@/api/generated/votes/votes";
+import { useVotesControllerGetVoteDetail } from "@/api/generated/votes/votes";
 import { tenantContextAtom } from "@/auth/atoms";
 import { isAdminOrBoard } from "@/auth/role-checks";
 
@@ -88,7 +85,7 @@ function buildMetaLine(
 }
 
 export function VoteDetailPage() {
-    const { t, i18n } = useTranslation(["voting", "dashboard", "common"]);
+    const { t, i18n } = useTranslation(["voting", "common"]);
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const tenantCtx = useAtomValue(tenantContextAtom);
@@ -99,12 +96,6 @@ export function VoteDetailPage() {
     const voteQuery = useVotesControllerGetVoteDetail(id ?? "", {
         query: {
             enabled: !!id,
-        },
-    });
-
-    const turnoutQuery = useVotesControllerGetVoteTurnout(id ?? "", {
-        query: {
-            enabled: !!id && isAdmin && voteQuery.data?.status === "OPEN",
         },
     });
 
@@ -149,8 +140,6 @@ export function VoteDetailPage() {
 
     const vote = voteQuery.data;
     const metaLine = buildMetaLine(vote, t, locale);
-    const showTurnoutLine =
-        isAdmin && vote.status === "OPEN" && !!turnoutQuery.data;
 
     return (
         <div className="flex flex-col gap-6">
@@ -174,14 +163,6 @@ export function VoteDetailPage() {
                     {metaLine && (
                         <p className="text-muted-foreground mt-2 text-sm">
                             {metaLine}
-                        </p>
-                    )}
-                    {showTurnoutLine && turnoutQuery.data && (
-                        <p className="text-muted-foreground mt-1 text-sm">
-                            {t("dashboard:featuredVote.turnoutLine", {
-                                voted: turnoutQuery.data.participationUnitCount,
-                                total: turnoutQuery.data.totalVotesUnitCount,
-                            })}
                         </p>
                     )}
                 </div>

@@ -3005,7 +3005,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Per-unit participation for an open vote",
+            "description": "Per-unit participation for an open vote. Unit owners receive a reduced shape carrying no answers, mechanisms or timestamps.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3070,6 +3070,36 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/VoteTurnoutResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Votes"
+        ]
+      }
+    },
+    "/api/votes/{id}/tally": {
+      "get": {
+        "operationId": "VotesController_getVoteTally",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Provisional per-question standings for an open vote. Board view only — the whole resource is gated rather than individual fields.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoteTallyResponseDto"
                 }
               }
             }
@@ -5665,6 +5695,35 @@
           "isRepresentative"
         ]
       },
+      "ParticipationAnswerDto": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string"
+          },
+          "optionId": {
+            "type": "string"
+          },
+          "optionLabel": {
+            "type": "string"
+          },
+          "optionKey": {
+            "type": "string",
+            "enum": [
+              "YES",
+              "NO",
+              "ABSTAIN",
+              "CUSTOM"
+            ]
+          }
+        },
+        "required": [
+          "questionId",
+          "optionId",
+          "optionLabel",
+          "optionKey"
+        ]
+      },
       "VoteParticipationUnitDto": {
         "type": "object",
         "properties": {
@@ -5673,12 +5732,6 @@
           },
           "unitNo": {
             "type": "string"
-          },
-          "ownerNames": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
           },
           "share": {
             "type": "string",
@@ -5692,6 +5745,18 @@
               "INELIGIBLE"
             ]
           },
+          "ownsUnit": {
+            "type": "boolean"
+          },
+          "isProxy": {
+            "type": "boolean"
+          },
+          "ownerNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "castMethod": {
             "type": "string",
             "enum": [
@@ -5702,6 +5767,9 @@
           "castAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "recordedBy": {
+            "type": "string"
           },
           "ineligibleReason": {
             "type": "string",
@@ -5719,16 +5787,21 @@
             "items": {
               "$ref": "#/components/schemas/ParticipationOwnerDto"
             }
+          },
+          "answers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ParticipationAnswerDto"
+            }
           }
         },
         "required": [
           "unitId",
           "unitNo",
-          "ownerNames",
           "share",
           "status",
-          "isOwnUnit",
-          "owners"
+          "ownsUnit",
+          "isProxy"
         ]
       },
       "VoteParticipationResponseDto": {
@@ -5905,6 +5978,10 @@
           },
           "participationPercent": {
             "type": "string"
+          },
+          "quorumMet": {
+            "type": "boolean",
+            "nullable": true
           }
         },
         "required": [
@@ -5914,7 +5991,63 @@
           "eligibleWeight",
           "totalVotesUnitCount",
           "totalVotesWeight",
-          "participationPercent"
+          "participationPercent",
+          "quorumMet"
+        ]
+      },
+      "VoteTallyOptionDto": {
+        "type": "object",
+        "properties": {
+          "optionId": {
+            "type": "string"
+          },
+          "voteUnitCount": {
+            "type": "number"
+          },
+          "voteWeight": {
+            "$ref": "#/components/schemas/FractionDto"
+          }
+        },
+        "required": [
+          "optionId",
+          "voteUnitCount",
+          "voteWeight"
+        ]
+      },
+      "VoteTallyQuestionDto": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string"
+          },
+          "majorityDenominator": {
+            "$ref": "#/components/schemas/FractionDto"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VoteTallyOptionDto"
+            }
+          }
+        },
+        "required": [
+          "questionId",
+          "majorityDenominator",
+          "options"
+        ]
+      },
+      "VoteTallyResponseDto": {
+        "type": "object",
+        "properties": {
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VoteTallyQuestionDto"
+            }
+          }
+        },
+        "required": [
+          "questions"
         ]
       },
       "TimelineEntryDto": {

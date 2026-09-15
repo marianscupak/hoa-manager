@@ -5,6 +5,7 @@
  * The HOA Manager API description
  * OpenAPI spec version: 1.0
  */
+import type { ParticipationAnswerDto } from "./participationAnswerDto";
 import type { ParticipationOwnerDto } from "./participationOwnerDto";
 import type { VoteParticipationUnitDtoCastMethod } from "./voteParticipationUnitDtoCastMethod";
 import type { VoteParticipationUnitDtoIneligibleReason } from "./voteParticipationUnitDtoIneligibleReason";
@@ -13,13 +14,17 @@ import type { VoteParticipationUnitDtoStatus } from "./voteParticipationUnitDtoS
 export interface VoteParticipationUnitDto {
     unitId: string;
     unitNo: string;
-    ownerNames: string[];
     /** Building share, e.g. "5/100". */
     share: string;
     status: VoteParticipationUnitDtoStatus;
+    ownsUnit: boolean;
+    isProxy: boolean;
+    ownerNames?: string[];
     castMethod?: VoteParticipationUnitDtoCastMethod;
     castAt?: string;
+    recordedBy?: string;
     ineligibleReason?: VoteParticipationUnitDtoIneligibleReason;
-    isOwnUnit: boolean;
-    owners: ParticipationOwnerDto[];
+    isOwnUnit?: boolean;
+    owners?: ParticipationOwnerDto[];
+    answers?: ParticipationAnswerDto[];
 }

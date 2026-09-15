@@ -7,6 +7,7 @@ import {
   type VoteConsentResponseDto,
   type VoteResultsResponseDto,
   type QuestionOutcomeDto,
+  type VoteParticipationUnitDto,
 } from '@/modules/voting/api/dto/vote.dto';
 import type {
   ElectorateConsentInput,
@@ -101,6 +102,18 @@ export interface VoteReadRepository {
     tenantId: string,
     voteIds: string[],
   ): Promise<Map<string, QuestionOutcomeDto[]>>;
+  /**
+   * Every unit in the vote's frozen electorate snapshot, with its ballot
+   * status and its current owners. Weights come from the snapshot; owner
+   * names come from ownership current at `now`, because names are not
+   * snapshotted.
+   */
+  findParticipation(
+    tenantId: string,
+    voteId: string,
+    requesterMembershipId: string,
+    now: Date,
+  ): Promise<VoteParticipationUnitDto[]>;
 }
 
 export const VOTE_READ_REPOSITORY = Symbol('VOTE_READ_REPOSITORY');

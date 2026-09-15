@@ -167,6 +167,12 @@ export class NotUnitRepresentativeException extends DomainException {
   }
 }
 
+export class UnitNotEligibleException extends DomainException {
+  constructor() {
+    super(ErrorCode.UNIT_NOT_ELIGIBLE);
+  }
+}
+
 export class VoteDocumentNotFoundException extends DomainException {
   constructor() {
     super(ErrorCode.VOTE_DOCUMENT_NOT_FOUND);

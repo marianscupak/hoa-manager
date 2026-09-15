@@ -12,13 +12,14 @@ import { VotingEventType } from '../voting-event-types';
 
 const PayloadSchema = z.object({
   unitId: z.uuid(),
-  representedMembershipId: z.uuid(),
+  signerOwnerId: z.uuid(),
   answers: z.array(BallotAnswerSchema),
   labels: z.object({
     voteTitle: z.string(),
     unitLabel: z.string(),
     castBy: z.string(),
-    representedLabel: z.string(),
+    signerLabel: z.string(),
+    attachmentFileName: z.string(),
     answers: z.array(LabeledBallotAnswerSchema),
   }),
 });
@@ -38,8 +39,9 @@ export const BallotCastProxyAuditEvent = defineAuditEvent({
     ballotId: string;
     unitId: string;
     unitLabel: string;
-    representedMembershipId: string;
-    representedLabel: string;
+    signerOwnerId: string;
+    signerLabel: string;
+    attachmentFileName: string;
     actor: AuditActor;
     castByLabel: string;
     answers: { questionId: string; optionId: string }[];
@@ -54,13 +56,14 @@ export const BallotCastProxyAuditEvent = defineAuditEvent({
       entityId: input.ballotId,
       payload: {
         unitId: input.unitId,
-        representedMembershipId: input.representedMembershipId,
+        signerOwnerId: input.signerOwnerId,
         answers: input.answers,
         labels: {
           voteTitle: input.voteTitle,
           unitLabel: input.unitLabel,
           castBy: input.castByLabel,
-          representedLabel: input.representedLabel,
+          signerLabel: input.signerLabel,
+          attachmentFileName: input.attachmentFileName,
           answers: input.labeledAnswers,
         },
       },

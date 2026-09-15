@@ -23,6 +23,7 @@ import { DeleteVoteHandler } from './application/commands/delete-vote/delete-vot
 import { DeleteVoteDocumentHandler } from './application/commands/delete-vote-document/delete-vote-document.handler';
 import { DeleteVoteQuestionHandler } from './application/commands/delete-vote-question/delete-vote-question.handler';
 import { OpenVoteCommandHandler } from './application/commands/open-vote/open-vote.handler';
+import { RecordPaperBallotHandler } from './application/commands/record-paper-ballot/record-paper-ballot.handler';
 import { RequestBallotAttachmentUploadHandler } from './application/commands/request-ballot-attachment-upload/request-ballot-attachment-upload.handler';
 import { RequestDocumentUploadHandler } from './application/commands/request-document-upload/request-document-upload.handler';
 import { RevokeConsentHandler } from './application/commands/revoke-consent/revoke-consent.handler';
@@ -47,6 +48,7 @@ import { GetDocumentDownloadUrlHandler } from './application/queries/get-documen
 import { GetVoteActivityHandler } from './application/queries/get-vote-activity/get-vote-activity.handler';
 import { GetVoteAuditExportHandler } from './application/queries/get-vote-audit-export/get-vote-audit-export.handler';
 import { GetVoteDetailHandler } from './application/queries/get-vote-detail/get-vote-detail.handler';
+import { GetVoteParticipationHandler } from './application/queries/get-vote-participation/get-vote-participation.handler';
 import { GetVoteResultsHandler } from './application/queries/get-vote-results/get-vote-results.handler';
 import { GetVoteTurnoutHandler } from './application/queries/get-vote-turnout/get-vote-turnout.handler';
 import { GetVoterStatusHandler } from './application/queries/get-voter-status/get-voter-status.handler';
@@ -81,6 +83,7 @@ const COMMAND_HANDLERS = [
   RevokeConsentHandler,
   OpenVoteCommandHandler,
   SubmitBallotHandler,
+  RecordPaperBallotHandler,
   RequestDocumentUploadHandler,
   ConfirmDocumentUploadHandler,
   DeleteVoteDocumentHandler,
@@ -98,6 +101,7 @@ const QUERY_HANDLERS = [
   GetVoteActivityHandler,
   GetVoteAuditExportHandler,
   GetVoteTurnoutHandler,
+  GetVoteParticipationHandler,
   GetDocumentDownloadUrlHandler,
   GetBallotAttachmentDownloadUrlHandler,
 ];

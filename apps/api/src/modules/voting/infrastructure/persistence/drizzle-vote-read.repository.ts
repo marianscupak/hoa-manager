@@ -39,6 +39,7 @@ import {
   type VoteConsentResponseDto,
   type VoteResultsResponseDto,
   type QuestionOutcomeDto,
+  type VoteParticipationUnitDto,
 } from '@/modules/voting/api/dto/vote.dto';
 import { type VoteReadRepository } from '@/modules/voting/application/ports/vote-read.repository.port';
 import {
@@ -1361,5 +1362,112 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
       outcomesByVote.set(row.voteId, list);
     }
     return outcomesByVote;
+  }
+
+  async findParticipation(
+    tenantId: string,
+    voteId: string,
+    requesterMembershipId: string,
+    now: Date,
+  ): Promise<VoteParticipationUnitDto[]> {
+    const snapshotRows = await this.drizzle.db
+      .select({
+        unitId: voteElectorateUnits.unitId,
+        unitNo: units.unitNo,
+        buildingShareNumerator: units.buildingShareNumerator,
+        buildingShareDenominator: units.buildingShareDenominator,
+        representativeMembershipId:
+          voteElectorateUnits.representativeMembershipId,
+        eligibilityStatus: voteElectorateUnits.eligibilityStatus,
+        ineligibleReason: voteElectorateUnits.ineligibleReason,
+      })
+      .from(voteElectorateUnits)
+      .innerJoin(units, eq(units.id, voteElectorateUnits.unitId))
+      .where(
+        and(
+          eq(voteElectorateUnits.tenantId, tenantId),
+          eq(voteElectorateUnits.voteId, voteId),
+        ),
+      )
+      .orderBy(units.unitNo);
+
+    if (snapshotRows.length === 0) return [];
+
+    const unitIds = snapshotRows.map((row) => row.unitId);
+
+    const ballotRows = await this.drizzle.db
+      .select({
+        unitId: ballots.unitId,
+        castMethod: ballots.castMethod,
+        castAt: ballots.castAt,
+      })
+      .from(ballots)
+      .where(and(eq(ballots.tenantId, tenantId), eq(ballots.voteId, voteId)));
+    const ballotByUnit = new Map(ballotRows.map((row) => [row.unitId, row]));
+
+    const ownerRows = await this.drizzle.db
+      .select({
+        unitId: unitOwnerships.unitId,
+        ownerId: owners.id,
+        displayName: owners.displayName,
+        shareNumerator: unitOwnerships.shareNumerator,
+        shareDenominator: unitOwnerships.shareDenominator,
+        membershipId: tenantMemberships.id,
+      })
+      .from(unitOwnerships)
+      .innerJoin(
+        unitOwnershipMembers,
+        eq(unitOwnershipMembers.ownershipId, unitOwnerships.id),
+      )
+      .innerJoin(owners, eq(unitOwnershipMembers.ownerId, owners.id))
+      .leftJoin(
+        tenantMemberships,
+        and(
+          eq(tenantMemberships.userId, owners.userId),
+          eq(tenantMemberships.tenantId, owners.tenantId),
+        ),
+      )
+      .where(
+        and(
+          eq(unitOwnerships.tenantId, tenantId),
+          inArray(unitOwnerships.unitId, unitIds),
+          ownershipActiveAt(now),
+        ),
+      );
+
+    const ownersByUnit = new Map<string, typeof ownerRows>();
+    for (const row of ownerRows) {
+      const list = ownersByUnit.get(row.unitId) ?? [];
+      list.push(row);
+      ownersByUnit.set(row.unitId, list);
+    }
+
+    return snapshotRows.map((row) => {
+      const ballot = ballotByUnit.get(row.unitId);
+      const owners = ownersByUnit.get(row.unitId) ?? [];
+      return {
+        unitId: row.unitId,
+        unitNo: row.unitNo,
+        ownerNames: owners.map((o) => o.displayName),
+        share: `${row.buildingShareNumerator}/${row.buildingShareDenominator}`,
+        status: ballot
+          ? 'VOTED'
+          : row.eligibilityStatus === 'ELIGIBLE'
+            ? 'NOT_VOTED'
+            : 'INELIGIBLE',
+        castMethod: ballot?.castMethod,
+        castAt: ballot?.castAt,
+        ineligibleReason: row.ineligibleReason ?? undefined,
+        isOwnUnit: row.representativeMembershipId === requesterMembershipId,
+        owners: owners.map((o) => ({
+          ownerId: o.ownerId,
+          displayName: o.displayName,
+          share: `${o.shareNumerator}/${o.shareDenominator}`,
+          isRepresentative:
+            o.membershipId != null &&
+            o.membershipId === row.representativeMembershipId,
+        })),
+      };
+    });
   }
 }

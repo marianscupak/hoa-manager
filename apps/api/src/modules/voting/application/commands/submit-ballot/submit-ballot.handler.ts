@@ -6,12 +6,12 @@ import { AuditService } from '@/modules/core/audit/application/services/audit.se
 import { type SubmitBallotResponseDto } from '@/modules/voting/api/dto/vote.dto';
 import { BallotCastDirectAuditEvent } from '@/modules/voting/audit/events/ballot-cast-direct.event';
 import { VotingAuditLabelResolver } from '@/modules/voting/audit/label-resolver.service';
+import { assertAnswersMatchQuestions } from '@/modules/voting/domain/vote/ballot-answers';
 import { VoteStatus } from '@/modules/voting/domain/vote/vote.types';
 import {
   VoteNotFoundException,
   VoteNotOpenException,
   BallotAlreadyCastException,
-  InvalidBallotAnswersException,
   NotUnitRepresentativeException,
 } from '@/shared/application/exceptions/vote.exceptions';
 import { type Clock, CLOCK } from '@/shared/application/ports/clock.port';
@@ -97,26 +97,8 @@ export class SubmitBallotHandler
       }
 
       // 4. Validate answers match vote questions and options
-      const questionMap = new Map(
-        vote.questions.map((q) => [q.id, new Set(q.options.map((o) => o.id))]),
-      );
-
       for (const ballot of ballotInputs) {
-        // Each ballot must answer every question exactly once
-        const answeredQuestionIds = new Set(
-          ballot.answers.map((a) => a.questionId),
-        );
-
-        if (answeredQuestionIds.size !== vote.questions.length) {
-          throw new InvalidBallotAnswersException();
-        }
-
-        for (const answer of ballot.answers) {
-          const validOptionIds = questionMap.get(answer.questionId);
-          if (!validOptionIds || !validOptionIds.has(answer.optionId)) {
-            throw new InvalidBallotAnswersException();
-          }
-        }
+        assertAnswersMatchQuestions(vote.questions, ballot.answers);
       }
 
       // 5. Persist all ballots atomically

@@ -528,6 +528,8 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
             unitId: input.unitId,
             castByMembershipId: input.castByMembershipId,
             castMethod: input.castMethod,
+            attributionOwnerId: input.attributionOwnerId ?? null,
+            attachmentDocumentId: input.attachmentDocumentId ?? null,
             castAt: new Date(),
           })
           .returning({ id: ballots.id });
@@ -580,6 +582,35 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
           eq(voteElectorateUnits.representativeMembershipId, membershipId),
         ),
       );
+  }
+
+  async findElectorateUnit(
+    tenantId: string,
+    voteId: string,
+    unitId: string,
+  ): Promise<{
+    unitId: string;
+    representativeMembershipId: string | null;
+    eligibilityStatus: string;
+  } | null> {
+    const rows = await this.db
+      .select({
+        unitId: voteElectorateUnits.unitId,
+        representativeMembershipId:
+          voteElectorateUnits.representativeMembershipId,
+        eligibilityStatus: voteElectorateUnits.eligibilityStatus,
+      })
+      .from(voteElectorateUnits)
+      .where(
+        and(
+          eq(voteElectorateUnits.tenantId, tenantId),
+          eq(voteElectorateUnits.voteId, voteId),
+          eq(voteElectorateUnits.unitId, unitId),
+        ),
+      )
+      .limit(1);
+
+    return rows[0] ?? null;
   }
 
   async hasExistingBallots(

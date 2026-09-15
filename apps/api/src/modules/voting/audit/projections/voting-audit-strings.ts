@@ -35,6 +35,8 @@ const STRINGS: Record<
       `${v.recorder} revoked the delegation of unit ${v.unit} from ${v.owner} to ${v.delegate}.`,
     'ballot.cast.privileged': (v) =>
       `${v.actor} cast ballot for unit ${v.unit}.`,
+    'ballot.cast.proxy.privileged': (v) =>
+      `${v.actor} recorded a paper ballot for unit ${v.unit}, signed by ${v.signer}.`,
     'ballot.cast.self': () => `Your ballot was recorded.`,
     'vote.closed.public': (v) => `Vote "${v.title}" was closed.`,
     'vote.resultsComputed.public': (v) => `Results computed for "${v.title}".`,
@@ -77,6 +79,8 @@ const STRINGS: Record<
       `${v.recorder} zrušil/a delegaci jednotky ${v.unit} z ${v.owner} na ${v.delegate}.`,
     'ballot.cast.privileged': (v) =>
       `${v.actor} hlasoval/a za jednotku ${v.unit}.`,
+    'ballot.cast.proxy.privileged': (v) =>
+      `${v.actor} zaznamenal(a) listinný hlas za jednotku ${v.unit}, podepsaný: ${v.signer}.`,
     'ballot.cast.self': () => `Váš hlas byl zaznamenán.`,
     'vote.closed.public': (v) => `Hlasování "${v.title}" bylo ukončeno.`,
     'vote.resultsComputed.public': (v) =>

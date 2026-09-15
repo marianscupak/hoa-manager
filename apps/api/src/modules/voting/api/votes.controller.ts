@@ -47,8 +47,10 @@ import {
   VoteConsentResponseDto,
   SubmitBallotDto,
   SubmitBallotResponseDto,
+  RecordPaperBallotDto,
   VoteResultsResponseDto,
   VoteTurnoutResponseDto,
+  VoteParticipationResponseDto,
 } from './dto/vote.dto';
 import {
   CurrentAuthUser,
@@ -70,6 +72,7 @@ import { DeleteBallotAttachmentCommand } from '../application/commands/delete-ba
 import { DeleteVoteCommand } from '../application/commands/delete-vote/delete-vote.command';
 import { DeleteVoteDocumentCommand } from '../application/commands/delete-vote-document/delete-vote-document.command';
 import { DeleteVoteQuestionCommand } from '../application/commands/delete-vote-question/delete-vote-question.command';
+import { RecordPaperBallotCommand } from '../application/commands/record-paper-ballot/record-paper-ballot.command';
 import { RequestBallotAttachmentUploadCommand } from '../application/commands/request-ballot-attachment-upload/request-ballot-attachment-upload.command';
 import { RequestDocumentUploadCommand } from '../application/commands/request-document-upload/request-document-upload.command';
 import { RevokeConsentCommand } from '../application/commands/revoke-consent/revoke-consent.command';
@@ -85,6 +88,7 @@ import { GetDocumentDownloadUrlQuery } from '../application/queries/get-document
 import { GetVoteActivityQuery } from '../application/queries/get-vote-activity/get-vote-activity.query';
 import { GetVoteAuditExportQuery } from '../application/queries/get-vote-audit-export/get-vote-audit-export.query';
 import { GetVoteDetailQuery } from '../application/queries/get-vote-detail/get-vote-detail.query';
+import { GetVoteParticipationQuery } from '../application/queries/get-vote-participation/get-vote-participation.query';
 import { GetVoteResultsQuery } from '../application/queries/get-vote-results/get-vote-results.query';
 import { GetVoteTurnoutQuery } from '../application/queries/get-vote-turnout/get-vote-turnout.query';
 import { GetVoterStatusQuery } from '../application/queries/get-voter-status/get-voter-status.query';
@@ -432,6 +436,53 @@ export class VotesController {
         id,
         tenantCtx.membershipId,
         body.ballots,
+      ),
+    );
+  }
+
+  @Post(':id/paper-ballots')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Records a signed paper ballot on behalf of a unit',
+    type: SubmitBallotResponseDto,
+  })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  recordPaperBallot(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() body: RecordPaperBallotDto,
+    @Tenant() tenantCtx: TenantContext,
+  ) {
+    return this.commandBus.execute(
+      new RecordPaperBallotCommand(
+        tenantCtx.tenantId,
+        id,
+        tenantCtx.membershipId,
+        body.unitId,
+        body.signerOwnerId,
+        body.attachmentDocumentId,
+        body.answers,
+      ),
+    );
+  }
+
+  @Get(':id/participation')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Per-unit participation for an open vote',
+    type: VoteParticipationResponseDto,
+  })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  getVoteParticipation(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Tenant() tenantCtx: TenantContext,
+  ): Promise<VoteParticipationResponseDto> {
+    return this.queryBus.execute(
+      new GetVoteParticipationQuery(
+        tenantCtx.tenantId,
+        id,
+        tenantCtx.membershipId,
       ),
     );
   }

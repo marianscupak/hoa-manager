@@ -6,6 +6,10 @@ export interface BallotInput {
   unitId: string;
   castByMembershipId: string;
   castMethod: 'DIRECT' | 'BOARD_PROXY';
+  /** The owner a BOARD_PROXY ballot is attributed to — the person who signed
+   *  the paper. Null for DIRECT ballots. */
+  attributionOwnerId?: string | null;
+  attachmentDocumentId?: string | null;
   answers: { questionId: string; optionId: string }[];
 }
 
@@ -35,6 +39,15 @@ export interface VoteWriteRepository {
     voteId: string,
     unitIds: string[],
   ): Promise<Set<string>>;
+  findElectorateUnit(
+    tenantId: string,
+    voteId: string,
+    unitId: string,
+  ): Promise<{
+    unitId: string;
+    representativeMembershipId: string | null;
+    eligibilityStatus: string;
+  } | null>;
   findScheduledToClose(now: Date): Promise<VoteAggregate[]>;
   saveResults(
     tenantId: string,

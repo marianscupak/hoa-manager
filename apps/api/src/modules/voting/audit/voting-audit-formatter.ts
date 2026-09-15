@@ -118,8 +118,7 @@ export class VotingAuditFormatter implements AuditEventFormatter, OnModuleInit {
           }),
         };
       }
-      case VotingEventType.BALLOT_CAST_DIRECT:
-      case VotingEventType.BALLOT_CAST_PROXY: {
+      case VotingEventType.BALLOT_CAST_DIRECT: {
         const p = event.payload as {
           labels: {
             voteTitle: string;
@@ -143,6 +142,26 @@ export class VotingAuditFormatter implements AuditEventFormatter, OnModuleInit {
           message: t(lang, 'ballot.cast.privileged', {
             actor: p.labels.castBy,
             unit: p.labels.unitLabel,
+          }),
+          details: { answers: p.labels.answers },
+        };
+      }
+      case VotingEventType.BALLOT_CAST_PROXY: {
+        const p = event.payload as {
+          labels: {
+            voteTitle: string;
+            unitLabel: string;
+            castBy: string;
+            signerLabel: string;
+            answers: { questionText: string; optionText: string }[];
+          };
+        };
+        return {
+          ...base,
+          message: t(lang, 'ballot.cast.proxy.privileged', {
+            actor: p.labels.castBy,
+            unit: p.labels.unitLabel,
+            signer: p.labels.signerLabel,
           }),
           details: { answers: p.labels.answers },
         };

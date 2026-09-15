@@ -115,6 +115,31 @@ describe('VotingAuditFormatter', () => {
     });
   });
 
+  it('names the signer when a paper ballot was recorded by proxy', () => {
+    const ballotEv = ev({
+      eventType: VotingEventType.BALLOT_CAST_PROXY,
+      visibility: Visibility.TENANT_PRIVILEGED,
+      actor: { type: 'USER', userId: 'user-9', membershipId: 'm-9' },
+      payload: {
+        unitId: 'unit-1',
+        signerOwnerId: 'owner-3',
+        answers: [],
+        labels: {
+          voteTitle: 'Windows',
+          unitLabel: 'A1',
+          castBy: 'Board Member',
+          signerLabel: 'Jana Nováková',
+          attachmentFileName: 'ballot_A1.pdf',
+          answers: [],
+        },
+      },
+    });
+    const entry = formatter.format(ballotEv, VIEWER_ADMIN);
+    expect(entry.message).toBe(
+      'Board Member recorded a paper ballot for unit A1, signed by Jana Nováková.',
+    );
+  });
+
   it('falls through to a generic entry for unknown event types', () => {
     const unknownEv = ev({
       eventType: 'VOTING.SOMETHING_NEW' as AuditEventType,
@@ -194,13 +219,14 @@ describe('VotingAuditFormatter', () => {
       VotingEventType.BALLOT_CAST_PROXY,
       {
         unitId: 'u-1',
-        representedMembershipId: 'm-2',
+        signerOwnerId: 'owner-2',
         answers: [],
         labels: {
           voteTitle: 'X',
           unitLabel: '1',
           castBy: 'Author',
-          representedLabel: 'Other',
+          signerLabel: 'Other',
+          attachmentFileName: 'ballot.pdf',
           answers: [],
         },
       },

@@ -559,6 +559,19 @@ export class SubmitBallotResponseDto {
   submittedAt!: Date;
 }
 
+export const recordPaperBallotSchema = z.object({
+  unitId: z.uuid(),
+  signerOwnerId: z.uuid(),
+  attachmentDocumentId: z.uuid(),
+  answers: z
+    .array(z.object({ questionId: z.uuid(), optionId: z.uuid() }))
+    .min(1),
+});
+
+export class RecordPaperBallotDto extends createZodDto(
+  recordPaperBallotSchema,
+) {}
+
 // ── Vote Results ──────────────────────────────────────
 
 export class VoteOptionResultDto {
@@ -659,4 +672,65 @@ export class VoteTurnoutResponseDto {
 
   @ApiProperty()
   participationPercent!: string;
+}
+
+// ── Vote Participation ──────────────────────────────────
+
+export class ParticipationOwnerDto {
+  @ApiProperty()
+  ownerId!: string;
+
+  @ApiProperty()
+  displayName!: string;
+
+  @ApiProperty({ description: 'Share of the unit, e.g. "1/2".' })
+  share!: string;
+
+  /** True when this owner's user account is the membership the electorate
+   *  snapshot recorded as the unit's representative — what the portal shows
+   *  as "Common representative". */
+  @ApiProperty()
+  isRepresentative!: boolean;
+}
+
+export class VoteParticipationUnitDto {
+  @ApiProperty()
+  unitId!: string;
+
+  @ApiProperty()
+  unitNo!: string;
+
+  @ApiProperty({ type: [String] })
+  ownerNames!: string[];
+
+  @ApiProperty({ description: 'Building share, e.g. "5/100".' })
+  share!: string;
+
+  @ApiProperty({ enum: ['VOTED', 'NOT_VOTED', 'INELIGIBLE'] })
+  status!: 'VOTED' | 'NOT_VOTED' | 'INELIGIBLE';
+
+  @ApiProperty({ required: false, enum: ['DIRECT', 'BOARD_PROXY'] })
+  castMethod?: 'DIRECT' | 'BOARD_PROXY';
+
+  @ApiProperty({ required: false, type: 'string', format: 'date-time' })
+  castAt?: Date;
+
+  @ApiProperty({
+    required: false,
+    enum: ['NO_REPRESENTATIVE', 'MISSING_OWNERSHIP', 'ASSOCIATION_OWNED'],
+  })
+  ineligibleReason?: string;
+
+  /** The requester represents this unit, so they should use the app booth
+   *  rather than record their own paper ballot. */
+  @ApiProperty()
+  isOwnUnit!: boolean;
+
+  @ApiProperty({ type: [ParticipationOwnerDto] })
+  owners!: ParticipationOwnerDto[];
+}
+
+export class VoteParticipationResponseDto {
+  @ApiProperty({ type: [VoteParticipationUnitDto] })
+  units!: VoteParticipationUnitDto[];
 }

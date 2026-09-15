@@ -49,7 +49,11 @@ export function CreateVoteQuestionsStep({
             {
                 id: voteId,
                 data: {
-                    title: t("create.steps.questions.defaultTitle"),
+                    // Left empty on purpose: a pre-filled "New question"
+                    // survives into the published vote whenever the chair
+                    // does not notice it. The review checklist blocks
+                    // scheduling until every question is named.
+                    title: "",
                     type: CreateVoteQuestionDtoType.YES_NO,
                 },
             },

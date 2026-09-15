@@ -203,7 +203,10 @@ export class CreateVoteQuestionOptionDto extends createZodDto(
 
 export const createVoteQuestionSchema = z
   .object({
-    title: z.string().min(1),
+    // Deliberately not `.min(1)`: the portal creates a question the moment
+    // the chair clicks "add", before they have typed a title. The title is
+    // required to schedule, not to draft (see `VoteAggregate.schedule`).
+    title: z.string(),
     description: z
       .string()
       .optional()

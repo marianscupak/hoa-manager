@@ -10,7 +10,6 @@ import type { UpdateVoteQuestionDtoRulesetOverride } from "./updateVoteQuestionD
 import type { UpdateVoteQuestionDtoType } from "./updateVoteQuestionDtoType";
 
 export interface UpdateVoteQuestionDto {
-    /** @minLength 1 */
     title: string;
     description?: string;
     type: UpdateVoteQuestionDtoType;

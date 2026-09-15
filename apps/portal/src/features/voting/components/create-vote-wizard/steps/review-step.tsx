@@ -65,6 +65,12 @@ export function buildReviewChecks(vote: VoteDetailResponseDto): ReviewCheck[] {
             step: "questions",
         },
         {
+            code: "VOTE_QUESTION_MISSING_TITLE",
+            ok: vote.questions.every((q) => q.title.trim().length > 0),
+            severity: "error",
+            step: "questions",
+        },
+        {
             code: "VOTE_QUESTION_MISSING_OPTIONS",
             ok: vote.questions.every(
                 (q) => q.type === "YES_NO" || q.options.length >= 2,

@@ -313,6 +313,7 @@ export const voting = {
                 VOTE_SCHEDULE_INVALID_RANGE: "Closing date is after opening",
                 VOTE_RULESET_REQUIRED: "Voting rules are configured",
                 VOTE_MISSING_QUESTIONS: "At least one question exists",
+                VOTE_QUESTION_MISSING_TITLE: "Every question has wording",
                 VOTE_QUESTION_MISSING_OPTIONS:
                     "Every question has answer options",
                 VOTE_WINDOW_TOO_SHORT_PER_ROLLAM:
@@ -418,6 +419,8 @@ export const voting = {
                     "At least one question must be added to the vote.",
                 VOTE_QUESTION_MISSING_OPTIONS:
                     'Question "{{param}}" requires at least two answer options.',
+                VOTE_QUESTION_MISSING_TITLE:
+                    'Question "{{param}}" needs its wording filled in.',
                 VOTE_RULESET_REQUIRED: "A default ruleset must be configured.",
                 VOTE_WINDOW_TOO_SHORT_PER_ROLLAM:
                     "The per-rollam voting window must last at least 15 days.",

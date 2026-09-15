@@ -161,6 +161,52 @@ describe("buildReviewChecks", () => {
         expect(findCheck(checks, "VOTE_RULESET_REQUIRED").ok).toBe(false);
     });
 
+    it("fails QUESTION_MISSING_TITLE when a question was added but never named", () => {
+        const vote = buildVote({
+            scheduledFrom: completeVote.scheduledFrom,
+            scheduledTo: completeVote.scheduledTo,
+            ruleset: completeVote.ruleset,
+            questions: [
+                {
+                    id: "q1",
+                    title: "",
+                    description: null,
+                    type: "YES_NO",
+                    sortOrder: 1,
+                    options: [],
+                } as unknown as VoteDetailResponseDto["questions"][number],
+            ],
+        });
+        const checks = buildReviewChecks(vote);
+        const titleCheck = findCheck(checks, "VOTE_QUESTION_MISSING_TITLE");
+
+        expect(titleCheck.ok).toBe(false);
+        expect(titleCheck.severity).toBe("error");
+        expect(titleCheck.step).toBe("questions");
+    });
+
+    it("treats a whitespace-only question title as missing", () => {
+        const vote = buildVote({
+            scheduledFrom: completeVote.scheduledFrom,
+            scheduledTo: completeVote.scheduledTo,
+            ruleset: completeVote.ruleset,
+            questions: [
+                {
+                    id: "q1",
+                    title: "   ",
+                    description: null,
+                    type: "YES_NO",
+                    sortOrder: 1,
+                    options: [],
+                } as unknown as VoteDetailResponseDto["questions"][number],
+            ],
+        });
+
+        expect(
+            findCheck(buildReviewChecks(vote), "VOTE_QUESTION_MISSING_TITLE").ok,
+        ).toBe(false);
+    });
+
     it("fails WINDOW_TOO_SHORT as an error when a per rollam vote runs under 15 days", () => {
         // The server rejects this outright (`vote.aggregate.ts`), so the
         // checklist must not present it as advice the chair can wave through.

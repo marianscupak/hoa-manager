@@ -89,6 +89,7 @@ export default {
     VOTE_NOT_READY_TO_OPEN: "The vote is not ready to be opened.",
     VOTE_NOT_SCHEDULED: "The vote must be scheduled before it can be opened.",
     VOTE_QUESTION_MISSING_OPTIONS: "Some questions are missing options.",
+    VOTE_QUESTION_MISSING_TITLE: "Some questions have no wording yet.",
     VOTE_SCHEDULE_MISSING_DATES:
         "The vote schedule is missing start or end dates.",
     VOTE_DOCUMENT_NOT_FOUND: "Document not found.",

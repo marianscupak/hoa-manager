@@ -5746,8 +5746,7 @@
         "type": "object",
         "properties": {
           "title": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string"
@@ -5905,8 +5904,7 @@
         "type": "object",
         "properties": {
           "title": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string"

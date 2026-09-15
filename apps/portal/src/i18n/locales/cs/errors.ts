@@ -91,6 +91,7 @@ export default {
     VOTE_NOT_SCHEDULED:
         "Hlasování musí být naplánováno, než může být otevřeno.",
     VOTE_QUESTION_MISSING_OPTIONS: "Některé otázky nemají vyplněné možnosti.",
+    VOTE_QUESTION_MISSING_TITLE: "Některé otázky nemají vyplněné znění.",
     VOTE_SCHEDULE_MISSING_DATES:
         "V harmonogramu hlasování chybí datum zahájení nebo ukončení.",
     VOTE_DOCUMENT_NOT_FOUND: "Dokument nebyl nalezen.",

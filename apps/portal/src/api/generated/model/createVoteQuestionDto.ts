@@ -10,7 +10,6 @@ import type { CreateVoteQuestionDtoRulesetOverride } from "./createVoteQuestionD
 import type { CreateVoteQuestionDtoType } from "./createVoteQuestionDtoType";
 
 export interface CreateVoteQuestionDto {
-    /** @minLength 1 */
     title: string;
     description?: string;
     type: CreateVoteQuestionDtoType;

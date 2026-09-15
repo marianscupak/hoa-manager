@@ -640,6 +640,95 @@ describe('VoteAggregate', () => {
     });
   });
 
+  describe('schedule() question validation', () => {
+    it('refuses to schedule a question left without a title', () => {
+      const aggregate = createDraftAggregate();
+      aggregate.setRuleset(createValidRuleset());
+      aggregate.addQuestion({
+        title: '',
+        description: null,
+        type: VoteQuestionType.YES_NO,
+      });
+
+      expect(() => aggregate.schedule(defaultNow)).toThrow(
+        expect.objectContaining({
+          code: 'INCOMPLETE_VOTE',
+          details: expect.arrayContaining([
+            expect.objectContaining({ code: 'VOTE_QUESTION_MISSING_TITLE' }),
+          ]),
+        }),
+      );
+    });
+
+    it('treats a whitespace-only title as missing', () => {
+      const aggregate = createDraftAggregate();
+      aggregate.setRuleset(createValidRuleset());
+      aggregate.addQuestion({
+        title: '   ',
+        description: null,
+        type: VoteQuestionType.YES_NO,
+      });
+
+      expect(() => aggregate.schedule(defaultNow)).toThrow(
+        expect.objectContaining({
+          code: 'INCOMPLETE_VOTE',
+          details: expect.arrayContaining([
+            expect.objectContaining({ code: 'VOTE_QUESTION_MISSING_TITLE' }),
+          ]),
+        }),
+      );
+    });
+
+    it('names an untitled question by its position when it also lacks options', () => {
+      // `VOTE_QUESTION_MISSING_OPTIONS` renders as `Otazka "{{param}}" ...`,
+      // which would come out with an empty pair of quotes otherwise.
+      const aggregate = createDraftAggregate();
+      aggregate.setRuleset(createValidRuleset());
+      aggregate.addQuestion({
+        title: 'Q1',
+        description: null,
+        type: VoteQuestionType.YES_NO,
+      });
+      aggregate.addQuestion({
+        title: '',
+        description: null,
+        type: VoteQuestionType.SINGLE_CHOICE,
+      });
+
+      expect(() => aggregate.schedule(defaultNow)).toThrow(
+        expect.objectContaining({
+          details: expect.arrayContaining([
+            expect.objectContaining({
+              code: 'VOTE_QUESTION_MISSING_OPTIONS',
+              param: '#2',
+            }),
+          ]),
+        }),
+      );
+    });
+
+    it('still names a titled question by its title', () => {
+      const aggregate = createDraftAggregate();
+      aggregate.setRuleset(createValidRuleset());
+      aggregate.addQuestion({
+        title: 'Pick one',
+        description: null,
+        type: VoteQuestionType.SINGLE_CHOICE,
+      });
+
+      expect(() => aggregate.schedule(defaultNow)).toThrow(
+        expect.objectContaining({
+          details: expect.arrayContaining([
+            expect.objectContaining({
+              code: 'VOTE_QUESTION_MISSING_OPTIONS',
+              param: 'Pick one',
+            }),
+          ]),
+        }),
+      );
+    });
+  });
+
   describe('open()', () => {
     let aggregate: VoteAggregate;
 

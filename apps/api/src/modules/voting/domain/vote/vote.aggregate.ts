@@ -159,14 +159,27 @@ export class VoteAggregate {
     if (this.questions.length === 0) {
       errors.push({ code: ErrorCode.VOTE_MISSING_QUESTIONS });
     } else {
-      for (const question of this.questions) {
+      this.questions.forEach((question, index) => {
+        // A question is created the moment the chair clicks "add", before
+        // they have typed anything, so an untitled question is a normal
+        // intermediate state of a draft — it just must not reach owners.
+        const title = question.title.trim();
+        if (title.length === 0) {
+          errors.push({
+            code: ErrorCode.VOTE_QUESTION_MISSING_TITLE,
+            param: `#${index + 1}`,
+          });
+        }
+
         if (question.options.length < 2) {
           errors.push({
             code: ErrorCode.VOTE_QUESTION_MISSING_OPTIONS,
-            param: question.title,
+            // Falls back to the position so the message never renders an
+            // empty pair of quotes.
+            param: title.length > 0 ? title : `#${index + 1}`,
           });
         }
-      }
+      });
     }
 
     if (errors.length > 0) {
@@ -303,10 +316,6 @@ export class VoteAggregate {
     // vote-level ruleset.
     const ruleset = this.assertRulesetPresent();
 
-    if (!input.title || input.title.trim() === '') {
-      throw new InvalidVoteQuestionException();
-    }
-
     const options = this.buildOptionsForQuestion(
       input.type,
       ruleset.allowAbstain,
@@ -346,10 +355,6 @@ export class VoteAggregate {
     const currentIndex = this.questions.findIndex((q) => q.id === questionId);
     if (currentIndex === -1) {
       throw new VoteQuestionNotFoundException();
-    }
-
-    if (!input.title || input.title.trim() === '') {
-      throw new InvalidVoteQuestionException();
     }
 
     const options = this.buildOptionsForQuestion(

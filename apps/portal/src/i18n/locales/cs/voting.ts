@@ -314,6 +314,7 @@ export const voting = {
                 VOTE_SCHEDULE_INVALID_RANGE: "Ukončení následuje po zahájení",
                 VOTE_RULESET_REQUIRED: "Pravidla hlasování jsou nastavena",
                 VOTE_MISSING_QUESTIONS: "Existuje alespoň jedna otázka",
+                VOTE_QUESTION_MISSING_TITLE: "Každá otázka má znění",
                 VOTE_QUESTION_MISSING_OPTIONS:
                     "Každá otázka má možnosti odpovědí",
                 VOTE_WINDOW_TOO_SHORT_PER_ROLLAM:
@@ -420,6 +421,8 @@ export const voting = {
                     "K hlasování musí být přidána alespoň jedna otázka.",
                 VOTE_QUESTION_MISSING_OPTIONS:
                     "Otázka „{{param}}“ musí mít alespoň dvě možnosti odpovědi.",
+                VOTE_QUESTION_MISSING_TITLE:
+                    "Otázka „{{param}}“ musí mít vyplněné znění.",
                 VOTE_RULESET_REQUIRED:
                     "Musí být nastavena výchozí pravidla hlasování.",
                 VOTE_WINDOW_TOO_SHORT_PER_ROLLAM:

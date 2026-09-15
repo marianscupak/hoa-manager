@@ -7,6 +7,7 @@ import {
     FilePlus,
     HelpCircle,
     Home,
+    Import,
     Link2,
     Lock,
     MailPlus,
@@ -34,7 +35,12 @@ interface EventTypeMeta {
 const META: Record<string, EventTypeMeta> = {
     "VOTING.VOTE_CREATED": { icon: FilePlus, dotColor: "bg-primary" },
     "VOTING.VOTE_UPDATED": { icon: PencilLine, dotColor: "bg-primary" },
+    "VOTING.VOTE_DELETED": { icon: Trash2, dotColor: "bg-destructive-bar" },
     "VOTING.VOTE_RULESET_SET": { icon: Settings, dotColor: "bg-primary" },
+    "VOTING.VOTE_RULESET_NON_STATUTORY_ACKNOWLEDGED": {
+        icon: ShieldCheck,
+        dotColor: "bg-warning",
+    },
     "VOTING.VOTE_SCHEDULED": { icon: CalendarClock, dotColor: "bg-primary" },
     "VOTING.VOTE_OPENED": { icon: PlayCircle, dotColor: "bg-success" },
     "VOTING.VOTE_ELECTORATE_SNAPSHOTTED": {
@@ -67,6 +73,11 @@ const META: Record<string, EventTypeMeta> = {
     "VOTING.VOTE_RESULTS_COMPUTED": {
         icon: BarChart3,
         dotColor: "bg-success",
+    },
+    "VOTING.VOTE_DOCUMENT_ADDED": { icon: FilePlus, dotColor: "bg-primary" },
+    "VOTING.VOTE_DOCUMENT_REMOVED": {
+        icon: Trash2,
+        dotColor: "bg-destructive-bar",
     },
     "CORE.TENANT_CREATED": { icon: Building2, dotColor: "bg-success" },
     "CORE.MEMBERSHIP_CREATED": { icon: UserPlus, dotColor: "bg-faint" },
@@ -102,6 +113,7 @@ const META: Record<string, EventTypeMeta> = {
         icon: UserCheck,
         dotColor: "bg-success",
     },
+    "CORE.KATASTR_DATA_IMPORTED": { icon: Import, dotColor: "bg-faint" },
 };
 
 const FALLBACK: EventTypeMeta = { icon: Circle, dotColor: "bg-border" };

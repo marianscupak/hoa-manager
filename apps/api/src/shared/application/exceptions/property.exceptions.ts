@@ -1,3 +1,9 @@
+import {
+  BadRequestException,
+  ConflictException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
+
 import { DomainException } from '@/shared/errors/domain.exception';
 import { ErrorCode } from '@/shared/errors/error-codes';
 
@@ -93,5 +99,23 @@ export class OwnershipNoScheduledTransferException extends DomainException {
 export class OwnerHasOwnershipRecordsException extends DomainException {
   constructor() {
     super(ErrorCode.OWNER_HAS_OWNERSHIP_RECORDS);
+  }
+}
+
+export class KatastrFileRejectedException extends BadRequestException {
+  constructor(errors: unknown[]) {
+    super({ code: 'KATASTR_FILE_REJECTED', errors });
+  }
+}
+
+export class KatastrImportBlockedException extends UnprocessableEntityException {
+  constructor(blockers: unknown[]) {
+    super({ code: 'KATASTR_IMPORT_BLOCKED', blockers });
+  }
+}
+
+export class KatastrImportPlanStaleException extends ConflictException {
+  constructor(preview: unknown) {
+    super({ code: 'KATASTR_IMPORT_PLAN_STALE', preview });
   }
 }

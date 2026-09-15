@@ -1,6 +1,6 @@
 type Lang = 'cs' | 'en';
 
-const STRINGS: Record<
+export const STRINGS: Record<
   Lang,
   Record<string, (vars: Record<string, string>) => string>
 > = {
@@ -34,6 +34,8 @@ const STRINGS: Record<
     'invite.revoked.privileged': (v) =>
       `${v.actor} revoked the invitation for owner ${v.owner}.`,
     'invite.accepted.public': (v) => `${v.user} joined the community.`,
+    'katastr.imported.privileged': (v) =>
+      `${v.actor} imported register data from the real estate register: ${v.created} units added, ${v.updated} updated, effective ${v.effectiveFrom}.`,
     unknown: (v) => `Activity recorded (${v.eventType}).`,
   },
   cs: {
@@ -68,6 +70,8 @@ const STRINGS: Record<
     'invite.revoked.privileged': (v) =>
       `${v.actor} zrušil/a pozvánku pro vlastníka ${v.owner}.`,
     'invite.accepted.public': (v) => `${v.user} se přidal/a do komunity.`,
+    'katastr.imported.privileged': (v) =>
+      `${v.actor} naimportoval/a údaje z katastru nemovitostí: ${v.created} jednotek přidáno, ${v.updated} upraveno, s účinností od ${v.effectiveFrom}.`,
     unknown: (v) => `Aktivita zaznamenána (${v.eventType}).`,
   },
 };

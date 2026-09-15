@@ -149,6 +149,27 @@ const PAYLOADS: Record<CoreEventType, Record<string, unknown>> = {
     flow: 'NEW_REGISTRATION',
     labels: { ownerName: 'Bob Owner', userName: 'Bob User' },
   },
+  [CoreEventType.KATASTR_DATA_IMPORTED]: {
+    counts: {
+      unitsCreated: 38,
+      unitsUpdated: 0,
+      unitsUnchanged: 0,
+      ownersCreated: 49,
+      ownersMatched: 0,
+    },
+    unitNumbers: ['132/1'],
+    effectiveFrom: '2024-04-08',
+    document: {
+      lvNumber: '33',
+      municipality: 'Volary',
+      cadastralArea: 'Volary',
+      validAt: '2024-04-08T00:15:02.000Z',
+      issuedAt: '2026-09-15T14:51:26.000Z',
+      fileHash: 'abc123',
+    },
+    warningCodes: [],
+    labels: { importedBy: 'Jan Admin' },
+  },
 };
 
 describe('CoreAuditFormatter', () => {
@@ -354,5 +375,29 @@ describe('CoreAuditFormatter', () => {
     expect(enEntry.message).toContain('12');
     expect(enEntry.message).toContain('Bob Owner');
     expect(enEntry.message).not.toContain('effective');
+  });
+
+  it('renders the katastr import event in both languages', () => {
+    const csEntry = formatter.format(
+      ev({
+        eventType: CoreEventType.KATASTR_DATA_IMPORTED,
+        payload: PAYLOADS[CoreEventType.KATASTR_DATA_IMPORTED],
+      }),
+      { ...VIEWER_ADMIN, viewerLanguage: 'cs' },
+    );
+    expect(csEntry.message).toContain('38');
+    expect(csEntry.message).not.toContain('KATASTR_DATA_IMPORTED');
+    expect(csEntry.message).toContain('s účinností od 8. 4. 2024');
+
+    const enEntry = formatter.format(
+      ev({
+        eventType: CoreEventType.KATASTR_DATA_IMPORTED,
+        payload: PAYLOADS[CoreEventType.KATASTR_DATA_IMPORTED],
+      }),
+      { ...VIEWER_ADMIN, viewerLanguage: 'en' },
+    );
+    expect(enEntry.message).toContain('38');
+    expect(enEntry.message).not.toContain('KATASTR_DATA_IMPORTED');
+    expect(enEntry.message).toContain('effective 8. 4. 2024');
   });
 });

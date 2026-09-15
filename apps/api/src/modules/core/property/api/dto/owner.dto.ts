@@ -58,6 +58,14 @@ export class OwnerResponseDto {
   @ApiProperty({
     nullable: true,
     type: String,
+    description:
+      'IČO (Czech company identification number), for legal entities. Public register data',
+  })
+  ico!: string | null;
+
+  @ApiProperty({
+    nullable: true,
+    type: String,
     enum: ['pending', 'expired'],
     description:
       'Status of the invite for this owner, null if no pending invite',

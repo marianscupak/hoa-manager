@@ -9,6 +9,9 @@ export interface Unit {
   unitNo: string;
   buildingShareNumerator: number;
   buildingShareDenominator: number;
+  katastrUnitId: string | null;
+  usageCode: string | null;
+  usageName: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -20,6 +23,8 @@ export interface Owner {
   email: string | null;
   userId: string | null;
   kind: OwnerKind;
+  katastrPersonId: string | null;
+  ico: string | null;
   createdAt: Date;
   updatedAt: Date;
 }

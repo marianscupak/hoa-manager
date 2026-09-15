@@ -45,12 +45,11 @@ export class CreateUnitHandler
     return this.uow.execute(async () => {
       let newUnit;
       try {
-        newUnit = await this.unitRepo.create(
-          command.tenantId,
-          command.unitNo,
-          command.buildingShareNumerator,
-          command.buildingShareDenominator,
-        );
+        newUnit = await this.unitRepo.create(command.tenantId, {
+          unitNo: command.unitNo,
+          buildingShareNumerator: command.buildingShareNumerator,
+          buildingShareDenominator: command.buildingShareDenominator,
+        });
       } catch (error: any) {
         if (error.code === '23505') {
           throw new DuplicateUnitNumberException();

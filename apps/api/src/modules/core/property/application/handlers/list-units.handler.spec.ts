@@ -10,6 +10,9 @@ const UNIT = {
   unitNo: '1',
   buildingShareNumerator: 1712,
   buildingShareDenominator: 10000,
+  katastrUnitId: 'k-unit-1',
+  usageCode: '1',
+  usageName: 'byt',
   createdAt: new Date('2026-01-01'),
   updatedAt: new Date('2026-01-01'),
 };
@@ -60,7 +63,6 @@ describe('ListUnitsHandler', () => {
     const [unit] = await handler.execute(new ListUnitsQuery(TENANT));
 
     expect(unit.owners).toEqual(['Jana Nováková', 'Petr Svoboda']);
-    expect(unit.isOwnershipComplete).toBe(true);
   });
 
   it('returns an empty owners array for a unit without active ownerships', async () => {
@@ -69,7 +71,17 @@ describe('ListUnitsHandler', () => {
     const [unit] = await handler.execute(new ListUnitsQuery(TENANT));
 
     expect(unit.owners).toEqual([]);
-    expect(unit.isOwnershipComplete).toBe(false);
+  });
+
+  it('exposes the cadastre usage but never the cadastre unit id', async () => {
+    const { handler } = buildHandler({ ownerships: [] });
+
+    const [unit] = await handler.execute(new ListUnitsQuery(TENANT));
+
+    expect(unit.usageCode).toBe('1');
+    expect(unit.usageName).toBe('byt');
+    // An internal matching key has no screen to appear on.
+    expect(unit).not.toHaveProperty('katastrUnitId');
   });
 
   it('evaluates every unit against the same `now`, read once per call', async () => {

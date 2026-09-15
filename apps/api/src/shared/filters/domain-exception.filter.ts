@@ -35,6 +35,36 @@ export class DomainExceptionFilter implements ExceptionFilter {
       tenantId: request.tenant?.tenantId,
     };
 
+    // Multer rejects an oversized or unexpectedly-shaped upload with a plain
+    // error carrying a `code`, not an HttpException, so without this it would
+    // fall through to the generic 500 below. Matched on the shape rather than
+    // on `MulterError`, which pnpm's strict layout does not expose to callers
+    // of `@nestjs/platform-express` (it is a transitive dependency, not a
+    // direct one). Any controller using `FileInterceptor` benefits from this,
+    // not just katastr import, so the codes are neutral rather than feature-
+    // specific.
+    const multerCode = (err as { code?: unknown } | null)?.code;
+    if (multerCode === 'LIMIT_FILE_SIZE') {
+      this.logger.warn('UploadRejected', {
+        ...requestContext,
+        code: 'FILE_TOO_LARGE',
+        statusCode: HttpStatus.PAYLOAD_TOO_LARGE,
+      });
+      return response
+        .status(HttpStatus.PAYLOAD_TOO_LARGE)
+        .json({ code: 'FILE_TOO_LARGE' });
+    }
+    if (multerCode === 'LIMIT_UNEXPECTED_FILE') {
+      this.logger.warn('UploadRejected', {
+        ...requestContext,
+        code: 'UNEXPECTED_FILE',
+        statusCode: HttpStatus.BAD_REQUEST,
+      });
+      return response
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ code: 'UNEXPECTED_FILE' });
+    }
+
     if (err instanceof DomainException) {
       const statusCode =
         ERROR_HTTP_STATUS[err.code] ?? HttpStatus.INTERNAL_SERVER_ERROR;

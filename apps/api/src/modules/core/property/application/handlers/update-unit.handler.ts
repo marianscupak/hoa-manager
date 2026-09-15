@@ -62,13 +62,11 @@ export class UpdateUnitHandler
 
     await this.uow.execute(async () => {
       try {
-        await this.unitRepo.update(
-          command.tenantId,
-          command.unitId,
-          command.unitNo,
-          command.buildingShareNumerator,
-          command.buildingShareDenominator,
-        );
+        await this.unitRepo.update(command.tenantId, command.unitId, {
+          unitNo: command.unitNo,
+          buildingShareNumerator: command.buildingShareNumerator,
+          buildingShareDenominator: command.buildingShareDenominator,
+        });
       } catch (error: any) {
         if (error.code === '23505') {
           throw new DuplicateUnitNumberException();

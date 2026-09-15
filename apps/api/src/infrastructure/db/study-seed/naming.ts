@@ -21,15 +21,7 @@ export function tenantName(base: string, id: string): string {
   return `${base} ${participantTag(id)}`;
 }
 
-/** "Lenka Marešová" -> "lenka.maresova" (ASCII, dot-separated). */
-export function slugify(name: string): string {
-  return name
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '.')
-    .replace(/^\.+|\.+$/g, '');
-}
+export { slugify } from '@/shared/domain/slugify';
 
 export function studyEmail(id: string, slug: string): string {
   return `${id.toLowerCase()}.${slug}@${STUDY_EMAIL_DOMAIN}`;

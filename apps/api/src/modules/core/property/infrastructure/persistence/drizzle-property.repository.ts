@@ -12,13 +12,15 @@ import {
   units,
 } from '@/infrastructure/db/schema';
 import {
+  CreateOwnerInput,
+  CreateUnitInput,
   OwnerRepository,
   UnitOwnershipRepository,
   UnitRepository,
+  UpdateUnitInput,
 } from '@/modules/core/property/application/ports/property.repository.port';
 import {
   OwnershipPartyInput,
-  type OwnerKind,
   type OwnershipPartyType,
 } from '@/modules/core/property/domain/ownership-plan';
 import {
@@ -35,19 +37,17 @@ export class DrizzleUnitRepository implements UnitRepository {
     return DRIZZLE_TX_STORAGE.getStore() ?? this.drizzle.db;
   }
 
-  async create(
-    tenantId: string,
-    unitNo: string,
-    buildingShareNumerator: number,
-    buildingShareDenominator: number,
-  ): Promise<Unit> {
+  async create(tenantId: string, input: CreateUnitInput): Promise<Unit> {
     const [inserted] = await this.db
       .insert(units)
       .values({
         tenantId,
-        unitNo,
-        buildingShareNumerator,
-        buildingShareDenominator,
+        unitNo: input.unitNo,
+        buildingShareNumerator: input.buildingShareNumerator,
+        buildingShareDenominator: input.buildingShareDenominator,
+        katastrUnitId: input.katastrUnitId ?? null,
+        usageCode: input.usageCode ?? null,
+        usageName: input.usageName ?? null,
       })
       .returning();
     return inserted;
@@ -56,16 +56,23 @@ export class DrizzleUnitRepository implements UnitRepository {
   async update(
     tenantId: string,
     unitId: string,
-    unitNo: string,
-    buildingShareNumerator: number,
-    buildingShareDenominator: number,
+    input: UpdateUnitInput,
   ): Promise<Unit> {
     const [updated] = await this.db
       .update(units)
       .set({
-        unitNo,
-        buildingShareNumerator,
-        buildingShareDenominator,
+        unitNo: input.unitNo,
+        buildingShareNumerator: input.buildingShareNumerator,
+        buildingShareDenominator: input.buildingShareDenominator,
+        ...(input.katastrUnitId === undefined
+          ? {}
+          : { katastrUnitId: input.katastrUnitId }),
+        ...(input.usageCode === undefined
+          ? {}
+          : { usageCode: input.usageCode }),
+        ...(input.usageName === undefined
+          ? {}
+          : { usageName: input.usageName }),
       })
       .where(and(eq(units.tenantId, tenantId), eq(units.id, unitId)))
       .returning();
@@ -109,21 +116,17 @@ export class DrizzleOwnerRepository implements OwnerRepository {
     return DRIZZLE_TX_STORAGE.getStore() ?? this.drizzle.db;
   }
 
-  async create(
-    tenantId: string,
-    displayName: string,
-    userId: string | null,
-    email: string | null,
-    kind: OwnerKind,
-  ): Promise<Owner> {
+  async create(tenantId: string, input: CreateOwnerInput): Promise<Owner> {
     const [inserted] = await this.db
       .insert(owners)
       .values({
         tenantId,
-        displayName,
-        userId,
-        email,
-        kind,
+        displayName: input.displayName,
+        userId: input.userId,
+        email: input.email,
+        kind: input.kind,
+        katastrPersonId: input.katastrPersonId ?? null,
+        ico: input.ico ?? null,
       })
       .returning();
     return inserted;
@@ -188,6 +191,18 @@ export class DrizzleOwnerRepository implements OwnerRepository {
     await this.db
       .update(owners)
       .set({ email })
+      .where(and(eq(owners.tenantId, tenantId), eq(owners.id, ownerId)));
+  }
+
+  async setKatastrPersonId(
+    tenantId: string,
+    ownerId: string,
+    katastrPersonId: string,
+    ico: string | null,
+  ): Promise<void> {
+    await this.db
+      .update(owners)
+      .set({ katastrPersonId, ...(ico === null ? {} : { ico }) })
       .where(and(eq(owners.tenantId, tenantId), eq(owners.id, ownerId)));
   }
 

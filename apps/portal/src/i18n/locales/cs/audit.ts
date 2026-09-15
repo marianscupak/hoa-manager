@@ -2,7 +2,10 @@ export const audit = {
     VOTING: {
         VOTE_CREATED: "Hlasování vytvořeno",
         VOTE_UPDATED: "Hlasování upraveno",
+        VOTE_DELETED: "Hlasování odstraněno",
         VOTE_RULESET_SET: "Pravidla nastavena",
+        VOTE_RULESET_NON_STATUTORY_ACKNOWLEDGED:
+            "Odchylka od pravidel potvrzena",
         VOTE_SCHEDULED: "Hlasování naplánováno",
         VOTE_OPENED: "Hlasování otevřeno",
         VOTE_ELECTORATE_SNAPSHOTTED: "Zaznamenán oprávněný seznam",
@@ -15,6 +18,8 @@ export const audit = {
         BALLOT_CAST_PROXY: "Hlas odevzdán v zastoupení",
         VOTE_CLOSED: "Hlasování uzavřeno",
         VOTE_RESULTS_COMPUTED: "Výsledky vypočteny",
+        VOTE_DOCUMENT_ADDED: "Dokument přidán",
+        VOTE_DOCUMENT_REMOVED: "Dokument odebrán",
     },
     CORE: {
         TENANT_CREATED: "Komunita vytvořena",
@@ -34,6 +39,7 @@ export const audit = {
         OWNER_INVITE_SENT: "Pozvánka odeslána",
         OWNER_INVITE_REVOKED: "Pozvánka zrušena",
         OWNER_INVITE_ACCEPTED: "Nový vlastník se přidal",
+        KATASTR_DATA_IMPORTED: "Data z katastru importována",
     },
     UNKNOWN: "Událost",
 };

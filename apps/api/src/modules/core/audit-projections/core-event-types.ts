@@ -15,6 +15,7 @@ export const CoreEventType = {
   OWNER_INVITE_SENT: 'CORE.OWNER_INVITE_SENT',
   OWNER_INVITE_REVOKED: 'CORE.OWNER_INVITE_REVOKED',
   OWNER_INVITE_ACCEPTED: 'CORE.OWNER_INVITE_ACCEPTED',
+  KATASTR_DATA_IMPORTED: 'CORE.KATASTR_DATA_IMPORTED',
 } as const;
 
 export type CoreEventType = (typeof CoreEventType)[keyof typeof CoreEventType];

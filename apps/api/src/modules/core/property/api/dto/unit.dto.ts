@@ -101,6 +101,20 @@ export class UnitResponseDto {
   })
   owners!: string[];
 
+  @ApiProperty({
+    nullable: true,
+    type: String,
+    description: "Cadastre usage code, e.g. '1' for a flat. Null when unknown",
+  })
+  usageCode!: string | null;
+
+  @ApiProperty({
+    nullable: true,
+    type: String,
+    description: 'Cadastre usage name in Czech, e.g. "byt". Null when unknown',
+  })
+  usageName!: string | null;
+
   @ApiProperty()
   createdAt!: Date;
 

@@ -25,6 +25,8 @@ export const owners = pgTable(
       .references(() => tenants.id, { onDelete: 'cascade' }),
     displayName: text('display_name').notNull(),
     kind: ownerKindEnum('kind').notNull().default('PERSON'),
+    katastrPersonId: text('katastr_person_id'),
+    ico: text('ico'),
     email: text('email'),
     userId: uuid('user_id').references(() => users.id, {
       onDelete: 'set null',
@@ -46,5 +48,8 @@ export const owners = pgTable(
       table.tenantId,
       table.email,
     ),
+    uniqueTenantKatastrPerson: unique(
+      'owners_tenant_katastr_person_id_unique',
+    ).on(table.tenantId, table.katastrPersonId),
   }),
 );

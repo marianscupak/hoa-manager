@@ -6,6 +6,7 @@ export default {
         empty: "No owners found.",
         table: {
             displayName: "Display Name",
+            ico: "Company ID {{ico}}",
             email: "Email",
             userAccount: "User Account",
             linked: "Linked",
@@ -83,6 +84,10 @@ export default {
         loadError: "Failed to load units.",
         table: {
             unitNumber: "Unit Number",
+            usage: "Usage",
+            usageUnknown: "Not stated",
+            usage_1: "flat",
+            usage_5: "non-residential",
             buildingShare: "Building Share",
             owners: "Owners",
             noOwner: "No owner assigned",

@@ -1,3 +1,4 @@
+import { useAtomValue } from "jotai";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -8,12 +9,19 @@ import { cn } from "@hoa-mngr/ui/lib/utils";
 
 import { useOwnerControllerGetOwners } from "@/api/generated/property-owners/property-owners";
 import { useUnitControllerGetUnits } from "@/api/generated/property-units/property-units";
+import { tenantContextAtom } from "@/auth/atoms";
+import { Role } from "@/auth/roles";
 
 import { OwnersPage } from "./owners-page";
 import { UnitsPage } from "./units-page";
 
 export function PropertyPage({ tab }: { tab: "units" | "owners" }) {
-    const { t } = useTranslation(["admin"]);
+    const { t } = useTranslation(["admin", "katastr"]);
+    const tenantCtx = useAtomValue(tenantContextAtom);
+    // The import is a bulk write that is hard to unwind, so it follows the
+    // ADMIN-only precedent the endpoint itself enforces — a board member
+    // (allowed everywhere else on this page) must not be offered it.
+    const isAdmin = !!tenantCtx?.roles.includes(Role.ADMIN);
     const [unitsCreateOpen, setUnitsCreateOpen] = useState(false);
     const [ownersCreateOpen, setOwnersCreateOpen] = useState(false);
 
@@ -62,9 +70,22 @@ export function PropertyPage({ tab }: { tab: "units" | "owners" }) {
                 <h1 className="font-display text-3xl font-black tracking-tight">
                     {t("admin:property.title")}
                 </h1>
-                <Button onClick={addButton.onClick}>
-                    <Plus /> {addButton.label}
-                </Button>
+                <div className="flex items-center gap-3">
+                    {tab === "units" && isAdmin && (
+                        <Button
+                            asChild
+                            variant="outline"
+                            className="cursor-pointer"
+                        >
+                            <NavLink to="/admin/units/import">
+                                {t("katastr:title")}
+                            </NavLink>
+                        </Button>
+                    )}
+                    <Button onClick={addButton.onClick}>
+                        <Plus /> {addButton.label}
+                    </Button>
+                </div>
             </div>
 
             <nav

@@ -72,13 +72,12 @@ export class CreateOwnerHandler
     }
 
     return this.uow.execute(async () => {
-      const newOwner = await this.ownerRepo.create(
-        command.tenantId,
-        command.displayName,
-        resolvedUserId,
+      const newOwner = await this.ownerRepo.create(command.tenantId, {
+        displayName: command.displayName,
+        userId: resolvedUserId,
         email,
-        command.kind,
-      );
+        kind: command.kind,
+      });
 
       const actor = this.auditContext.requireActor();
       const actorLabel = await this.labelResolver.resolveActorLabel(actor);

@@ -19,6 +19,7 @@ export interface OwnerWithInviteStatus {
   email: string | null;
   userId: string | null;
   kind: OwnerKind;
+  ico: string | null;
   inviteStatus: 'pending' | 'expired' | null;
   inviteCreatedAt: Date | null;
   hasOwnershipRecords: boolean;
@@ -64,10 +65,18 @@ export class ListOwnersHandler
         }
 
         return {
-          ...owner,
+          id: owner.id,
+          tenantId: owner.tenantId,
+          displayName: owner.displayName,
+          email: owner.email,
+          userId: owner.userId,
+          kind: owner.kind,
+          ico: owner.ico,
           inviteStatus,
           inviteCreatedAt,
           hasOwnershipRecords: referenced.has(owner.id),
+          createdAt: owner.createdAt,
+          updatedAt: owner.updatedAt,
         };
       }),
     );

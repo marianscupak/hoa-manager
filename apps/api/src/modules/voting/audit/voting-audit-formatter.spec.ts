@@ -247,6 +247,10 @@ describe('VotingAuditFormatter', () => {
         labels: { voteTitle: 'X', questions: [] },
       },
     ],
+    [
+      VotingEventType.VOTE_DELETED,
+      { labels: { voteTitle: 'X', deletedBy: 'Author' } },
+    ],
   ])(
     'every event type renders a non-empty message: %s',
     (eventType, payload) => {
@@ -428,5 +432,19 @@ describe('VotingAuditFormatter', () => {
     expect(entry.message).toBe(
       'John Doe attached document "budget.pdf" to "Budget 2026".',
     );
+  });
+
+  it('renders VOTE_DELETED for a privileged viewer in Czech', () => {
+    const entry = formatter.format(
+      ev({
+        eventType: VotingEventType.VOTE_DELETED,
+        visibility: Visibility.TENANT_PRIVILEGED,
+        payload: {
+          labels: { voteTitle: 'Budget 2026', deletedBy: 'John Doe' },
+        },
+      }),
+      { ...VIEWER_ADMIN, viewerLanguage: 'cs' },
+    );
+    expect(entry.message).toBe('John Doe odstranil/a hlasování "Budget 2026".');
   });
 });

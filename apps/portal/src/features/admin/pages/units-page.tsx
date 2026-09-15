@@ -14,7 +14,10 @@ import { useUnitControllerGetUnits } from "@/api/generated/property-units/proper
 
 import { CreateUnitDialog } from "../components/create-unit-dialog";
 import { DeleteUnitDialog } from "../components/delete-unit-dialog";
-import { getUnitColumns } from "../components/units-table/units-table-columns";
+import {
+    getUnitColumns,
+    UNITS_TABLE_GRID_TEMPLATE,
+} from "../components/units-table/units-table-columns";
 
 export interface UnitsPageProps {
     createOpen: boolean;
@@ -95,7 +98,7 @@ export function UnitsPage({ createOpen, onCreateOpenChange }: UnitsPageProps) {
             <DataTable
                 columns={columns}
                 data={units ?? []}
-                gridTemplate="1.1fr 1.4fr 1.5fr 88px"
+                gridTemplate={UNITS_TABLE_GRID_TEMPLATE}
                 isLoading={isLoading}
                 loadingMessage={tCommon("loading")}
                 emptyMessage={t("units.empty")}

@@ -16,6 +16,16 @@ export interface UnitResponseDto {
     buildingShareDenominator: number;
     /** Display names of the current owners of this unit */
     owners: string[];
+    /**
+     * Cadastre usage code, e.g. '1' for a flat. Null when unknown
+     * @nullable
+     */
+    usageCode: string | null;
+    /**
+     * Cadastre usage name in Czech, e.g. "byt". Null when unknown
+     * @nullable
+     */
+    usageName: string | null;
     createdAt: string;
     updatedAt: string;
 }

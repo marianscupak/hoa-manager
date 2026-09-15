@@ -182,6 +182,22 @@ export class CoreAuditFormatter implements AuditEventFormatter, OnModuleInit {
           }),
         };
       }
+      case CoreEventType.KATASTR_DATA_IMPORTED: {
+        const p = event.payload as {
+          counts: { unitsCreated: number; unitsUpdated: number };
+          effectiveFrom: string;
+          labels: { importedBy: string };
+        };
+        return {
+          ...base,
+          message: t(lang, 'katastr.imported.privileged', {
+            actor: p.labels.importedBy,
+            created: String(p.counts.unitsCreated),
+            updated: String(p.counts.unitsUpdated),
+            effectiveFrom: displayDate(p.effectiveFrom),
+          }),
+        };
+      }
       case CoreEventType.OWNER_EMAIL_ADDED: {
         const p = event.payload as {
           labels: { ownerName: string; addedBy: string };

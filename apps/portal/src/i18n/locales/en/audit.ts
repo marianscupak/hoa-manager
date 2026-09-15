@@ -2,7 +2,9 @@ export const audit = {
     VOTING: {
         VOTE_CREATED: "Vote created",
         VOTE_UPDATED: "Vote updated",
+        VOTE_DELETED: "Vote removed",
         VOTE_RULESET_SET: "Ruleset configured",
+        VOTE_RULESET_NON_STATUTORY_ACKNOWLEDGED: "Rule deviation acknowledged",
         VOTE_SCHEDULED: "Vote scheduled",
         VOTE_OPENED: "Vote opened",
         VOTE_ELECTORATE_SNAPSHOTTED: "Electorate snapshotted",
@@ -15,6 +17,8 @@ export const audit = {
         BALLOT_CAST_PROXY: "Ballot cast by proxy",
         VOTE_CLOSED: "Vote closed",
         VOTE_RESULTS_COMPUTED: "Results computed",
+        VOTE_DOCUMENT_ADDED: "Document added",
+        VOTE_DOCUMENT_REMOVED: "Document removed",
     },
     CORE: {
         TENANT_CREATED: "Community created",
@@ -34,6 +38,7 @@ export const audit = {
         OWNER_INVITE_SENT: "Invitation sent",
         OWNER_INVITE_REVOKED: "Invitation revoked",
         OWNER_INVITE_ACCEPTED: "New owner joined",
+        KATASTR_DATA_IMPORTED: "Cadastre data imported",
     },
     UNKNOWN: "Event",
 };

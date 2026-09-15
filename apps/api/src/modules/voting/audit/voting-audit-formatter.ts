@@ -196,6 +196,18 @@ export class VotingAuditFormatter implements AuditEventFormatter, OnModuleInit {
           }),
         };
       }
+      case VotingEventType.VOTE_DELETED: {
+        const p = event.payload as {
+          labels: { voteTitle: string; deletedBy: string };
+        };
+        return {
+          ...base,
+          message: t(lang, 'vote.deleted.privileged', {
+            title: p.labels.voteTitle,
+            actor: p.labels.deletedBy,
+          }),
+        };
+      }
       case VotingEventType.VOTE_QUESTION_CREATED: {
         const p = event.payload as {
           labels: { voteTitle: string; questionTitle: string; actor: string };

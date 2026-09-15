@@ -15,6 +15,7 @@ const STRINGS: Record<
     'vote.electorateSnapshotted.privileged': (v) =>
       `Electorate snapshot for "${v.title}" recorded (${v.totalUnits} units).`,
     'vote.updated.privileged': (v) => `${v.actor} updated vote "${v.title}".`,
+    'vote.deleted.privileged': (v) => `${v.actor} deleted vote "${v.title}".`,
     'vote.question.created.privileged': (v) =>
       `${v.actor} added question "${v.question}" to "${v.title}".`,
     'vote.question.updated.privileged': (v) =>
@@ -59,6 +60,8 @@ const STRINGS: Record<
       `Snímek elektorátu pro "${v.title}" zaznamenán (${v.totalUnits} jednotek).`,
     'vote.updated.privileged': (v) =>
       `${v.actor} upravil/a hlasování "${v.title}".`,
+    'vote.deleted.privileged': (v) =>
+      `${v.actor} odstranil/a hlasování "${v.title}".`,
     'vote.question.created.privileged': (v) =>
       `${v.actor} přidal/a otázku "${v.question}" do "${v.title}".`,
     'vote.question.updated.privileged': (v) =>

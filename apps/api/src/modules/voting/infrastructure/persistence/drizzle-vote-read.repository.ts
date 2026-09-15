@@ -169,6 +169,7 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
           eq(voteDocuments.tenantId, tenantId),
           eq(voteDocuments.voteId, id),
           eq(voteDocuments.status, 'UPLOADED'),
+          eq(voteDocuments.kind, 'VOTE'),
         ),
       )
       .orderBy(voteDocuments.createdAt);

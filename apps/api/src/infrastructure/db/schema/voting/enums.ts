@@ -73,3 +73,8 @@ export const voteDocumentStatusEnum = pgEnum('vote_document_status', [
   'PENDING',
   'UPLOADED',
 ]);
+
+export const voteDocumentKindEnum = pgEnum('vote_document_kind', [
+  'VOTE',
+  'BALLOT',
+]);

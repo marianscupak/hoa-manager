@@ -3,9 +3,10 @@ import { and, count, eq, lt } from 'drizzle-orm';
 
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
 import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
-import { voteDocuments } from '@/infrastructure/db/schema';
+import { ballots, voteDocuments } from '@/infrastructure/db/schema';
 
 import {
+  type VoteDocumentKind,
   type VoteDocumentRecord,
   type VoteDocumentRepository,
   type VoteDocumentStatus,
@@ -56,6 +57,7 @@ export class DrizzleVoteDocumentRepository implements VoteDocumentRepository {
         and(
           eq(voteDocuments.tenantId, tenantId),
           eq(voteDocuments.voteId, voteId),
+          eq(voteDocuments.kind, 'VOTE'),
         ),
       )
       .orderBy(voteDocuments.createdAt);
@@ -70,6 +72,7 @@ export class DrizzleVoteDocumentRepository implements VoteDocumentRepository {
         and(
           eq(voteDocuments.tenantId, tenantId),
           eq(voteDocuments.voteId, voteId),
+          eq(voteDocuments.kind, 'VOTE'),
         ),
       );
     return rows[0]?.value ?? 0;
@@ -110,6 +113,22 @@ export class DrizzleVoteDocumentRepository implements VoteDocumentRepository {
       );
     return rows.map(mapRow);
   }
+
+  async isAttachmentLinked(
+    tenantId: string,
+    documentId: string,
+  ): Promise<boolean> {
+    const rows = await this.db
+      .select({ value: count() })
+      .from(ballots)
+      .where(
+        and(
+          eq(ballots.tenantId, tenantId),
+          eq(ballots.attachmentDocumentId, documentId),
+        ),
+      );
+    return (rows[0]?.value ?? 0) > 0;
+  }
 }
 
 function mapRow(row: typeof voteDocuments.$inferSelect): VoteDocumentRecord {
@@ -122,6 +141,7 @@ function mapRow(row: typeof voteDocuments.$inferSelect): VoteDocumentRecord {
     contentType: row.contentType,
     sizeBytes: row.sizeBytes,
     objectKey: row.objectKey,
+    kind: row.kind as VoteDocumentKind,
     status: row.status as VoteDocumentStatus,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,

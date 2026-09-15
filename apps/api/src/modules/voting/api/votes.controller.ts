@@ -30,6 +30,8 @@ import {
   CreateVoteQuestionDto,
   CreateVoteResponseDto,
   DocumentDownloadUrlResponseDto,
+  RequestBallotAttachmentUploadDto,
+  RequestBallotAttachmentUploadResponseDto,
   RequestDocumentUploadDto,
   RequestDocumentUploadResponseDto,
   SetVoteRulesetDto,
@@ -64,9 +66,11 @@ import { ConfirmDocumentUploadCommand } from '../application/commands/confirm-do
 import { CreateVoteCommand } from '../application/commands/create-vote/create-vote.command';
 import { CreateVoteConsentCommand } from '../application/commands/create-vote-consent/create-vote-consent.command';
 import { CreateVoteQuestionCommand } from '../application/commands/create-vote-question/create-vote-question.command';
+import { DeleteBallotAttachmentCommand } from '../application/commands/delete-ballot-attachment/delete-ballot-attachment.command';
 import { DeleteVoteCommand } from '../application/commands/delete-vote/delete-vote.command';
 import { DeleteVoteDocumentCommand } from '../application/commands/delete-vote-document/delete-vote-document.command';
 import { DeleteVoteQuestionCommand } from '../application/commands/delete-vote-question/delete-vote-question.command';
+import { RequestBallotAttachmentUploadCommand } from '../application/commands/request-ballot-attachment-upload/request-ballot-attachment-upload.command';
 import { RequestDocumentUploadCommand } from '../application/commands/request-document-upload/request-document-upload.command';
 import { RevokeConsentCommand } from '../application/commands/revoke-consent/revoke-consent.command';
 import { ScheduleVoteCommand } from '../application/commands/schedule-vote/schedule-vote.command';
@@ -74,6 +78,7 @@ import { SetVoteRulesetCommand } from '../application/commands/set-vote-ruleset/
 import { SubmitBallotCommand } from '../application/commands/submit-ballot/submit-ballot.command';
 import { UpdateVoteCommand } from '../application/commands/update-vote/update-vote.command';
 import { UpdateVoteQuestionCommand } from '../application/commands/update-vote-question/update-vote-question.command';
+import { GetBallotAttachmentDownloadUrlQuery } from '../application/queries/get-ballot-attachment-download-url/get-ballot-attachment-download-url.query';
 import { GetConsentsQuery } from '../application/queries/get-consents/get-consents.query';
 import { GetDelegationCandidatesQuery } from '../application/queries/get-delegation-candidates/get-delegation-candidates.query';
 import { GetDocumentDownloadUrlQuery } from '../application/queries/get-document-download-url/get-document-download-url.query';
@@ -596,6 +601,63 @@ export class VotesController {
         id,
         documentId,
         tenantCtx.roles,
+      ),
+    );
+  }
+
+  @Post(':id/ballot-attachments')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiCreatedResponse({ type: RequestBallotAttachmentUploadResponseDto })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  requestBallotAttachmentUpload(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() body: RequestBallotAttachmentUploadDto,
+    @Tenant() tenantCtx: TenantContext,
+  ) {
+    return this.commandBus.execute(
+      new RequestBallotAttachmentUploadCommand(
+        tenantCtx.tenantId,
+        id,
+        tenantCtx.membershipId,
+        body,
+      ),
+    );
+  }
+
+  @Delete(':id/ballot-attachments/:documentId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({ description: 'Ballot attachment deleted' })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  deleteBallotAttachment(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('documentId', ParseUUIDPipe) documentId: string,
+    @Tenant() tenantCtx: TenantContext,
+  ) {
+    return this.commandBus.execute(
+      new DeleteBallotAttachmentCommand(tenantCtx.tenantId, id, documentId),
+    );
+  }
+
+  @Get(':id/ballot-attachments/:documentId/download-url')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Returns a short-lived presigned download URL',
+    type: DocumentDownloadUrlResponseDto,
+  })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  getBallotAttachmentDownloadUrl(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('documentId', ParseUUIDPipe) documentId: string,
+    @Tenant() tenantCtx: TenantContext,
+  ) {
+    return this.queryBus.execute(
+      new GetBallotAttachmentDownloadUrlQuery(
+        tenantCtx.tenantId,
+        id,
+        documentId,
       ),
     );
   }

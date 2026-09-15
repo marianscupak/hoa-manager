@@ -18,10 +18,12 @@ import { ConfirmDocumentUploadHandler } from './application/commands/confirm-doc
 import { CreateVoteHandler } from './application/commands/create-vote/create-vote.handler';
 import { CreateVoteConsentHandler } from './application/commands/create-vote-consent/create-vote-consent.handler';
 import { CreateVoteQuestionHandler } from './application/commands/create-vote-question/create-vote-question.handler';
+import { DeleteBallotAttachmentHandler } from './application/commands/delete-ballot-attachment/delete-ballot-attachment.handler';
 import { DeleteVoteHandler } from './application/commands/delete-vote/delete-vote.handler';
 import { DeleteVoteDocumentHandler } from './application/commands/delete-vote-document/delete-vote-document.handler';
 import { DeleteVoteQuestionHandler } from './application/commands/delete-vote-question/delete-vote-question.handler';
 import { OpenVoteCommandHandler } from './application/commands/open-vote/open-vote.handler';
+import { RequestBallotAttachmentUploadHandler } from './application/commands/request-ballot-attachment-upload/request-ballot-attachment-upload.handler';
 import { RequestDocumentUploadHandler } from './application/commands/request-document-upload/request-document-upload.handler';
 import { RevokeConsentHandler } from './application/commands/revoke-consent/revoke-consent.handler';
 import { ScheduleVoteHandler } from './application/commands/schedule-vote/schedule-vote.handler';
@@ -38,6 +40,7 @@ import { VOTE_CONSENT_WRITE_REPOSITORY } from './application/ports/vote-consent-
 import { VOTE_DOCUMENT_REPOSITORY } from './application/ports/vote-document.repository.port';
 import { VOTE_READ_REPOSITORY } from './application/ports/vote-read.repository.port';
 import { VOTE_WRITE_REPOSITORY } from './application/ports/vote-write.repository.port';
+import { GetBallotAttachmentDownloadUrlHandler } from './application/queries/get-ballot-attachment-download-url/get-ballot-attachment-download-url.handler';
 import { GetConsentsHandler } from './application/queries/get-consents/get-consents.handler';
 import { GetDelegationCandidatesHandler } from './application/queries/get-delegation-candidates/get-delegation-candidates.handler';
 import { GetDocumentDownloadUrlHandler } from './application/queries/get-document-download-url/get-document-download-url.handler';
@@ -81,6 +84,8 @@ const COMMAND_HANDLERS = [
   RequestDocumentUploadHandler,
   ConfirmDocumentUploadHandler,
   DeleteVoteDocumentHandler,
+  RequestBallotAttachmentUploadHandler,
+  DeleteBallotAttachmentHandler,
 ];
 const QUERY_HANDLERS = [
   GetVoteDetailHandler,
@@ -94,6 +99,7 @@ const QUERY_HANDLERS = [
   GetVoteAuditExportHandler,
   GetVoteTurnoutHandler,
   GetDocumentDownloadUrlHandler,
+  GetBallotAttachmentDownloadUrlHandler,
 ];
 const REPOSITORIES = [
   { provide: VOTE_WRITE_REPOSITORY, useClass: DrizzleVoteWriteRepository },

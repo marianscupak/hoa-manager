@@ -155,6 +155,20 @@
       "when": 1787440124092,
       "tag": "0021_tranquil_mephisto",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1789429221065,
+      "tag": "0022_icy_zarda",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1789431270468,
+      "tag": "0023_perpetual_justin_hammer",
+      "breakpoints": true
     }
   ]
 }

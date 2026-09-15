@@ -80,6 +80,7 @@ describe('RequestDocumentUploadHandler', () => {
       contentType: 'application/pdf',
       sizeBytes: 1024,
       objectKey: expectedKey,
+      kind: 'VOTE',
       status: 'PENDING',
     });
     expect(storage.presignPut).toHaveBeenCalledWith(

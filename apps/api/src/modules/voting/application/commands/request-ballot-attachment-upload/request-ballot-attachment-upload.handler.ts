@@ -3,21 +3,19 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
 import {
-  VOTE_DOCUMENT_ALLOWED_CONTENT_TYPES,
-  VOTE_DOCUMENT_MAX_COUNT,
-  VOTE_DOCUMENT_MAX_SIZE_BYTES,
+  BALLOT_SCAN_ALLOWED_CONTENT_TYPES,
+  BALLOT_SCAN_MAX_SIZE_BYTES,
 } from '@/modules/voting/domain/vote/vote-document.constants';
 import { VoteStatus } from '@/modules/voting/domain/vote/vote.types';
 import {
   DocumentStorageNotConfiguredException,
-  VoteDocumentLimitReachedException,
   VoteDocumentTooLargeException,
   VoteDocumentTypeNotAllowedException,
-  VoteNotDraftException,
   VoteNotFoundException,
+  VoteNotOpenException,
 } from '@/shared/application/exceptions/vote.exceptions';
 
-import { RequestDocumentUploadCommand } from './request-document-upload.command';
+import { RequestBallotAttachmentUploadCommand } from './request-ballot-attachment-upload.command';
 import {
   DOCUMENT_STORAGE,
   type DocumentStoragePort,
@@ -31,14 +29,14 @@ import {
   type VoteWriteRepository,
 } from '../../ports/vote-write.repository.port';
 
-export interface RequestDocumentUploadResult {
+export interface RequestBallotAttachmentUploadResult {
   documentId: string;
   uploadUrl: string;
 }
 
-@CommandHandler(RequestDocumentUploadCommand)
-export class RequestDocumentUploadHandler
-  implements ICommandHandler<RequestDocumentUploadCommand>
+@CommandHandler(RequestBallotAttachmentUploadCommand)
+export class RequestBallotAttachmentUploadHandler
+  implements ICommandHandler<RequestBallotAttachmentUploadCommand>
 {
   constructor(
     @Inject(VOTE_WRITE_REPOSITORY)
@@ -51,8 +49,8 @@ export class RequestDocumentUploadHandler
   ) {}
 
   async execute(
-    command: RequestDocumentUploadCommand,
-  ): Promise<RequestDocumentUploadResult> {
+    command: RequestBallotAttachmentUploadCommand,
+  ): Promise<RequestBallotAttachmentUploadResult> {
     const { tenantId, voteId, actorMembershipId, data } = command;
 
     if (!this.storage.isConfigured()) {
@@ -63,28 +61,24 @@ export class RequestDocumentUploadHandler
     if (!aggregate) {
       throw new VoteNotFoundException();
     }
-    if (aggregate.status !== VoteStatus.DRAFT) {
-      throw new VoteNotDraftException();
+    if (aggregate.status !== VoteStatus.OPEN) {
+      throw new VoteNotOpenException();
     }
 
-    if (!VOTE_DOCUMENT_ALLOWED_CONTENT_TYPES.includes(data.contentType)) {
+    if (!BALLOT_SCAN_ALLOWED_CONTENT_TYPES.includes(data.contentType)) {
       throw new VoteDocumentTypeNotAllowedException();
     }
-    if (data.sizeBytes > VOTE_DOCUMENT_MAX_SIZE_BYTES) {
+    if (data.sizeBytes > BALLOT_SCAN_MAX_SIZE_BYTES) {
       throw new VoteDocumentTooLargeException();
     }
 
-    const existingCount = await this.documentRepository.countByVoteId(
-      tenantId,
-      voteId,
-    );
-    if (existingCount >= VOTE_DOCUMENT_MAX_COUNT) {
-      throw new VoteDocumentLimitReachedException();
-    }
-
     const documentId = crypto.randomUUID();
-    const objectKey = `tenants/${tenantId}/votes/${voteId}/${documentId}`;
+    const objectKey = `tenants/${tenantId}/votes/${voteId}/ballots/${documentId}`;
 
+    // Stays PENDING on purpose. RecordPaperBallotHandler verifies the object
+    // and flips it to UPLOADED inside the transaction that writes the ballot,
+    // so an abandoned flow leaves a row the stale-upload cron reaps and no
+    // audit line for a ballot that was never recorded.
     await this.unitOfWork.execute(async () => {
       await this.documentRepository.insert({
         id: documentId,
@@ -95,7 +89,7 @@ export class RequestDocumentUploadHandler
         contentType: data.contentType,
         sizeBytes: data.sizeBytes,
         objectKey,
-        kind: 'VOTE',
+        kind: 'BALLOT',
         status: 'PENDING',
       });
     });

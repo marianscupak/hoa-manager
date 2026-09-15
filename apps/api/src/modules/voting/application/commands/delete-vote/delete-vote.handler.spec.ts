@@ -38,6 +38,7 @@ const UPLOADED_DOC: VoteDocumentRecord = {
   contentType: 'application/pdf',
   sizeBytes: 1024,
   objectKey: 'tenants/tenant-1/votes/vote-1/doc-1',
+  kind: 'VOTE',
   status: 'UPLOADED',
   createdAt: new Date('2026-08-22T10:00:00Z'),
   updatedAt: new Date('2026-08-22T10:00:00Z'),

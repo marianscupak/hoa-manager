@@ -31,6 +31,7 @@ const UPLOADED_DOC: VoteDocumentRecord = {
   contentType: 'application/pdf',
   sizeBytes: 1024,
   objectKey: 'tenants/tenant-1/votes/vote-1/doc-1',
+  kind: 'VOTE',
   status: 'UPLOADED',
   createdAt: new Date('2026-08-22T10:00:00Z'),
   updatedAt: new Date('2026-08-22T10:00:00Z'),
@@ -103,5 +104,18 @@ describe('GetDocumentDownloadUrlHandler', () => {
     await expect(handler.execute(query())).rejects.toThrow(
       DocumentStorageNotConfiguredException,
     );
+  });
+
+  it('treats a ballot scan as not found on the public document route', async () => {
+    documentRepository.findById.mockResolvedValue({
+      ...UPLOADED_DOC,
+      kind: 'BALLOT',
+      fileName: 'ballot.pdf',
+    });
+
+    await expect(handler.execute(query(['ADMIN']))).rejects.toThrow(
+      VoteDocumentNotFoundException,
+    );
+    expect(storage.presignGet).not.toHaveBeenCalled();
   });
 });

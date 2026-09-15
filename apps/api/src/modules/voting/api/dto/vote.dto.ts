@@ -325,6 +325,28 @@ export class DocumentDownloadUrlResponseDto {
   downloadUrl!: string;
 }
 
+export const requestBallotAttachmentUploadSchema = z.object({
+  fileName: z.string().min(1).max(255),
+  contentType: z.string().min(1).max(127),
+  // See requestDocumentUploadSchema above: .min(1) rather than .positive(),
+  // since zod v4's native toJSONSchema emits `exclusiveMinimum` as a
+  // JSON-Schema-2020-12 number, which orval rejects against our declared
+  // OpenAPI 3.0 spec (which requires exclusiveMinimum to be boolean).
+  sizeBytes: z.number().int().min(1),
+});
+
+export class RequestBallotAttachmentUploadDto extends createZodDto(
+  requestBallotAttachmentUploadSchema,
+) {}
+
+export class RequestBallotAttachmentUploadResponseDto {
+  @ApiProperty()
+  documentId!: string;
+
+  @ApiProperty()
+  uploadUrl!: string;
+}
+
 export class VoteDetailResponseDto extends CreateVoteResponseDto {
   @ApiProperty({
     type: SetVoteRulesetResponseDto,

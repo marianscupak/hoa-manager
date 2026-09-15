@@ -1,14 +1,12 @@
 import { Inject } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { VoteStatus } from '@/modules/voting/domain/vote/vote.types';
 import {
   DocumentStorageNotConfiguredException,
   VoteDocumentNotFoundException,
-  VoteNotFoundException,
 } from '@/shared/application/exceptions/vote.exceptions';
 
-import { GetDocumentDownloadUrlQuery } from './get-document-download-url.query';
+import { GetBallotAttachmentDownloadUrlQuery } from './get-ballot-attachment-download-url.query';
 import {
   DOCUMENT_STORAGE,
   type DocumentStoragePort,
@@ -17,18 +15,12 @@ import {
   VOTE_DOCUMENT_REPOSITORY,
   type VoteDocumentRepository,
 } from '../../ports/vote-document.repository.port';
-import {
-  VOTE_WRITE_REPOSITORY,
-  type VoteWriteRepository,
-} from '../../ports/vote-write.repository.port';
 
-@QueryHandler(GetDocumentDownloadUrlQuery)
-export class GetDocumentDownloadUrlHandler
-  implements IQueryHandler<GetDocumentDownloadUrlQuery>
+@QueryHandler(GetBallotAttachmentDownloadUrlQuery)
+export class GetBallotAttachmentDownloadUrlHandler
+  implements IQueryHandler<GetBallotAttachmentDownloadUrlQuery>
 {
   constructor(
-    @Inject(VOTE_WRITE_REPOSITORY)
-    private readonly voteWriteRepository: VoteWriteRepository,
     @Inject(VOTE_DOCUMENT_REPOSITORY)
     private readonly documentRepository: VoteDocumentRepository,
     @Inject(DOCUMENT_STORAGE)
@@ -36,24 +28,12 @@ export class GetDocumentDownloadUrlHandler
   ) {}
 
   async execute(
-    query: GetDocumentDownloadUrlQuery,
+    query: GetBallotAttachmentDownloadUrlQuery,
   ): Promise<{ downloadUrl: string }> {
-    const { tenantId, voteId, documentId, roles } = query;
+    const { tenantId, voteId, documentId } = query;
 
     if (!this.storage.isConfigured()) {
       throw new DocumentStorageNotConfiguredException();
-    }
-
-    const aggregate = await this.voteWriteRepository.findById(tenantId, voteId);
-    if (!aggregate) {
-      throw new VoteNotFoundException();
-    }
-
-    // Same DRAFT-visibility rule as GetVoteDetailHandler.
-    const isPrivileged =
-      roles.includes('ADMIN') || roles.includes('BOARD_MEMBER');
-    if (aggregate.status === VoteStatus.DRAFT && !isPrivileged) {
-      throw new VoteNotFoundException();
     }
 
     const document = await this.documentRepository.findById(
@@ -61,11 +41,10 @@ export class GetDocumentDownloadUrlHandler
       voteId,
       documentId,
     );
-    // A ballot scan is privileged and has its own route; on this one it does
-    // not exist, so a leaked document id reveals nothing.
+    // A scan is only downloadable once its ballot was actually recorded.
     if (
       !document ||
-      document.kind !== 'VOTE' ||
+      document.kind !== 'BALLOT' ||
       document.status !== 'UPLOADED'
     ) {
       throw new VoteDocumentNotFoundException();

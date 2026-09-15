@@ -151,9 +151,11 @@ export const voting = {
             scheduledTo: {
                 label: "Konec hlasování",
                 description: "Kdy se má hlasování automaticky uzavřít?",
+                errors: {
+                    tooShortPerRollam:
+                        "Hlasování per rollam musí trvat nejméně 15 dní. Posuňte konec hlasování dál.",
+                },
             },
-            shortVotingPeriodWarning:
-                "Doba hlasování je kratší než 15 dní. Zvažte její prodloužení, aby měli všichni vlastníci dostatek času hlasovat.",
             weightBasis: {
                 label: "Váha hlasů",
                 placeholder: "Vyberte váhu hlasů",
@@ -314,7 +316,8 @@ export const voting = {
                 VOTE_MISSING_QUESTIONS: "Existuje alespoň jedna otázka",
                 VOTE_QUESTION_MISSING_OPTIONS:
                     "Každá otázka má možnosti odpovědí",
-                SHORT_VOTING_PERIOD: "Hlasování trvá alespoň 15 dní",
+                VOTE_WINDOW_TOO_SHORT_PER_ROLLAM:
+                    "Hlasování per rollam trvá alespoň 15 dní",
             },
         },
     },
@@ -390,7 +393,7 @@ export const voting = {
             schedule: "Naplánovat hlasování",
             scheduleConfirmTitle: "Naplánovat hlasování",
             scheduleConfirmDescription:
-                "Opravdu chcete toto hlasování naplánovat? Tato akce zpřístupní hlasování běžným uživatelům a nelze ji vzít zpět. Po naplánování již nebude možné upravovat detaily hlasování ani ruleset.",
+                "Opravdu chcete toto hlasování naplánovat? Tato akce zpřístupní hlasování běžným uživatelům a nelze ji vzít zpět. Po naplánování již nebude možné upravovat detaily hlasování ani jeho pravidla.",
             cancel: "Zrušit",
             confirm: "Ano, naplánovat hlasování",
             delete: "Smazat koncept",
@@ -417,7 +420,8 @@ export const voting = {
                     "K hlasování musí být přidána alespoň jedna otázka.",
                 VOTE_QUESTION_MISSING_OPTIONS:
                     "Otázka „{{param}}“ musí mít alespoň dvě možnosti odpovědi.",
-                VOTE_RULESET_REQUIRED: "Musí být nastaven výchozí ruleset.",
+                VOTE_RULESET_REQUIRED:
+                    "Musí být nastavena výchozí pravidla hlasování.",
                 VOTE_WINDOW_TOO_SHORT_PER_ROLLAM:
                     "Hlasovací okno per rollam musí trvat alespoň 15 dnů.",
             },

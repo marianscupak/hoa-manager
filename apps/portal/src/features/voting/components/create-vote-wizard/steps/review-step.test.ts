@@ -65,7 +65,9 @@ describe("buildReviewChecks", () => {
         // Null-guarded: no `from`/`to` means these checks can't be violated.
         expect(findCheck(checks, "VOTE_SCHEDULE_IN_PAST").ok).toBe(true);
         expect(findCheck(checks, "VOTE_SCHEDULE_INVALID_RANGE").ok).toBe(true);
-        expect(findCheck(checks, "SHORT_VOTING_PERIOD").ok).toBe(true);
+        expect(
+            findCheck(checks, "VOTE_WINDOW_TOO_SHORT_PER_ROLLAM").ok,
+        ).toBe(true);
     });
 
     it("fails INVALID_RANGE when the opening date is after the closing date (both in the future)", () => {
@@ -159,18 +161,40 @@ describe("buildReviewChecks", () => {
         expect(findCheck(checks, "VOTE_RULESET_REQUIRED").ok).toBe(false);
     });
 
-    it("warns SHORT_VOTING_PERIOD when the voting period is under 15 days", () => {
+    it("fails WINDOW_TOO_SHORT as an error when a per rollam vote runs under 15 days", () => {
+        // The server rejects this outright (`vote.aggregate.ts`), so the
+        // checklist must not present it as advice the chair can wave through.
         const vote = buildVote({
+            mode: "PER_ROLLAM",
             scheduledFrom: new Date(Date.now() + 2 * DAY_MS).toISOString(),
             scheduledTo: new Date(Date.now() + 12 * DAY_MS).toISOString(),
             ruleset: completeVote.ruleset,
             questions: completeVote.questions,
         });
         const checks = buildReviewChecks(vote);
-        const shortPeriod = findCheck(checks, "SHORT_VOTING_PERIOD");
+        const window = findCheck(checks, "VOTE_WINDOW_TOO_SHORT_PER_ROLLAM");
 
-        expect(shortPeriod.ok).toBe(false);
-        expect(shortPeriod.severity).toBe("warning");
+        expect(window.ok).toBe(false);
+        expect(window.severity).toBe("error");
+        expect(window.step).toBe("details");
+    });
+
+    it("omits the window check entirely for an assembly record", () => {
+        // An assembly record captures when a meeting happened, not how long
+        // owners had to respond, so the 15-day floor does not apply.
+        const vote = buildVote({
+            mode: "ASSEMBLY_RECORD",
+            scheduledFrom: new Date(Date.now() + 2 * DAY_MS).toISOString(),
+            scheduledTo: new Date(Date.now() + 3 * DAY_MS).toISOString(),
+            ruleset: completeVote.ruleset,
+            questions: completeVote.questions,
+        });
+        const checks = buildReviewChecks(vote);
+
+        expect(
+            checks.some((c) => c.code === "VOTE_WINDOW_TOO_SHORT_PER_ROLLAM"),
+        ).toBe(false);
+        expect(checks.every((c) => c.ok)).toBe(true);
     });
 
     it("assigns the expected step and severity to each check", () => {
@@ -186,9 +210,9 @@ describe("buildReviewChecks", () => {
         expect(findCheck(checks, "VOTE_QUESTION_MISSING_OPTIONS").step).toBe(
             "questions",
         );
-        expect(findCheck(checks, "SHORT_VOTING_PERIOD").severity).toBe(
-            "warning",
-        );
+        expect(
+            findCheck(checks, "VOTE_WINDOW_TOO_SHORT_PER_ROLLAM").severity,
+        ).toBe("error");
         expect(findCheck(checks, "VOTE_RULESET_REQUIRED").severity).toBe(
             "error",
         );

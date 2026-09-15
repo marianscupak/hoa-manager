@@ -21,6 +21,8 @@ export default {
         description:
             "Set a password to create your account and join the association.",
         passwordLabel: "Password",
+        passwordReveal: "Show password",
+        passwordHide: "Hide password",
         passwordPlaceholder: "Enter a password (min. 8 characters)",
         submit: "Create Account & Join",
         submitting: "Creating account...",

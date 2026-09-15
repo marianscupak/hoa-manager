@@ -23,6 +23,8 @@ export default {
         emailLabel: "Email Address",
         emailPlaceholder: "jane.smith@example.com",
         passwordLabel: "Password",
+        passwordReveal: "Show password",
+        passwordHide: "Hide password",
         submit: "Sign in",
         submitting: "Signing in...",
         error: "Login failed. Please check your credentials.",

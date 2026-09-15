@@ -18,17 +18,17 @@ export interface ReviewCheck {
 }
 
 /**
- * Drives the review checklist so owners see problems before submitting. The
- * six `VOTE_*` error checks mirror the server's known `INCOMPLETE_VOTE` codes
- * (see `voting:detail.validation.errors.*`); the server remains the source of
+ * Drives the review checklist so owners see problems before submitting. Every
+ * check mirrors a server `INCOMPLETE_VOTE` code (see
+ * `voting:detail.validation.errors.*`); the server remains the source of
  * truth — `useScheduleVote` + `ScheduleValidationModal` still handle any
- * mismatch. `SHORT_VOTING_PERIOD` is a client-side advisory warning (a
- * 15-day heuristic) and never blocks scheduling here — note that for
- * PER_ROLLAM votes the server *does* enforce a real 15-day floor
- * (`VOTE_WINDOW_TOO_SHORT_PER_ROLLAM`, part of the same `INCOMPLETE_VOTE`
- * details on schedule); this client-side check hasn't been split by mode
- * yet, so a too-short per-rollam window still only surfaces here as a
- * non-blocking warning and gets caught for real by the server on submit.
+ * mismatch.
+ *
+ * The 15-day window check is per rollam only, and it is an error rather than
+ * advice: `vote.aggregate.ts` refuses to schedule a shorter per-rollam vote.
+ * An assembly record has no such floor — it captures when a meeting happened,
+ * not how long owners had to respond — so the check is left out for it
+ * entirely rather than shown as a warning nobody needs to act on.
  */
 export function buildReviewChecks(vote: VoteDetailResponseDto): ReviewCheck[] {
     const from = vote.scheduledFrom ? new Date(vote.scheduledFrom) : null;
@@ -72,13 +72,17 @@ export function buildReviewChecks(vote: VoteDetailResponseDto): ReviewCheck[] {
             severity: "error",
             step: "questions",
         },
-        {
-            code: "SHORT_VOTING_PERIOD",
-            ok: !from || !to || differenceInDays(to, from) >= 15,
-            severity: "warning",
-            step: "details",
-        },
     ];
+
+    if (vote.mode === "PER_ROLLAM") {
+        checks.push({
+            code: "VOTE_WINDOW_TOO_SHORT_PER_ROLLAM",
+            ok: !from || !to || differenceInDays(to, from) >= 15,
+            severity: "error",
+            step: "details",
+        });
+    }
+
     return checks;
 }
 

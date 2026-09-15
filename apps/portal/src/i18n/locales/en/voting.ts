@@ -151,9 +151,11 @@ export const voting = {
             scheduledTo: {
                 label: "Scheduled To",
                 description: "When should the vote automatically close?",
+                errors: {
+                    tooShortPerRollam:
+                        "A per rollam vote must run for at least 15 days. Move the closing date further out.",
+                },
             },
-            shortVotingPeriodWarning:
-                "The voting period is shorter than 15 days. Consider extending it to give all owners enough time to vote.",
             weightBasis: {
                 label: "Weight Basis",
                 placeholder: "Select weight basis",
@@ -313,7 +315,8 @@ export const voting = {
                 VOTE_MISSING_QUESTIONS: "At least one question exists",
                 VOTE_QUESTION_MISSING_OPTIONS:
                     "Every question has answer options",
-                SHORT_VOTING_PERIOD: "Voting period is at least 15 days",
+                VOTE_WINDOW_TOO_SHORT_PER_ROLLAM:
+                    "Per rollam voting period is at least 15 days",
             },
         },
     },

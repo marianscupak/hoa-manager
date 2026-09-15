@@ -36,6 +36,8 @@ export function LoginPage() {
                         name="password"
                         label={t("loginPage.passwordLabel")}
                         type="password"
+                        revealLabel={t("loginPage.passwordReveal")}
+                        hideLabel={t("loginPage.passwordHide")}
                         disabled={isPending}
                     />
 

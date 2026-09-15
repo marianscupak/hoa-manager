@@ -23,6 +23,8 @@ export default {
         emailLabel: "E-mailová adresa",
         emailPlaceholder: "jan.novak@example.com",
         passwordLabel: "Heslo",
+        passwordReveal: "Zobrazit heslo",
+        passwordHide: "Skrýt heslo",
         submit: "Přihlásit se",
         submitting: "Přihlašuji...",
         error: "Přihlášení se nezdařilo. Zkontrolujte prosím své údaje.",

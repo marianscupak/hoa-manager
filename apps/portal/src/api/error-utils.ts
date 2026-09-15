@@ -25,10 +25,14 @@ export function showApiError(err: unknown): void {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const message = i18n.t(`errors:${code}` as any) as string;
 
+    // Longer than the global default: an API error usually names something the
+    // user has to go and change, so it has to survive being read twice.
+    const options = { duration: 10_000 };
+
     if (message === `errors:${code}`) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        toast.error(i18n.t("errors:UNKNOWN" as any) as string);
+        toast.error(i18n.t("errors:UNKNOWN" as any) as string, options);
     } else {
-        toast.error(message);
+        toast.error(message, options);
     }
 }

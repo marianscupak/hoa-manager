@@ -1,3 +1,4 @@
+import { Eye, EyeOff } from "lucide-react";
 import * as React from "react";
 import { useFormContext } from "react-hook-form";
 
@@ -17,6 +18,10 @@ export interface FormInputProps extends InputProps {
     label?: string;
     description?: string;
     suffix?: React.ReactNode;
+    /** Accessible name for the reveal toggle on a `type="password"` field. */
+    revealLabel?: string;
+    /** Accessible name for the same toggle once the value is visible. */
+    hideLabel?: string;
 }
 
 const InputWithSuffix = React.forwardRef<
@@ -47,9 +52,64 @@ const InputWithSuffix = React.forwardRef<
 });
 InputWithSuffix.displayName = "InputWithSuffix";
 
+/**
+ * A password field the user can read back. Without this there is no way to
+ * check a typo before submitting, which is the one thing a masked field makes
+ * impossible and password managers otherwise paper over.
+ */
+const InputWithReveal = React.forwardRef<
+    HTMLInputElement,
+    InputProps & { revealLabel: string; hideLabel: string }
+>(({ revealLabel, hideLabel, className, ...props }, ref) => {
+    const { error, formItemId, formDescriptionId, formMessageId } =
+        useFormField();
+    const [revealed, setRevealed] = React.useState(false);
+    const Icon = revealed ? EyeOff : Eye;
+
+    return (
+        <div className="relative">
+            <Input
+                ref={ref}
+                id={formItemId}
+                aria-describedby={
+                    !error
+                        ? formDescriptionId
+                        : `${formDescriptionId} ${formMessageId}`
+                }
+                aria-invalid={!!error}
+                {...props}
+                type={revealed ? "text" : "password"}
+                className={cn("pr-10", className)}
+            />
+            <button
+                type="button"
+                onClick={() => setRevealed((v) => !v)}
+                aria-label={revealed ? hideLabel : revealLabel}
+                className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex cursor-pointer items-center px-3"
+            >
+                <Icon className="h-4 w-4" />
+            </button>
+        </div>
+    );
+});
+InputWithReveal.displayName = "InputWithReveal";
+
 export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
-    ({ name, label, description, suffix, className, ...props }, ref) => {
+    (
+        {
+            name,
+            label,
+            description,
+            suffix,
+            revealLabel = "Show password",
+            hideLabel = "Hide password",
+            className,
+            ...props
+        },
+        ref,
+    ) => {
         const { control } = useFormContext();
+        const isPassword = props.type === "password";
 
         return (
             <FormField
@@ -58,7 +118,16 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
                 render={({ field }) => (
                     <FormItem>
                         {label && <FormLabel>{label}</FormLabel>}
-                        {suffix !== undefined ? (
+                        {isPassword ? (
+                            <InputWithReveal
+                                revealLabel={revealLabel}
+                                hideLabel={hideLabel}
+                                {...field}
+                                {...props}
+                                ref={ref}
+                                className={className}
+                            />
+                        ) : suffix !== undefined ? (
                             <InputWithSuffix
                                 suffix={suffix}
                                 {...field}

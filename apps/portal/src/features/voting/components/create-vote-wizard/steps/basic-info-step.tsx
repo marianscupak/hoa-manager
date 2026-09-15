@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { differenceInDays } from "date-fns";
-import { AlertTriangle } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
@@ -28,6 +27,35 @@ const createVoteFormSchema = z.object({
 });
 
 type CreateVoteFormValues = z.infer<typeof createVoteFormSchema>;
+
+/** Mirrors `PER_ROLLAM_MIN_WINDOW_MS` in the server's vote aggregate. */
+const PER_ROLLAM_MIN_DAYS = 15;
+
+/**
+ * The server refuses to schedule a per-rollam vote with a window under 15
+ * days, so the wizard blocks it here rather than letting the chair reach the
+ * review step and be rejected on submit. An assembly record has no such
+ * floor.
+ */
+function buildFormSchema(mode: "PER_ROLLAM" | "ASSEMBLY_RECORD") {
+    return createVoteFormSchema.superRefine((values, ctx) => {
+        if (mode !== "PER_ROLLAM") return;
+        if (!values.scheduledFrom || !values.scheduledTo) return;
+
+        const days = differenceInDays(
+            new Date(values.scheduledTo),
+            new Date(values.scheduledFrom),
+        );
+        if (days < PER_ROLLAM_MIN_DAYS) {
+            ctx.addIssue({
+                code: "custom",
+                path: ["scheduledTo"],
+                message:
+                    "voting:create.fields.scheduledTo.errors.tooShortPerRollam",
+            });
+        }
+    });
+}
 
 export interface CreateVoteBasicInfoStepProps {
     onSuccess: (id: string) => void;
@@ -57,8 +85,16 @@ export function CreateVoteBasicInfoStep({
 }: CreateVoteBasicInfoStepProps) {
     const { t } = useTranslation(["voting", "errors"]);
 
+    // Mode is immutable once the vote exists, so the schema only ever needs
+    // building once per step.
+    const schema = useMemo(() => buildFormSchema(mode), [mode]);
+
     const basicInfoForm = useForm<CreateVoteFormValues>({
-        resolver: zodResolver(createVoteFormSchema),
+        resolver: zodResolver(schema),
+        // The per-rollam window error has to land the moment both dates are
+        // set, the way the advisory banner it replaced did. On the default
+        // `onSubmit` the chair would only find out after clicking Continue.
+        mode: "onChange",
         defaultValues: {
             title: initialData?.title ?? "",
             description: initialData?.description ?? "",
@@ -135,25 +171,6 @@ export function CreateVoteBasicInfoStep({
         }
     };
 
-    const renderShortVotingPeriodWarning = () => {
-        const from = basicInfoForm.watch("scheduledFrom");
-        const to = basicInfoForm.watch("scheduledTo");
-        if (from && to) {
-            const days = differenceInDays(new Date(to), new Date(from));
-            if (days < 15) {
-                return (
-                    <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
-                        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-                        <span>
-                            {t("voting:create.fields.shortVotingPeriodWarning")}
-                        </span>
-                    </div>
-                );
-            }
-        }
-        return null;
-    };
-
     return (
         <FormProvider {...basicInfoForm}>
             <form
@@ -208,8 +225,6 @@ export function CreateVoteBasicInfoStep({
                             timeLabel={t("voting:create.fields.time")}
                         />
                     </div>
-
-                    {renderShortVotingPeriodWarning()}
                 </div>
             </form>
         </FormProvider>

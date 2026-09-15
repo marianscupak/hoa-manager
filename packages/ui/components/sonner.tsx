@@ -8,6 +8,11 @@ const Toaster = ({ ...props }: ToasterProps) => {
             theme="light"
             position="top-center"
             className="toaster group"
+            // Sonner's 4s default is too quick to finish reading an error, and
+            // an error is exactly the toast worth reading. The close button
+            // gives back the control a longer timeout takes away.
+            duration={6000}
+            closeButton
             toastOptions={{
                 classNames: {
                     toast: "group toast group-[.toaster]:bg-card group-[.toaster]:text-card-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg",

@@ -21,6 +21,8 @@ export default {
         description:
             "Nastavte si heslo pro vytvoření účtu a připojení ke společenství.",
         passwordLabel: "Heslo",
+        passwordReveal: "Zobrazit heslo",
+        passwordHide: "Skrýt heslo",
         passwordPlaceholder: "Zadejte heslo (min. 8 znaků)",
         submit: "Vytvořit účet a připojit se",
         submitting: "Vytváření účtu...",

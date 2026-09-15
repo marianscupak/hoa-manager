@@ -54,6 +54,8 @@ export function InviteRegisterSection({
                         label={t("register.passwordLabel")}
                         type="password"
                         placeholder={t("register.passwordPlaceholder")}
+                        revealLabel={t("register.passwordReveal")}
+                        hideLabel={t("register.passwordHide")}
                     />
 
                     <Button

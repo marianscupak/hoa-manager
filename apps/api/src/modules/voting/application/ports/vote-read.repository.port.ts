@@ -107,6 +107,10 @@ export interface VoteReadRepository {
    * status and its current owners. Weights come from the snapshot; owner
    * names come from ownership current at `now`, because names are not
    * snapshotted.
+   *
+   * Always returns the **full** board-level shape. Redaction for unit
+   * owners happens in `GetVoteParticipationHandler`, which is the single
+   * place that decides what each role may see.
    */
   findParticipation(
     tenantId: string,

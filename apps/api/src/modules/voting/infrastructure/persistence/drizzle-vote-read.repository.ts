@@ -17,6 +17,7 @@ import {
   users,
   voteElectorateUnits,
   ballots,
+  ballotAnswers,
   voteResults,
   voteQuestionResults,
   voteOptionResults,
@@ -40,6 +41,7 @@ import {
   type VoteResultsResponseDto,
   type QuestionOutcomeDto,
   type VoteParticipationUnitDto,
+  type ParticipationAnswerDto,
 } from '@/modules/voting/api/dto/vote.dto';
 import { type VoteReadRepository } from '@/modules/voting/application/ports/vote-read.repository.port';
 import {
@@ -1397,13 +1399,48 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
 
     const ballotRows = await this.drizzle.db
       .select({
+        ballotId: ballots.id,
         unitId: ballots.unitId,
         castMethod: ballots.castMethod,
         castAt: ballots.castAt,
+        recordedBy: users.fullName,
       })
       .from(ballots)
+      .leftJoin(
+        tenantMemberships,
+        eq(tenantMemberships.id, ballots.castByMembershipId),
+      )
+      .leftJoin(users, eq(users.id, tenantMemberships.userId))
       .where(and(eq(ballots.tenantId, tenantId), eq(ballots.voteId, voteId)));
     const ballotByUnit = new Map(ballotRows.map((row) => [row.unitId, row]));
+
+    const ballotIds = ballotRows.map((row) => row.ballotId);
+    const answerRows =
+      ballotIds.length === 0
+        ? []
+        : await this.drizzle.db
+            .select({
+              ballotId: ballotAnswers.ballotId,
+              questionId: ballotAnswers.questionId,
+              optionId: ballotAnswers.optionId,
+              optionLabel: voteOptions.label,
+              optionKey: voteOptions.optionKey,
+            })
+            .from(ballotAnswers)
+            .innerJoin(voteOptions, eq(voteOptions.id, ballotAnswers.optionId))
+            .where(inArray(ballotAnswers.ballotId, ballotIds));
+
+    const answersByBallot = new Map<string, ParticipationAnswerDto[]>();
+    for (const row of answerRows) {
+      const list = answersByBallot.get(row.ballotId) ?? [];
+      list.push({
+        questionId: row.questionId,
+        optionId: row.optionId,
+        optionLabel: row.optionLabel,
+        optionKey: row.optionKey as VoteOptionSemantic,
+      });
+      answersByBallot.set(row.ballotId, list);
+    }
 
     const ownerRows = await this.drizzle.db
       .select({
@@ -1445,6 +1482,15 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
     return snapshotRows.map((row) => {
       const ballot = ballotByUnit.get(row.unitId);
       const owners = ownersByUnit.get(row.unitId) ?? [];
+      // Ownership, not representation: a co-owner who is not the common
+      // representative still owns the unit, and a proxy delegate does not.
+      const ownsUnit = owners.some(
+        (o) =>
+          o.membershipId != null && o.membershipId === requesterMembershipId,
+      );
+      const representsUnit =
+        row.representativeMembershipId === requesterMembershipId;
+
       return {
         unitId: row.unitId,
         unitNo: row.unitNo,
@@ -1457,8 +1503,20 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
             : 'INELIGIBLE',
         castMethod: ballot?.castMethod,
         castAt: ballot?.castAt,
+        // Every ballot has a castByMembershipId, including DIRECT ones (it's
+        // the voter's own membership) — only surface it as "recorded by"
+        // when a paper ballot was actually recorded on someone's behalf.
+        recordedBy:
+          ballot?.castMethod === 'BOARD_PROXY'
+            ? ballot.recordedBy ?? undefined
+            : undefined,
+        answers: ballot
+          ? answersByBallot.get(ballot.ballotId) ?? []
+          : undefined,
         ineligibleReason: row.ineligibleReason ?? undefined,
-        isOwnUnit: row.representativeMembershipId === requesterMembershipId,
+        isOwnUnit: representsUnit,
+        ownsUnit,
+        isProxy: representsUnit && !ownsUnit,
         owners: owners.map((o) => ({
           ownerId: o.ownerId,
           displayName: o.displayName,

@@ -1,15 +1,53 @@
 import { Inject } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import {
-  VOTE_READ_REPOSITORY,
-  type VoteReadRepository,
-} from '@/modules/voting/application/ports/vote-read.repository.port';
+import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
 import { VoteNotFoundException } from '@/shared/application/exceptions/vote.exceptions';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 
 import { GetVoteParticipationQuery } from './get-vote-participation.query';
-import { VoteParticipationResponseDto } from '../../../api/dto/vote.dto';
+import {
+  type VoteParticipationResponseDto,
+  type VoteParticipationUnitDto,
+} from '../../../api/dto/vote.dto';
+import {
+  VOTE_READ_REPOSITORY,
+  type VoteReadRepository,
+} from '../../ports/vote-read.repository.port';
+
+const BOARD_VIEW_ROLES: readonly TenantMembershipRole[] = [
+  TenantMembershipRole.ADMIN,
+  TenantMembershipRole.BOARD_MEMBER,
+  TenantMembershipRole.AUDITOR,
+];
+
+/**
+ * What a unit owner may see: that a unit exists, its weight, and whether it
+ * has voted. Built by construction rather than by deleting keys, so a field
+ * added to the repository row is excluded by default instead of leaking
+ * until someone remembers to redact it.
+ *
+ * `status` is narrowed too, not just `ineligibleReason`: a bare INELIGIBLE
+ * would leave the portal unable to tell a unit with no common representative
+ * (which owners must see as simply "not voted") from one with no owner on
+ * record (which is genuinely outside the electorate).
+ */
+function toOwnerView(
+  unit: VoteParticipationUnitDto,
+): VoteParticipationUnitDto {
+  return {
+    unitId: unit.unitId,
+    unitNo: unit.unitNo,
+    share: unit.share,
+    status:
+      unit.status === 'INELIGIBLE' &&
+      unit.ineligibleReason === 'NO_REPRESENTATIVE'
+        ? 'NOT_VOTED'
+        : unit.status,
+    ownsUnit: unit.ownsUnit,
+    isProxy: unit.isProxy,
+  };
+}
 
 @QueryHandler(GetVoteParticipationQuery)
 export class GetVoteParticipationHandler
@@ -39,6 +77,10 @@ export class GetVoteParticipationHandler
       throw new VoteNotFoundException();
     }
 
-    return { units };
+    const isBoardView = query.roles.some((role) =>
+      BOARD_VIEW_ROLES.includes(role),
+    );
+
+    return { units: isBoardView ? units : units.map(toOwnerView) };
   }
 }

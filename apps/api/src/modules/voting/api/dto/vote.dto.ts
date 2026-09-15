@@ -701,6 +701,22 @@ export class ParticipationOwnerDto {
   isRepresentative!: boolean;
 }
 
+export class ParticipationAnswerDto {
+  @ApiProperty()
+  questionId!: string;
+
+  @ApiProperty()
+  optionId!: string;
+
+  /** Stored label, not a translation key — SINGLE_CHOICE questions carry
+   *  free-text options that have no fixed semantics. */
+  @ApiProperty()
+  optionLabel!: string;
+
+  @ApiProperty({ enum: VoteOptionSemantic })
+  optionKey!: VoteOptionSemantic;
+}
+
 export class VoteParticipationUnitDto {
   @ApiProperty()
   unitId!: string;
@@ -708,20 +724,38 @@ export class VoteParticipationUnitDto {
   @ApiProperty()
   unitNo!: string;
 
-  @ApiProperty({ type: [String] })
-  ownerNames!: string[];
-
   @ApiProperty({ description: 'Building share, e.g. "5/100".' })
   share!: string;
 
   @ApiProperty({ enum: ['VOTED', 'NOT_VOTED', 'INELIGIBLE'] })
   status!: 'VOTED' | 'NOT_VOTED' | 'INELIGIBLE';
 
+  /** The requester is an active owner of this unit, for any share. Drives
+   *  the "Yours" marker. Present for every role. */
+  @ApiProperty()
+  ownsUnit!: boolean;
+
+  /** The requester represents this unit but does not own it. Drives the
+   *  "Proxy" marker. Present for every role. */
+  @ApiProperty()
+  isProxy!: boolean;
+
+  // ── Board/admin/auditor only. Absent for unit owners; see
+  //    GetVoteParticipationHandler, which is the single redaction point.
+
+  @ApiProperty({ required: false, type: [String] })
+  ownerNames?: string[];
+
   @ApiProperty({ required: false, enum: ['DIRECT', 'BOARD_PROXY'] })
   castMethod?: 'DIRECT' | 'BOARD_PROXY';
 
   @ApiProperty({ required: false, type: 'string', format: 'date-time' })
   castAt?: Date;
+
+  /** Who recorded a paper ballot. Null for DIRECT ballots and when the
+   *  recording membership no longer resolves to a user. */
+  @ApiProperty({ required: false })
+  recordedBy?: string;
 
   @ApiProperty({
     required: false,
@@ -731,11 +765,14 @@ export class VoteParticipationUnitDto {
 
   /** The requester represents this unit, so they should use the app booth
    *  rather than record their own paper ballot. */
-  @ApiProperty()
-  isOwnUnit!: boolean;
+  @ApiProperty({ required: false })
+  isOwnUnit?: boolean;
 
-  @ApiProperty({ type: [ParticipationOwnerDto] })
-  owners!: ParticipationOwnerDto[];
+  @ApiProperty({ required: false, type: [ParticipationOwnerDto] })
+  owners?: ParticipationOwnerDto[];
+
+  @ApiProperty({ required: false, type: [ParticipationAnswerDto] })
+  answers?: ParticipationAnswerDto[];
 }
 
 export class VoteParticipationResponseDto {

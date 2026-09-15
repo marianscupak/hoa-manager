@@ -469,11 +469,12 @@ export class VotesController {
   @Get(':id/participation')
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
-    description: 'Per-unit participation for an open vote',
+    description:
+      'Per-unit participation for an open vote. Unit owners receive a ' +
+      'reduced shape carrying no answers, mechanisms or timestamps.',
     type: VoteParticipationResponseDto,
   })
-  @UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
-  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard)
   getVoteParticipation(
     @Param('id', ParseUUIDPipe) id: string,
     @Tenant() tenantCtx: TenantContext,
@@ -483,6 +484,7 @@ export class VotesController {
         tenantCtx.tenantId,
         id,
         tenantCtx.membershipId,
+        tenantCtx.roles,
       ),
     );
   }

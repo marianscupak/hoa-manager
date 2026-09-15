@@ -12,6 +12,7 @@ import {
 
 export interface TallyElectorateRow {
   unitId: string;
+  eligibilityStatus: string;
   ineligibleReason: string | null;
   weightNum: number;
   weightDen: number;
@@ -61,6 +62,8 @@ export interface TallyResult {
   quorumMet: boolean | null;
   participationWeight: Rational;
   participationUnitCount: number;
+  eligibleWeight: Rational;
+  eligibleUnitCount: number;
   totalVotesWeight: Rational;
   totalVotesUnitCount: number;
   questionResults: TallyQuestionResult[];
@@ -91,6 +94,17 @@ export function computeVoteResults(input: TallyInput): TallyResult {
 
   const totalVotesWeight = Rational.sum([...weightByUnit.values()]);
   const totalVotesUnitCount = countable.length;
+
+  // "Eligible" is narrower than "countable": an association-owned unit is
+  // already out of `countable`, while a unit with no common representative
+  // still counts toward the statutory total but cannot itself vote.
+  const eligibleRows = countable.filter(
+    (row) => row.eligibilityStatus === 'ELIGIBLE',
+  );
+  const eligibleUnitCount = eligibleRows.length;
+  const eligibleWeight = Rational.sum(
+    eligibleRows.map((row) => Rational.from(row.weightNum, row.weightDen)),
+  );
 
   const participatingUnits = new Set(
     input.ballots
@@ -209,6 +223,8 @@ export function computeVoteResults(input: TallyInput): TallyResult {
     quorumMet,
     participationWeight,
     participationUnitCount,
+    eligibleWeight,
+    eligibleUnitCount,
     totalVotesWeight,
     totalVotesUnitCount,
     questionResults,

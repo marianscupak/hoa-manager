@@ -40,6 +40,7 @@ function building(total: number, yes: number, no: number, abstain = 0) {
     { length: total },
     (_, i) => ({
       unitId: `u${i}`,
+      eligibilityStatus: 'ELIGIBLE',
       ineligibleReason: null,
       weightNum: 1,
       weightDen: total,
@@ -203,6 +204,7 @@ describe('computeVoteResults', () => {
     const data = building(4, 2, 0);
     data.electorate[3] = {
       unitId: 'u3',
+      eligibilityStatus: 'INELIGIBLE',
       ineligibleReason: 'ASSOCIATION_OWNED',
       weightNum: 1,
       weightDen: 4,
@@ -223,12 +225,14 @@ describe('computeVoteResults', () => {
     const data = building(4, 2, 0);
     data.electorate[2] = {
       unitId: 'u2',
+      eligibilityStatus: 'INELIGIBLE',
       ineligibleReason: 'NO_REPRESENTATIVE',
       weightNum: 1,
       weightDen: 4,
     };
     data.electorate[3] = {
       unitId: 'u3',
+      eligibilityStatus: 'INELIGIBLE',
       ineligibleReason: 'MISSING_OWNERSHIP',
       weightNum: 1,
       weightDen: 4,
@@ -250,6 +254,7 @@ describe('computeVoteResults', () => {
   it('exact fractions: three 1/3-units all voting yes give participation exactly 1', () => {
     const electorate = [0, 1, 2].map((i) => ({
       unitId: `u${i}`,
+      eligibilityStatus: 'ELIGIBLE',
       ineligibleReason: null,
       weightNum: 1,
       weightDen: 3,
@@ -272,5 +277,76 @@ describe('computeVoteResults', () => {
       answers,
     });
     expect(result.participationWeight.eq(Rational.one())).toBe(true); // 0.3333×3 would fail this
+  });
+});
+
+describe('eligible aggregates', () => {
+  it('counts only eligible, countable units', () => {
+    const result = computeVoteResults({
+      mode: VoteMode.PER_ROLLAM,
+      quorum: null,
+      questions: [],
+      electorate: [
+        {
+          unitId: 'u1',
+          eligibilityStatus: 'ELIGIBLE',
+          ineligibleReason: null,
+          weightNum: 40,
+          weightDen: 100,
+        },
+        {
+          unitId: 'u2',
+          eligibilityStatus: 'ELIGIBLE',
+          ineligibleReason: null,
+          weightNum: 35,
+          weightDen: 100,
+        },
+        {
+          unitId: 'u3',
+          eligibilityStatus: 'INELIGIBLE',
+          ineligibleReason: 'NO_REPRESENTATIVE',
+          weightNum: 15,
+          weightDen: 100,
+        },
+        {
+          unitId: 'u4',
+          eligibilityStatus: 'INELIGIBLE',
+          ineligibleReason: 'ASSOCIATION_OWNED',
+          weightNum: 10,
+          weightDen: 100,
+        },
+      ],
+      ballots: [],
+      answers: [],
+    });
+
+    // u3 is countable but not eligible; u4 is association-owned and so is
+    // excluded from the countable set entirely.
+    expect(result.eligibleUnitCount).toBe(2);
+    expect(result.eligibleWeight.num).toBe(3n);
+    expect(result.eligibleWeight.den).toBe(4n);
+    expect(result.totalVotesUnitCount).toBe(3);
+  });
+
+  it('reports zero eligible weight when no unit is eligible', () => {
+    const result = computeVoteResults({
+      mode: VoteMode.PER_ROLLAM,
+      quorum: null,
+      questions: [],
+      electorate: [
+        {
+          unitId: 'u1',
+          eligibilityStatus: 'INELIGIBLE',
+          ineligibleReason: 'MISSING_OWNERSHIP',
+          weightNum: 1,
+          weightDen: 1,
+        },
+      ],
+      ballots: [],
+      answers: [],
+    });
+
+    expect(result.eligibleUnitCount).toBe(0);
+    expect(result.eligibleWeight.isZero()).toBe(true);
   });
 });

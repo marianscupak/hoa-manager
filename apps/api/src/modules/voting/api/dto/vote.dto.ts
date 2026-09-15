@@ -672,6 +672,14 @@ export class VoteTurnoutResponseDto {
 
   @ApiProperty()
   participationPercent!: string;
+
+  /**
+   * Null for PER_ROLLAM votes, which have no quorum — the same three-state
+   * semantics `VoteResultsResponseDto.quorumMet` already uses, so the portal
+   * can share one rendering rule between live and closed views.
+   */
+  @ApiProperty({ type: Boolean, nullable: true })
+  quorumMet!: boolean | null;
 }
 
 // ── Vote Participation ──────────────────────────────────

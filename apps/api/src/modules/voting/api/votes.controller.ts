@@ -509,8 +509,7 @@ export class VotesController {
     description: 'Turnout for an open or closed vote',
     type: VoteTurnoutResponseDto,
   })
-  @UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
-  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard)
   getVoteTurnout(
     @Tenant() tenantCtx: TenantContext,
     @Param('id', ParseUUIDPipe) id: string,

@@ -64,6 +64,7 @@ export class ResultCalculationDomainService
       }),
       electorate: electorateRows.map((e) => ({
         unitId: e.unitId,
+        eligibilityStatus: e.eligibilityStatus,
         ineligibleReason: e.ineligibleReason,
         weightNum: e.weightNum,
         weightDen: e.weightDen,

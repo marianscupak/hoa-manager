@@ -5,12 +5,12 @@ import { Link } from "react-router";
 import {
     Button,
     CellNumeric,
-    formatPercent,
     StatusChip,
     type ColumnDef,
 } from "@hoa-mngr/ui";
 
 import type { UnitResponseDto } from "@/api/generated/model";
+import { shareCellValues } from "@/features/units/utils/shares";
 
 import { capitalizeFirst } from "./capitalize-first";
 
@@ -91,13 +91,10 @@ export function getUnitColumns(
             enableGlobalFilter: false,
             cell: ({ row }) => (
                 <CellNumeric
-                    value={formatPercent(
-                        (row.original.buildingShareNumerator /
-                            row.original.buildingShareDenominator) *
-                            100,
-                        1,
+                    {...shareCellValues(
+                        row.original.buildingShareNumerator,
+                        row.original.buildingShareDenominator,
                     )}
-                    secondary={`${row.original.buildingShareNumerator}/${row.original.buildingShareDenominator}`}
                 />
             ),
         },

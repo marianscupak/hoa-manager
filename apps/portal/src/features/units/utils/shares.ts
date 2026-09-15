@@ -8,6 +8,8 @@
  * fraction so a rounded value never drives a decision.
  */
 
+import { formatPercent } from "@hoa-mngr/ui";
+
 /** The fraction as a percentage (0..100), unrounded. 0 if the denominator is missing. */
 export function sharePercent(numerator: number, denominator: number): number {
     if (!denominator) return 0;
@@ -34,4 +36,24 @@ export function isCoOwnedShare(
 ): boolean {
     if (!denominator) return false;
     return numerator < denominator;
+}
+
+/**
+ * The pair every share renders as, wherever it appears: the fraction leads
+ * because that is the number the association's documents state, and the
+ * percentage sits underneath as the readable approximation.
+ *
+ * Shared so the unit list, the owner list, the ownership history and the
+ * dashboard cannot drift apart again — they previously disagreed on both the
+ * order and what the second line held (percentage vs. the API's rounded
+ * decimal).
+ */
+export function shareCellValues(
+    numerator: number,
+    denominator: number,
+): { value: string; secondary: string } {
+    return {
+        value: `${numerator}/${denominator}`,
+        secondary: formatPercent(sharePercent(numerator, denominator)),
+    };
 }

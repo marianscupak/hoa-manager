@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isCoOwnedShare, sharePercent } from "./shares";
+import { isCoOwnedShare, shareCellValues, sharePercent } from "./shares";
 
 describe("sharePercent", () => {
     it("converts a stored fraction to a percentage", () => {
@@ -60,5 +60,28 @@ describe("isCoOwnedShare", () => {
 
     it("is false when the denominator is missing", () => {
         expect(isCoOwnedShare(1, 0)).toBe(false);
+    });
+});
+
+describe("shareCellValues", () => {
+    it("leads with the fraction and carries the percentage underneath", () => {
+        expect(shareCellValues(6342, 206422)).toEqual({
+            value: "6342/206422",
+            secondary: "3.07 %",
+        });
+    });
+
+    it("renders a whole share without trailing zeros", () => {
+        expect(shareCellValues(1, 1)).toEqual({
+            value: "1/1",
+            secondary: "100 %",
+        });
+    });
+
+    it("survives a missing denominator rather than printing NaN", () => {
+        expect(shareCellValues(1, 0)).toEqual({
+            value: "1/0",
+            secondary: "0 %",
+        });
     });
 });

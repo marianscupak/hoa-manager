@@ -1,10 +1,10 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
-import { formatPercent, StatusChip } from "@hoa-mngr/ui";
+import { StatusChip } from "@hoa-mngr/ui";
 
 import type { OwnedUnitResponseDto } from "@/api/generated/model";
-import { isCoOwnedShare, sharePercent } from "@/features/units/utils/shares";
+import { isCoOwnedShare, shareCellValues } from "@/features/units/utils/shares";
 
 interface OwnedUnitsTableProps {
     units: OwnedUnitResponseDto[];
@@ -59,29 +59,18 @@ export function OwnedUnitsTable({ units }: OwnedUnitsTableProps) {
                         </td>
                         <td className="py-2 text-right tabular-nums">
                             <span className="text-foreground block font-medium">
-                                {u.shareNumerator}/{u.shareDenominator}
+                                {shareCellValues(u.shareNumerator, u.shareDenominator).value}
                             </span>
                             <span className="text-faint text-detail">
-                                {formatPercent(
-                                    sharePercent(
-                                        u.shareNumerator,
-                                        u.shareDenominator,
-                                    ),
-                                )}
+                                {shareCellValues(u.shareNumerator, u.shareDenominator).secondary}
                             </span>
                         </td>
                         <td className="py-2 text-right tabular-nums">
                             <span className="text-foreground block font-medium">
-                                {u.buildingShareNumerator}/
-                                {u.buildingShareDenominator}
+                                {shareCellValues(u.buildingShareNumerator, u.buildingShareDenominator).value}
                             </span>
                             <span className="text-faint text-detail">
-                                {formatPercent(
-                                    sharePercent(
-                                        u.buildingShareNumerator,
-                                        u.buildingShareDenominator,
-                                    ),
-                                )}
+                                {shareCellValues(u.buildingShareNumerator, u.buildingShareDenominator).secondary}
                             </span>
                         </td>
                     </tr>

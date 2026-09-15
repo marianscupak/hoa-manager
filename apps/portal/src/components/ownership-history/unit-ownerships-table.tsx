@@ -10,6 +10,7 @@ import {
 } from "@hoa-mngr/ui";
 
 import type { UnitOwnershipPeriodResponseDto } from "@/api/generated/model";
+import { shareCellValues } from "@/features/units/utils/shares";
 
 import { flattenPeriods, periodLabel, type OwnershipHistoryRow } from "./rows";
 
@@ -56,8 +57,10 @@ export function getUnitOwnershipColumns(
             enableGlobalFilter: false,
             cell: ({ row }) => (
                 <CellNumeric
-                    value={`${row.original.party.shareNumerator}/${row.original.party.shareDenominator}`}
-                    secondary={row.original.party.shareDecimal}
+                    {...shareCellValues(
+                        row.original.party.shareNumerator,
+                        row.original.party.shareDenominator,
+                    )}
                 />
             ),
         },

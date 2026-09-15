@@ -5,14 +5,13 @@ import { Link } from "react-router";
 import {
     Button,
     CellNumeric,
-    formatPercent,
     StatusChip,
     type ColumnDef,
 } from "@hoa-mngr/ui";
 
 import type { OwnedUnitResponseDto } from "@/api/generated/model";
 
-import { isCoOwnedShare, sharePercent } from "../utils/shares";
+import { isCoOwnedShare, shareCellValues } from "../utils/shares";
 
 /**
  * Columns for the owner-facing unit list.
@@ -55,12 +54,9 @@ export function getMyUnitColumns(
             enableGlobalFilter: false,
             cell: ({ row }) => (
                 <CellNumeric
-                    value={`${row.original.shareNumerator}/${row.original.shareDenominator}`}
-                    secondary={formatPercent(
-                        sharePercent(
-                            row.original.shareNumerator,
-                            row.original.shareDenominator,
-                        ),
+                    {...shareCellValues(
+                        row.original.shareNumerator,
+                        row.original.shareDenominator,
                     )}
                 />
             ),
@@ -72,12 +68,9 @@ export function getMyUnitColumns(
             enableGlobalFilter: false,
             cell: ({ row }) => (
                 <CellNumeric
-                    value={`${row.original.buildingShareNumerator}/${row.original.buildingShareDenominator}`}
-                    secondary={formatPercent(
-                        sharePercent(
-                            row.original.buildingShareNumerator,
-                            row.original.buildingShareDenominator,
-                        ),
+                    {...shareCellValues(
+                        row.original.buildingShareNumerator,
+                        row.original.buildingShareDenominator,
                     )}
                 />
             ),

@@ -29,6 +29,9 @@ import type {
     CreateVoteResponseDto,
     DelegationCandidateDto,
     DocumentDownloadUrlResponseDto,
+    RecordPaperBallotDto,
+    RequestBallotAttachmentUploadDto,
+    RequestBallotAttachmentUploadResponseDto,
     RequestDocumentUploadDto,
     RequestDocumentUploadResponseDto,
     SetVoteRulesetDto,
@@ -42,6 +45,7 @@ import type {
     VoteConsentResponseDto,
     VoteDetailResponseDto,
     VoteListItemResponseDto,
+    VoteParticipationResponseDto,
     VoteResultsResponseDto,
     VoteTurnoutResponseDto,
     VoterStatusResponseDto,
@@ -2070,6 +2074,267 @@ export const useVotesControllerSubmitBallot = <
         queryClient,
     );
 };
+export const votesControllerRecordPaperBallot = (
+    id: string,
+    recordPaperBallotDto: BodyType<RecordPaperBallotDto>,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<SubmitBallotResponseDto>(
+        {
+            url: `/api/votes/${id}/paper-ballots`,
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            data: recordPaperBallotDto,
+            signal,
+        },
+        options,
+    );
+};
+
+export const getVotesControllerRecordPaperBallotMutationOptions = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof votesControllerRecordPaperBallot>>,
+        TError,
+        { id: string; data: BodyType<RecordPaperBallotDto> },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof votesControllerRecordPaperBallot>>,
+    TError,
+    { id: string; data: BodyType<RecordPaperBallotDto> },
+    TContext
+> => {
+    const mutationKey = ["votesControllerRecordPaperBallot"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof votesControllerRecordPaperBallot>>,
+        { id: string; data: BodyType<RecordPaperBallotDto> }
+    > = (props) => {
+        const { id, data } = props ?? {};
+
+        return votesControllerRecordPaperBallot(id, data, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type VotesControllerRecordPaperBallotMutationResult = NonNullable<
+    Awaited<ReturnType<typeof votesControllerRecordPaperBallot>>
+>;
+export type VotesControllerRecordPaperBallotMutationBody =
+    BodyType<RecordPaperBallotDto>;
+export type VotesControllerRecordPaperBallotMutationError = ErrorType<unknown>;
+
+export const useVotesControllerRecordPaperBallot = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof votesControllerRecordPaperBallot>>,
+            TError,
+            { id: string; data: BodyType<RecordPaperBallotDto> },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof votesControllerRecordPaperBallot>>,
+    TError,
+    { id: string; data: BodyType<RecordPaperBallotDto> },
+    TContext
+> => {
+    return useMutation(
+        getVotesControllerRecordPaperBallotMutationOptions(options),
+        queryClient,
+    );
+};
+export const votesControllerGetVoteParticipation = (
+    id: string,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<VoteParticipationResponseDto>(
+        { url: `/api/votes/${id}/participation`, method: "GET", signal },
+        options,
+    );
+};
+
+export const getVotesControllerGetVoteParticipationQueryKey = (id: string) => {
+    return [`/api/votes/${id}/participation`] as const;
+};
+
+export const getVotesControllerGetVoteParticipationQueryOptions = <
+    TData = Awaited<ReturnType<typeof votesControllerGetVoteParticipation>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof votesControllerGetVoteParticipation>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getVotesControllerGetVoteParticipationQueryKey(id);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof votesControllerGetVoteParticipation>>
+    > = ({ signal }) =>
+        votesControllerGetVoteParticipation(id, requestOptions, signal);
+
+    return {
+        queryKey,
+        queryFn,
+        enabled: !!id,
+        ...queryOptions,
+    } as UseQueryOptions<
+        Awaited<ReturnType<typeof votesControllerGetVoteParticipation>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type VotesControllerGetVoteParticipationQueryResult = NonNullable<
+    Awaited<ReturnType<typeof votesControllerGetVoteParticipation>>
+>;
+export type VotesControllerGetVoteParticipationQueryError = ErrorType<unknown>;
+
+export function useVotesControllerGetVoteParticipation<
+    TData = Awaited<ReturnType<typeof votesControllerGetVoteParticipation>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof votesControllerGetVoteParticipation>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof votesControllerGetVoteParticipation>
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<typeof votesControllerGetVoteParticipation>
+                    >
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useVotesControllerGetVoteParticipation<
+    TData = Awaited<ReturnType<typeof votesControllerGetVoteParticipation>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof votesControllerGetVoteParticipation>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof votesControllerGetVoteParticipation>
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<typeof votesControllerGetVoteParticipation>
+                    >
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useVotesControllerGetVoteParticipation<
+    TData = Awaited<ReturnType<typeof votesControllerGetVoteParticipation>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof votesControllerGetVoteParticipation>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useVotesControllerGetVoteParticipation<
+    TData = Awaited<ReturnType<typeof votesControllerGetVoteParticipation>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof votesControllerGetVoteParticipation>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
+    const queryOptions = getVotesControllerGetVoteParticipationQueryOptions(
+        id,
+        options,
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+        TData,
+        TError
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+    return { ...query, queryKey: queryOptions.queryKey };
+}
+
 export const votesControllerGetVoteResults = (
     id: string,
     options?: SecondParameter<typeof customInstance>,
@@ -3264,6 +3529,440 @@ export function useVotesControllerGetDocumentDownloadUrl<
         documentId,
         options,
     );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+        TData,
+        TError
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+    return { ...query, queryKey: queryOptions.queryKey };
+}
+
+export const votesControllerRequestBallotAttachmentUpload = (
+    id: string,
+    requestBallotAttachmentUploadDto: BodyType<RequestBallotAttachmentUploadDto>,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<RequestBallotAttachmentUploadResponseDto>(
+        {
+            url: `/api/votes/${id}/ballot-attachments`,
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            data: requestBallotAttachmentUploadDto,
+            signal,
+        },
+        options,
+    );
+};
+
+export const getVotesControllerRequestBallotAttachmentUploadMutationOptions = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<
+            ReturnType<typeof votesControllerRequestBallotAttachmentUpload>
+        >,
+        TError,
+        { id: string; data: BodyType<RequestBallotAttachmentUploadDto> },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof votesControllerRequestBallotAttachmentUpload>>,
+    TError,
+    { id: string; data: BodyType<RequestBallotAttachmentUploadDto> },
+    TContext
+> => {
+    const mutationKey = ["votesControllerRequestBallotAttachmentUpload"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<
+            ReturnType<typeof votesControllerRequestBallotAttachmentUpload>
+        >,
+        { id: string; data: BodyType<RequestBallotAttachmentUploadDto> }
+    > = (props) => {
+        const { id, data } = props ?? {};
+
+        return votesControllerRequestBallotAttachmentUpload(
+            id,
+            data,
+            requestOptions,
+        );
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type VotesControllerRequestBallotAttachmentUploadMutationResult =
+    NonNullable<
+        Awaited<ReturnType<typeof votesControllerRequestBallotAttachmentUpload>>
+    >;
+export type VotesControllerRequestBallotAttachmentUploadMutationBody =
+    BodyType<RequestBallotAttachmentUploadDto>;
+export type VotesControllerRequestBallotAttachmentUploadMutationError =
+    ErrorType<unknown>;
+
+export const useVotesControllerRequestBallotAttachmentUpload = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<
+                ReturnType<typeof votesControllerRequestBallotAttachmentUpload>
+            >,
+            TError,
+            { id: string; data: BodyType<RequestBallotAttachmentUploadDto> },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof votesControllerRequestBallotAttachmentUpload>>,
+    TError,
+    { id: string; data: BodyType<RequestBallotAttachmentUploadDto> },
+    TContext
+> => {
+    return useMutation(
+        getVotesControllerRequestBallotAttachmentUploadMutationOptions(options),
+        queryClient,
+    );
+};
+export const votesControllerDeleteBallotAttachment = (
+    id: string,
+    documentId: string,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<void>(
+        {
+            url: `/api/votes/${id}/ballot-attachments/${documentId}`,
+            method: "DELETE",
+            signal,
+        },
+        options,
+    );
+};
+
+export const getVotesControllerDeleteBallotAttachmentMutationOptions = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof votesControllerDeleteBallotAttachment>>,
+        TError,
+        { id: string; documentId: string },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof votesControllerDeleteBallotAttachment>>,
+    TError,
+    { id: string; documentId: string },
+    TContext
+> => {
+    const mutationKey = ["votesControllerDeleteBallotAttachment"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof votesControllerDeleteBallotAttachment>>,
+        { id: string; documentId: string }
+    > = (props) => {
+        const { id, documentId } = props ?? {};
+
+        return votesControllerDeleteBallotAttachment(
+            id,
+            documentId,
+            requestOptions,
+        );
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type VotesControllerDeleteBallotAttachmentMutationResult = NonNullable<
+    Awaited<ReturnType<typeof votesControllerDeleteBallotAttachment>>
+>;
+
+export type VotesControllerDeleteBallotAttachmentMutationError =
+    ErrorType<unknown>;
+
+export const useVotesControllerDeleteBallotAttachment = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof votesControllerDeleteBallotAttachment>>,
+            TError,
+            { id: string; documentId: string },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof votesControllerDeleteBallotAttachment>>,
+    TError,
+    { id: string; documentId: string },
+    TContext
+> => {
+    return useMutation(
+        getVotesControllerDeleteBallotAttachmentMutationOptions(options),
+        queryClient,
+    );
+};
+export const votesControllerGetBallotAttachmentDownloadUrl = (
+    id: string,
+    documentId: string,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<DocumentDownloadUrlResponseDto>(
+        {
+            url: `/api/votes/${id}/ballot-attachments/${documentId}/download-url`,
+            method: "GET",
+            signal,
+        },
+        options,
+    );
+};
+
+export const getVotesControllerGetBallotAttachmentDownloadUrlQueryKey = (
+    id: string,
+    documentId: string,
+) => {
+    return [
+        `/api/votes/${id}/ballot-attachments/${documentId}/download-url`,
+    ] as const;
+};
+
+export const getVotesControllerGetBallotAttachmentDownloadUrlQueryOptions = <
+    TData = Awaited<
+        ReturnType<typeof votesControllerGetBallotAttachmentDownloadUrl>
+    >,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    documentId: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof votesControllerGetBallotAttachmentDownloadUrl
+                    >
+                >,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getVotesControllerGetBallotAttachmentDownloadUrlQueryKey(
+            id,
+            documentId,
+        );
+
+    const queryFn: QueryFunction<
+        Awaited<
+            ReturnType<typeof votesControllerGetBallotAttachmentDownloadUrl>
+        >
+    > = ({ signal }) =>
+        votesControllerGetBallotAttachmentDownloadUrl(
+            id,
+            documentId,
+            requestOptions,
+            signal,
+        );
+
+    return {
+        queryKey,
+        queryFn,
+        enabled: !!(id && documentId),
+        ...queryOptions,
+    } as UseQueryOptions<
+        Awaited<
+            ReturnType<typeof votesControllerGetBallotAttachmentDownloadUrl>
+        >,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type VotesControllerGetBallotAttachmentDownloadUrlQueryResult =
+    NonNullable<
+        Awaited<
+            ReturnType<typeof votesControllerGetBallotAttachmentDownloadUrl>
+        >
+    >;
+export type VotesControllerGetBallotAttachmentDownloadUrlQueryError =
+    ErrorType<unknown>;
+
+export function useVotesControllerGetBallotAttachmentDownloadUrl<
+    TData = Awaited<
+        ReturnType<typeof votesControllerGetBallotAttachmentDownloadUrl>
+    >,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    documentId: string,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof votesControllerGetBallotAttachmentDownloadUrl
+                    >
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<
+                            typeof votesControllerGetBallotAttachmentDownloadUrl
+                        >
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<
+                            typeof votesControllerGetBallotAttachmentDownloadUrl
+                        >
+                    >
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useVotesControllerGetBallotAttachmentDownloadUrl<
+    TData = Awaited<
+        ReturnType<typeof votesControllerGetBallotAttachmentDownloadUrl>
+    >,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    documentId: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof votesControllerGetBallotAttachmentDownloadUrl
+                    >
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<
+                            typeof votesControllerGetBallotAttachmentDownloadUrl
+                        >
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<
+                            typeof votesControllerGetBallotAttachmentDownloadUrl
+                        >
+                    >
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useVotesControllerGetBallotAttachmentDownloadUrl<
+    TData = Awaited<
+        ReturnType<typeof votesControllerGetBallotAttachmentDownloadUrl>
+    >,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    documentId: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof votesControllerGetBallotAttachmentDownloadUrl
+                    >
+                >,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useVotesControllerGetBallotAttachmentDownloadUrl<
+    TData = Awaited<
+        ReturnType<typeof votesControllerGetBallotAttachmentDownloadUrl>
+    >,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    documentId: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof votesControllerGetBallotAttachmentDownloadUrl
+                    >
+                >,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
+    const queryOptions =
+        getVotesControllerGetBallotAttachmentDownloadUrlQueryOptions(
+            id,
+            documentId,
+            options,
+        );
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<
         TData,

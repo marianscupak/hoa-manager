@@ -2950,6 +2950,76 @@
         ]
       }
     },
+    "/api/votes/{id}/paper-ballots": {
+      "post": {
+        "operationId": "VotesController_recordPaperBallot",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordPaperBallotDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Records a signed paper ballot on behalf of a unit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubmitBallotResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Votes"
+        ]
+      }
+    },
+    "/api/votes/{id}/participation": {
+      "get": {
+        "operationId": "VotesController_getVoteParticipation",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Per-unit participation for an open vote",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoteParticipationResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Votes"
+        ]
+      }
+    },
     "/api/votes/{id}/results": {
       "get": {
         "operationId": "VotesController_getVoteResults",
@@ -3206,6 +3276,115 @@
     "/api/votes/{id}/documents/{documentId}/download-url": {
       "get": {
         "operationId": "VotesController_getDocumentDownloadUrl",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "documentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns a short-lived presigned download URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentDownloadUrlResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Votes"
+        ]
+      }
+    },
+    "/api/votes/{id}/ballot-attachments": {
+      "post": {
+        "operationId": "VotesController_requestBallotAttachmentUpload",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestBallotAttachmentUploadDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestBallotAttachmentUploadResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Votes"
+        ]
+      }
+    },
+    "/api/votes/{id}/ballot-attachments/{documentId}": {
+      "delete": {
+        "operationId": "VotesController_deleteBallotAttachment",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "documentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Ballot attachment deleted"
+          }
+        },
+        "tags": [
+          "Votes"
+        ]
+      }
+    },
+    "/api/votes/{id}/ballot-attachments/{documentId}/download-url": {
+      "get": {
+        "operationId": "VotesController_getBallotAttachmentDownloadUrl",
         "parameters": [
           {
             "name": "id",
@@ -5413,6 +5592,159 @@
           "submittedAt"
         ]
       },
+      "RecordPaperBallotDto": {
+        "type": "object",
+        "properties": {
+          "unitId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "signerOwnerId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "attachmentDocumentId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "answers": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "questionId": {
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                },
+                "optionId": {
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                }
+              },
+              "required": [
+                "questionId",
+                "optionId"
+              ]
+            }
+          }
+        },
+        "required": [
+          "unitId",
+          "signerOwnerId",
+          "attachmentDocumentId",
+          "answers"
+        ]
+      },
+      "ParticipationOwnerDto": {
+        "type": "object",
+        "properties": {
+          "ownerId": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "share": {
+            "type": "string",
+            "description": "Share of the unit, e.g. \"1/2\"."
+          },
+          "isRepresentative": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ownerId",
+          "displayName",
+          "share",
+          "isRepresentative"
+        ]
+      },
+      "VoteParticipationUnitDto": {
+        "type": "object",
+        "properties": {
+          "unitId": {
+            "type": "string"
+          },
+          "unitNo": {
+            "type": "string"
+          },
+          "ownerNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "share": {
+            "type": "string",
+            "description": "Building share, e.g. \"5/100\"."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "VOTED",
+              "NOT_VOTED",
+              "INELIGIBLE"
+            ]
+          },
+          "castMethod": {
+            "type": "string",
+            "enum": [
+              "DIRECT",
+              "BOARD_PROXY"
+            ]
+          },
+          "castAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "ineligibleReason": {
+            "type": "string",
+            "enum": [
+              "NO_REPRESENTATIVE",
+              "MISSING_OWNERSHIP",
+              "ASSOCIATION_OWNED"
+            ]
+          },
+          "isOwnUnit": {
+            "type": "boolean"
+          },
+          "owners": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ParticipationOwnerDto"
+            }
+          }
+        },
+        "required": [
+          "unitId",
+          "unitNo",
+          "ownerNames",
+          "share",
+          "status",
+          "isOwnUnit",
+          "owners"
+        ]
+      },
+      "VoteParticipationResponseDto": {
+        "type": "object",
+        "properties": {
+          "units": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VoteParticipationUnitDto"
+            }
+          }
+        },
+        "required": [
+          "units"
+        ]
+      },
       "FractionDto": {
         "type": "object",
         "properties": {
@@ -5707,6 +6039,46 @@
         },
         "required": [
           "downloadUrl"
+        ]
+      },
+      "RequestBallotAttachmentUploadDto": {
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "contentType": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 127
+          },
+          "sizeBytes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "fileName",
+          "contentType",
+          "sizeBytes"
+        ]
+      },
+      "RequestBallotAttachmentUploadResponseDto": {
+        "type": "object",
+        "properties": {
+          "documentId": {
+            "type": "string"
+          },
+          "uploadUrl": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "documentId",
+          "uploadUrl"
         ]
       }
     }

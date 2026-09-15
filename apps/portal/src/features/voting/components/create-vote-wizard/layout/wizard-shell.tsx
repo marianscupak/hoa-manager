@@ -3,34 +3,35 @@ import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
-import { Button, StatusChip } from "@hoa-mngr/ui";
+import { Button } from "@hoa-mngr/ui";
 import { cn } from "@hoa-mngr/ui/lib/utils";
-
-export type WizardStepId =
-    | "mode"
-    | "details"
-    | "rules"
-    | "questions"
-    | "review";
 
 export type WizardSavedState = "saved" | "dirty" | "saving";
 
-export interface WizardShellStep {
-    id: WizardStepId;
+export interface WizardShellStep<TStepId extends string = string> {
+    id: TStepId;
     labelKey: string;
     state: "done" | "active" | "upcoming";
     enabled: boolean;
     badge?: number;
 }
 
-export interface WizardShellProps {
-    /** Vote title shown next to "New vote" in the top bar. Empty until typed/saved. */
-    title: string;
-    isDraft: boolean;
-    /** `null` hides the indicator entirely (nothing has been saved yet). */
-    savedState: WizardSavedState | null;
-    steps: WizardShellStep[];
-    onStepSelect: (id: WizardStepId) => void;
+export interface WizardShellProps<TStepId extends string = string> {
+    /** Left side of the top bar — a flow's own title block. */
+    heading: React.ReactNode;
+    /** Right side of the top bar, e.g. a saved indicator or a status pill. */
+    headerEnd?: React.ReactNode;
+    exitTo: string;
+    exitLabel: string;
+    /** Return true to cancel the exit navigation — for a flow that needs to
+     *  confirm before discarding work. */
+    onExitIntercept?: () => boolean;
+    railTitle: string;
+    railNote: string;
+    /** Tailwind max-width class for the main column. */
+    contentMaxWidth?: string;
+    steps: WizardShellStep<TStepId>[];
+    onStepSelect: (id: TStepId) => void;
     /** Secondary actions under the rail note (delete draft). */
     railFooter?: React.ReactNode;
     footer: React.ReactNode;
@@ -41,7 +42,7 @@ export interface WizardShellProps {
  * Icon-only in the narrow top bar, icon + label from `sm` up. The label stays in
  * the accessibility tree at every width via `sr-only`.
  */
-function SavedIndicator({ state }: { state: WizardSavedState }) {
+export function SavedIndicator({ state }: { state: WizardSavedState }) {
     const { t } = useTranslation(["voting"]);
 
     const icon =
@@ -100,14 +101,14 @@ function StepCircle({
     );
 }
 
-function StepRailButton({
+function StepRailButton<TStepId extends string>({
     step,
     index,
     onSelect,
 }: {
-    step: WizardShellStep;
+    step: WizardShellStep<TStepId>;
     index: number;
-    onSelect: (id: WizardStepId) => void;
+    onSelect: (id: TStepId) => void;
 }) {
     const { t } = useTranslation(["voting"]);
 
@@ -150,18 +151,21 @@ function StepRailButton({
     );
 }
 
-export function WizardShell({
-    title,
-    isDraft,
-    savedState,
+export function WizardShell<TStepId extends string = string>({
+    heading,
+    headerEnd,
+    exitTo,
+    exitLabel,
+    onExitIntercept,
+    railTitle,
+    railNote,
+    contentMaxWidth,
     steps,
     onStepSelect,
     railFooter,
     footer,
     children,
-}: WizardShellProps) {
-    const { t } = useTranslation(["voting"]);
-
+}: WizardShellProps<TStepId>) {
     return (
         <div className="bg-background flex min-h-screen flex-col">
             <header className="bg-card sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-4 border-b px-4 md:px-6">
@@ -172,48 +176,30 @@ export function WizardShell({
                         asChild
                         className="text-detail h-8 shrink-0 px-3 [&_svg]:size-3.5"
                     >
-                        <Link to="/voting">
+                        <Link
+                            to={exitTo}
+                            onClick={(e) => {
+                                if (onExitIntercept?.()) e.preventDefault();
+                            }}
+                        >
                             <ArrowLeft />
                             {/* Nunito bold sits ~1px above optical center at
                                 this size; compensate so the label aligns with
                                 the icon. */}
-                            <span className="translate-y-px">
-                                {t("voting:wizard.exit")}
-                            </span>
+                            <span className="translate-y-px">{exitLabel}</span>
                         </Link>
                     </Button>
                     <div className="bg-border hidden h-5 w-px sm:block" />
-                    <div className="flex min-w-0 items-center gap-2">
-                        <p className="truncate text-sm font-semibold">
-                            {t("voting:wizard.newVote")}
-                            {title ? ` · ${title}` : ""}
-                        </p>
-                        {isDraft && (
-                            <StatusChip
-                                variant="neutral"
-                                dot={false}
-                                className="shrink-0"
-                            >
-                                {t("voting:wizard.draft")}
-                            </StatusChip>
-                        )}
-                    </div>
+                    {heading}
                 </div>
 
-                {savedState && (
-                    <div
-                        aria-live="polite"
-                        className="flex shrink-0 items-center"
-                    >
-                        <SavedIndicator state={savedState} />
-                    </div>
-                )}
+                {headerEnd}
             </header>
 
             <div className="flex flex-1 items-stretch">
                 <aside className="bg-card hidden w-[264px] shrink-0 flex-col border-r px-5 py-7 lg:flex">
                     <p className="text-muted-foreground text-2xs mb-4 px-2 font-semibold tracking-[0.8px] uppercase">
-                        {t("voting:wizard.railTitle")}
+                        {railTitle}
                     </p>
                     <nav className="flex flex-col gap-0.5">
                         {steps.map((step, index) => (
@@ -226,14 +212,19 @@ export function WizardShell({
                         ))}
                     </nav>
                     <div className="rounded-panel bg-muted text-muted-foreground mt-6 p-3 text-xs">
-                        {t("voting:wizard.note")}
+                        {railNote}
                     </div>
                     {railFooter && <div className="mt-4">{railFooter}</div>}
                 </aside>
 
                 <main className="flex min-w-0 flex-1 flex-col">
                     <div className="flex-1 px-4 py-8 md:px-12 md:py-9">
-                        <div className="mx-auto w-full max-w-3xl">
+                        <div
+                            className={cn(
+                                "mx-auto w-full",
+                                contentMaxWidth ?? "max-w-3xl",
+                            )}
+                        >
                             {children}
                         </div>
                     </div>

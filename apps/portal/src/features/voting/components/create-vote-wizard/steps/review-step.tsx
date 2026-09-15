@@ -8,7 +8,7 @@ import { cn } from "@hoa-mngr/ui/lib/utils";
 
 import { VoteDetailResponseDto } from "@/api/generated/model";
 
-import type { WizardStepId } from "../layout/wizard-shell";
+import type { WizardStepId } from "..";
 
 export interface ReviewCheck {
     code: string;

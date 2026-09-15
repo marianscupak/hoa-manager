@@ -12,6 +12,7 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
+    StatusChip,
     toast,
 } from "@hoa-mngr/ui";
 
@@ -28,10 +29,10 @@ import { DeleteDraftVoteDialog } from "../delete-draft-vote-dialog";
 import { VoteDocumentsSection } from "../vote-documents-section";
 import { ScheduleValidationModal } from "../schedule-validation-modal";
 import {
+    SavedIndicator,
     WizardShell,
     type WizardSavedState,
     type WizardShellStep,
-    type WizardStepId,
 } from "./layout/wizard-shell";
 import { CreateVoteBasicInfoStep } from "./steps/basic-info-step";
 import { ModeStep } from "./steps/mode-step";
@@ -39,7 +40,12 @@ import { CreateVoteQuestionsStep } from "./steps/questions-step";
 import { buildReviewChecks, ReviewStep } from "./steps/review-step";
 import { CreateVoteRulesetStep } from "./steps/ruleset-step";
 
-export type { WizardStepId };
+export type WizardStepId =
+    | "mode"
+    | "details"
+    | "rules"
+    | "questions"
+    | "review";
 
 const STEP_ORDER: WizardStepId[] = [
     "mode",
@@ -184,20 +190,25 @@ export function CreateVoteWizard({
         !voteData ||
         reviewChecks.some((check) => check.severity === "error" && !check.ok);
 
-    const steps: WizardShellStep[] = STEP_ORDER.map((id, index) => ({
-        id,
-        labelKey: STEP_LABEL_KEYS[id],
-        state:
-            index < activeIndex
-                ? "done"
-                : index === activeIndex
-                  ? "active"
-                  : "upcoming",
-        enabled:
-            !documentsSettling &&
-            (id === "mode" || id === "details" || hasDraft),
-        badge: id === "questions" ? questionCount : undefined,
-    }));
+    const steps: WizardShellStep<WizardStepId>[] = STEP_ORDER.map(
+        (id, index) => ({
+            id,
+            labelKey: STEP_LABEL_KEYS[id],
+            state:
+                index < activeIndex
+                    ? "done"
+                    : index === activeIndex
+                      ? "active"
+                      : "upcoming",
+            enabled:
+                !documentsSettling &&
+                (id === "mode" || id === "details" || hasDraft),
+            badge: id === "questions" ? questionCount : undefined,
+        }),
+    );
+
+    const title = voteData?.title ?? "";
+    const isDraft = voteData?.status === "DRAFT";
 
     // "saved" is the only state that needs a draft behind it — an untouched new
     // vote shows nothing, but typing into step 1 still reports "Unsaved changes".
@@ -301,10 +312,38 @@ export function CreateVoteWizard({
 
     return (
         <>
-            <WizardShell
-                title={voteData?.title ?? ""}
-                isDraft={voteData?.status === "DRAFT"}
-                savedState={savedState}
+            <WizardShell<WizardStepId>
+                heading={
+                    <div className="flex min-w-0 items-center gap-2">
+                        <p className="truncate text-sm font-semibold">
+                            {t("voting:wizard.newVote")}
+                            {title ? ` · ${title}` : ""}
+                        </p>
+                        {isDraft && (
+                            <StatusChip
+                                variant="neutral"
+                                dot={false}
+                                className="shrink-0"
+                            >
+                                {t("voting:wizard.draft")}
+                            </StatusChip>
+                        )}
+                    </div>
+                }
+                headerEnd={
+                    savedState ? (
+                        <div
+                            aria-live="polite"
+                            className="flex shrink-0 items-center"
+                        >
+                            <SavedIndicator state={savedState} />
+                        </div>
+                    ) : undefined
+                }
+                exitTo="/voting"
+                exitLabel={t("voting:wizard.exit")}
+                railTitle={t("voting:wizard.railTitle")}
+                railNote={t("voting:wizard.note")}
                 steps={steps}
                 onStepSelect={goToStep}
                 railFooter={

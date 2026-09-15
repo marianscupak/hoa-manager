@@ -1,0 +1,31 @@
+{
+  "_comment": "The single checked-in list the API and the portal both assert against, so a code added to one side without the other fails a test. Lives beside katastr-document.ts and import-plan.ts, where these codes are actually defined — the API is the producer, the portal only renders. The API's own katastr-error-codes.spec.ts ties this file to KatastrParseErrorCode / ImportBlockerCode / ImportWarningCode at compile time (a Record<Code, true> literal that TypeScript rejects if it is missing a union member or carries one that does not exist) and then compares its keys to this file at runtime. The portal cannot import those TS unions — apps/portal and apps/api are separate deployable apps — so apps/portal/src/features/admin/components/katastr-import/messages.test.ts reads this same file via a relative fs path and compares it to KATASTR_ERROR_CODES / KATASTR_BLOCKER_CODES / KATASTR_WARNING_CODES.",
+  "errorCodes": [
+    "NOT_A_KATASTR_DOCUMENT",
+    "UNSUPPORTED_DIALECT",
+    "DTD_NOT_ALLOWED",
+    "MALFORMED_XML",
+    "UNKNOWN_SUBJECT_TYPE",
+    "PARTIAL_EXTRACT",
+    "INCONSISTENT_DUPLICATE_UNIT",
+    "SHARE_OUT_OF_RANGE",
+    "SHARE_MALFORMED",
+    "BUILDING_SHARE_SUM",
+    "UNIT_SHARE_SUM",
+    "SJM_SHAPE_UNEXPECTED",
+    "UNIT_WITHOUT_OWNER",
+    "SUBJECT_WITHOUT_ID",
+    "SUBJECT_WITHOUT_TYPE",
+    "MISSING_DOCUMENT_DATE"
+  ],
+  "blockerCodes": [
+    "EFFECTIVE_DATE_TOO_EARLY",
+    "TRANSFER_ALREADY_SCHEDULED",
+    "AMBIGUOUS_NAME",
+    "AMBIGUOUS_ICO",
+    "MIXED_ASSOCIATION",
+    "UNIT_NO_COLLISION",
+    "OWNERSHIP_PLAN_REJECTED"
+  ],
+  "warningCodes": ["IMPLIED_FULL_SHARE", "NAME_MATCH", "KIND_MISMATCH"]
+}

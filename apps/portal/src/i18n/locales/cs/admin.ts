@@ -6,6 +6,7 @@ export default {
         empty: "Nenalezeni žádní vlastníci.",
         table: {
             displayName: "Zobrazované jméno",
+            ico: "IČO {{ico}}",
             email: "E-mail",
             userAccount: "Uživatelský účet",
             linked: "Propojeno",
@@ -84,6 +85,10 @@ export default {
         loadError: "Jednotky se nepodařilo načíst.",
         table: {
             unitNumber: "Číslo jednotky",
+            usage: "Využití",
+            usageUnknown: "Neuvedeno",
+            usage_1: "byt",
+            usage_5: "nebytový prostor",
             buildingShare: "Podíl na budově",
             owners: "Vlastníci",
             noOwner: "Bez vlastníka",

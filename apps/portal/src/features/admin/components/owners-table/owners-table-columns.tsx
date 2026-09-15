@@ -1,7 +1,7 @@
 import { TFunction } from "i18next";
 import { MailIcon } from "lucide-react";
 
-import { StatusChip, type ColumnDef } from "@hoa-mngr/ui";
+import { CellPrimary, StatusChip, type ColumnDef } from "@hoa-mngr/ui";
 
 import type { OwnerResponseDto } from "@/api/generated/model";
 
@@ -56,16 +56,29 @@ export const getOwnerColumns = (
         sortingFn: "localeNumeric",
         enableGlobalFilter: true,
         cell: ({ row }) => (
-            <span className="text-foreground inline-flex min-w-0 items-center gap-2 text-sm font-semibold">
-                <span className="truncate">{row.original.displayName}</span>
+            <div className="flex min-w-0 items-center gap-2">
+                <CellPrimary
+                    title={row.original.displayName}
+                    subtitle={
+                        row.original.kind === "LEGAL_ENTITY" && row.original.ico
+                            ? t("owners.table.ico", {
+                                  ico: row.original.ico,
+                              })
+                            : undefined
+                    }
+                />
                 {row.original.kind !== "PERSON" && (
-                    <StatusChip variant="neutral" dot={false}>
+                    <StatusChip
+                        variant="neutral"
+                        dot={false}
+                        className="shrink-0"
+                    >
                         {row.original.kind === "LEGAL_ENTITY"
                             ? t("owners.kind.legalEntity")
                             : t("owners.kind.association")}
                     </StatusChip>
                 )}
-            </span>
+            </div>
         ),
     },
     {

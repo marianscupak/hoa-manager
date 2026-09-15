@@ -11,6 +11,7 @@ import csInvite from "./locales/cs/invite";
 import csNotFound from "./locales/cs/not-found";
 import { audit as csAudit } from "./locales/cs/audit";
 import { dashboard as csDashboard } from "./locales/cs/dashboard";
+import csKatastr from "./locales/cs/katastr";
 import { voting as csVoting } from "./locales/cs/voting";
 import enAdmin from "./locales/en/admin";
 import enAuth from "./locales/en/auth";
@@ -21,6 +22,7 @@ import enInvite from "./locales/en/invite";
 import enNotFound from "./locales/en/not-found";
 import { audit as enAudit } from "./locales/en/audit";
 import { dashboard as enDashboard } from "./locales/en/dashboard";
+import enKatastr from "./locales/en/katastr";
 import { voting as enVoting } from "./locales/en/voting";
 
 declare module "i18next" {
@@ -37,6 +39,7 @@ declare module "i18next" {
             "voting": typeof enVoting;
             "audit": typeof enAudit;
             "dashboard": typeof enDashboard;
+            "katastr": typeof enKatastr;
         };
     }
 }
@@ -54,6 +57,7 @@ i18n.use(initReactI18next).init({
             "voting": enVoting,
             "audit": enAudit,
             "dashboard": enDashboard,
+            "katastr": enKatastr,
         },
         cs: {
             "home": csHome,
@@ -66,6 +70,7 @@ i18n.use(initReactI18next).init({
             "voting": csVoting,
             "audit": csAudit,
             "dashboard": csDashboard,
+            "katastr": csKatastr,
         },
     },
     lng: "cs",

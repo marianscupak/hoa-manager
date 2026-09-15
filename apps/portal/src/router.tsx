@@ -7,6 +7,7 @@ import { SelectTenantLayout } from "@/components/layouts/select-tenant-layout";
 import { AdminGuard } from "@/components/shell/admin-guard";
 import { AppShell } from "@/components/shell/app-shell";
 import { AuthGuard } from "@/components/shell/auth-guard";
+import { KatastrImportPage } from "@/features/admin/pages/katastr-import-page";
 import { PropertyPage } from "@/features/admin/pages/property-page";
 import { UnitDetailPage } from "@/features/admin/pages/unit-detail-page";
 import { UsersPage } from "@/features/admin/pages/users-page";
@@ -115,6 +116,10 @@ export const router = createBrowserRouter([
                             {
                                 path: "units",
                                 element: <PropertyPage tab="units" />,
+                            },
+                            {
+                                path: "units/import",
+                                element: <KatastrImportPage />,
                             },
                             {
                                 path: "owners",

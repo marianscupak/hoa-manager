@@ -18,6 +18,11 @@ export interface OwnerResponseDto {
     userId: string | null;
     kind: OwnerResponseDtoKind;
     /**
+     * IČO (Czech company identification number), for legal entities. Public register data
+     * @nullable
+     */
+    ico: string | null;
+    /**
      * Status of the invite for this owner, null if no pending invite
      * @nullable
      */

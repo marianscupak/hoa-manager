@@ -1,5 +1,6 @@
 import type enAuth from "./locales/en/auth";
 import type enHome from "./locales/en/home";
+import type enKatastr from "./locales/en/katastr";
 import type enNotFound from "./locales/en/not-found";
 
 /**
@@ -14,6 +15,7 @@ declare module "i18next" {
             "home": typeof enHome;
             "not-found": typeof enNotFound;
             "auth": typeof enAuth;
+            "katastr": typeof enKatastr;
         };
     }
 }

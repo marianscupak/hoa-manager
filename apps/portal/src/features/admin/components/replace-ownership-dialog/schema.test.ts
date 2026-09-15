@@ -119,6 +119,65 @@ describe("replaceOwnershipSchema", () => {
         ).toBe(true);
     });
 
+    it("does not call two unfilled rows a duplicate owner", () => {
+        // `emptyRow()` seeds `memberOwnerIds: [""]`, so two freshly added
+        // rows used to collide on the empty string and report the owner as
+        // chosen twice before either had been chosen at all.
+        const result = replaceOwnershipSchema(t).safeParse({
+            ...EFFECTIVE,
+            ownerships: [
+                { partyType: "SOLE", share: null, memberOwnerIds: [""] },
+                { partyType: "SOLE", share: null, memberOwnerIds: [""] },
+            ],
+        });
+
+        const messages = result.success
+            ? []
+            : result.error.issues.map((i) => i.message);
+        expect(messages).not.toContain("units.ownershipEditor.duplicateError");
+    });
+
+    it("does not call two unfilled SJM slots the same member", () => {
+        const result = replaceOwnershipSchema(t).safeParse({
+            ...EFFECTIVE,
+            ownerships: [
+                {
+                    partyType: "SJM",
+                    share: { num: 1, den: 1 },
+                    memberOwnerIds: ["", ""],
+                },
+            ],
+        });
+
+        const messages = result.success
+            ? []
+            : result.error.issues.map((i) => i.message);
+        expect(messages).not.toContain("units.ownershipEditor.membersError");
+    });
+
+    it("still reports a real duplicate once both rows are filled in", () => {
+        const result = replaceOwnershipSchema(t).safeParse({
+            ...EFFECTIVE,
+            ownerships: [
+                {
+                    partyType: "SOLE",
+                    share: { num: 1, den: 2 },
+                    memberOwnerIds: ["p1"],
+                },
+                {
+                    partyType: "SOLE",
+                    share: { num: 1, den: 2 },
+                    memberOwnerIds: ["p1"],
+                },
+            ],
+        });
+
+        expect(result.success).toBe(false);
+        expect(
+            result.success ? [] : result.error.issues.map((i) => i.message),
+        ).toContain("units.ownershipEditor.duplicateError");
+    });
+
     it("rejects the same owner appearing in two different parties", () => {
         const result = replaceOwnershipSchema(t).safeParse({
             ...EFFECTIVE,

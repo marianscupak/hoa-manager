@@ -59,11 +59,18 @@ export const replaceOwnershipSchema = (
                             .max(2),
                     })
                     .refine(
-                        (p) =>
-                            p.partyType === "SOLE"
-                                ? p.memberOwnerIds.length === 1
-                                : p.memberOwnerIds.length === 2 &&
-                                  p.memberOwnerIds[0] !== p.memberOwnerIds[1],
+                        (p) => {
+                            if (p.partyType === "SOLE") {
+                                return p.memberOwnerIds.length === 1;
+                            }
+                            if (p.memberOwnerIds.length !== 2) return false;
+                            const [first, second] = p.memberOwnerIds;
+                            // Two slots nobody has picked yet are not "the
+                            // same member" — the per-slot required rule
+                            // already reports them.
+                            if (!first || !second) return true;
+                            return first !== second;
+                        },
                         {
                             message: t("units.ownershipEditor.membersError"),
                             path: ["memberOwnerIds"],
@@ -83,7 +90,11 @@ export const replaceOwnershipSchema = (
             )
             .refine(
                 (items) => {
-                    const ids = items.flatMap((i) => i.memberOwnerIds);
+                    // Blank slots are placeholders, not owners; counting them
+                    // made every second unfilled row look like a duplicate.
+                    const ids = items
+                        .flatMap((i) => i.memberOwnerIds)
+                        .filter((id) => id !== "");
                     return new Set(ids).size === ids.length;
                 },
                 { message: t("units.ownershipEditor.duplicateError") },

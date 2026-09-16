@@ -11,6 +11,7 @@ import {
     type RosterFilter,
 } from "@/features/voting/components/assembly-record/roster";
 import { RosterRail } from "@/features/voting/components/assembly-record/roster-rail";
+import { RunningCountCard } from "@/features/voting/components/assembly-record/running-count-card";
 import { UnitPanel } from "@/features/voting/components/assembly-record/unit-panel";
 import { useAssemblyRecord } from "@/features/voting/hooks/use-assembly-record";
 
@@ -110,6 +111,12 @@ export function AssemblyRecordPage() {
                 <AttendanceCard
                     totals={record.totals}
                     unitCount={units.length}
+                />
+
+                <RunningCountCard
+                    questions={record.questions}
+                    totals={record.totals}
+                    weightBasis={record.weightBasis}
                 />
 
                 <div className="grid gap-4 lg:grid-cols-[330px_1fr]">

@@ -315,6 +315,14 @@ export const voting = {
             quorumRule: "Quorum needs more than half of all votes",
             sharesOnRecord: "Shares on record: {{num}}/{{den}}",
         },
+        tally: {
+            eyebrow: "Running count",
+            entered: "{{entered}} of {{present}} present units entered",
+            units_one: "{{count}} unit",
+            units_other: "{{count}} units",
+            footnoteShare: "Board only · shares of all votes in the building · provisional until published",
+            footnoteUnits: "Board only · provisional until published",
+        },
         roster: {
             search: "Search unit or owner…",
             noOwner: "No registered owner",

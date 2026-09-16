@@ -316,6 +316,15 @@ export const voting = {
             quorumRule: "Usnášeníschopnost vyžaduje víc než polovinu všech hlasů",
             sharesOnRecord: "Podíly v evidenci: {{num}}/{{den}}",
         },
+        tally: {
+            eyebrow: "Průběžný počet",
+            entered: "zadáno {{entered}} z {{present}} přítomných jednotek",
+            units_one: "{{count}} jednotka",
+            units_few: "{{count}} jednotky",
+            units_other: "{{count}} jednotek",
+            footnoteShare: "Jen pro výbor · podíly ze všech hlasů v domě · průběžné do publikace",
+            footnoteUnits: "Jen pro výbor · průběžné do publikace",
+        },
         roster: {
             search: "Hledat jednotku nebo vlastníka…",
             noOwner: "Bez zapsaného vlastníka",

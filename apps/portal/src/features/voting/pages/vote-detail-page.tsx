@@ -178,16 +178,21 @@ export function VoteDetailPage() {
                             <Edit2 />
                             {t("voting:detail.actions.edit")}
                         </Button>
+                        {/* An assembly record is never scheduled — it goes
+                            from draft straight to published. Its own action
+                            lives in the sidebar. */}
                         <Dialog
                             open={isConfirmOpen}
                             onOpenChange={setIsConfirmOpen}
                         >
-                            <DialogTrigger asChild>
-                                <Button size="sm">
-                                    <Send />
-                                    {t("voting:detail.actions.schedule")}
-                                </Button>
-                            </DialogTrigger>
+                            {vote.mode !== "ASSEMBLY_RECORD" && (
+                                <DialogTrigger asChild>
+                                    <Button size="sm">
+                                        <Send />
+                                        {t("voting:detail.actions.schedule")}
+                                    </Button>
+                                </DialogTrigger>
+                            )}
                             <DialogContent>
                                 <DialogHeader>
                                     <DialogTitle>

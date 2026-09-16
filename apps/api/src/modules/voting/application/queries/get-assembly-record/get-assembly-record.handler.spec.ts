@@ -173,7 +173,11 @@ describe('GetAssemblyRecordHandler', () => {
     expect(result.totals.unitsAwaitingEntry).toBe(1);
   });
 
-  it('reports a unit that is missing a common representative as ineligible', async () => {
+  it('lets the board record a unit that has no common representative', async () => {
+    // The pre-agreed representative is a per-rollam requirement. At a meeting
+    // the co-owners settle it in the room, and a sole owner with no user
+    // account is never a candidate at all — both would otherwise be
+    // unrecordable, which is most of a real building.
     const { handler } = build({
       units: [
         {
@@ -186,9 +190,26 @@ describe('GetAssemblyRecordHandler', () => {
     const result = await handler.execute(query());
 
     expect(result.units[0]).toMatchObject({
-      eligibility: 'INELIGIBLE',
+      eligibility: 'ELIGIBLE',
       ineligibleReason: 'NO_REPRESENTATIVE',
     });
+    expect(result.totals.ineligibleUnitCount).toBe(0);
+  });
+
+  it('still reports a unit with no ownership on record as ineligible', async () => {
+    // Nobody could have stood up for it, and no attestation fixes that.
+    const { handler } = build({
+      units: [
+        {
+          unitId: 'u1',
+          ineligibleReason: ElectorateIneligibleReason.MISSING_OWNERSHIP,
+        },
+      ],
+    });
+
+    const result = await handler.execute(query());
+
+    expect(result.units[0].eligibility).toBe('INELIGIBLE');
     expect(result.totals.ineligibleUnitCount).toBe(1);
   });
 

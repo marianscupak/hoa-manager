@@ -1,5 +1,11 @@
-import { CheckIcon, ChevronLeft, ChevronRight, MinusIcon, XIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+    CheckIcon,
+    ChevronLeft,
+    ChevronRight,
+    MinusIcon,
+    XIcon,
+} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Button, Input, StatusChip, formatPercent } from "@hoa-mngr/ui";
@@ -8,6 +14,7 @@ import { cn } from "@hoa-mngr/ui/lib/utils";
 import type { AssemblyRecordResponseDto } from "@/api/generated/model";
 import { sharePercent } from "@/features/units/utils/shares";
 
+import { getOptionLabel } from "../shared/question-options";
 import type { AssemblyUnit } from "./roster";
 
 type Question = AssemblyRecordResponseDto["questions"][number];
@@ -19,21 +26,22 @@ const OPTION_ICON: Record<string, typeof CheckIcon> = {
     ABSTAIN: MinusIcon,
 };
 
+const OPTION_TONE: Record<string, string> = {
+    YES: "text-success-tint-foreground",
+    NO: "text-destructive-muted-foreground",
+    ABSTAIN: "text-secondary-foreground",
+};
+
 /** Spelled out rather than interpolated: the i18n keys are typed. */
 const INELIGIBLE_KEY: Record<string, string> = {
-    NO_REPRESENTATIVE:
-        "voting:assemblyRecord.unit.ineligible.NO_REPRESENTATIVE",
     MISSING_OWNERSHIP:
         "voting:assemblyRecord.unit.ineligible.MISSING_OWNERSHIP",
     ASSOCIATION_OWNED:
         "voting:assemblyRecord.unit.ineligible.ASSOCIATION_OWNED",
 };
 
-const OPTION_TONE: Record<string, string> = {
-    YES: "text-success-tint-foreground",
-    NO: "text-destructive-muted-foreground",
-    ABSTAIN: "text-secondary-foreground",
-};
+/** Marks the proxy-holder choice apart from any owner id. */
+const PROXY = "__PROXY__";
 
 interface UnitPanelProps {
     unit: AssemblyUnit;
@@ -62,17 +70,31 @@ export function UnitPanel({
 }: UnitPanelProps) {
     const { t } = useTranslation(["voting"]);
 
-    // Who voted, chosen before any answer can be entered. `PROXY` means a
-    // holder of a power of attorney who is not an owner on record.
-    const [voterChoice, setVoterChoice] = useState<string | null>(null);
-    const [proxyName, setProxyName] = useState("");
+    // A sole owner is the only person who could have stood up for the unit, so
+    // preselecting them saves a click on much the commonest case.
+    const defaultVoter = (u: AssemblyUnit) =>
+        u.voterOwnerId ??
+        (u.voterNote ? PROXY : null) ??
+        (u.owners.length === 1 ? u.owners[0].ownerId : null);
+
+    const [voterChoice, setVoterChoice] = useState<string | null>(() =>
+        defaultVoter(unit),
+    );
+    const [proxyName, setProxyName] = useState(unit.voterNote ?? "");
+    // Answers picked but not yet complete. A ballot answers every question at
+    // once, so partial picks live here until the last one lands.
+    const [pending, setPending] = useState<Record<string, string>>({});
 
     useEffect(() => {
-        setVoterChoice(unit.voterOwnerId ?? (unit.voterNote ? "PROXY" : null));
+        setVoterChoice(defaultVoter(unit));
         setProxyName(unit.voterNote ?? "");
-    }, [unit.unitId, unit.voterOwnerId, unit.voterNote]);
+        setPending({});
+        // Keyed on the unit alone: a refetch for the same unit must not wipe a
+        // pick the board has just made.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [unit.unitId]);
 
-    const ineligible = unit.eligibility === "INELIGIBLE";
+    const recordable = unit.eligibility === "ELIGIBLE";
     const sharePct = sharePercent(
         Number(unit.share.num),
         Number(unit.share.den),
@@ -80,34 +102,47 @@ export function UnitPanel({
     const allPct =
         sharePercent(Number(allVotesWeight.num), Number(allVotesWeight.den)) ||
         1;
+    const sharePercentOfAll = formatPercent((sharePct / allPct) * 100);
 
-    const commitVoter = (choice: string | null, note: string) => {
+    const voterChosen =
+        voterChoice !== null &&
+        (voterChoice !== PROXY || proxyName.trim().length > 0);
+
+    const commitPresent = (choice: string | null, note: string) => {
         if (!choice) return;
         onPresent(
-            choice === "PROXY"
+            choice === PROXY
                 ? { ownerId: null, note: note.trim() || null }
                 : { ownerId: choice, note: null },
         );
     };
 
     const answerFor = (questionId: string) =>
-        unit.answers.find((a) => a.questionId === questionId)?.optionId ?? null;
+        pending[questionId] ??
+        unit.answers.find((a) => a.questionId === questionId)?.optionId ??
+        null;
 
     const chooseOption = (questionId: string, optionId: string) => {
-        // A ballot answers every question at once, so an answer is only sent
-        // when the last question has been filled in.
-        const next = questions.map((q) => ({
+        const next = { ...pending, [questionId]: optionId };
+        setPending(next);
+
+        const complete = questions.map((q) => ({
             questionId: q.questionId,
             optionId:
-                q.questionId === questionId ? optionId : answerFor(q.questionId),
+                next[q.questionId] ??
+                unit.answers.find((a) => a.questionId === q.questionId)
+                    ?.optionId,
         }));
-        if (next.every((a) => a.optionId)) {
-            onAnswer(next as { questionId: string; optionId: string }[]);
+        if (complete.every((a) => a.optionId)) {
+            onAnswer(complete as { questionId: string; optionId: string }[]);
         }
     };
 
-    const voterChosen =
-        voterChoice !== null && (voterChoice !== "PROXY" || !!proxyName.trim());
+    const missingAnswers = useMemo(
+        () => questions.filter((q) => !answerFor(q.questionId)).length,
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [questions, pending, unit.answers],
+    );
 
     return (
         <div className="rounded-card bg-card shadow-clay-card border p-5">
@@ -129,7 +164,7 @@ export function UnitPanel({
                         {t("voting:assemblyRecord.unit.share", {
                             num: unit.share.num,
                             den: unit.share.den,
-                            percent: formatPercent((sharePct / allPct) * 100),
+                            percent: sharePercentOfAll,
                         })}
                     </p>
                     {unit.owners.length > 1 && (
@@ -161,18 +196,57 @@ export function UnitPanel({
                 </div>
             </div>
 
-            {ineligible ? (
+            {!recordable ? (
                 <div className="rounded-panel bg-accent text-secondary-foreground mt-5 border p-4 text-sm">
                     {t(
-                        (INELIGIBLE_KEY[
-                            unit.ineligibleReason ?? "NO_REPRESENTATIVE"
-                        ] ??
-                            INELIGIBLE_KEY
-                                .NO_REPRESENTATIVE) as "voting:assemblyRecord.unit.ineligible.NO_REPRESENTATIVE",
+                        (INELIGIBLE_KEY[unit.ineligibleReason ?? ""] ??
+                            INELIGIBLE_KEY.MISSING_OWNERSHIP) as "voting:assemblyRecord.unit.ineligible.MISSING_OWNERSHIP",
                     )}
                 </div>
             ) : (
                 <>
+                    {/* The voter comes first: the API refuses a ballot for a
+                        unit whose voter has not been recorded, and naming them
+                        is what "present" actually means here. */}
+                    <p className="mt-5 text-sm font-semibold">
+                        {t("voting:assemblyRecord.unit.voterQuestion")}
+                    </p>
+                    <div className="mt-2 space-y-2">
+                        {unit.owners.map((owner) => (
+                            <RadioRow
+                                key={owner.ownerId}
+                                checked={voterChoice === owner.ownerId}
+                                label={owner.displayName}
+                                hint={t("voting:assemblyRecord.unit.voterOwner")}
+                                onSelect={() => {
+                                    setVoterChoice(owner.ownerId);
+                                    if (unit.attendance === "PRESENT") {
+                                        commitPresent(owner.ownerId, "");
+                                    }
+                                }}
+                            />
+                        ))}
+                        <RadioRow
+                            checked={voterChoice === PROXY}
+                            label={t("voting:assemblyRecord.unit.voterProxy")}
+                            onSelect={() => setVoterChoice(PROXY)}
+                        />
+                        {voterChoice === PROXY && (
+                            <Input
+                                value={proxyName}
+                                onChange={(e) => setProxyName(e.target.value)}
+                                onBlur={() => {
+                                    if (unit.attendance === "PRESENT") {
+                                        commitPresent(PROXY, proxyName);
+                                    }
+                                }}
+                                placeholder={t(
+                                    "voting:assemblyRecord.unit.voterProxyPlaceholder",
+                                )}
+                            />
+                        )}
+                    </div>
+
                     <p className="mt-5 text-sm font-semibold">
                         {t("voting:assemblyRecord.unit.attendanceQuestion")}
                     </p>
@@ -180,12 +254,14 @@ export function UnitPanel({
                         <SelectionCard
                             selected={unit.attendance === "PRESENT"}
                             title={t("voting:assemblyRecord.unit.present")}
-                            hint={t("voting:assemblyRecord.unit.presentHint")}
-                            onClick={() =>
+                            hint={
                                 voterChosen
-                                    ? commitVoter(voterChoice, proxyName)
-                                    : undefined
+                                    ? t("voting:assemblyRecord.unit.presentHint")
+                                    : t(
+                                          "voting:assemblyRecord.unit.presentNeedsVoter",
+                                      )
                             }
+                            onClick={() => commitPresent(voterChoice, proxyName)}
                             disabled={!voterChosen}
                         />
                         <SelectionCard
@@ -197,52 +273,7 @@ export function UnitPanel({
                         />
                     </div>
 
-                    {unit.attendance !== "ABSENT" && (
-                        <div className="mt-5">
-                            <p className="text-sm font-semibold">
-                                {t("voting:assemblyRecord.unit.voterQuestion")}
-                            </p>
-                            <div className="mt-2 space-y-2">
-                                {unit.owners.map((owner) => (
-                                    <RadioRow
-                                        key={owner.ownerId}
-                                        checked={voterChoice === owner.ownerId}
-                                        label={owner.displayName}
-                                        hint={t(
-                                            "voting:assemblyRecord.unit.voterOwner",
-                                        )}
-                                        onSelect={() => {
-                                            setVoterChoice(owner.ownerId);
-                                            commitVoter(owner.ownerId, "");
-                                        }}
-                                    />
-                                ))}
-                                <RadioRow
-                                    checked={voterChoice === "PROXY"}
-                                    label={t(
-                                        "voting:assemblyRecord.unit.voterProxy",
-                                    )}
-                                    onSelect={() => setVoterChoice("PROXY")}
-                                />
-                                {voterChoice === "PROXY" && (
-                                    <Input
-                                        value={proxyName}
-                                        onChange={(e) =>
-                                            setProxyName(e.target.value)
-                                        }
-                                        onBlur={() =>
-                                            commitVoter("PROXY", proxyName)
-                                        }
-                                        placeholder={t(
-                                            "voting:assemblyRecord.unit.voterProxyPlaceholder",
-                                        )}
-                                    />
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    {unit.attendance === "PRESENT" && voterChosen && (
+                    {unit.attendance === "PRESENT" && (
                         <div className="mt-6 space-y-4">
                             {questions.map((question, qIndex) => (
                                 <div
@@ -280,16 +311,22 @@ export function UnitPanel({
                                                     className={cn(
                                                         "flex h-[46px] cursor-pointer items-center justify-center gap-2 rounded-full border-2 text-sm font-semibold transition-colors",
                                                         chosen
-                                                            ? "border-primary bg-primary-faint"
+                                                            ? cn(
+                                                                  "border-primary bg-primary-faint",
+                                                                  OPTION_TONE[
+                                                                      option
+                                                                          .optionKey
+                                                                  ],
+                                                              )
                                                             : "border-border hover:bg-accent",
-                                                        chosen &&
-                                                            OPTION_TONE[
-                                                                option.optionKey
-                                                            ],
                                                     )}
                                                 >
                                                     <Icon className="h-4 w-4" />
-                                                    {option.label}
+                                                    {getOptionLabel(
+                                                        option.optionKey,
+                                                        option.label,
+                                                        t,
+                                                    )}
                                                 </button>
                                             );
                                         })}
@@ -297,7 +334,14 @@ export function UnitPanel({
                                 </div>
                             ))}
                             <p className="text-faint text-[11.5px]">
-                                {t("voting:assemblyRecord.unit.answersFootnote")}
+                                {missingAnswers > 0
+                                    ? t(
+                                          "voting:assemblyRecord.unit.answersIncomplete",
+                                          { count: missingAnswers },
+                                      )
+                                    : t(
+                                          "voting:assemblyRecord.unit.answersFootnote",
+                                      )}
                             </p>
                         </div>
                     )}
@@ -305,7 +349,7 @@ export function UnitPanel({
                     {unit.attendance === "ABSENT" && (
                         <div className="rounded-panel bg-accent text-secondary-foreground mt-5 border p-4 text-sm">
                             {t("voting:assemblyRecord.unit.absentExplainer", {
-                                percent: formatPercent((sharePct / allPct) * 100),
+                                percent: sharePercentOfAll,
                             })}
                         </div>
                     )}
@@ -330,14 +374,18 @@ function SelectionCard({
     onClick: () => void;
     disabled?: boolean;
 }) {
+    // A selected card is never dimmed, even while the choice that led to it is
+    // being re-picked — that is what made "Present" look broken once chosen.
+    const blocked = disabled && !selected;
+
     return (
         <button
             type="button"
             onClick={onClick}
-            disabled={disabled}
+            disabled={blocked}
             className={cn(
                 "rounded-tile border-2 p-3 text-left transition-colors",
-                disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer",
+                blocked ? "cursor-not-allowed opacity-50" : "cursor-pointer",
                 selected && !neutral && "border-primary bg-primary-faint",
                 // Absent is a deliberate, neutral choice — never an error tone.
                 selected && neutral && "border-secondary-foreground bg-accent",

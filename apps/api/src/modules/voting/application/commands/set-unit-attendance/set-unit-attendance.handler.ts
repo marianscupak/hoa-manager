@@ -17,11 +17,8 @@ import {
 } from '@/modules/voting/application/ports/vote-write.repository.port';
 import { AssemblyAttendanceRecordedAuditEvent } from '@/modules/voting/audit/events/assembly-attendance-recorded.event';
 import { VotingAuditLabelResolver } from '@/modules/voting/audit/label-resolver.service';
-import {
-  ElectorateIneligibleReason,
-  VoteMode,
-  VoteStatus,
-} from '@/modules/voting/domain/vote/vote.types';
+import { isRecordableAtAssembly } from '@/modules/voting/domain/vote/assembly-eligibility';
+import { VoteMode, VoteStatus } from '@/modules/voting/domain/vote/vote.types';
 import {
   NotAnAssemblyRecordException,
   UnitNotEligibleForAttendanceException,
@@ -35,20 +32,6 @@ import {
 } from '@/shared/application/ports/unit-of-work.port';
 
 import { SetUnitAttendanceCommand } from './set-unit-attendance.command';
-
-/**
- * Ineligibilities a meeting cannot cure. A unit the association owns casts no
- * vote at all, and a unit with no ownership on record has nobody who could
- * have stood up in the room.
- *
- * NO_REPRESENTATIVE is deliberately absent: co-owners settle representation at
- * the meeting, often with a power of attorney handed over there, and recording
- * that consent is part of this flow.
- */
-const UNCURABLE_AT_A_MEETING = [
-  ElectorateIneligibleReason.ASSOCIATION_OWNED,
-  ElectorateIneligibleReason.MISSING_OWNERSHIP,
-];
 
 @CommandHandler(SetUnitAttendanceCommand)
 export class SetUnitAttendanceHandler
@@ -91,11 +74,7 @@ export class SetUnitAttendanceHandler
           this.clock.now(),
         );
         const row = electorate.find((e) => e.unitId === unitId);
-        if (
-          !row ||
-          (row.ineligibleReason &&
-            UNCURABLE_AT_A_MEETING.includes(row.ineligibleReason))
-        ) {
+        if (!row || !isRecordableAtAssembly(row.ineligibleReason)) {
           throw new UnitNotEligibleForAttendanceException();
         }
       }

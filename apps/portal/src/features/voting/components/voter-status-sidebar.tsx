@@ -183,108 +183,122 @@ export function VoterStatusSidebar({ vote }: VoterStatusSidebarProps) {
             u.partyType === OwnedUnitResponseDtoPartyType.SJM,
     );
 
+    // Somebody who owns nothing in this vote has no status to report. An empty
+    // card headed "your voting status" reads as a fault rather than as an
+    // absence, so it is left out entirely.
+    const hasVoterStatus = statusData.owningUnits.length > 0;
+
     return (
         <div className="flex flex-col gap-4">
-            <Card className="overflow-hidden">
-                <CardHeader className="border-hairline border-b">
-                    <CardTitle>{t("detail.statusSidebar.title")}</CardTitle>
-                    <p className="text-muted-foreground text-sm">
-                        {t("detail.statusSidebar.totalPower")}{" "}
-                        <span className="text-foreground font-semibold">
-                            {formatTotalVotingPower(
-                                statusData.totalVotingPower,
-                                vote.ruleset?.weightBasis,
-                                t,
-                            )}
-                        </span>
-                    </p>
-                </CardHeader>
-
-                <CardContent className="flex flex-col gap-3 pt-4">
-                    {statusData.owningUnits.map((unit) => (
-                        <div key={unit.id} className="flex items-center gap-3">
-                            <div
-                                className={cn(
-                                    "rounded-tile flex h-10 w-10 shrink-0 items-center justify-center",
-                                    STATUS_ICON_TILE[unit.status],
+            {hasVoterStatus && (
+                <Card className="overflow-hidden">
+                    <CardHeader className="border-hairline border-b">
+                        <CardTitle>{t("detail.statusSidebar.title")}</CardTitle>
+                        <p className="text-muted-foreground text-sm">
+                            {t("detail.statusSidebar.totalPower")}{" "}
+                            <span className="text-foreground font-semibold">
+                                {formatTotalVotingPower(
+                                    statusData.totalVotingPower,
+                                    vote.ruleset?.weightBasis,
+                                    t,
                                 )}
-                            >
-                                <Home className="h-4 w-4" />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                                <p className="truncate text-sm font-semibold">
-                                    {unit.name}
-                                </p>
-                                <p className="text-muted-foreground text-xs">
-                                    {t("detail.statusSidebar.share")}{" "}
-                                    {unit.share}
-                                </p>
-                            </div>
-                            <UnitStatusChip unit={unit} />
-                        </div>
-                    ))}
-
-                    {prompt === "required" && (
-                        <div className="rounded-panel border-warning-tint-border bg-warning-muted border p-3">
-                            <p className="text-warning-deep text-sm leading-[19px]">
-                                {t("status.requiresDelegation")}
-                            </p>
-                            {isSjmDelegationUnit && (
-                                <p className="text-warning-deep mt-1.5 text-sm leading-[19px]">
-                                    {t("status.requiresDelegationSjm")}
-                                </p>
-                            )}
-                            <Link
-                                to={`/voting/${voteId}/delegate`}
-                                className="text-primary-tint-foreground mt-1.5 inline-block text-sm font-semibold hover:underline"
-                            >
-                                {t("detail.statusSidebar.manageDelegation")} →
-                            </Link>
-                        </div>
-                    )}
-
-                    {prompt === "available" && (
-                        <div className="rounded-panel border-hairline bg-muted/40 border p-3">
-                            <p className="text-muted-foreground text-sm leading-[19px]">
-                                {t("status.readyCanDelegate")}
-                            </p>
-                            <Link
-                                to={`/voting/${voteId}/delegate`}
-                                className="text-primary-tint-foreground mt-1.5 inline-block text-sm font-semibold hover:underline"
-                            >
-                                {t("detail.statusSidebar.arrangeDelegation")} →
-                            </Link>
-                        </div>
-                    )}
-                </CardContent>
-
-                {isVoteOpen && (
-                    <CardFooter className="border-hairline flex flex-col gap-2 border-t pt-4">
-                        <Button
-                            size="lg"
-                            disabled={!statusData.canVote}
-                            asChild={statusData.canVote}
-                            className="w-full"
-                        >
-                            {statusData.canVote ? (
-                                <Link to={`/voting/${voteId}/cast`}>
-                                    {t("detail.statusSidebar.voteButton")}
-                                    <ArrowRight />
-                                </Link>
-                            ) : statusData.owningUnits.some(
-                                  (u) => u.status === "VOTED",
-                              ) ? (
-                                t("detail.statusSidebar.alreadyVotedButton")
-                            ) : (
-                                t("detail.statusSidebar.voteButton")
-                            )}
-                        </Button>
-                        <p className="text-muted-foreground text-center text-xs">
-                            {t("detail.statusSidebar.ballotsFinal")}
+                            </span>
                         </p>
-                    </CardFooter>
-                )}
-            </Card>
+                    </CardHeader>
+
+                    <CardContent className="flex flex-col gap-3 pt-4">
+                        {statusData.owningUnits.map((unit) => (
+                            <div
+                                key={unit.id}
+                                className="flex items-center gap-3"
+                            >
+                                <div
+                                    className={cn(
+                                        "rounded-tile flex h-10 w-10 shrink-0 items-center justify-center",
+                                        STATUS_ICON_TILE[unit.status],
+                                    )}
+                                >
+                                    <Home className="h-4 w-4" />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                    <p className="truncate text-sm font-semibold">
+                                        {unit.name}
+                                    </p>
+                                    <p className="text-muted-foreground text-xs">
+                                        {t("detail.statusSidebar.share")}{" "}
+                                        {unit.share}
+                                    </p>
+                                </div>
+                                <UnitStatusChip unit={unit} />
+                            </div>
+                        ))}
+
+                        {prompt === "required" && (
+                            <div className="rounded-panel border-warning-tint-border bg-warning-muted border p-3">
+                                <p className="text-warning-deep text-sm leading-[19px]">
+                                    {t("status.requiresDelegation")}
+                                </p>
+                                {isSjmDelegationUnit && (
+                                    <p className="text-warning-deep mt-1.5 text-sm leading-[19px]">
+                                        {t("status.requiresDelegationSjm")}
+                                    </p>
+                                )}
+                                <Link
+                                    to={`/voting/${voteId}/delegate`}
+                                    className="text-primary-tint-foreground mt-1.5 inline-block text-sm font-semibold hover:underline"
+                                >
+                                    {t("detail.statusSidebar.manageDelegation")}{" "}
+                                    →
+                                </Link>
+                            </div>
+                        )}
+
+                        {prompt === "available" && (
+                            <div className="rounded-panel border-hairline bg-muted/40 border p-3">
+                                <p className="text-muted-foreground text-sm leading-[19px]">
+                                    {t("status.readyCanDelegate")}
+                                </p>
+                                <Link
+                                    to={`/voting/${voteId}/delegate`}
+                                    className="text-primary-tint-foreground mt-1.5 inline-block text-sm font-semibold hover:underline"
+                                >
+                                    {t(
+                                        "detail.statusSidebar.arrangeDelegation",
+                                    )}{" "}
+                                    →
+                                </Link>
+                            </div>
+                        )}
+                    </CardContent>
+
+                    {isVoteOpen && (
+                        <CardFooter className="border-hairline flex flex-col gap-2 border-t pt-4">
+                            <Button
+                                size="lg"
+                                disabled={!statusData.canVote}
+                                asChild={statusData.canVote}
+                                className="w-full"
+                            >
+                                {statusData.canVote ? (
+                                    <Link to={`/voting/${voteId}/cast`}>
+                                        {t("detail.statusSidebar.voteButton")}
+                                        <ArrowRight />
+                                    </Link>
+                                ) : statusData.owningUnits.some(
+                                      (u) => u.status === "VOTED",
+                                  ) ? (
+                                    t("detail.statusSidebar.alreadyVotedButton")
+                                ) : (
+                                    t("detail.statusSidebar.voteButton")
+                                )}
+                            </Button>
+                            <p className="text-muted-foreground text-center text-xs">
+                                {t("detail.statusSidebar.ballotsFinal")}
+                            </p>
+                        </CardFooter>
+                    )}
+                </Card>
+            )}
 
             {vote.status === "OPEN" && (
                 <Card>

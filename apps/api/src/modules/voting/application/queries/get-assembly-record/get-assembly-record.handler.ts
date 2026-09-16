@@ -21,6 +21,7 @@ import {
   VOTE_WRITE_REPOSITORY,
   type VoteWriteRepository,
 } from '@/modules/voting/application/ports/vote-write.repository.port';
+import { isRecordableAtAssembly } from '@/modules/voting/domain/vote/assembly-eligibility';
 import {
   ElectorateIneligibleReason,
   QuorumMeasure,
@@ -99,7 +100,11 @@ export class GetAssemblyRecordHandler
         unitNo: ctx?.unitNo ?? '',
         owners: ctx?.owners ?? [],
         share: toFractionDto(Rational.from(row.weightNum, row.weightDen)),
-        eligibility: row.eligibilityStatus,
+        // What the board can act on, not what a per-rollam electorate would
+        // say: a missing common representative is settled in the room.
+        eligibility: isRecordableAtAssembly(row.ineligibleReason)
+          ? 'ELIGIBLE'
+          : 'INELIGIBLE',
         ineligibleReason: row.ineligibleReason,
         attendance: att?.status ?? null,
         voterOwnerId: att?.voterOwnerId ?? null,

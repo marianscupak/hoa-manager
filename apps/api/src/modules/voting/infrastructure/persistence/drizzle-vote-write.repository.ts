@@ -135,213 +135,213 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
   }
 
   async save(vote: VoteAggregate): Promise<void> {
-    await this.db.transaction(async (tx) => {
-      const voteInsert = this.mapVoteInsert(vote);
-      const voteUpdate = this.mapVoteUpdate(vote);
+    // Runs on whatever transaction the caller opened. `this.db` already
+    // resolves to the ambient one inside a unit of work, so opening another
+    // here only bought a SAVEPOINT round-trip per save while making the
+    // "one transaction per command" rule untrue on paper.
+    const tx = this.db;
 
-      await tx.insert(votes).values(voteInsert).onConflictDoUpdate({
-        target: votes.id,
-        set: voteUpdate,
-      });
+    const voteInsert = this.mapVoteInsert(vote);
+    const voteUpdate = this.mapVoteUpdate(vote);
 
-      // --- Handle Rulesets (Vote-level and Per-question) ---
+    await tx.insert(votes).values(voteInsert).onConflictDoUpdate({
+      target: votes.id,
+      set: voteUpdate,
+    });
 
-      // 1. Fetch all existing rulesets for this vote to determine what to update/insert/delete
-      const existingRulesets = await tx
-        .select()
-        .from(voteRulesets)
-        .where(
-          and(
-            eq(voteRulesets.tenantId, vote.tenantId),
-            eq(voteRulesets.voteId, vote.id),
-          ),
-        );
+    // --- Handle Rulesets (Vote-level and Per-question) ---
 
-      // 2. Handle Vote-level Ruleset
-      const existingVoteRuleset = existingRulesets.find(
-        (r) => r.questionId === null,
+    // 1. Fetch all existing rulesets for this vote to determine what to update/insert/delete
+    const existingRulesets = await tx
+      .select()
+      .from(voteRulesets)
+      .where(
+        and(
+          eq(voteRulesets.tenantId, vote.tenantId),
+          eq(voteRulesets.voteId, vote.id),
+        ),
       );
-      if (vote.ruleset) {
-        const rulesetValues = this.mapRulesetUpdate(vote);
-        if (existingVoteRuleset) {
+
+    // 2. Handle Vote-level Ruleset
+    const existingVoteRuleset = existingRulesets.find(
+      (r) => r.questionId === null,
+    );
+    if (vote.ruleset) {
+      const rulesetValues = this.mapRulesetUpdate(vote);
+      if (existingVoteRuleset) {
+        await tx
+          .update(voteRulesets)
+          .set({ ...rulesetValues, updatedAt: new Date() })
+          .where(eq(voteRulesets.id, existingVoteRuleset.id));
+      } else {
+        await tx.insert(voteRulesets).values(this.mapRulesetInsert(vote));
+      }
+    } else if (existingVoteRuleset) {
+      await tx
+        .delete(voteRulesets)
+        .where(eq(voteRulesets.id, existingVoteRuleset.id));
+    }
+
+    // 3. Handle Per-question Overrides
+    const currentQuestionIds = vote.questions.map((q) => q.id);
+
+    // Update or Insert current overrides
+    for (const q of vote.questions) {
+      const existingOverride = existingRulesets.find(
+        (r) => r.questionId === q.id,
+      );
+
+      if (q.rulesetOverride) {
+        const overrideValues = {
+          ...mapRulesetColumns(q.rulesetOverride),
+          updatedAt: new Date(),
+        };
+
+        if (existingOverride) {
           await tx
             .update(voteRulesets)
-            .set({ ...rulesetValues, updatedAt: new Date() })
-            .where(eq(voteRulesets.id, existingVoteRuleset.id));
+            .set(overrideValues)
+            .where(eq(voteRulesets.id, existingOverride.id));
         } else {
-          await tx.insert(voteRulesets).values(this.mapRulesetInsert(vote));
+          await tx
+            .insert(voteRulesets)
+            .values(this.mapQuestionRulesetInsert(q, vote));
         }
-      } else if (existingVoteRuleset) {
+      } else if (existingOverride) {
+        // Override removed from an existing question
         await tx
           .delete(voteRulesets)
-          .where(eq(voteRulesets.id, existingVoteRuleset.id));
+          .where(eq(voteRulesets.id, existingOverride.id));
       }
+    }
 
-      // 3. Handle Per-question Overrides
-      const currentQuestionIds = vote.questions.map((q) => q.id);
-
-      // Update or Insert current overrides
-      for (const q of vote.questions) {
-        const existingOverride = existingRulesets.find(
-          (r) => r.questionId === q.id,
-        );
-
-        if (q.rulesetOverride) {
-          const overrideValues = {
-            ...mapRulesetColumns(q.rulesetOverride),
-            updatedAt: new Date(),
-          };
-
-          if (existingOverride) {
-            await tx
-              .update(voteRulesets)
-              .set(overrideValues)
-              .where(eq(voteRulesets.id, existingOverride.id));
-          } else {
-            await tx
-              .insert(voteRulesets)
-              .values(this.mapQuestionRulesetInsert(q, vote));
-          }
-        } else if (existingOverride) {
-          // Override removed from an existing question
-          await tx
-            .delete(voteRulesets)
-            .where(eq(voteRulesets.id, existingOverride.id));
-        }
-      }
-
-      // 4. Cleanup orphaned overrides (for questions that were deleted)
-      const orphanedOverrides = existingRulesets.filter(
-        (r) =>
-          r.questionId !== null && !currentQuestionIds.includes(r.questionId),
+    // 4. Cleanup orphaned overrides (for questions that were deleted)
+    const orphanedOverrides = existingRulesets.filter(
+      (r) =>
+        r.questionId !== null && !currentQuestionIds.includes(r.questionId),
+    );
+    if (orphanedOverrides.length > 0) {
+      await tx.delete(voteRulesets).where(
+        inArray(
+          voteRulesets.id,
+          orphanedOverrides.map((r) => r.id),
+        ),
       );
-      if (orphanedOverrides.length > 0) {
-        await tx.delete(voteRulesets).where(
-          inArray(
-            voteRulesets.id,
-            orphanedOverrides.map((r) => r.id),
+    }
+
+    const existingQuestionRows = await tx
+      .select({ id: voteQuestions.id })
+      .from(voteQuestions)
+      .where(
+        and(
+          eq(voteQuestions.tenantId, vote.tenantId),
+          eq(voteQuestions.voteId, vote.id),
+        ),
+      );
+    const existingQuestionIds = existingQuestionRows.map((q) => q.id);
+
+    const aggregateQuestionIds = vote.questions.map((q) => q.id);
+    const questionsToRemove = existingQuestionIds.filter(
+      (id) => !aggregateQuestionIds.includes(id),
+    );
+    const questionsToUpdate = vote.questions.filter((q) =>
+      existingQuestionIds.includes(q.id),
+    );
+    const questionsToInsert = vote.questions.filter(
+      (q) => !existingQuestionIds.includes(q.id),
+    );
+
+    if (questionsToRemove.length > 0) {
+      await tx
+        .delete(voteOptions)
+        .where(
+          and(
+            eq(voteOptions.tenantId, vote.tenantId),
+            inArray(voteOptions.questionId, questionsToRemove),
           ),
         );
-      }
-
-      const existingQuestionRows = await tx
-        .select({ id: voteQuestions.id })
-        .from(voteQuestions)
+      await tx
+        .delete(voteQuestions)
         .where(
           and(
             eq(voteQuestions.tenantId, vote.tenantId),
-            eq(voteQuestions.voteId, vote.id),
+            inArray(voteQuestions.id, questionsToRemove),
           ),
         );
-      const existingQuestionIds = existingQuestionRows.map((q) => q.id);
+    }
 
-      const aggregateQuestionIds = vote.questions.map((q) => q.id);
-      const questionsToRemove = existingQuestionIds.filter(
-        (id) => !aggregateQuestionIds.includes(id),
-      );
-      const questionsToUpdate = vote.questions.filter((q) =>
-        existingQuestionIds.includes(q.id),
-      );
-      const questionsToInsert = vote.questions.filter(
-        (q) => !existingQuestionIds.includes(q.id),
-      );
+    if (questionsToInsert.length > 0) {
+      await tx
+        .insert(voteQuestions)
+        .values(questionsToInsert.map((q) => this.mapQuestionInsert(q, vote)));
+    }
 
-      if (questionsToRemove.length > 0) {
+    for (const q of questionsToUpdate) {
+      await tx
+        .update(voteQuestions)
+        .set(this.mapQuestionUpdate(q))
+        .where(
+          and(
+            eq(voteQuestions.tenantId, vote.tenantId),
+            eq(voteQuestions.id, q.id),
+          ),
+        );
+    }
+
+    for (const q of vote.questions) {
+      const existingOptionRows = await tx
+        .select({ id: voteOptions.id })
+        .from(voteOptions)
+        .where(
+          and(
+            eq(voteOptions.tenantId, vote.tenantId),
+            eq(voteOptions.questionId, q.id),
+          ),
+        );
+      const existingOptionIds = existingOptionRows.map((o) => o.id);
+
+      const optionPlan = planOptionPersistence(existingOptionIds, q.options);
+
+      if (optionPlan.toDelete.length > 0) {
         await tx
           .delete(voteOptions)
           .where(
             and(
               eq(voteOptions.tenantId, vote.tenantId),
-              inArray(voteOptions.questionId, questionsToRemove),
-            ),
-          );
-        await tx
-          .delete(voteQuestions)
-          .where(
-            and(
-              eq(voteQuestions.tenantId, vote.tenantId),
-              inArray(voteQuestions.id, questionsToRemove),
+              inArray(voteOptions.id, optionPlan.toDelete),
             ),
           );
       }
 
-      if (questionsToInsert.length > 0) {
+      const optionsToUpdate = q.options.filter((o) =>
+        optionPlan.toUpdate.includes(o.id),
+      );
+      for (const o of optionsToUpdate) {
         await tx
-          .insert(voteQuestions)
-          .values(
-            questionsToInsert.map((q) => this.mapQuestionInsert(q, vote)),
-          );
-      }
-
-      for (const q of questionsToUpdate) {
-        await tx
-          .update(voteQuestions)
-          .set(this.mapQuestionUpdate(q))
-          .where(
-            and(
-              eq(voteQuestions.tenantId, vote.tenantId),
-              eq(voteQuestions.id, q.id),
-            ),
-          );
-      }
-
-      for (const q of vote.questions) {
-        const existingOptionRows = await tx
-          .select({ id: voteOptions.id })
-          .from(voteOptions)
+          .update(voteOptions)
+          .set({
+            label: o.label,
+            optionKey: o.optionKey,
+            sortOrder: o.sortOrder,
+            updatedAt: new Date(),
+          })
           .where(
             and(
               eq(voteOptions.tenantId, vote.tenantId),
-              eq(voteOptions.questionId, q.id),
+              eq(voteOptions.id, o.id),
             ),
           );
-        const existingOptionIds = existingOptionRows.map((o) => o.id);
-
-        const optionPlan = planOptionPersistence(existingOptionIds, q.options);
-
-        if (optionPlan.toDelete.length > 0) {
-          await tx
-            .delete(voteOptions)
-            .where(
-              and(
-                eq(voteOptions.tenantId, vote.tenantId),
-                inArray(voteOptions.id, optionPlan.toDelete),
-              ),
-            );
-        }
-
-        const optionsToUpdate = q.options.filter((o) =>
-          optionPlan.toUpdate.includes(o.id),
-        );
-        for (const o of optionsToUpdate) {
-          await tx
-            .update(voteOptions)
-            .set({
-              label: o.label,
-              optionKey: o.optionKey,
-              sortOrder: o.sortOrder,
-              updatedAt: new Date(),
-            })
-            .where(
-              and(
-                eq(voteOptions.tenantId, vote.tenantId),
-                eq(voteOptions.id, o.id),
-              ),
-            );
-        }
-
-        const optionsToInsert = q.options.filter((o) =>
-          optionPlan.toInsert.includes(o.id),
-        );
-        if (optionsToInsert.length > 0) {
-          await tx
-            .insert(voteOptions)
-            .values(
-              optionsToInsert.map((o) => this.mapOptionInsert(o, q, vote)),
-            );
-        }
       }
-    });
+
+      const optionsToInsert = q.options.filter((o) =>
+        optionPlan.toInsert.includes(o.id),
+      );
+      if (optionsToInsert.length > 0) {
+        await tx
+          .insert(voteOptions)
+          .values(optionsToInsert.map((o) => this.mapOptionInsert(o, q, vote)));
+      }
+    }
   }
 
   private mapVoteInsert(vote: VoteAggregate): typeof votes.$inferInsert {

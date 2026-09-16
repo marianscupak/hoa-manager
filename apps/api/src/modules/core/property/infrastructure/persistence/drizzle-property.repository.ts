@@ -243,6 +243,25 @@ export class DrizzleUnitOwnershipRepository implements UnitOwnershipRepository {
     return this.attachMembers(parties);
   }
 
+  async listActiveOwnerIdsByTenant(
+    tenantId: string,
+    now: Date,
+  ): Promise<{ unitId: string; ownerId: string }[]> {
+    return await this.db
+      .select({
+        unitId: unitOwnerships.unitId,
+        ownerId: unitOwnershipMembers.ownerId,
+      })
+      .from(unitOwnerships)
+      .innerJoin(
+        unitOwnershipMembers,
+        eq(unitOwnershipMembers.ownershipId, unitOwnerships.id),
+      )
+      .where(
+        and(eq(unitOwnerships.tenantId, tenantId), ownershipActiveAt(now)),
+      );
+  }
+
   private async attachMembers(
     parties: (typeof unitOwnerships.$inferSelect)[],
   ): Promise<UnitOwnershipParty[]> {

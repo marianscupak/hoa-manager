@@ -57,49 +57,40 @@ export class ListUnitsHandler implements IQueryHandler<
   async execute(query: ListUnitsQuery): Promise<ListedUnit[]> {
     // The caller's own units come from the query that already owns that
     // filter, so "which are mine" cannot drift from what `/units/mine` says.
-    const [units, tenantOwners, owned] = await Promise.all([
+    const now = this.clock.now();
+    const [units, tenantOwners, activeOwnerships, owned] = await Promise.all([
       this.unitRepo.listByTenant(query.tenantId),
       this.ownerRepo.listByTenant(query.tenantId),
+      this.ownershipRepo.listActiveOwnerIdsByTenant(query.tenantId, now),
       this.queryBus.execute<GetOwnedUnitsQuery, OwnedUnitResponseDto[]>(
         new GetOwnedUnitsQuery(query.tenantId, query.membershipId),
       ),
     ]);
     const namesById = new Map(tenantOwners.map((o) => [o.id, o.displayName]));
-    const now = this.clock.now();
 
-    // TODO: In a real app with many units, this N+1 query should be optimized
-    // with a join in the repository or a dataloader, but for MVP it's OK.
-    const result: UnitWithStatus[] = [];
-
-    for (const unit of units) {
-      const ownerships = await this.ownershipRepo.listActiveByUnit(
-        query.tenantId,
-        unit.id,
-        now,
-      );
-
-      const owners = [
-        ...new Set(
-          ownerships
-            .flatMap((o) => o.memberOwnerIds)
-            .map((id) => namesById.get(id))
-            .filter((name): name is string => !!name),
-        ),
-      ];
-
-      result.push({
-        id: unit.id,
-        tenantId: unit.tenantId,
-        unitNo: unit.unitNo,
-        buildingShareNumerator: unit.buildingShareNumerator,
-        buildingShareDenominator: unit.buildingShareDenominator,
-        usageCode: unit.usageCode,
-        usageName: unit.usageName,
-        createdAt: unit.createdAt,
-        updatedAt: unit.updatedAt,
-        owners,
-      });
+    // One query for the whole register rather than one per unit: this list is
+    // read by every member now, not by an admin now and then.
+    const ownerIdsByUnit = new Map<string, Set<string>>();
+    for (const row of activeOwnerships) {
+      const ids = ownerIdsByUnit.get(row.unitId) ?? new Set<string>();
+      ids.add(row.ownerId);
+      ownerIdsByUnit.set(row.unitId, ids);
     }
+
+    const result: UnitWithStatus[] = units.map((unit) => ({
+      id: unit.id,
+      tenantId: unit.tenantId,
+      unitNo: unit.unitNo,
+      buildingShareNumerator: unit.buildingShareNumerator,
+      buildingShareDenominator: unit.buildingShareDenominator,
+      usageCode: unit.usageCode,
+      usageName: unit.usageName,
+      createdAt: unit.createdAt,
+      updatedAt: unit.updatedAt,
+      owners: [...(ownerIdsByUnit.get(unit.id) ?? [])]
+        .map((id) => namesById.get(id))
+        .filter((name): name is string => !!name),
+    }));
 
     return markOwnUnits(result, owned);
   }

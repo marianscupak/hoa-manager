@@ -83,6 +83,17 @@ export interface UnitOwnershipRepository {
     unitId: string,
     now: Date,
   ): Promise<UnitOwnershipParty[]>;
+  /**
+   * Every (unit, owner) pair active at `now` across the whole association,
+   * in one query.
+   *
+   * The register list is read by every member, so asking per unit meant a
+   * query per flat per page view.
+   */
+  listActiveOwnerIdsByTenant(
+    tenantId: string,
+    now: Date,
+  ): Promise<{ unitId: string; ownerId: string }[]>;
   /** Every party of the unit, past, current and scheduled, oldest first. */
   listByUnit(tenantId: string, unitId: string): Promise<UnitOwnershipParty[]>;
   /** True when the membership's owner record appears in any party of the unit. */

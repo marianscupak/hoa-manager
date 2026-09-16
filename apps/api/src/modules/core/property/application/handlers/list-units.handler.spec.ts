@@ -25,7 +25,9 @@ function buildHandler(overrides?: {
 }) {
   const unitRepo = { listByTenant: jest.fn().mockResolvedValue([UNIT]) };
   const ownershipRepo = {
-    listActiveByUnit: jest.fn().mockResolvedValue(overrides?.ownerships ?? []),
+    listActiveOwnerIdsByTenant: jest
+      .fn()
+      .mockResolvedValue(overrides?.ownerships ?? []),
   };
   const ownerRepo = {
     listByTenant: jest.fn().mockResolvedValue(
@@ -53,18 +55,12 @@ function buildHandler(overrides?: {
 
 describe('ListUnitsHandler', () => {
   it('resolves owner display names across ownership parties, deduplicated', async () => {
+    // Two parties, one owner in both: the name appears once.
     const { handler } = buildHandler({
       ownerships: [
-        {
-          shareNumerator: 1,
-          shareDenominator: 2,
-          memberOwnerIds: ['o1', 'o2'],
-        },
-        {
-          shareNumerator: 1,
-          shareDenominator: 2,
-          memberOwnerIds: ['o1'],
-        },
+        { unitId: 'u1', ownerId: 'o1' },
+        { unitId: 'u1', ownerId: 'o2' },
+        { unitId: 'u1', ownerId: 'o1' },
       ],
     });
 
@@ -127,14 +123,21 @@ describe('ListUnitsHandler', () => {
     expect(unit).not.toHaveProperty('katastrUnitId');
   });
 
-  it('evaluates every unit against the same `now`, read once per call', async () => {
+  it('reads the register ownerships once, not once per unit', async () => {
+    // This endpoint used to be two admins on an admin screen; it is now every
+    // resident opening the unit list. A query per unit means a query per
+    // resident per flat, which in a real building is hundreds.
     const unitRepo = {
       listByTenant: jest
         .fn()
-        .mockResolvedValue([UNIT, { ...UNIT, id: 'u2', unitNo: '2' }]),
+        .mockResolvedValue([
+          UNIT,
+          { ...UNIT, id: 'u2', unitNo: '2' },
+          { ...UNIT, id: 'u3', unitNo: '3' },
+        ]),
     };
     const ownershipRepo = {
-      listActiveByUnit: jest.fn().mockResolvedValue([]),
+      listActiveOwnerIdsByTenant: jest.fn().mockResolvedValue([]),
     };
     const ownerRepo = { listByTenant: jest.fn().mockResolvedValue([]) };
     const clock = { now: jest.fn(() => new Date('2026-09-04T10:00:00Z')) };
@@ -149,9 +152,38 @@ describe('ListUnitsHandler', () => {
 
     await handler.execute(new ListUnitsQuery(TENANT, MEMBERSHIP));
 
+    expect(ownershipRepo.listActiveOwnerIdsByTenant).toHaveBeenCalledTimes(1);
+  });
+
+  it('evaluates every unit against the same `now`, read once per call', async () => {
+    const unitRepo = {
+      listByTenant: jest
+        .fn()
+        .mockResolvedValue([UNIT, { ...UNIT, id: 'u2', unitNo: '2' }]),
+    };
+    const ownershipRepo = {
+      listActiveOwnerIdsByTenant: jest.fn().mockResolvedValue([]),
+    };
+    const ownerRepo = { listByTenant: jest.fn().mockResolvedValue([]) };
+    const clock = { now: jest.fn(() => new Date('2026-09-04T10:00:00Z')) };
+    const queryBus = { execute: jest.fn().mockResolvedValue([]) };
+    const handler = new ListUnitsHandler(
+      unitRepo as never,
+      ownershipRepo as never,
+      ownerRepo as never,
+      clock as never,
+      queryBus as never,
+    );
+
+    await handler.execute(new ListUnitsQuery(TENANT, MEMBERSHIP));
+
+    // One `now` per call, and that same instant decides which ownerships
+    // count — otherwise two units in one response could disagree about who
+    // owns what.
     expect(clock.now).toHaveBeenCalledTimes(1);
-    const [firstCall, secondCall] = ownershipRepo.listActiveByUnit.mock.calls;
-    expect(firstCall).toEqual([TENANT, 'u1', firstCall[2]]);
-    expect(secondCall).toEqual([TENANT, 'u2', firstCall[2]]);
+    expect(ownershipRepo.listActiveOwnerIdsByTenant).toHaveBeenCalledWith(
+      TENANT,
+      new Date('2026-09-04T10:00:00Z'),
+    );
   });
 });

@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import {
     AlertTriangle,
     ArrowLeft,
@@ -80,7 +81,7 @@ export function ReviewStage({
     const ineligiblePercent = groupPercent(null);
 
     const meetingDate = record.meetingDate
-        ? new Date(record.meetingDate).toLocaleString()
+        ? format(new Date(record.meetingDate), "d. M. yyyy HH:mm")
         : null;
     const entered = totals.presentUnitCount - totals.unitsAwaitingEntry;
     const unaccounted =

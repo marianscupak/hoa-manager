@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import { Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
@@ -32,7 +33,7 @@ export function RecordHeader({
               published
                   ? "voting:assemblyRecord.header.heldOnPublished"
                   : "voting:assemblyRecord.header.heldOn",
-              { date: new Date(meetingDate).toLocaleString() },
+              { date: format(new Date(meetingDate), "d. M. yyyy HH:mm") },
           )
         : t("voting:assemblyRecord.header.noDate");
 

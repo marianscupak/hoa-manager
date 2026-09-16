@@ -1,7 +1,7 @@
 import { AxiosError } from "axios";
 import { describe, expect, it } from "vitest";
 
-import { getApiErrorParam } from "./error-utils";
+import { formatErrorParam, getApiErrorParam } from "./error-utils";
 
 const error = (data: unknown) => {
     const err = new AxiosError("failed");
@@ -58,5 +58,23 @@ describe("getApiErrorParam", () => {
             getApiErrorParam(error({ code: "VOTE_NOT_FOUND" })),
         ).toBeUndefined();
         expect(getApiErrorParam(new Error("boom"))).toBeUndefined();
+    });
+});
+
+describe("formatErrorParam", () => {
+    it("writes a calendar date the way the rest of the app does", () => {
+        // The API states dates as YYYY-MM-DD; a Czech sentence does not.
+        expect(formatErrorParam("2026-09-15")).toBe("15. 9. 2026");
+    });
+
+    it("leaves a value that is not a date alone", () => {
+        // Shares, counts and names travel through the same placeholder.
+        expect(formatErrorParam("2/3")).toBe("2/3");
+        expect(formatErrorParam("47/50")).toBe("47/50");
+        expect(formatErrorParam(undefined)).toBeUndefined();
+    });
+
+    it("leaves a date-shaped value that is not a real date alone", () => {
+        expect(formatErrorParam("2026-13-45")).toBe("2026-13-45");
     });
 });

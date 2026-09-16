@@ -1,4 +1,5 @@
 import { AxiosError } from "axios";
+import { format, isValid, parseISO } from "date-fns";
 
 import { toast } from "@hoa-mngr/ui";
 
@@ -32,6 +33,25 @@ export function getApiErrorParam(err: unknown): string | undefined {
     return data?.details?.find((d) => d.code === data.code)?.param;
 }
 
+const CALENDAR_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * The value as the sentence should read it.
+ *
+ * The API states calendar dates as YYYY-MM-DD (`formatAssociationDate`), which
+ * is not how a Czech sentence writes one. The renderer cannot know what a
+ * given value means, but that shape is unambiguous — shares, counts and names
+ * never look like it — so it is written the way every other date in the app
+ * is. Anything else is passed through untouched.
+ */
+export function formatErrorParam(
+    param: string | undefined,
+): string | undefined {
+    if (!param || !CALENDAR_DATE.test(param)) return param;
+    const date = parseISO(param);
+    return isValid(date) ? format(date, "d. M. yyyy") : param;
+}
+
 /**
  * Show a translated toast for an API error.
  * Looks up `errors:<CODE>` in the i18n resources.
@@ -41,7 +61,7 @@ export function showApiError(err: unknown): void {
     const code = getApiErrorCode(err) ?? "UNKNOWN";
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const message = i18n.t(`errors:${code}` as any, {
-        param: getApiErrorParam(err),
+        param: formatErrorParam(getApiErrorParam(err)),
     }) as string;
 
     // Longer than the global default: an API error usually names something the

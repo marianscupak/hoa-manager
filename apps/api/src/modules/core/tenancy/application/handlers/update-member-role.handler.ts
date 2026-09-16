@@ -66,6 +66,7 @@ export class UpdateMemberRoleHandler implements ICommandHandler<UpdateMemberRole
 
     await this.uow.execute(async () => {
       await this.membershipRepository.updateRole(
+        command.tenantId,
         command.membershipId,
         command.role,
       );

@@ -13,9 +13,7 @@ import { ConsentAlreadyRecordedException } from '@/shared/application/exceptions
 import { isUniqueViolation } from '@/shared/errors/pg-errors';
 
 @Injectable()
-export class DrizzleVoteConsentWriteRepository
-  implements VoteConsentWriteRepository
-{
+export class DrizzleVoteConsentWriteRepository implements VoteConsentWriteRepository {
   constructor(private readonly drizzle: DrizzleService) {}
 
   private get db() {
@@ -90,6 +88,7 @@ export class DrizzleVoteConsentWriteRepository
   }
 
   async updateStatus(
+    tenantId: string,
     consentId: string,
     status: VoteUnitConsentStatus,
   ): Promise<void> {
@@ -99,6 +98,11 @@ export class DrizzleVoteConsentWriteRepository
         status,
         updatedAt: new Date(),
       })
-      .where(eq(voteUnitConsents.id, consentId));
+      .where(
+        and(
+          eq(voteUnitConsents.tenantId, tenantId),
+          eq(voteUnitConsents.id, consentId),
+        ),
+      );
   }
 }

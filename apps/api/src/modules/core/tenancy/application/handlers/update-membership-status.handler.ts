@@ -27,12 +27,9 @@ export class UpdateMembershipStatusHandler implements ICommandHandler<UpdateMemb
   async execute(command: UpdateMembershipStatusCommand) {
     const existing = await this.membershipRepo.findById(command.membershipId);
     if (!existing) {
-      // Preserve current behavior: silently no-op (mirrors prior handler that
-      // just called updateStatus without error if the row didn't exist).
-      return this.membershipRepo.updateStatus(
-        command.membershipId,
-        command.status,
-      );
+      // Unchanged behaviour, stated directly: the previous version called
+      // `updateStatus` on an id that matches no row, which does nothing.
+      return;
     }
 
     if (existing.status === command.status) {
@@ -42,7 +39,10 @@ export class UpdateMembershipStatusHandler implements ICommandHandler<UpdateMemb
     // No UoW wrapper: this handler is only dispatched from within other
     // UoW-wrapped flows (AcceptOwnerInviteHandler). The repo calls and audit
     // append participate in the outer transaction via DRIZZLE_TX_STORAGE.
+    // The tenant comes from the row that was just read, so the write cannot
+    // reach past the membership this command actually found.
     const result = await this.membershipRepo.updateStatus(
+      existing.tenantId,
       command.membershipId,
       command.status,
     );

@@ -29,7 +29,11 @@ export interface VoteConsentWriteRepository {
   /**
    * Updates the status of an existing consent.
    */
-  updateStatus(consentId: string, status: VoteUnitConsentStatus): Promise<void>;
+  updateStatus(
+    tenantId: string,
+    consentId: string,
+    status: VoteUnitConsentStatus,
+  ): Promise<void>;
 }
 
 export const VOTE_CONSENT_WRITE_REPOSITORY = Symbol(

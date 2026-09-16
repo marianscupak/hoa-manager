@@ -109,21 +109,40 @@ export class DrizzleMembershipRepository implements MembershipRepository {
     return inserted;
   }
 
+  // Both writes carry the tenant in the predicate, not only in the caller.
+  // The handlers do check it, but a membership id is a bare uuid and the next
+  // caller may not — and getting it wrong here changes someone's role in
+  // another association.
   async updateStatus(
+    tenantId: string,
     id: string,
     status: TenantMembershipStatus,
   ): Promise<void> {
     await this.db
       .update(tenantMemberships)
       .set({ status })
-      .where(eq(tenantMemberships.id, id));
+      .where(
+        and(
+          eq(tenantMemberships.tenantId, tenantId),
+          eq(tenantMemberships.id, id),
+        ),
+      );
   }
 
-  async updateRole(id: string, role: TenantMembership['role']): Promise<void> {
+  async updateRole(
+    tenantId: string,
+    id: string,
+    role: TenantMembership['role'],
+  ): Promise<void> {
     await this.db
       .update(tenantMemberships)
       .set({ role })
-      .where(eq(tenantMemberships.id, id));
+      .where(
+        and(
+          eq(tenantMemberships.tenantId, tenantId),
+          eq(tenantMemberships.id, id),
+        ),
+      );
   }
 
   async listByTenant(tenantId: string): Promise<TenantMembershipWithUser[]> {

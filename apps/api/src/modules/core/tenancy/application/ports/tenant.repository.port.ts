@@ -40,8 +40,16 @@ export interface MembershipRepository {
       'id' | 'createdAt' | 'updatedAt' | 'lastSeenAt'
     >,
   ): Promise<TenantMembership>;
-  updateStatus(id: string, status: TenantMembershipStatus): Promise<void>;
-  updateRole(id: string, role: TenantMembership['role']): Promise<void>;
+  updateStatus(
+    tenantId: string,
+    id: string,
+    status: TenantMembershipStatus,
+  ): Promise<void>;
+  updateRole(
+    tenantId: string,
+    id: string,
+    role: TenantMembership['role'],
+  ): Promise<void>;
   listByTenant(tenantId: string): Promise<TenantMembershipWithUser[]>;
 }
 

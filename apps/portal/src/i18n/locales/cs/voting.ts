@@ -385,7 +385,6 @@ export const voting = {
             autosave: "Průběžně uloženo",
             stillToEnter: "zbývá zadat {{count}} přítomných jednotek",
             allEntered: "všechny přítomné jednotky zadány",
-            nextToEnter: "Další jednotka k zadání",
             review: "Zkontrolovat a publikovat",
         },
         review: {
@@ -496,6 +495,7 @@ export const voting = {
             rules: "Pravidla hlasování",
             questions: "Otázky",
             review: "Kontrola a naplánování",
+            reviewAssembly: "Kontrola a zápis",
         },
         note: "Koncept se ukládá automaticky po dokončení každého kroku. Vlastníci nic nevidí, dokud hlasování nenaplánujete.",
         back: "Zpět",
@@ -504,6 +504,10 @@ export const voting = {
         stepOf: "Krok {{n}} ze {{total}}",
         review: {
             title: "Kontrola a naplánování",
+            titleAssembly: "Kontrola a zápis",
+            recordTitle: "Zapsat zasedání?",
+            recordCopy:
+                "Nastavení je hotové. Zápis se otevře a hlasy budete zadávat po jednotkách; vlastníci uvidí hlasování až po publikaci záznamu.",
             edit: "Upravit",
             scheduleTitle: "Naplánovat hlasování?",
             scheduleCopy:

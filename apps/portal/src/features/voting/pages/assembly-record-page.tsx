@@ -7,10 +7,7 @@ import { Button, ErrorState, PageLoading } from "@hoa-mngr/ui";
 
 import { AttendanceCard } from "@/features/voting/components/assembly-record/attendance-card";
 import { RecordHeader } from "@/features/voting/components/assembly-record/record-header";
-import {
-    rosterState,
-    type RosterFilter,
-} from "@/features/voting/components/assembly-record/roster";
+import type { RosterFilter } from "@/features/voting/components/assembly-record/roster";
 import { RosterRail } from "@/features/voting/components/assembly-record/roster-rail";
 import { RunningCountCard } from "@/features/voting/components/assembly-record/running-count-card";
 import { UnitPanel } from "@/features/voting/components/assembly-record/unit-panel";
@@ -54,18 +51,6 @@ export function AssemblyRecordPage() {
         if (units.length === 0) return;
         const next = (selectedIndex + delta + units.length) % units.length;
         setSelectedUnitId(units[next].unitId);
-    };
-
-    /** Walks present-and-incomplete units in roster order, wrapping. */
-    const goToNextToEnter = () => {
-        const order = [
-            ...units.slice(selectedIndex + 1),
-            ...units.slice(0, selectedIndex + 1),
-        ];
-        const next = order.find(
-            (u) => rosterState(u, questionCount) === "toEnter",
-        );
-        if (next) setSelectedUnitId(next.unitId);
     };
 
     if (isLoading) return <PageLoading />;
@@ -158,20 +143,11 @@ export function AssemblyRecordPage() {
                               })
                             : t("voting:assemblyRecord.footer.allEntered")}
                     </p>
-                    <div className="flex gap-2">
-                        <Button
-                            variant="outline"
-                            onClick={goToNextToEnter}
-                            disabled={awaiting === 0}
-                        >
-                            {t("voting:assemblyRecord.footer.nextToEnter")}
-                        </Button>
-                        <Button asChild>
-                            <Link to={`/voting/${id}/assembly-record/review`}>
-                                {t("voting:assemblyRecord.footer.review")}
-                            </Link>
-                        </Button>
-                    </div>
+                    <Button asChild>
+                        <Link to={`/voting/${id}/assembly-record/review`}>
+                            {t("voting:assemblyRecord.footer.review")}
+                        </Link>
+                    </Button>
                 </div>
             </footer>
         </div>

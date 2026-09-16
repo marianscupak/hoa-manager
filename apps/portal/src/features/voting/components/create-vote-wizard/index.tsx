@@ -193,7 +193,10 @@ export function CreateVoteWizard({
     const steps: WizardShellStep<WizardStepId>[] = STEP_ORDER.map(
         (id, index) => ({
             id,
-            labelKey: STEP_LABEL_KEYS[id],
+            labelKey:
+                id === "review" && mode === "ASSEMBLY_RECORD"
+                    ? "voting:wizard.steps.reviewAssembly"
+                    : STEP_LABEL_KEYS[id],
             state:
                 index < activeIndex
                     ? "done"

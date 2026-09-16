@@ -191,12 +191,20 @@ export function ReviewStep({
 }: ReviewStepProps) {
     const { t } = useTranslation(["voting"]);
     const checks = buildReviewChecks(vote);
+    // An assembly record is never scheduled — the meeting already happened, so
+    // there is nothing to announce to owners and nothing to wait for. This
+    // step hands over to the recording screen instead.
+    const isAssemblyRecord = vote.mode === "ASSEMBLY_RECORD";
 
     return (
         <div className="space-y-6">
             <div>
                 <h1 className="font-display text-2xl font-extrabold tracking-tight">
-                    {t("voting:wizard.review.title")}
+                    {t(
+                        isAssemblyRecord
+                            ? "voting:wizard.review.titleAssembly"
+                            : "voting:wizard.review.title",
+                    )}
                 </h1>
             </div>
 
@@ -214,20 +222,41 @@ export function ReviewStep({
 
             <div className="rounded-card border-hairline bg-card shadow-clay-card border p-5">
                 <h2 className="font-display text-base font-extrabold">
-                    {t("voting:wizard.review.scheduleTitle")}
+                    {t(
+                        isAssemblyRecord
+                            ? "voting:wizard.review.recordTitle"
+                            : "voting:wizard.review.scheduleTitle",
+                    )}
                 </h2>
                 <p className="text-muted-foreground text-detail mt-1.5 mb-4 leading-[19px]">
-                    {t("voting:wizard.review.scheduleCopy")}
+                    {t(
+                        isAssemblyRecord
+                            ? "voting:wizard.review.recordCopy"
+                            : "voting:wizard.review.scheduleCopy",
+                    )}
                 </p>
                 <div className="flex flex-wrap items-center gap-2.5">
-                    <Button
-                        type="button"
-                        onClick={onScheduleClick}
-                        disabled={scheduleDisabled}
-                    >
-                        <Send />
-                        {t("voting:wizard.review.scheduleAction")}
-                    </Button>
+                    {isAssemblyRecord ? (
+                        <Button
+                            type="button"
+                            disabled={scheduleDisabled}
+                            asChild
+                        >
+                            <Link to={`/voting/${vote.id}/assembly-record`}>
+                                <Send />
+                                {t("voting:wizard.review.startRecordingAction")}
+                            </Link>
+                        </Button>
+                    ) : (
+                        <Button
+                            type="button"
+                            onClick={onScheduleClick}
+                            disabled={scheduleDisabled}
+                        >
+                            <Send />
+                            {t("voting:wizard.review.scheduleAction")}
+                        </Button>
+                    )}
                     <Button type="button" variant="ghost" asChild>
                         <Link to="/voting">
                             {t("voting:wizard.review.keepDraft")}

@@ -382,7 +382,6 @@ export const voting = {
             autosave: "Saved as you go",
             stillToEnter: "{{count}} present units still to enter",
             allEntered: "all present units entered",
-            nextToEnter: "Next unit to enter",
             review: "Review & publish",
         },
         review: {
@@ -488,6 +487,7 @@ export const voting = {
             rules: "Voting rules",
             questions: "Questions",
             review: "Review & schedule",
+            reviewAssembly: "Review & record",
         },
         note: "Your draft saves automatically as you complete each step. Owners see nothing until the vote is scheduled.",
         back: "Back",
@@ -496,6 +496,10 @@ export const voting = {
         stepOf: "Step {{n}} of {{total}}",
         review: {
             title: "Review & schedule",
+            titleAssembly: "Review & record",
+            recordTitle: "Record the assembly?",
+            recordCopy:
+                "The setup is done. The recording screen opens next and you enter the ballots unit by unit; owners see nothing until the record is published.",
             edit: "Edit",
             scheduleTitle: "Schedule this vote?",
             scheduleCopy:

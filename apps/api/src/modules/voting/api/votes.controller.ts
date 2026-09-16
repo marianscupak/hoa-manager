@@ -47,6 +47,7 @@ import {
   VoteConsentResponseDto,
   SubmitBallotDto,
   SubmitBallotResponseDto,
+  RecordAssemblyBallotDto,
   RecordPaperBallotDto,
   SetUnitAttendanceDto,
   VoteResultsResponseDto,
@@ -70,10 +71,12 @@ import { ConfirmDocumentUploadCommand } from '../application/commands/confirm-do
 import { CreateVoteCommand } from '../application/commands/create-vote/create-vote.command';
 import { CreateVoteConsentCommand } from '../application/commands/create-vote-consent/create-vote-consent.command';
 import { CreateVoteQuestionCommand } from '../application/commands/create-vote-question/create-vote-question.command';
+import { DeleteAssemblyBallotCommand } from '../application/commands/delete-assembly-ballot/delete-assembly-ballot.command';
 import { DeleteBallotAttachmentCommand } from '../application/commands/delete-ballot-attachment/delete-ballot-attachment.command';
 import { DeleteVoteCommand } from '../application/commands/delete-vote/delete-vote.command';
 import { DeleteVoteDocumentCommand } from '../application/commands/delete-vote-document/delete-vote-document.command';
 import { DeleteVoteQuestionCommand } from '../application/commands/delete-vote-question/delete-vote-question.command';
+import { RecordAssemblyBallotCommand } from '../application/commands/record-assembly-ballot/record-assembly-ballot.command';
 import { RecordPaperBallotCommand } from '../application/commands/record-paper-ballot/record-paper-ballot.command';
 import { RequestBallotAttachmentUploadCommand } from '../application/commands/request-ballot-attachment-upload/request-ballot-attachment-upload.command';
 import { RequestDocumentUploadCommand } from '../application/commands/request-document-upload/request-document-upload.command';
@@ -466,6 +469,52 @@ export class VotesController {
         body.status,
         body.voterOwnerId ?? null,
         body.voterNote ?? null,
+      ),
+    );
+  }
+
+  @Post(':id/assembly-ballots/:unitId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({
+    description: 'Records how a unit voted at the assembly',
+  })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  recordAssemblyBallot(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('unitId', ParseUUIDPipe) unitId: string,
+    @Body() body: RecordAssemblyBallotDto,
+    @Tenant() tenantCtx: TenantContext,
+  ) {
+    return this.commandBus.execute(
+      new RecordAssemblyBallotCommand(
+        tenantCtx.tenantId,
+        id,
+        tenantCtx.membershipId,
+        unitId,
+        body.answers,
+      ),
+    );
+  }
+
+  @Delete(':id/assembly-ballots/:unitId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({
+    description: 'Discards what was entered for a unit while recording',
+  })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  deleteAssemblyBallot(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('unitId', ParseUUIDPipe) unitId: string,
+    @Tenant() tenantCtx: TenantContext,
+  ) {
+    return this.commandBus.execute(
+      new DeleteAssemblyBallotCommand(
+        tenantCtx.tenantId,
+        id,
+        tenantCtx.membershipId,
+        unitId,
       ),
     );
   }

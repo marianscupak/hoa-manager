@@ -29,6 +29,7 @@ import type {
     CreateVoteResponseDto,
     DelegationCandidateDto,
     DocumentDownloadUrlResponseDto,
+    RecordAssemblyBallotDto,
     RecordPaperBallotDto,
     RequestBallotAttachmentUploadDto,
     RequestBallotAttachmentUploadResponseDto,
@@ -2171,6 +2172,191 @@ export const useVotesControllerSetUnitAttendance = <
 > => {
     return useMutation(
         getVotesControllerSetUnitAttendanceMutationOptions(options),
+        queryClient,
+    );
+};
+export const votesControllerRecordAssemblyBallot = (
+    id: string,
+    unitId: string,
+    recordAssemblyBallotDto: BodyType<RecordAssemblyBallotDto>,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<void>(
+        {
+            url: `/api/votes/${id}/assembly-ballots/${unitId}`,
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            data: recordAssemblyBallotDto,
+            signal,
+        },
+        options,
+    );
+};
+
+export const getVotesControllerRecordAssemblyBallotMutationOptions = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof votesControllerRecordAssemblyBallot>>,
+        TError,
+        { id: string; unitId: string; data: BodyType<RecordAssemblyBallotDto> },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof votesControllerRecordAssemblyBallot>>,
+    TError,
+    { id: string; unitId: string; data: BodyType<RecordAssemblyBallotDto> },
+    TContext
+> => {
+    const mutationKey = ["votesControllerRecordAssemblyBallot"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof votesControllerRecordAssemblyBallot>>,
+        { id: string; unitId: string; data: BodyType<RecordAssemblyBallotDto> }
+    > = (props) => {
+        const { id, unitId, data } = props ?? {};
+
+        return votesControllerRecordAssemblyBallot(
+            id,
+            unitId,
+            data,
+            requestOptions,
+        );
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type VotesControllerRecordAssemblyBallotMutationResult = NonNullable<
+    Awaited<ReturnType<typeof votesControllerRecordAssemblyBallot>>
+>;
+export type VotesControllerRecordAssemblyBallotMutationBody =
+    BodyType<RecordAssemblyBallotDto>;
+export type VotesControllerRecordAssemblyBallotMutationError =
+    ErrorType<unknown>;
+
+export const useVotesControllerRecordAssemblyBallot = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof votesControllerRecordAssemblyBallot>>,
+            TError,
+            {
+                id: string;
+                unitId: string;
+                data: BodyType<RecordAssemblyBallotDto>;
+            },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof votesControllerRecordAssemblyBallot>>,
+    TError,
+    { id: string; unitId: string; data: BodyType<RecordAssemblyBallotDto> },
+    TContext
+> => {
+    return useMutation(
+        getVotesControllerRecordAssemblyBallotMutationOptions(options),
+        queryClient,
+    );
+};
+export const votesControllerDeleteAssemblyBallot = (
+    id: string,
+    unitId: string,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<void>(
+        {
+            url: `/api/votes/${id}/assembly-ballots/${unitId}`,
+            method: "DELETE",
+            signal,
+        },
+        options,
+    );
+};
+
+export const getVotesControllerDeleteAssemblyBallotMutationOptions = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof votesControllerDeleteAssemblyBallot>>,
+        TError,
+        { id: string; unitId: string },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof votesControllerDeleteAssemblyBallot>>,
+    TError,
+    { id: string; unitId: string },
+    TContext
+> => {
+    const mutationKey = ["votesControllerDeleteAssemblyBallot"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof votesControllerDeleteAssemblyBallot>>,
+        { id: string; unitId: string }
+    > = (props) => {
+        const { id, unitId } = props ?? {};
+
+        return votesControllerDeleteAssemblyBallot(id, unitId, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type VotesControllerDeleteAssemblyBallotMutationResult = NonNullable<
+    Awaited<ReturnType<typeof votesControllerDeleteAssemblyBallot>>
+>;
+
+export type VotesControllerDeleteAssemblyBallotMutationError =
+    ErrorType<unknown>;
+
+export const useVotesControllerDeleteAssemblyBallot = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof votesControllerDeleteAssemblyBallot>>,
+            TError,
+            { id: string; unitId: string },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof votesControllerDeleteAssemblyBallot>>,
+    TError,
+    { id: string; unitId: string },
+    TContext
+> => {
+    return useMutation(
+        getVotesControllerDeleteAssemblyBallotMutationOptions(options),
         queryClient,
     );
 };

@@ -4,6 +4,8 @@ import { ScheduleModule } from '@nestjs/schedule';
 
 import { ConfigModule } from '@/infrastructure/config/config.module';
 import { AuditModule } from '@/modules/core/audit/audit.module';
+import { DeleteAssemblyBallotHandler } from '@/modules/voting/application/commands/delete-assembly-ballot/delete-assembly-ballot.handler';
+import { RecordAssemblyBallotHandler } from '@/modules/voting/application/commands/record-assembly-ballot/record-assembly-ballot.handler';
 import { SetUnitAttendanceHandler } from '@/modules/voting/application/commands/set-unit-attendance/set-unit-attendance.handler';
 import { VOTE_ATTENDANCE_REPOSITORY } from '@/modules/voting/application/ports/vote-attendance.repository.port';
 import { DrizzleVoteAttendanceRepository } from '@/modules/voting/infrastructure/persistence/drizzle-vote-attendance.repository';
@@ -73,6 +75,8 @@ import { VoteDocumentCleanupService } from './infrastructure/vote-document-clean
 import { VoteSchedulerService } from './infrastructure/vote-scheduler.service';
 
 const COMMAND_HANDLERS = [
+  RecordAssemblyBallotHandler,
+  DeleteAssemblyBallotHandler,
   SetUnitAttendanceHandler,
   CloseVoteCommandHandler,
   CreateVoteHandler,

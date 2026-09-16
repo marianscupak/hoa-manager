@@ -12,14 +12,18 @@ import { VotingEventType } from '../voting-event-types';
 
 const PayloadSchema = z.object({
   unitId: z.uuid(),
-  signerOwnerId: z.uuid(),
+  // Null when an assembly record names a proxy holder who owns nothing;
+  // `signerLabel` still carries the name for the sentence.
+  signerOwnerId: z.uuid().nullable(),
   answers: z.array(BallotAnswerSchema),
   labels: z.object({
     voteTitle: z.string(),
     unitLabel: z.string(),
     castBy: z.string(),
     signerLabel: z.string(),
-    attachmentFileName: z.string(),
+    // Null for an assembly record: the minutes are the document, and no
+    // scan is attached per unit.
+    attachmentFileName: z.string().nullable(),
     answers: z.array(LabeledBallotAnswerSchema),
   }),
 });
@@ -39,9 +43,9 @@ export const BallotCastProxyAuditEvent = defineAuditEvent({
     ballotId: string;
     unitId: string;
     unitLabel: string;
-    signerOwnerId: string;
+    signerOwnerId: string | null;
     signerLabel: string;
-    attachmentFileName: string;
+    attachmentFileName: string | null;
     actor: AuditActor;
     castByLabel: string;
     answers: { questionId: string; optionId: string }[];

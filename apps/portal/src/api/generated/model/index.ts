@@ -95,6 +95,8 @@ export * from "./questionOutcomeDtoOutcome";
 export * from "./quorumRuleResponseDto";
 export * from "./quorumRuleResponseDtoComparator";
 export * from "./quorumRuleResponseDtoMeasure";
+export * from "./recordAssemblyBallotDto";
+export * from "./recordAssemblyBallotDtoAnswersItem";
 export * from "./recordPaperBallotDto";
 export * from "./recordPaperBallotDtoAnswersItem";
 export * from "./registerFromInviteDto";

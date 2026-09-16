@@ -253,3 +253,21 @@ export class UnitNotEligibleForAttendanceException extends DomainException {
     super(ErrorCode.UNIT_NOT_ELIGIBLE_FOR_ATTENDANCE);
   }
 }
+
+/** Only a unit the board marked as represented can have a ballot entered. */
+export class UnitNotPresentException extends DomainException {
+  constructor() {
+    super(ErrorCode.UNIT_NOT_PRESENT);
+  }
+}
+
+/**
+ * Recording how a unit voted without recording who voted would leave the audit
+ * trail naming nobody. The screen asks for the voter first; this makes that
+ * order binding.
+ */
+export class AssemblyVoterNotRecordedException extends DomainException {
+  constructor() {
+    super(ErrorCode.ASSEMBLY_VOTER_NOT_RECORDED);
+  }
+}

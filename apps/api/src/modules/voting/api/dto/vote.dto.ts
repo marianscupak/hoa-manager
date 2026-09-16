@@ -239,6 +239,15 @@ export class SetUnitAttendanceDto extends createZodDto(
   setUnitAttendanceSchema,
 ) {}
 
+export const recordAssemblyBallotSchema = z.object({
+  answers: z.array(
+    z.object({ questionId: z.uuid(), optionId: z.uuid() }),
+  ),
+});
+export class RecordAssemblyBallotDto extends createZodDto(
+  recordAssemblyBallotSchema,
+) {}
+
 export class CreateVoteQuestionDto extends createZodDto(
   createVoteQuestionSchema,
 ) {}

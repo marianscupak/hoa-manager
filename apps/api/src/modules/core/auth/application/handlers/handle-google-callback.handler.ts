@@ -26,6 +26,7 @@ import {
   type GoogleOidcService,
 } from '@/modules/core/auth/application/ports/google-oidc.service.port';
 import { CreateUserCommand } from '@/modules/core/identity/application/commands/create-user.command';
+import { MarkEmailVerifiedCommand } from '@/modules/core/identity/application/commands/mark-email-verified.command';
 import { GetUserByEmailQuery } from '@/modules/core/identity/application/queries/get-user-by-email.query';
 import { GetUserByIdQuery } from '@/modules/core/identity/application/queries/get-user-by-id.query';
 import { GetMembershipsByUserIdQuery } from '@/modules/core/tenancy/application/queries/get-memberships-by-user-id.query';
@@ -126,6 +127,9 @@ export class HandleGoogleCallbackHandler
           new CreateUserCommand(
             idToken.email!.toLowerCase(),
             idToken.name ?? idToken.email!,
+            // Google refused this login above unless it had verified the
+            // address, so it is proven by the time we get here.
+            true,
           ),
         );
         const userId = (userResult as { id: string }).id;
@@ -144,6 +148,11 @@ export class HandleGoogleCallbackHandler
       if (!user.isActive) {
         throw new UnauthorizedException();
       }
+
+      // Accounts created before the flag was carried across still sit at
+      // false, which blocks them from accepting an owner invite. Setting it
+      // on every login repairs them; the command is a no-op once it is true.
+      await this.commandBus.execute(new MarkEmailVerifiedCommand(user.id));
 
       await this.authIdentityRepository.updateLastUsed(identity!.id);
 

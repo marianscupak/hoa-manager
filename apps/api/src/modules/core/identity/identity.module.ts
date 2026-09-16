@@ -6,11 +6,16 @@ import { IdentityController } from '@/modules/core/identity/api/identity.control
 import { CreateUserHandler } from '@/modules/core/identity/application/handlers/create-user.handler';
 import { GetUserByEmailHandler } from '@/modules/core/identity/application/handlers/get-user-by-email.handler';
 import { GetUserByIdHandler } from '@/modules/core/identity/application/handlers/get-user-by-id.handler';
+import { MarkEmailVerifiedHandler } from '@/modules/core/identity/application/handlers/mark-email-verified.handler';
 import { UpdateUserLanguageHandler } from '@/modules/core/identity/application/handlers/update-user-language.handler';
 import { USER_REPOSITORY } from '@/modules/core/identity/application/ports/user.repository.port';
 import { DrizzleUserRepository } from '@/modules/core/identity/infrastructure/persistence/drizzle-user.repository';
 
-const CommandHandlers = [CreateUserHandler, UpdateUserLanguageHandler];
+const CommandHandlers = [
+  CreateUserHandler,
+  MarkEmailVerifiedHandler,
+  UpdateUserLanguageHandler,
+];
 const QueryHandlers = [GetUserByIdHandler, GetUserByEmailHandler];
 
 @Module({

@@ -10,12 +10,16 @@ export class User {
     public updatedAt: Date,
   ) {}
 
-  static createNew(params: { email: string; fullName: string }): User {
+  static createNew(params: {
+    email: string;
+    fullName: string;
+    isEmailVerified?: boolean;
+  }): User {
     return new User(
       '',
       params.email,
       params.fullName,
-      false,
+      params.isEmailVerified ?? false,
       true,
       'cs',
       new Date(),

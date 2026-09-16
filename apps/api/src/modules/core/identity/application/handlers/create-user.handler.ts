@@ -23,7 +23,11 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
     }
 
     const inserted = await this.users.create(
-      User.createNew({ email: cmd.email, fullName: cmd.fullName }),
+      User.createNew({
+        email: cmd.email,
+        fullName: cmd.fullName,
+        isEmailVerified: cmd.isEmailVerified,
+      }),
     );
 
     return { id: inserted.id };

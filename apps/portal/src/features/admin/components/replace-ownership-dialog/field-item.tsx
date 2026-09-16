@@ -118,9 +118,9 @@ export function ReplaceOwnershipFieldItem({
                     />
                 </div>
 
-                {/* The compound field needs room for both numbers, the slash
-                    and the mode pill; below ~280px they start to crowd. */}
-                <div className="w-[288px] shrink-0">
+                {/* The field's own full width — enough for both numbers, the
+                    slash and the mode pill without crowding. */}
+                <div className="w-[232px] shrink-0">
                     <FormField
                         control={control}
                         name={`ownerships.${index}.share`}

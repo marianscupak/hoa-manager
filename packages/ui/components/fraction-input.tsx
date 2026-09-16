@@ -212,7 +212,7 @@ export function FractionInput({
 
     const fieldInvalid = ariaInvalid || invalid;
     const innerInput = cn(
-        "min-w-0 flex-1 bg-transparent font-mono text-md font-semibold tabular-nums",
+        "min-w-0 flex-1 bg-transparent font-mono text-sm font-medium tabular-nums",
         "placeholder:text-faint placeholder:font-normal",
         "outline-none disabled:cursor-not-allowed",
     );
@@ -228,7 +228,11 @@ export function FractionInput({
     return (
         <div
             className={cn(
-                "border-input bg-card ring-offset-background flex h-10 w-full items-center gap-1.5 rounded-[9px] border px-3 transition-colors",
+                // A share is a couple of short numbers and a pill, so the
+                // field has a natural size. Stretching it across a dialog
+                // would only open a gap between the numbers and the pill;
+                // `className` can still widen it where that is wanted.
+                "border-input bg-card ring-offset-background flex h-10 w-full max-w-[232px] items-center gap-1.5 rounded-[9px] border px-3 transition-colors",
                 "focus-within:ring-ring focus-within:ring-2 focus-within:ring-offset-2 focus-within:outline-none",
                 fieldInvalid &&
                     "border-destructive focus-within:ring-destructive",
@@ -248,7 +252,7 @@ export function FractionInput({
                         autoComplete="off"
                         aria-label={label("common:fractionInput.numerator")}
                         aria-invalid={fieldInvalid || undefined}
-                        className={cn(innerInput, "max-w-[78px] text-right")}
+                        className={cn(innerInput, "max-w-[52px] text-right")}
                         onChange={(e) => {
                             setNumText(e.target.value);
                             setInvalid(false);
@@ -266,9 +270,12 @@ export function FractionInput({
                             if (e.key === "Enter") commit();
                         }}
                     />
+                    {/* Same family and size as the numbers, so the glyphs sit
+                        on a shared baseline rather than each being centred in
+                        its own differently-sized line box. */}
                     <span
                         aria-hidden
-                        className="text-faint shrink-0 text-xl font-light"
+                        className="text-faint shrink-0 font-mono text-sm"
                     >
                         /
                     </span>
@@ -285,7 +292,7 @@ export function FractionInput({
                         autoComplete="off"
                         aria-label={label("common:fractionInput.denominator")}
                         aria-invalid={fieldInvalid || undefined}
-                        className={cn(innerInput, "max-w-[78px] text-left")}
+                        className={cn(innerInput, "max-w-[52px] text-left")}
                         onChange={(e) => {
                             setDenText(e.target.value);
                             setInvalid(false);
@@ -305,7 +312,7 @@ export function FractionInput({
                         autoComplete="off"
                         aria-label={label("common:fractionInput.percent")}
                         aria-invalid={fieldInvalid || undefined}
-                        className={cn(innerInput, "max-w-[110px] text-right")}
+                        className={cn(innerInput, "max-w-[72px] text-right")}
                         onChange={(e) => {
                             setPercentText(e.target.value);
                             percentSource.current = null;

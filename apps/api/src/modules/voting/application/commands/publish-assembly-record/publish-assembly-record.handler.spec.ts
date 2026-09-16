@@ -173,4 +173,29 @@ describe('PublishAssemblyRecordHandler', () => {
       code: 'VOTE_NOT_DRAFT',
     });
   });
+
+  it('refuses to publish a record nobody has worked on', async () => {
+    // Zero attendance rows means the board never started, not that nobody
+    // came — an inquorate meeting still has every unit marked absent. The gate
+    // passes vacuously here, and publishing is irreversible, so this is caught
+    // separately.
+    const { handler, calls } = build({ attendance: [], ballotUnitIds: [] });
+
+    await expect(handler.execute(command())).rejects.toMatchObject({
+      code: 'ASSEMBLY_RECORD_INCOMPLETE',
+    });
+    expect(calls.snapshotted).toBe(false);
+  });
+
+  it('publishes a meeting where every unit was marked absent', async () => {
+    const { handler, closed } = build({
+      attendance: [
+        { unitId: 'u1', status: 'ABSENT', voterOwnerId: null, voterNote: null },
+      ],
+      ballotUnitIds: [],
+    });
+
+    await expect(handler.execute(command())).resolves.toBeUndefined();
+    expect(closed.value).toBe(true);
+  });
 });

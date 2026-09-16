@@ -9,6 +9,7 @@ import { PublishAssemblyRecordHandler } from '@/modules/voting/application/comma
 import { RecordAssemblyBallotHandler } from '@/modules/voting/application/commands/record-assembly-ballot/record-assembly-ballot.handler';
 import { SetUnitAttendanceHandler } from '@/modules/voting/application/commands/set-unit-attendance/set-unit-attendance.handler';
 import { VOTE_ATTENDANCE_REPOSITORY } from '@/modules/voting/application/ports/vote-attendance.repository.port';
+import { GetAssemblyRecordHandler } from '@/modules/voting/application/queries/get-assembly-record/get-assembly-record.handler';
 import { DrizzleVoteAttendanceRepository } from '@/modules/voting/infrastructure/persistence/drizzle-vote-attendance.repository';
 
 import { VotesController } from './api/votes.controller';
@@ -101,6 +102,7 @@ const COMMAND_HANDLERS = [
   DeleteBallotAttachmentHandler,
 ];
 const QUERY_HANDLERS = [
+  GetAssemblyRecordHandler,
   GetVoteDetailHandler,
   GetVotesHandler,
   GetVoterStatusHandler,

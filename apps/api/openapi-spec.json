@@ -3226,6 +3226,36 @@
         ]
       }
     },
+    "/api/votes/{id}/assembly-record": {
+      "get": {
+        "operationId": "VotesController_getAssemblyRecord",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Everything the assembly recording screen needs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssemblyRecordResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Votes"
+        ]
+      }
+    },
     "/api/votes/{id}/paper-ballots": {
       "post": {
         "operationId": "VotesController_recordPaperBallot",
@@ -6404,6 +6434,246 @@
           "answers"
         ]
       },
+      "FractionDto": {
+        "type": "object",
+        "properties": {
+          "num": {
+            "type": "string"
+          },
+          "den": {
+            "type": "string"
+          },
+          "decimal": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "num",
+          "den",
+          "decimal"
+        ]
+      },
+      "AssemblyRecordTotalsDto": {
+        "type": "object",
+        "properties": {
+          "allVotesWeight": {
+            "$ref": "#/components/schemas/FractionDto"
+          },
+          "presentWeight": {
+            "$ref": "#/components/schemas/FractionDto"
+          },
+          "presentUnitCount": {
+            "type": "number"
+          },
+          "absentUnitCount": {
+            "type": "number"
+          },
+          "ineligibleUnitCount": {
+            "type": "number"
+          },
+          "unitsAwaitingEntry": {
+            "type": "number"
+          },
+          "quorate": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "allVotesWeight",
+          "presentWeight",
+          "presentUnitCount",
+          "absentUnitCount",
+          "ineligibleUnitCount",
+          "unitsAwaitingEntry",
+          "quorate"
+        ]
+      },
+      "AssemblyRecordOwnerDto": {
+        "type": "object",
+        "properties": {
+          "ownerId": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ownerId",
+          "displayName"
+        ]
+      },
+      "AssemblyRecordAnswerDto": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string"
+          },
+          "optionId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "questionId",
+          "optionId"
+        ]
+      },
+      "AssemblyRecordUnitDto": {
+        "type": "object",
+        "properties": {
+          "unitId": {
+            "type": "string"
+          },
+          "unitNo": {
+            "type": "string"
+          },
+          "owners": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssemblyRecordOwnerDto"
+            }
+          },
+          "share": {
+            "$ref": "#/components/schemas/FractionDto"
+          },
+          "eligibility": {
+            "type": "string",
+            "enum": [
+              "ELIGIBLE",
+              "INELIGIBLE"
+            ]
+          },
+          "ineligibleReason": {
+            "type": "string",
+            "nullable": true
+          },
+          "attendance": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "PRESENT",
+              "ABSENT"
+            ]
+          },
+          "voterOwnerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "voterNote": {
+            "type": "string",
+            "nullable": true
+          },
+          "answers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssemblyRecordAnswerDto"
+            }
+          }
+        },
+        "required": [
+          "unitId",
+          "unitNo",
+          "owners",
+          "share",
+          "eligibility",
+          "ineligibleReason",
+          "attendance",
+          "voterOwnerId",
+          "voterNote",
+          "answers"
+        ]
+      },
+      "AssemblyRecordOptionDto": {
+        "type": "object",
+        "properties": {
+          "optionId": {
+            "type": "string"
+          },
+          "optionKey": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "weight": {
+            "$ref": "#/components/schemas/FractionDto"
+          },
+          "unitCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "optionId",
+          "optionKey",
+          "label",
+          "weight",
+          "unitCount"
+        ]
+      },
+      "AssemblyRecordQuestionDto": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssemblyRecordOptionDto"
+            }
+          }
+        },
+        "required": [
+          "questionId",
+          "title",
+          "options"
+        ]
+      },
+      "AssemblyRecordResponseDto": {
+        "type": "object",
+        "properties": {
+          "voteTitle": {
+            "type": "string"
+          },
+          "meetingDate": {
+            "type": "string",
+            "nullable": true
+          },
+          "weightBasis": {
+            "type": "string",
+            "enum": [
+              "UNIT_SHARE",
+              "ONE_UNIT_ONE_VOTE"
+            ]
+          },
+          "totals": {
+            "$ref": "#/components/schemas/AssemblyRecordTotalsDto"
+          },
+          "units": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssemblyRecordUnitDto"
+            }
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssemblyRecordQuestionDto"
+            }
+          }
+        },
+        "required": [
+          "voteTitle",
+          "meetingDate",
+          "weightBasis",
+          "totals",
+          "units",
+          "questions"
+        ]
+      },
       "RecordPaperBallotDto": {
         "type": "object",
         "properties": {
@@ -6598,25 +6868,6 @@
         },
         "required": [
           "units"
-        ]
-      },
-      "FractionDto": {
-        "type": "object",
-        "properties": {
-          "num": {
-            "type": "string"
-          },
-          "den": {
-            "type": "string"
-          },
-          "decimal": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "num",
-          "den",
-          "decimal"
         ]
       },
       "VoteOptionResultDto": {

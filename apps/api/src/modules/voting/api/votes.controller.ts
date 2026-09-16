@@ -47,6 +47,7 @@ import {
   VoteConsentResponseDto,
   SubmitBallotDto,
   SubmitBallotResponseDto,
+  AssemblyRecordResponseDto,
   RecordAssemblyBallotDto,
   RecordPaperBallotDto,
   SetUnitAttendanceDto,
@@ -88,6 +89,7 @@ import { SetVoteRulesetCommand } from '../application/commands/set-vote-ruleset/
 import { SubmitBallotCommand } from '../application/commands/submit-ballot/submit-ballot.command';
 import { UpdateVoteCommand } from '../application/commands/update-vote/update-vote.command';
 import { UpdateVoteQuestionCommand } from '../application/commands/update-vote-question/update-vote-question.command';
+import { GetAssemblyRecordQuery } from '../application/queries/get-assembly-record/get-assembly-record.query';
 import { GetBallotAttachmentDownloadUrlQuery } from '../application/queries/get-ballot-attachment-download-url/get-ballot-attachment-download-url.query';
 import { GetConsentsQuery } from '../application/queries/get-consents/get-consents.query';
 import { GetDelegationCandidatesQuery } from '../application/queries/get-delegation-candidates/get-delegation-candidates.query';
@@ -538,6 +540,23 @@ export class VotesController {
         id,
         tenantCtx.membershipId,
       ),
+    );
+  }
+
+  @Get(':id/assembly-record')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Everything the assembly recording screen needs',
+    type: AssemblyRecordResponseDto,
+  })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  getAssemblyRecord(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Tenant() tenantCtx: TenantContext,
+  ) {
+    return this.queryBus.execute(
+      new GetAssemblyRecordQuery(tenantCtx.tenantId, id),
     );
   }
 

@@ -75,6 +75,12 @@ export class PublishAssemblyRecordHandler
       //    makes the tally's "votes cast" denominator equal the shares that
       //    were in the room.
       const attendance = await this.attendanceRepo.findByVote(tenantId, voteId);
+      // Zero rows means the board never started, not that nobody came: an
+      // inquorate meeting still has every unit marked absent. The gate below
+      // would pass vacuously, and publishing cannot be undone.
+      if (attendance.length === 0) {
+        throw new AssemblyRecordIncompleteException();
+      }
       const present = attendance.filter((a) => a.status === 'PRESENT');
       const withBallot = new Set(
         await this.voteRepository.findUnitIdsWithBallot(tenantId, voteId),

@@ -112,12 +112,31 @@ export interface VoteReadRepository {
    * owners happens in `GetVoteParticipationHandler`, which is the single
    * place that decides what each role may see.
    */
+  /**
+   * Per-unit context the assembly recording screen needs on top of the live
+   * electorate: display data and whatever the board has already entered.
+   *
+   * Separate from `findParticipation`, which reads the electorate snapshot —
+   * an assembly record has none until it is published.
+   */
+  findAssemblyUnitContext(
+    tenantId: string,
+    voteId: string,
+    now: Date,
+  ): Promise<AssemblyUnitContext[]>;
   findParticipation(
     tenantId: string,
     voteId: string,
     requesterMembershipId: string,
     now: Date,
   ): Promise<VoteParticipationUnitDto[]>;
+}
+
+export interface AssemblyUnitContext {
+  unitId: string;
+  unitNo: string;
+  owners: { ownerId: string; displayName: string }[];
+  answers: { questionId: string; optionId: string }[];
 }
 
 export const VOTE_READ_REPOSITORY = Symbol('VOTE_READ_REPOSITORY');

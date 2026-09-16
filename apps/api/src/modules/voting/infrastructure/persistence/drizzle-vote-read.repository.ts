@@ -43,7 +43,10 @@ import {
   type VoteParticipationUnitDto,
   type ParticipationAnswerDto,
 } from '@/modules/voting/api/dto/vote.dto';
-import { type VoteReadRepository } from '@/modules/voting/application/ports/vote-read.repository.port';
+import {
+  type AssemblyUnitContext,
+  type VoteReadRepository,
+} from '@/modules/voting/application/ports/vote-read.repository.port';
 import {
   resolveElectorateUnits,
   type ElectorateConsentInput,
@@ -371,6 +374,81 @@ export class DrizzleVoteReadRepository implements VoteReadRepository {
   }
 
   /** Unit number and building share, for the units a voter status lists. */
+  async findAssemblyUnitContext(
+    tenantId: string,
+    voteId: string,
+    now: Date,
+  ): Promise<AssemblyUnitContext[]> {
+    // Every unit in the building, not just those in a snapshot: an assembly
+    // record has no electorate snapshot until it is published, and the roster
+    // has to list the whole house.
+    const unitRows = await this.drizzle.db
+      .select({ unitId: units.id, unitNo: units.unitNo })
+      .from(units)
+      .where(eq(units.tenantId, tenantId))
+      .orderBy(units.unitNo);
+
+    const unitIds = unitRows.map((u) => u.unitId);
+    if (unitIds.length === 0) return [];
+
+    const ownerRows = await this.drizzle.db
+      .select({
+        unitId: unitOwnerships.unitId,
+        ownerId: owners.id,
+        displayName: owners.displayName,
+      })
+      .from(unitOwnerships)
+      .innerJoin(
+        unitOwnershipMembers,
+        eq(unitOwnershipMembers.ownershipId, unitOwnerships.id),
+      )
+      .innerJoin(owners, eq(unitOwnershipMembers.ownerId, owners.id))
+      .where(
+        and(
+          eq(unitOwnerships.tenantId, tenantId),
+          inArray(unitOwnerships.unitId, unitIds),
+          ownershipActiveAt(now),
+        ),
+      );
+
+    const answerRows = await this.drizzle.db
+      .select({
+        unitId: ballots.unitId,
+        questionId: ballotAnswers.questionId,
+        optionId: ballotAnswers.optionId,
+      })
+      .from(ballots)
+      .innerJoin(ballotAnswers, eq(ballotAnswers.ballotId, ballots.id))
+      .where(and(eq(ballots.tenantId, tenantId), eq(ballots.voteId, voteId)));
+
+    const ownersByUnit = new Map<
+      string,
+      { ownerId: string; displayName: string }[]
+    >();
+    for (const row of ownerRows) {
+      const list = ownersByUnit.get(row.unitId) ?? [];
+      list.push({ ownerId: row.ownerId, displayName: row.displayName });
+      ownersByUnit.set(row.unitId, list);
+    }
+
+    const answersByUnit = new Map<
+      string,
+      { questionId: string; optionId: string }[]
+    >();
+    for (const row of answerRows) {
+      const list = answersByUnit.get(row.unitId) ?? [];
+      list.push({ questionId: row.questionId, optionId: row.optionId });
+      answersByUnit.set(row.unitId, list);
+    }
+
+    return unitRows.map((u) => ({
+      unitId: u.unitId,
+      unitNo: u.unitNo,
+      owners: ownersByUnit.get(u.unitId) ?? [],
+      answers: answersByUnit.get(u.unitId) ?? [],
+    }));
+  }
+
   private async loadUnitDisplayInfo(
     tenantId: string,
     unitIds: string[],

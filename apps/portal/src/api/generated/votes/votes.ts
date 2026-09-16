@@ -22,6 +22,7 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+    AssemblyRecordResponseDto,
     ConsentPreviewResponseDto,
     CreateVoteConsentDto,
     CreateVoteDto,
@@ -2445,6 +2446,175 @@ export const useVotesControllerPublishAssemblyRecord = <
         queryClient,
     );
 };
+export const votesControllerGetAssemblyRecord = (
+    id: string,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<AssemblyRecordResponseDto>(
+        { url: `/api/votes/${id}/assembly-record`, method: "GET", signal },
+        options,
+    );
+};
+
+export const getVotesControllerGetAssemblyRecordQueryKey = (id: string) => {
+    return [`/api/votes/${id}/assembly-record`] as const;
+};
+
+export const getVotesControllerGetAssemblyRecordQueryOptions = <
+    TData = Awaited<ReturnType<typeof votesControllerGetAssemblyRecord>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof votesControllerGetAssemblyRecord>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getVotesControllerGetAssemblyRecordQueryKey(id);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof votesControllerGetAssemblyRecord>>
+    > = ({ signal }) =>
+        votesControllerGetAssemblyRecord(id, requestOptions, signal);
+
+    return {
+        queryKey,
+        queryFn,
+        enabled: !!id,
+        ...queryOptions,
+    } as UseQueryOptions<
+        Awaited<ReturnType<typeof votesControllerGetAssemblyRecord>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type VotesControllerGetAssemblyRecordQueryResult = NonNullable<
+    Awaited<ReturnType<typeof votesControllerGetAssemblyRecord>>
+>;
+export type VotesControllerGetAssemblyRecordQueryError = ErrorType<unknown>;
+
+export function useVotesControllerGetAssemblyRecord<
+    TData = Awaited<ReturnType<typeof votesControllerGetAssemblyRecord>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof votesControllerGetAssemblyRecord>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof votesControllerGetAssemblyRecord>
+                    >,
+                    TError,
+                    Awaited<ReturnType<typeof votesControllerGetAssemblyRecord>>
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useVotesControllerGetAssemblyRecord<
+    TData = Awaited<ReturnType<typeof votesControllerGetAssemblyRecord>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof votesControllerGetAssemblyRecord>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof votesControllerGetAssemblyRecord>
+                    >,
+                    TError,
+                    Awaited<ReturnType<typeof votesControllerGetAssemblyRecord>>
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useVotesControllerGetAssemblyRecord<
+    TData = Awaited<ReturnType<typeof votesControllerGetAssemblyRecord>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof votesControllerGetAssemblyRecord>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useVotesControllerGetAssemblyRecord<
+    TData = Awaited<ReturnType<typeof votesControllerGetAssemblyRecord>>,
+    TError = ErrorType<unknown>,
+>(
+    id: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof votesControllerGetAssemblyRecord>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
+    const queryOptions = getVotesControllerGetAssemblyRecordQueryOptions(
+        id,
+        options,
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+        TData,
+        TError
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+    return { ...query, queryKey: queryOptions.queryKey };
+}
+
 export const votesControllerRecordPaperBallot = (
     id: string,
     recordPaperBallotDto: BodyType<RecordPaperBallotDto>,

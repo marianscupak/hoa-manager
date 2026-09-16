@@ -1,0 +1,243 @@
+import { type ElectorateService } from '@/modules/voting/application/ports/electorate-service.port';
+import {
+  type AttendanceRow,
+  type VoteAttendanceRepository,
+} from '@/modules/voting/application/ports/vote-attendance.repository.port';
+import {
+  type AssemblyUnitContext,
+  type VoteReadRepository,
+} from '@/modules/voting/application/ports/vote-read.repository.port';
+import { type VoteWriteRepository } from '@/modules/voting/application/ports/vote-write.repository.port';
+import { type VoteAggregate } from '@/modules/voting/domain/vote/vote.aggregate';
+import {
+  ElectorateEligibilityStatus,
+  ElectorateIneligibleReason,
+  MajorityDenominatorBasis,
+  MajorityRuleType,
+  QuorumMeasure,
+  ThresholdComparator,
+  VoteMode,
+  VoteStatus,
+  VoteWeightBasis,
+} from '@/modules/voting/domain/vote/vote.types';
+import { type Clock } from '@/shared/application/ports/clock.port';
+
+import { GetAssemblyRecordHandler } from './get-assembly-record.handler';
+import { GetAssemblyRecordQuery } from './get-assembly-record.query';
+
+const RULESET = {
+  weightBasis: VoteWeightBasis.UNIT_SHARE,
+  quorum: {
+    measure: QuorumMeasure.UNIT_SHARE,
+    threshold: { num: 1, den: 2 },
+    comparator: ThresholdComparator.STRICT_GREATER,
+  },
+  majorityRuleType: MajorityRuleType.SIMPLE_MAJORITY,
+  majorityDenominatorBasis: MajorityDenominatorBasis.VOTES_CAST,
+  majorityThreshold: { num: 1, den: 2 },
+  majorityComparator: ThresholdComparator.STRICT_GREATER,
+  allowAbstain: true,
+  acknowledgedNonStatutory: false,
+};
+
+type UnitSpec = {
+  unitId: string;
+  weight?: [number, number];
+  ineligibleReason?: ElectorateIneligibleReason;
+  answers?: { questionId: string; optionId: string }[];
+};
+
+function build(options: {
+  units: UnitSpec[];
+  attendance?: AttendanceRow[];
+  weightBasis?: VoteWeightBasis;
+}) {
+  const vote = {
+    id: 'vote-1',
+    tenantId: 'tenant-1',
+    title: 'Assembly 12 Sep',
+    mode: VoteMode.ASSEMBLY_RECORD,
+    status: VoteStatus.DRAFT,
+    scheduledFrom: new Date('2026-09-12T18:30:00Z'),
+    ruleset: { ...RULESET, weightBasis: options.weightBasis ?? RULESET.weightBasis },
+    questions: [
+      {
+        id: 'q1',
+        title: 'Approve the budget?',
+        options: [
+          { id: 'o-yes', optionKey: 'YES', label: 'Ano' },
+          { id: 'o-no', optionKey: 'NO', label: 'Ne' },
+          { id: 'o-abs', optionKey: 'ABSTAIN', label: 'Zdržel se' },
+        ],
+      },
+    ],
+  } as unknown as VoteAggregate;
+
+  const context: AssemblyUnitContext[] = options.units.map((u) => ({
+    unitId: u.unitId,
+    unitNo: u.unitId.toUpperCase(),
+    owners: [{ ownerId: `owner-${u.unitId}`, displayName: `Owner ${u.unitId}` }],
+    answers: u.answers ?? [],
+  }));
+
+  const handler = new GetAssemblyRecordHandler(
+    { findById: jest.fn().mockResolvedValue(vote) } as unknown as VoteWriteRepository,
+    {
+      findAssemblyUnitContext: jest.fn(async () => context),
+    } as unknown as VoteReadRepository,
+    {
+      findByVote: jest.fn(async () => options.attendance ?? []),
+    } as unknown as VoteAttendanceRepository,
+    {
+      resolveElectorate: jest.fn(async () =>
+        options.units.map((u) => ({
+          unitId: u.unitId,
+          eligibilityStatus: u.ineligibleReason
+            ? ElectorateEligibilityStatus.INELIGIBLE
+            : ElectorateEligibilityStatus.ELIGIBLE,
+          ineligibleReason: u.ineligibleReason ?? null,
+          weightNum: u.weight?.[0] ?? 1,
+          weightDen: u.weight?.[1] ?? 4,
+          representativeMembershipId: null,
+        })),
+      ),
+    } as unknown as ElectorateService,
+    { now: () => new Date('2026-09-16T12:00:00Z') } as Clock,
+  );
+
+  return { handler };
+}
+
+const query = () => new GetAssemblyRecordQuery('tenant-1', 'vote-1');
+
+const present = (unitId: string): AttendanceRow => ({
+  unitId,
+  status: 'PRESENT',
+  voterOwnerId: `owner-${unitId}`,
+  voterNote: null,
+});
+
+describe('GetAssemblyRecordHandler', () => {
+  it('reports both the weight and the unit count for every option', async () => {
+    // The running count leads with whichever metric decides the vote, so the
+    // read model carries both and lets the screen choose.
+    const { handler } = build({
+      units: [
+        { unitId: 'u1', weight: [1, 4], answers: [{ questionId: 'q1', optionId: 'o-yes' }] },
+        { unitId: 'u2', weight: [3, 4], answers: [{ questionId: 'q1', optionId: 'o-no' }] },
+      ],
+      attendance: [present('u1'), present('u2')],
+    });
+
+    const result = await handler.execute(query());
+    const options = result.questions[0].options;
+
+    expect(options.find((o: { optionKey: string }) => o.optionKey === 'YES')).toMatchObject({
+      unitCount: 1,
+      weight: { num: '1', den: '4' },
+    });
+    expect(options.find((o: { optionKey: string }) => o.optionKey === 'NO')).toMatchObject({
+      unitCount: 1,
+      weight: { num: '3', den: '4' },
+    });
+  });
+
+  it('counts a unit the board has not reached as awaiting entry, not absent', async () => {
+    const { handler } = build({
+      units: [{ unitId: 'u1' }, { unitId: 'u2' }, { unitId: 'u3' }],
+      attendance: [
+        present('u1'),
+        { unitId: 'u2', status: 'ABSENT', voterOwnerId: null, voterNote: null },
+      ],
+    });
+
+    const result = await handler.execute(query());
+
+    expect(result.totals).toMatchObject({
+      presentUnitCount: 1,
+      absentUnitCount: 1,
+      unitsAwaitingEntry: 1,
+    });
+    expect(result.units.find((u: { unitId: string }) => u.unitId === 'u3')!.attendance).toBeNull();
+  });
+
+  it('counts a present unit with no ballot as awaiting entry', async () => {
+    // This is exactly what the publish gate blocks on.
+    const { handler } = build({
+      units: [{ unitId: 'u1', answers: [] }],
+      attendance: [present('u1')],
+    });
+
+    const result = await handler.execute(query());
+
+    expect(result.totals.unitsAwaitingEntry).toBe(1);
+  });
+
+  it('reports a unit that is missing a common representative as ineligible', async () => {
+    const { handler } = build({
+      units: [
+        {
+          unitId: 'u1',
+          ineligibleReason: ElectorateIneligibleReason.NO_REPRESENTATIVE,
+        },
+      ],
+    });
+
+    const result = await handler.execute(query());
+
+    expect(result.units[0]).toMatchObject({
+      eligibility: 'INELIGIBLE',
+      ineligibleReason: 'NO_REPRESENTATIVE',
+    });
+    expect(result.totals.ineligibleUnitCount).toBe(1);
+  });
+
+  it('measures presence against every countable unit, including ineligible ones', async () => {
+    // The quorum denominator is all the votes in the building; a unit with no
+    // common representative still counts toward it even though it cannot vote.
+    const { handler } = build({
+      units: [
+        { unitId: 'u1', weight: [1, 2] },
+        {
+          unitId: 'u2',
+          weight: [1, 2],
+          ineligibleReason: ElectorateIneligibleReason.NO_REPRESENTATIVE,
+        },
+      ],
+      attendance: [present('u1')],
+    });
+
+    const result = await handler.execute(query());
+
+    expect(result.totals.allVotesWeight).toMatchObject({ num: '1', den: '1' });
+    expect(result.totals.presentWeight).toMatchObject({ num: '1', den: '2' });
+    // More than half is required, and exactly half is not more than half.
+    expect(result.totals.quorate).toBe(false);
+  });
+
+  it('reports the assembly as quorate once more than half the votes are present', async () => {
+    const { handler } = build({
+      units: [
+        { unitId: 'u1', weight: [3, 4] },
+        { unitId: 'u2', weight: [1, 4] },
+      ],
+      attendance: [present('u1')],
+    });
+
+    const result = await handler.execute(query());
+
+    expect(result.totals.quorate).toBe(true);
+  });
+
+  it('carries the meeting date and the weight basis the screen needs', async () => {
+    const { handler } = build({
+      units: [{ unitId: 'u1' }],
+      weightBasis: VoteWeightBasis.ONE_UNIT_ONE_VOTE,
+    });
+
+    const result = await handler.execute(query());
+
+    expect(result.weightBasis).toBe('ONE_UNIT_ONE_VOTE');
+    expect(result.meetingDate).toBe('2026-09-12T18:30:00.000Z');
+  });
+});

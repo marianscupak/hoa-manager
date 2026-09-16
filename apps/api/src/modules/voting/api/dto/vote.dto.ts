@@ -780,6 +780,128 @@ export class ParticipationAnswerDto {
   optionKey!: VoteOptionSemantic;
 }
 
+class AssemblyRecordOwnerDto {
+  @ApiProperty()
+  ownerId!: string;
+
+  @ApiProperty()
+  displayName!: string;
+}
+
+class AssemblyRecordAnswerDto {
+  @ApiProperty()
+  questionId!: string;
+
+  @ApiProperty()
+  optionId!: string;
+}
+
+class AssemblyRecordUnitDto {
+  @ApiProperty()
+  unitId!: string;
+
+  @ApiProperty()
+  unitNo!: string;
+
+  @ApiProperty({ type: [AssemblyRecordOwnerDto] })
+  owners!: AssemblyRecordOwnerDto[];
+
+  @ApiProperty({ type: FractionDto })
+  share!: FractionDto;
+
+  @ApiProperty({ enum: ['ELIGIBLE', 'INELIGIBLE'] })
+  eligibility!: 'ELIGIBLE' | 'INELIGIBLE';
+
+  @ApiProperty({ nullable: true, type: String })
+  ineligibleReason!: string | null;
+
+  /** Null while the board has not reached this unit — distinct from ABSENT. */
+  @ApiProperty({ nullable: true, enum: ['PRESENT', 'ABSENT'] })
+  attendance!: 'PRESENT' | 'ABSENT' | null;
+
+  @ApiProperty({ nullable: true, type: String })
+  voterOwnerId!: string | null;
+
+  @ApiProperty({ nullable: true, type: String })
+  voterNote!: string | null;
+
+  @ApiProperty({ type: [AssemblyRecordAnswerDto] })
+  answers!: AssemblyRecordAnswerDto[];
+}
+
+class AssemblyRecordOptionDto {
+  @ApiProperty()
+  optionId!: string;
+
+  @ApiProperty()
+  optionKey!: string;
+
+  @ApiProperty()
+  label!: string;
+
+  /** Both metrics travel: the screen leads with whichever decides the vote. */
+  @ApiProperty({ type: FractionDto })
+  weight!: FractionDto;
+
+  @ApiProperty()
+  unitCount!: number;
+}
+
+class AssemblyRecordQuestionDto {
+  @ApiProperty()
+  questionId!: string;
+
+  @ApiProperty()
+  title!: string;
+
+  @ApiProperty({ type: [AssemblyRecordOptionDto] })
+  options!: AssemblyRecordOptionDto[];
+}
+
+class AssemblyRecordTotalsDto {
+  @ApiProperty({ type: FractionDto })
+  allVotesWeight!: FractionDto;
+
+  @ApiProperty({ type: FractionDto })
+  presentWeight!: FractionDto;
+
+  @ApiProperty()
+  presentUnitCount!: number;
+
+  @ApiProperty()
+  absentUnitCount!: number;
+
+  @ApiProperty()
+  ineligibleUnitCount!: number;
+
+  /** Present units that have not answered every question yet. */
+  @ApiProperty()
+  unitsAwaitingEntry!: number;
+
+  @ApiProperty()
+  quorate!: boolean;
+}
+
+export class AssemblyRecordResponseDto {
+  @ApiProperty()
+  voteTitle!: string;
+
+  @ApiProperty({ nullable: true, type: String })
+  meetingDate!: string | null;
+
+  @ApiProperty({ enum: ['UNIT_SHARE', 'ONE_UNIT_ONE_VOTE'] })
+  weightBasis!: 'UNIT_SHARE' | 'ONE_UNIT_ONE_VOTE';
+
+  @ApiProperty({ type: AssemblyRecordTotalsDto })
+  totals!: AssemblyRecordTotalsDto;
+
+  @ApiProperty({ type: [AssemblyRecordUnitDto] })
+  units!: AssemblyRecordUnitDto[];
+
+  @ApiProperty({ type: [AssemblyRecordQuestionDto] })
+  questions!: AssemblyRecordQuestionDto[];
+}
+
 export class VoteParticipationUnitDto {
   @ApiProperty()
   unitId!: string;

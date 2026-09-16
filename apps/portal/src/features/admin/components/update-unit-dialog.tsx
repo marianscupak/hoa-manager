@@ -50,7 +50,7 @@ export function UpdateUnitDialog({
     onSuccess,
 }: UpdateUnitDialogProps) {
     const { t } = useTranslation(["admin", "common"]);
-    const buildingDenominator = useBuildingDenominator();
+    const buildingDenominator = useBuildingDenominator(open);
     const queryClient = useQueryClient();
 
     const updateUnit = useUnitControllerUpdateUnit({

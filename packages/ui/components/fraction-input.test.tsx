@@ -196,6 +196,22 @@ describe("FractionInput", () => {
             expect(percentField().value).toBe("8.56");
         });
 
+        it("treats a retyped percent as fresh input, not as the value it came from", async () => {
+            // 1/3 renders as "33.33" but is not 3333/10000. Once the user has
+            // typed, the text is all that counts — the same digits must not
+            // mean two different things depending on invisible history.
+            const { user, onChange } = setup({ value: { num: 1, den: 3 } });
+            await user.click(modeButton("%"));
+            expect(percentField().value).toBe("33.33");
+            await user.clear(percentField());
+            await user.type(percentField(), "33.33");
+            await leaveField(user);
+            expect(onChange).toHaveBeenLastCalledWith({
+                num: 3333,
+                den: 10000,
+            });
+        });
+
         it("clears the other mode when there is nothing to convert", async () => {
             const { user } = setup({ defaultDenominator: 1332 });
             await user.click(modeButton("%"));
@@ -204,6 +220,12 @@ describe("FractionInput", () => {
             expect(numerator().value).toBe("");
             expect(denominator().value).toBe("");
         });
+    });
+
+    it("survives being unmounted while focused, as a closing dialog does", async () => {
+        const { user, unmount } = setup({ defaultDenominator: 1332 });
+        await user.type(numerator(), "114");
+        expect(() => unmount()).not.toThrow();
     });
 
     describe("in Czech", () => {

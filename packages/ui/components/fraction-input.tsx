@@ -132,12 +132,19 @@ export function FractionInput({
         onChange(next);
     };
 
-    /** The percent text read as a fraction, honouring an untouched switch. */
+    /**
+     * The percent text read as a fraction.
+     *
+     * A percent nobody has typed into still stands for the exact fraction it
+     * was rendered from, so looking at a value as a percent and leaving
+     * cannot silently re-round it. The first keystroke cuts that link and the
+     * text alone counts from then on — otherwise the same visible "33.33"
+     * would mean 1/3 or 3333/10000 depending on history the user cannot see.
+     */
     const percentAsFraction = (): Fraction | null => {
+        if (percentSource.current) return percentSource.current;
         const text = percentText.trim();
         if (text === "") return null;
-        const source = percentSource.current;
-        if (source && toPercentText(source) === text) return source;
         return percentToFractionOver(text, defaultDenominator);
     };
 
@@ -301,6 +308,7 @@ export function FractionInput({
                         className={cn(innerInput, "max-w-[110px] text-right")}
                         onChange={(e) => {
                             setPercentText(e.target.value);
+                            percentSource.current = null;
                             setInvalid(false);
                         }}
                         onKeyDown={(e) => {

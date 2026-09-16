@@ -45,7 +45,7 @@ export function CreateUnitDialog({
     onSuccess,
 }: CreateUnitDialogProps) {
     const { t } = useTranslation(["admin"]);
-    const buildingDenominator = useBuildingDenominator();
+    const buildingDenominator = useBuildingDenominator(open);
     const queryClient = useQueryClient();
 
     const createUnit = useUnitControllerCreateUnit({

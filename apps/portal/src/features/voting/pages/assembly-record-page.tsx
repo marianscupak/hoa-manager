@@ -79,7 +79,9 @@ export function AssemblyRecordPage() {
             <header className="bg-card sticky top-0 z-10 border-b">
                 <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-3 px-4 py-3">
                     <Button variant="outline" size="sm" asChild>
-                        <Link to={`/voting/${id}`}>{t("voting:assemblyRecord.header.exit")}</Link>
+                        <Link to={`/voting/${id}`}>
+                            {t("voting:assemblyRecord.header.exit")}
+                        </Link>
                     </Button>
                     <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold">
@@ -108,16 +110,18 @@ export function AssemblyRecordPage() {
             </header>
 
             <main className="mx-auto max-w-[1200px] space-y-4 px-4 py-5 pb-24">
-                <AttendanceCard
-                    totals={record.totals}
-                    unitCount={units.length}
-                />
+                <div className="grid items-start gap-4 lg:grid-cols-2">
+                    <AttendanceCard
+                        totals={record.totals}
+                        unitCount={units.length}
+                    />
 
-                <RunningCountCard
-                    questions={record.questions}
-                    totals={record.totals}
-                    weightBasis={record.weightBasis}
-                />
+                    <RunningCountCard
+                        questions={record.questions}
+                        totals={record.totals}
+                        weightBasis={record.weightBasis}
+                    />
+                </div>
 
                 <div className="grid gap-4 lg:grid-cols-[330px_1fr]">
                     <RosterRail

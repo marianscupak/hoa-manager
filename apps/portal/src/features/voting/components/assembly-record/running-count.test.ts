@@ -11,7 +11,7 @@ const t = ((key: string, opts?: { count?: number }) =>
 const ALL = { num: "1", den: "1" };
 
 describe("runningCountFigure", () => {
-    it("leads with the share when shares decide the vote", () => {
+    it("shows the share when shares decide the vote", () => {
         // The handoff led with unit counts. Under the statutory ruleset that is
         // misleading: nine small units voting yes can still be a minority.
         const figure = runningCountFigure(
@@ -21,11 +21,10 @@ describe("runningCountFigure", () => {
             t,
         );
 
-        expect(figure.primary).toBe("25 %");
-        expect(figure.secondary).toContain("9|");
+        expect(figure).toBe("25 %");
     });
 
-    it("leads with the unit count when units decide the vote", () => {
+    it("shows the unit count when units decide the vote", () => {
         const figure = runningCountFigure(
             { weight: { num: "1", den: "4" }, unitCount: 9 },
             ALL,
@@ -33,8 +32,7 @@ describe("runningCountFigure", () => {
             t,
         );
 
-        expect(figure.primary).toBe("9|assemblyRecord.tally.units");
-        expect(figure.secondary).toBeNull();
+        expect(figure).toBe("9|assemblyRecord.tally.units");
     });
 
     it("computes the share against all votes, not the ballots entered", () => {
@@ -47,7 +45,7 @@ describe("runningCountFigure", () => {
             t,
         );
 
-        expect(figure.primary).toBe("25 %");
+        expect(figure).toBe("25 %");
     });
 
     it("reads zero as zero rather than NaN", () => {
@@ -58,7 +56,7 @@ describe("runningCountFigure", () => {
             t,
         );
 
-        expect(figure.primary).toBe("0 %");
+        expect(figure).toBe("0 %");
     });
 
     it("trims a trailing zero the way every other percentage here does", () => {
@@ -69,6 +67,6 @@ describe("runningCountFigure", () => {
             t,
         );
 
-        expect(figure.primary).toBe("50 %");
+        expect(figure).toBe("50 %");
     });
 });

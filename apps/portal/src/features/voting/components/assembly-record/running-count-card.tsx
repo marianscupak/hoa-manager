@@ -61,48 +61,40 @@ export function RunningCountCard({
                             {question.title}
                         </p>
                         <div className="mt-1.5 flex flex-wrap gap-2">
-                            {question.options.map((option) => {
-                                const figure = runningCountFigure(
-                                    option,
-                                    totals.allVotesWeight,
-                                    weightBasis,
-                                    t,
-                                );
-                                return (
+                            {question.options.map((option) => (
+                                <span
+                                    key={option.optionId}
+                                    className="bg-accent inline-flex items-baseline gap-1.5 rounded-full px-2.5 py-1 text-[12.5px]"
+                                >
                                     <span
-                                        key={option.optionId}
-                                        className="bg-accent inline-flex items-baseline gap-1.5 rounded-full px-2.5 py-1 text-[12.5px]"
+                                        className={cn(
+                                            "h-1.5 w-1.5 self-center rounded-full",
+                                            DOT[option.optionKey] ??
+                                                "bg-border",
+                                        )}
+                                    />
+                                    <span
+                                        className={cn(
+                                            "font-semibold",
+                                            TONE[option.optionKey],
+                                        )}
                                     >
-                                        <span
-                                            className={cn(
-                                                "h-1.5 w-1.5 self-center rounded-full",
-                                                DOT[option.optionKey] ??
-                                                    "bg-border",
-                                            )}
-                                        />
-                                        <span
-                                            className={cn(
-                                                "font-semibold",
-                                                TONE[option.optionKey],
-                                            )}
-                                        >
-                                            {figure.primary}
-                                        </span>
-                                        <span className="text-muted-foreground">
-                                            {getOptionLabel(
-                                                option.optionKey,
-                                                option.label,
-                                                t,
-                                            )}
-                                        </span>
-                                        {figure.secondary && (
-                                            <span className="text-faint">
-                                                · {figure.secondary}
-                                            </span>
+                                        {runningCountFigure(
+                                            option,
+                                            totals.allVotesWeight,
+                                            weightBasis,
+                                            t,
                                         )}
                                     </span>
-                                );
-                            })}
+                                    <span className="text-muted-foreground">
+                                        {getOptionLabel(
+                                            option.optionKey,
+                                            option.label,
+                                            t,
+                                        )}
+                                    </span>
+                                </span>
+                            ))}
                         </div>
                     </li>
                 ))}

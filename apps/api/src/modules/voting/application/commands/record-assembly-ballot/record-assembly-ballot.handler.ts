@@ -84,6 +84,17 @@ export class RecordAssemblyBallotHandler
       // every question exactly once.
       assertAnswersMatchQuestions(vote.questions, answers);
 
+      // Transcribing minutes means typos, so re-entering a unit replaces what
+      // was there. The unique (vote, unit) constraint would otherwise reject
+      // the correction outright. Safe only because this command is confined to
+      // an assembly record still in draft — a cast ballot stays final
+      // everywhere else.
+      await this.voteWriteRepository.deleteBallotForUnit(
+        tenantId,
+        voteId,
+        unitId,
+      );
+
       const [saved] = await this.voteWriteRepository.saveBallots(
         tenantId,
         voteId,

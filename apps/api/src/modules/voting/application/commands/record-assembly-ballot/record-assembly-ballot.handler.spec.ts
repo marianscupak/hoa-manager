@@ -62,6 +62,7 @@ function build(options?: {
         };
 
   const saved: BallotInput[] = [];
+  const deleted: string[] = [];
 
   const handler = new RecordAssemblyBallotHandler(
     { execute: jest.fn((work: () => Promise<unknown>) => work()) } as unknown as UnitOfWork,
@@ -69,9 +70,23 @@ function build(options?: {
       findDetailById: jest.fn().mockResolvedValue(vote),
     } as unknown as VoteReadRepository,
     {
+      // Mirrors the real unique (vote, unit) constraint, so a second ballot
+      // for the same unit only lands if the first was removed.
       saveBallots: jest.fn(async (_t: string, _v: string, b: BallotInput[]) => {
-        saved.push(...b);
+        for (const ballot of b) {
+          if (saved.some((s) => s.unitId === ballot.unitId)) {
+            throw Object.assign(new Error('duplicate'), {
+              code: 'BALLOT_ALREADY_CAST',
+            });
+          }
+          saved.push(ballot);
+        }
         return b.map((x, i) => ({ ballotId: `ballot-${i}`, unitId: x.unitId }));
+      }),
+      deleteBallotForUnit: jest.fn(async (_t: string, _v: string, u: string) => {
+        deleted.push(u);
+        const at = saved.findIndex((s) => s.unitId === u);
+        if (at >= 0) saved.splice(at, 1);
       }),
     } as unknown as VoteWriteRepository,
     {
@@ -87,7 +102,7 @@ function build(options?: {
     } as unknown as VotingAuditLabelResolver,
   );
 
-  return { handler, saved };
+  return { handler, saved, deleted };
 }
 
 describe('RecordAssemblyBallotHandler', () => {
@@ -248,5 +263,29 @@ describe('RecordAssemblyBallotHandler', () => {
         ),
       ),
     ).rejects.toMatchObject({ code: 'VOTE_NOT_DRAFT' });
+  });
+
+  it('replaces an answer the board already entered for the unit', async () => {
+    // Transcribing minutes means typos. A recorded ballot has to be
+    // correctable while the record is still a draft, which the unique
+    // (vote, unit) constraint would otherwise refuse.
+    const { handler, saved, deleted } = build();
+
+    await handler.execute(
+      new RecordAssemblyBallotCommand('tenant-1', 'vote-1', 'member-1', 'unit-1', [
+        YES,
+      ]),
+    );
+    await handler.execute(
+      new RecordAssemblyBallotCommand('tenant-1', 'vote-1', 'member-1', 'unit-1', [
+        { questionId: 'q1', optionId: 'o-no-1' },
+      ]),
+    );
+
+    // The delete runs before every save, so the first one is a no-op; what
+    // matters is that the unit ends up with exactly one, corrected ballot.
+    expect(deleted).toContain('unit-1');
+    expect(saved).toHaveLength(1);
+    expect(saved[0].answers).toEqual([{ questionId: 'q1', optionId: 'o-no-1' }]);
   });
 });

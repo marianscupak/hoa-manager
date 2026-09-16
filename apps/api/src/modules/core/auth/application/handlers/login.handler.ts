@@ -20,9 +20,10 @@ import {
   type PasswordHasher,
   type TokenSigner,
 } from '@/modules/core/auth/application/ports/auth.utils.port';
+import { resolveAutoScope } from '@/modules/core/auth/application/resolve-auto-scope';
 import { GetUserByEmailQuery } from '@/modules/core/identity/application/queries/get-user-by-email.query';
 import { GetMembershipsByUserIdQuery } from '@/modules/core/tenancy/application/queries/get-memberships-by-user-id.query';
-import { TenantMembershipStatus } from '@/modules/core/tenancy/domain/tenant.entity';
+import { type TenantMembership } from '@/modules/core/tenancy/domain/tenant.entity';
 import {
   UnauthorizedException,
   InvalidCredentialsException,
@@ -96,18 +97,16 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
       const memberships = await this.queryBus.execute(
         new GetMembershipsByUserIdQuery(user.id),
       );
-      const activeMemberships = (memberships as any[]).filter(
-        (m) => m.status === TenantMembershipStatus.ACTIVE,
-      );
+      const scoped = resolveAutoScope(memberships as TenantMembership[]);
 
       let tenantId: string | undefined;
       let membershipId: string | undefined;
       let roles: string[] = [];
 
-      if (activeMemberships.length === 1) {
-        tenantId = activeMemberships[0]!.tenantId;
-        membershipId = activeMemberships[0]!.id;
-        roles = [activeMemberships[0]!.role];
+      if (scoped) {
+        tenantId = scoped.tenantId;
+        membershipId = scoped.id;
+        roles = [scoped.role];
       }
 
       const accessTokenPayload = {

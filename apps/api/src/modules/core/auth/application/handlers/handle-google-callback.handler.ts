@@ -25,12 +25,13 @@ import {
   GOOGLE_OIDC_SERVICE,
   type GoogleOidcService,
 } from '@/modules/core/auth/application/ports/google-oidc.service.port';
+import { resolveAutoScope } from '@/modules/core/auth/application/resolve-auto-scope';
 import { CreateUserCommand } from '@/modules/core/identity/application/commands/create-user.command';
 import { MarkEmailVerifiedCommand } from '@/modules/core/identity/application/commands/mark-email-verified.command';
 import { GetUserByEmailQuery } from '@/modules/core/identity/application/queries/get-user-by-email.query';
 import { GetUserByIdQuery } from '@/modules/core/identity/application/queries/get-user-by-id.query';
 import { GetMembershipsByUserIdQuery } from '@/modules/core/tenancy/application/queries/get-memberships-by-user-id.query';
-import { TenantMembershipStatus } from '@/modules/core/tenancy/domain/tenant.entity';
+import { type TenantMembership } from '@/modules/core/tenancy/domain/tenant.entity';
 import { UnauthorizedException } from '@/shared/application/exceptions/auth.exceptions';
 import { AccountExistsException } from '@/shared/application/exceptions/invite.exceptions';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
@@ -159,18 +160,16 @@ export class HandleGoogleCallbackHandler
       const memberships = await this.queryBus.execute(
         new GetMembershipsByUserIdQuery(user.id),
       );
-      const activeMemberships = (memberships as any[]).filter(
-        (m) => m.status === TenantMembershipStatus.ACTIVE,
-      );
+      const scoped = resolveAutoScope(memberships as TenantMembership[]);
 
       let tenantId: string | null = null;
       let membershipId: string | null = null;
       let roles: string[] | null = null;
 
-      if (activeMemberships.length === 1) {
-        tenantId = activeMemberships[0]!.tenantId;
-        membershipId = activeMemberships[0]!.id;
-        roles = [activeMemberships[0]!.role];
+      if (scoped) {
+        tenantId = scoped.tenantId;
+        membershipId = scoped.id;
+        roles = [scoped.role];
       }
 
       const rawRefreshToken = randomBytes(32).toString('hex');

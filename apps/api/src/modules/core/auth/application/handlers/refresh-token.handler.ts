@@ -18,6 +18,7 @@ import {
   type TokenSigner,
   type TokenVerifier,
 } from '@/modules/core/auth/application/ports/auth.utils.port';
+import { resolveAutoScope } from '@/modules/core/auth/application/resolve-auto-scope';
 import { AuthSession } from '@/modules/core/auth/domain/auth-identity.entity';
 import { type GetUserByIdResult } from '@/modules/core/identity/application/handlers/get-user-by-id.handler';
 import { GetUserByIdQuery } from '@/modules/core/identity/application/queries/get-user-by-id.query';
@@ -216,15 +217,11 @@ export class RefreshTokenHandler
         TenantMembership[]
       >(new GetMembershipsByUserIdQuery(userId));
 
-      if (memberships.length === 1) {
-        const membership = memberships[0];
-        if (membership.status !== TenantMembershipStatus.ACTIVE) {
-          throw new UnauthorizedException();
-        }
-        return makeClaimsFromMemberShip(membership);
-      } else {
-        return claims;
-      }
+      // Same rule as login and the Google callback. Counting every
+      // membership here, rather than only the active ones, meant a user with
+      // a pending invitation elsewhere lost their tenant scope on refresh.
+      const scoped = resolveAutoScope(memberships);
+      return scoped ? makeClaimsFromMemberShip(scoped) : claims;
     }
   }
 

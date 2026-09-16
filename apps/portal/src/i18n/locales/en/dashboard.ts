@@ -8,7 +8,7 @@ export const dashboard = {
         ctaOpen: "Open vote",
         personalUncast: "You haven't voted yet",
         personalCast: "You've cast your ballot",
-        personalDelegated: "You've delegated your vote",
+        personalDelegated: "You've named a representative",
         emptyTitle: "No votes are currently open or scheduled.",
         errorMessage: "Couldn't load the featured vote.",
         turnoutLine: "{{voted}} of {{total}} units have voted",

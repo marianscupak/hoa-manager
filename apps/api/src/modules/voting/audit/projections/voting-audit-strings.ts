@@ -23,17 +23,17 @@ const STRINGS: Record<
     'vote.question.deleted.privileged': (v) =>
       `${v.actor} removed question "${v.question}" from "${v.title}".`,
     'vote.consent.created.privileged': (v) =>
-      `${v.owner} delegated unit ${v.unit} to ${v.delegate}.`,
+      `${v.owner} named ${v.delegate} to represent unit ${v.unit}.`,
     'vote.consent.revoked.privileged': (v) =>
-      `${v.actor} revoked the delegation for unit ${v.unit}.`,
+      `${v.actor} revoked the representation for unit ${v.unit}.`,
     'vote.consent.created.self': (v) =>
-      `${v.owner} delegated unit ${v.unit} to ${v.delegate}.`,
+      `${v.owner} named ${v.delegate} to represent unit ${v.unit}.`,
     'vote.consent.created.byRecorder': (v) =>
-      `${v.recorder} recorded a delegation of unit ${v.unit} from ${v.owner} to ${v.delegate}.`,
+      `${v.recorder} recorded that ${v.delegate} represents ${v.owner} for unit ${v.unit}.`,
     'vote.consent.revoked.self': (v) =>
-      `${v.owner} revoked the delegation of unit ${v.unit} to ${v.delegate}.`,
+      `${v.owner} revoked ${v.delegate} representing unit ${v.unit}.`,
     'vote.consent.revoked.byRecorder': (v) =>
-      `${v.recorder} revoked the delegation of unit ${v.unit} from ${v.owner} to ${v.delegate}.`,
+      `${v.recorder} revoked ${v.delegate} representing ${v.owner} for unit ${v.unit}.`,
     'ballot.cast.privileged': (v) =>
       `${v.actor} cast ballot for unit ${v.unit}.`,
     'ballot.cast.proxy.privileged': (v) =>

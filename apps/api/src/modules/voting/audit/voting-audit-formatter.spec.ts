@@ -304,7 +304,7 @@ describe('VotingAuditFormatter', () => {
         payload: { ...basePayload, recordedByMembershipId: 'owner-m-1' },
       });
       const entry = formatter.format(e, VIEWER_ADMIN);
-      expect(entry.message).toBe('Bob delegated unit 12 to Carol.');
+      expect(entry.message).toBe('Bob named Carol to represent unit 12.');
     });
 
     it('renders byRecorder variant when admin recorded on behalf (en)', () => {
@@ -315,7 +315,7 @@ describe('VotingAuditFormatter', () => {
       });
       const entry = formatter.format(e, VIEWER_ADMIN);
       expect(entry.message).toBe(
-        'Alice (board) recorded a delegation of unit 12 from Bob to Carol.',
+        'Alice (board) recorded that Carol represents Bob for unit 12.',
       );
     });
 
@@ -341,7 +341,7 @@ describe('VotingAuditFormatter', () => {
         payload: basePayload,
       });
       const entry = formatter.format(e, VIEWER_ADMIN);
-      expect(entry.message).toBe('Bob delegated unit 12 to Carol.');
+      expect(entry.message).toBe('Bob named Carol to represent unit 12.');
     });
   });
 
@@ -360,7 +360,7 @@ describe('VotingAuditFormatter', () => {
       },
     };
 
-    it('renders self variant when owner revoked their own delegation (en)', () => {
+    it('renders self variant when owner revoked their own representation (en)', () => {
       const e = ev({
         eventType: VotingEventType.VOTE_CONSENT_REVOKED,
         visibility: Visibility.TENANT_PRIVILEGED,
@@ -368,7 +368,7 @@ describe('VotingAuditFormatter', () => {
       });
       const entry = formatter.format(e, VIEWER_ADMIN);
       expect(entry.message).toBe(
-        'Bob revoked the delegation of unit 12 to Carol.',
+        'Bob revoked Carol representing unit 12.',
       );
     });
 
@@ -380,7 +380,7 @@ describe('VotingAuditFormatter', () => {
       });
       const entry = formatter.format(e, VIEWER_ADMIN);
       expect(entry.message).toBe(
-        'Alice (board) revoked the delegation of unit 12 from Bob to Carol.',
+        'Alice (board) revoked Carol representing Bob for unit 12.',
       );
     });
 
@@ -407,7 +407,7 @@ describe('VotingAuditFormatter', () => {
       });
       const entry = formatter.format(e, VIEWER_ADMIN);
       expect(entry.message).toBe(
-        'Alice (board) revoked the delegation for unit 12.',
+        'Alice (board) revoked the representation for unit 12.',
       );
     });
   });

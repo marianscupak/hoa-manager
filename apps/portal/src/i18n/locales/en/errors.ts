@@ -59,7 +59,7 @@ export default {
     VOTE_SCHEDULE_IN_PAST: "Scheduled dates cannot be in the past.",
     VOTE_SCHEDULE_INVALID_RANGE: "Invalid vote schedule range.",
     INVALID_VOTE_STATUS_FOR_DELEGATION:
-        "Delegation is only allowed when the vote is in scheduled status.",
+        "A representative can only be named while the vote is scheduled.",
     NOT_A_UNIT_OWNER: "You are not an owner of this unit.",
     UNIT_NOT_ELIGIBLE: "This unit has no vote to cast in this ballot.",
     MEMBERSHIP_HAS_NO_ASSOCIATED_OWNER:
@@ -67,7 +67,7 @@ export default {
     LAST_ADMIN_CANNOT_BE_REMOVED:
         "The last administrator cannot be removed or assigned a different role.",
     BALLOT_ALREADY_CAST: "You have already cast a ballot for this vote.",
-    DELEGATION_NOT_FOUND: "The requested delegation was not found.",
+    DELEGATION_NOT_FOUND: "The requested representation was not found.",
     FORBIDDEN: "You do not have permission to perform this action.",
     INCOMPLETE_VOTE: "The vote configuration is incomplete.",
     INVALID_BALLOT_ANSWERS: "The submitted ballot answers are invalid.",
@@ -101,5 +101,5 @@ export default {
         "The upload did not complete. Please try again.",
     DOCUMENT_STORAGE_NOT_CONFIGURED: "Document storage is not configured.",
     CONSENT_ALREADY_RECORDED:
-        "A power of attorney from this owner is already recorded for this vote. Revoke it first.",
+        "A representation from this owner is already recorded for this vote. Revoke it first.",
 } as const;

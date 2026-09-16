@@ -211,6 +211,8 @@ export const voting = {
                     VOTES_CAST: "Z odevzdaných hlasů",
                     ALL_VOTES: "Ze všech hlasů",
                 },
+                assemblyHint:
+                    "Ze zákona rozhoduje většina přítomných. Přísnější variantu zvolte jen tehdy, vyžadují-li ji vaše stanovy.",
             },
             majorityThreshold: {
                 label: "Požadovaná většina",

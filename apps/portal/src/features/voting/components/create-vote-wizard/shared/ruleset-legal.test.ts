@@ -28,6 +28,28 @@ describe("ruleset-legal", () => {
             "ASSEMBLY_QUORUM_BELOW_FLOOR",
         );
     });
+    it("accepts a majority of all votes for an assembly", () => {
+        // The law makes a majority of those present the default but lets the
+        // bylaws require a higher number, and all votes over the same
+        // threshold is strictly harder to reach. `tierIssues` already allowed
+        // it; only the form locked the field.
+        const { tier1 } = tierIssues("ASSEMBLY_RECORD", {
+            ...ASSEMBLY_PRESET,
+            majorityDenominatorBasis: "ALL_VOTES",
+        });
+
+        expect(tier1).toEqual([]);
+    });
+    it("still rejects votes cast for per rollam", () => {
+        const { tier1 } = tierIssues("PER_ROLLAM", {
+            ...PER_ROLLAM_PRESET,
+            majorityDenominatorBasis: "VOTES_CAST",
+        });
+
+        expect(tier1).toContainEqual({
+            code: "PER_ROLLAM_BASIS_NOT_ALL_VOTES",
+        });
+    });
     it("flags one-unit-one-vote as tier 3", () => {
         expect(
             tierIssues("PER_ROLLAM", {

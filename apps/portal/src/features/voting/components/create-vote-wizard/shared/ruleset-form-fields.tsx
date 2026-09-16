@@ -96,14 +96,16 @@ function SelectionCards({ name, options, groupLabel }: SelectionCardsProps) {
 }
 
 /**
- * Statutory derivation for `majorityDenominatorBasis`: only ASSEMBLY_RECORD
- * + QUALIFIED_MAJORITY leaves it as a real choice (VOTES_CAST is the
- * statutory default there, ALL_VOTES is the stricter alternative — see
- * ruleset-legal.ts's tier1 rules). Every other combination is forced:
- * UNANIMITY always requires ALL_VOTES, PER_ROLLAM always requires ALL_VOTES
- * (any other basis is a tier1 finding), and ASSEMBLY_RECORD's statutory
- * SIMPLE_MAJORITY preset uses VOTES_CAST. Returns `null` when the field is
- * user-editable.
+ * Statutory derivation for `majorityDenominatorBasis`. Returns `null` when the
+ * field is a real choice and the board may set it.
+ *
+ * For an assembly it always is one: a majority of those present is the default
+ * the law sets, but the bylaws may demand a higher number, and a majority of
+ * *all* votes over the same threshold is strictly harder to reach. Unanimity
+ * is the one assembly case still forced — unanimity of those present would let
+ * a nearly empty meeting pass anything — and per rollam is fixed by statute.
+ * `ruleset-legal.ts`'s tier1 rules have always agreed; only this form locked
+ * the field.
  */
 function derivedMajorityBasis(
     mode: VoteMode,
@@ -111,7 +113,6 @@ function derivedMajorityBasis(
 ): MajorityDenominatorBasis | null {
     if (majorityRuleType === "UNANIMITY") return "ALL_VOTES";
     if (mode === "PER_ROLLAM") return "ALL_VOTES";
-    if (majorityRuleType === "SIMPLE_MAJORITY") return "VOTES_CAST";
     return null;
 }
 
@@ -344,6 +345,13 @@ export function RulesetFormFields({
                     label={t(
                         "voting:create.fields.majorityDenominatorBasis.label",
                     )}
+                    description={
+                        !derivedBasis && mode === "ASSEMBLY_RECORD"
+                            ? t(
+                                  "voting:create.fields.majorityDenominatorBasis.assemblyHint",
+                              )
+                            : undefined
+                    }
                     disabled={!!derivedBasis}
                     options={[
                         {

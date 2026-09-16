@@ -212,6 +212,8 @@ export const voting = {
                     VOTES_CAST: "Of votes cast",
                     ALL_VOTES: "Of all votes",
                 },
+                assemblyHint:
+                    "By law a majority of those present decides. Choose the stricter option only if your bylaws require it.",
             },
             majorityThreshold: {
                 label: "Majority Threshold",

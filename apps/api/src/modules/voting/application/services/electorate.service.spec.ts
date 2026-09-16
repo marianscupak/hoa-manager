@@ -109,4 +109,22 @@ describe('ElectorateDomainService', () => {
     expect(result[0].weightNum).toBe(25);
     expect(result[0].weightDen).toBe(148);
   });
+
+  it('resolves ownership as of the date it is given, not today', async () => {
+    // The assembly record's "as of the meeting date" decision rests entirely
+    // on this argument reaching `findOwnershipParties`. If the service ever
+    // stops passing it through, a published record would quietly describe
+    // today's owners instead of the ones who were in the room.
+    const meetingDate = new Date('2026-09-12T18:30:00Z');
+    dataRepo.findAllUnits.mockResolvedValue([]);
+    dataRepo.findOwnershipParties.mockResolvedValue([]);
+    dataRepo.findValidConsents.mockResolvedValue([]);
+
+    await service.resolveElectorate(voteWith(), meetingDate);
+
+    expect(dataRepo.findOwnershipParties).toHaveBeenCalledWith(
+      defaultTenantId,
+      meetingDate,
+    );
+  });
 });

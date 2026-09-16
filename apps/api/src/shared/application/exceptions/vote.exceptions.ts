@@ -271,3 +271,16 @@ export class AssemblyVoterNotRecordedException extends DomainException {
     super(ErrorCode.ASSEMBLY_VOTER_NOT_RECORDED);
   }
 }
+
+/**
+ * Every unit marked present must have a ballot before the record is published.
+ *
+ * This is what keeps "votes cast" equal to "present shares", which is the
+ * denominator the statutory majority is measured against. Publishing with a
+ * present unit still unentered would silently shrink it.
+ */
+export class AssemblyRecordIncompleteException extends DomainException {
+  constructor() {
+    super(ErrorCode.ASSEMBLY_RECORD_INCOMPLETE);
+  }
+}

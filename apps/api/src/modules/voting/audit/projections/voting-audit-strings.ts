@@ -38,6 +38,8 @@ const STRINGS: Record<
       `${v.actor} recorded unit ${v.unit} as present; voted by ${v.voter}.`,
     'assembly.attendance.absent.privileged': (v) =>
       `${v.actor} recorded unit ${v.unit} as absent.`,
+    'assembly.record.published.public': (v) =>
+      `${v.actor} published the record of "${v.title}" with ${v.present} units present.`,
     'ballot.cast.privileged': (v) =>
       `${v.actor} cast ballot for unit ${v.unit}.`,
     'ballot.cast.proxy.privileged': (v) =>
@@ -88,6 +90,8 @@ const STRINGS: Record<
       `${v.actor} zaznamenal/a jednotku ${v.unit} jako přítomnou; hlasoval/a ${v.voter}.`,
     'assembly.attendance.absent.privileged': (v) =>
       `${v.actor} zaznamenal/a jednotku ${v.unit} jako nepřítomnou.`,
+    'assembly.record.published.public': (v) =>
+      `${v.actor} publikoval/a záznam „${v.title}“; přítomno bylo ${v.present} jednotek.`,
     'ballot.cast.privileged': (v) =>
       `${v.actor} hlasoval/a za jednotku ${v.unit}.`,
     'ballot.cast.proxy.privileged': (v) =>

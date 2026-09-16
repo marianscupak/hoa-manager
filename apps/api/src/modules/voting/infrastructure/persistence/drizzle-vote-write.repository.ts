@@ -493,6 +493,17 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
       );
   }
 
+  async findUnitIdsWithBallot(
+    tenantId: string,
+    voteId: string,
+  ): Promise<string[]> {
+    const rows = await this.db
+      .select({ unitId: ballots.unitId })
+      .from(ballots)
+      .where(and(eq(ballots.tenantId, tenantId), eq(ballots.voteId, voteId)));
+    return rows.map((r) => r.unitId);
+  }
+
   async saveElectorateUnits(
     tenantId: string,
     voteId: string,

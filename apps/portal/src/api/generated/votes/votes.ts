@@ -2360,6 +2360,91 @@ export const useVotesControllerDeleteAssemblyBallot = <
         queryClient,
     );
 };
+export const votesControllerPublishAssemblyRecord = (
+    id: string,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<void>(
+        {
+            url: `/api/votes/${id}/publish-assembly-record`,
+            method: "POST",
+            signal,
+        },
+        options,
+    );
+};
+
+export const getVotesControllerPublishAssemblyRecordMutationOptions = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof votesControllerPublishAssemblyRecord>>,
+        TError,
+        { id: string },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof votesControllerPublishAssemblyRecord>>,
+    TError,
+    { id: string },
+    TContext
+> => {
+    const mutationKey = ["votesControllerPublishAssemblyRecord"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof votesControllerPublishAssemblyRecord>>,
+        { id: string }
+    > = (props) => {
+        const { id } = props ?? {};
+
+        return votesControllerPublishAssemblyRecord(id, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type VotesControllerPublishAssemblyRecordMutationResult = NonNullable<
+    Awaited<ReturnType<typeof votesControllerPublishAssemblyRecord>>
+>;
+
+export type VotesControllerPublishAssemblyRecordMutationError =
+    ErrorType<unknown>;
+
+export const useVotesControllerPublishAssemblyRecord = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof votesControllerPublishAssemblyRecord>>,
+            TError,
+            { id: string },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof votesControllerPublishAssemblyRecord>>,
+    TError,
+    { id: string },
+    TContext
+> => {
+    return useMutation(
+        getVotesControllerPublishAssemblyRecordMutationOptions(options),
+        queryClient,
+    );
+};
 export const votesControllerRecordPaperBallot = (
     id: string,
     recordPaperBallotDto: BodyType<RecordPaperBallotDto>,

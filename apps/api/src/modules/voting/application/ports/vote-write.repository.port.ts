@@ -29,6 +29,8 @@ export interface VoteWriteRepository {
     voteId: string,
     unitId: string,
   ): Promise<void>;
+  /** Unit ids that already have a ballot recorded for this vote. */
+  findUnitIdsWithBallot(tenantId: string, voteId: string): Promise<string[]>;
   saveElectorateUnits(
     tenantId: string,
     voteId: string,

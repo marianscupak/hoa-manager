@@ -76,6 +76,7 @@ import { DeleteBallotAttachmentCommand } from '../application/commands/delete-ba
 import { DeleteVoteCommand } from '../application/commands/delete-vote/delete-vote.command';
 import { DeleteVoteDocumentCommand } from '../application/commands/delete-vote-document/delete-vote-document.command';
 import { DeleteVoteQuestionCommand } from '../application/commands/delete-vote-question/delete-vote-question.command';
+import { PublishAssemblyRecordCommand } from '../application/commands/publish-assembly-record/publish-assembly-record.command';
 import { RecordAssemblyBallotCommand } from '../application/commands/record-assembly-ballot/record-assembly-ballot.command';
 import { RecordPaperBallotCommand } from '../application/commands/record-paper-ballot/record-paper-ballot.command';
 import { RequestBallotAttachmentUploadCommand } from '../application/commands/request-ballot-attachment-upload/request-ballot-attachment-upload.command';
@@ -515,6 +516,27 @@ export class VotesController {
         id,
         tenantCtx.membershipId,
         unitId,
+      ),
+    );
+  }
+
+  @Post(':id/publish-assembly-record')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({
+    description:
+      'Closes the assembly record, computes results and reveals it to owners',
+  })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  publishAssemblyRecord(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Tenant() tenantCtx: TenantContext,
+  ) {
+    return this.commandBus.execute(
+      new PublishAssemblyRecordCommand(
+        tenantCtx.tenantId,
+        id,
+        tenantCtx.membershipId,
       ),
     );
   }

@@ -192,6 +192,20 @@ export class VotingAuditFormatter implements AuditEventFormatter, OnModuleInit {
           ),
         };
       }
+      case VotingEventType.ASSEMBLY_RECORD_PUBLISHED: {
+        const p = event.payload as {
+          presentCount: number;
+          labels: { voteTitle: string; publishedBy: string };
+        };
+        return {
+          ...base,
+          message: t(lang, 'assembly.record.published.public', {
+            actor: p.labels.publishedBy,
+            title: p.labels.voteTitle,
+            present: String(p.presentCount),
+          }),
+        };
+      }
       case VotingEventType.VOTE_CLOSED: {
         const p = event.payload as { labels: { voteTitle: string } };
         return {

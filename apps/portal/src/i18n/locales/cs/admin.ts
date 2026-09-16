@@ -242,7 +242,19 @@ export default {
                 "Manželé ve společném jmění drží jeden nedílný podíl, který se u obou uvádí celý — součet sloupce proto nemusí dát 100 %.",
         },
         link: {
+            action: "Propojit s účtem",
+            title: "Propojit s účtem",
+            body: "Vyberte účet, který za tohoto vlastníka jedná. Propojení určuje, kdo za jeho jednotky hlasuje — na už uzavřených hlasováních se neprojeví, na dalších ano.",
+            search: "Hledat účet…",
             suggested: "Vypadá jako táž osoba",
+            confirm: "Propojit",
+            cancel: "Zrušit",
+            success: "Účet propojen.",
+            empty: "Není co propojit — všechny účty už někoho zastupují.",
+        },
+        unlink: {
+            action: "Zrušit propojení",
+            success: "Propojení zrušeno.",
         },
     },
     users: {

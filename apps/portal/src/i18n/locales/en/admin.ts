@@ -236,7 +236,19 @@ export default {
                 "Spouses in joint ownership hold one undivided share, shown in full for both — so the column need not add up to 100 %.",
         },
         link: {
+            action: "Link an account",
+            title: "Link an account",
+            body: "Pick the account that acts for this owner. The link decides who votes for their units — it does not touch votes already closed, but it applies to the next one.",
+            search: "Search for an account…",
             suggested: "Looks like the same person",
+            confirm: "Link",
+            cancel: "Cancel",
+            success: "Account linked.",
+            empty: "Nothing to link — every account already stands for somebody.",
+        },
+        unlink: {
+            action: "Remove the link",
+            success: "Link removed.",
         },
     },
     users: {

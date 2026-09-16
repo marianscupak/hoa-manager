@@ -1,67 +1,19 @@
 import type { TFunction } from "i18next";
 
-import {
-    type ColumnDef,
-    formatPercent,
-    StatusChip,
-    type StatusChipVariant,
-} from "@hoa-mngr/ui";
-
-import type { PersonResponseDto } from "@/api/generated/model";
+import { type ColumnDef, formatPercent, StatusChip } from "@hoa-mngr/ui";
 
 import { type PersonRow } from "../utils/people-filter";
-
-const STATUS_VARIANT: Record<string, StatusChipVariant> = {
-    ACTIVE: "success",
-    INVITED: "warning",
-};
-
-/**
- * What a row says about access, in one column: the role for someone with an
- * account, otherwise how far along the invitation is.
- */
-function accessCell(person: PersonResponseDto, t: TFunction<"admin">) {
-    if (person.role) {
-        return (
-            <div className="flex flex-wrap items-center gap-1.5">
-                <StatusChip variant="neutral" dot={false}>
-                    {t(`users.roles.${person.role}` as "users.roles.ADMIN")}
-                </StatusChip>
-                {person.status && person.status !== "ACTIVE" && (
-                    <StatusChip
-                        variant={STATUS_VARIANT[person.status] ?? "warning"}
-                    >
-                        {t(
-                            `users.table.status.${person.status}` as "users.table.status.ACTIVE",
-                        )}
-                    </StatusChip>
-                )}
-            </div>
-        );
-    }
-    if (person.inviteStatus) {
-        return (
-            <StatusChip variant="warning">
-                {t("people.access.invited")}
-            </StatusChip>
-        );
-    }
-    return (
-        <span className="text-faint text-sm">
-            {t("people.access.noAccount")}
-        </span>
-    );
-}
 
 export interface PeopleColumnOptions {
     /** ADMIN and BOARD_MEMBER; a unit owner gets neither contact nor access. */
     canSeeAccounts: boolean;
+    renderAccess: (person: PersonRow) => React.ReactNode;
     renderActions: (person: PersonRow) => React.ReactNode;
 }
 
 export const getPeopleColumns = (
     t: TFunction<"admin">,
-    { canSeeAccounts, renderActions }: PeopleColumnOptions,
+    { canSeeAccounts, renderAccess, renderActions }: PeopleColumnOptions,
 ): ColumnDef<PersonRow>[] => [
     {
         id: "name",
@@ -145,7 +97,7 @@ export const getPeopleColumns = (
                   enableSorting: false,
                   enableGlobalFilter: false,
                   cell: ({ row }: { row: { original: PersonRow } }) =>
-                      accessCell(row.original, t),
+                      renderAccess(row.original),
               } satisfies ColumnDef<PersonRow>,
               {
                   id: "actions",

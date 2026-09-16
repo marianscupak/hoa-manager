@@ -6,17 +6,26 @@ import { useTranslation } from "react-i18next";
 import { Button, DataTable, PageHeader } from "@hoa-mngr/ui";
 import { cn } from "@hoa-mngr/ui/lib/utils";
 
+import type { OwnerResponseDto } from "@/api/generated/model";
 import { usePeopleControllerGetPeople } from "@/api/generated/people/people";
 import { tenantContextAtom } from "@/auth/atoms";
 import { isAdminOrBoard } from "@/auth/role-checks";
+import { AddOwnerEmailDialog } from "@/features/admin/components/add-owner-email-dialog";
 import { CreateOwnerDialog } from "@/features/admin/components/create-owner-dialog";
+import { DeleteOwnerDialog } from "@/features/admin/components/delete-owner-dialog";
+import { Role } from "@/auth/roles";
 
+import { LinkAccountDialog } from "../components/link-account-dialog";
+import { PersonAccessCell } from "../components/person-access-cell";
+import { PersonRowActions } from "../components/person-row-actions";
 import { getPeopleColumns } from "../components/people-table-columns";
 import {
     filterPeople,
     PEOPLE_FILTERS,
+    toOwnerRef,
     toPersonRows,
     type PeopleFilter,
+    type PersonRow,
 } from "../utils/people-filter";
 
 const FILTER_LABEL: Record<PeopleFilter, string> = {
@@ -41,21 +50,45 @@ export function PeoplePage() {
     const tenantCtx = useAtomValue(tenantContextAtom);
     const canSeeAccounts = isAdminOrBoard(tenantCtx?.roles);
 
+    const isAdmin = !!tenantCtx?.roles.includes(Role.ADMIN);
+
     const [filter, setFilter] = useState<PeopleFilter>("all");
     const [createOpen, setCreateOpen] = useState(false);
+    const [linking, setLinking] = useState<PersonRow | null>(null);
+    const [deleting, setDeleting] = useState<PersonRow | null>(null);
+    const [addingEmail, setAddingEmail] = useState<PersonRow | null>(null);
 
     const { data: people, isLoading, refetch } = usePeopleControllerGetPeople();
+
+    const allRows = useMemo(() => toPersonRows(people ?? []), [people]);
+
+    // The guard the role control needs: with one ADMIN left, that role cannot
+    // be given away or there would be nobody to administer the association.
+    const isLastAdmin = allRows.filter((p) => p.role === "ADMIN").length === 1;
 
     const columns = useMemo(
         () =>
             getPeopleColumns(t, {
                 canSeeAccounts,
-                renderActions: () => null,
+                renderAccess: (person) => (
+                    <PersonAccessCell
+                        person={person}
+                        isAdmin={isAdmin}
+                        isLastAdmin={isLastAdmin}
+                    />
+                ),
+                renderActions: (person) => (
+                    <PersonRowActions
+                        person={person}
+                        isAdmin={isAdmin}
+                        onDelete={setDeleting}
+                        onAddEmail={setAddingEmail}
+                        onLink={setLinking}
+                    />
+                ),
             }),
-        [t, canSeeAccounts],
+        [t, canSeeAccounts, isAdmin, isLastAdmin],
     );
-
-    const allRows = useMemo(() => toPersonRows(people ?? []), [people]);
     const rows = filterPeople(allRows, filter);
 
     return (
@@ -117,11 +150,32 @@ export function PeoplePage() {
             <p className="text-faint text-xs">{t("people.table.sharesNote")}</p>
 
             {canSeeAccounts && (
-                <CreateOwnerDialog
-                    open={createOpen}
-                    onOpenChange={setCreateOpen}
-                    onSuccess={refetch}
-                />
+                <>
+                    <CreateOwnerDialog
+                        open={createOpen}
+                        onOpenChange={setCreateOpen}
+                        onSuccess={refetch}
+                    />
+                    <LinkAccountDialog
+                        owner={linking}
+                        people={allRows}
+                        onOpenChange={(open) => !open && setLinking(null)}
+                    />
+                    <AddOwnerEmailDialog
+                        owner={
+                            toOwnerRef(addingEmail) as OwnerResponseDto | null
+                        }
+                        open={addingEmail !== null}
+                        onOpenChange={(open) => !open && setAddingEmail(null)}
+                        onSuccess={refetch}
+                    />
+                    <DeleteOwnerDialog
+                        owner={toOwnerRef(deleting) as OwnerResponseDto | null}
+                        open={deleting !== null}
+                        onOpenChange={(open) => !open && setDeleting(null)}
+                        onSuccess={refetch}
+                    />
+                </>
             )}
         </div>
     );

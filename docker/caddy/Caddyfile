@@ -24,6 +24,16 @@
     encode gzip
 }
 
+# One canonical host. Visitors who type the www prefix land on the same site
+# instead of a connection error, and cookies and sessions stay on a single
+# origin rather than splitting between two.
+#
+# Requires a DNS record for www.{$DOMAIN} pointing at this server — without it
+# Caddy cannot obtain a certificate for the name and this block never serves.
+www.{$DOMAIN} {
+    redir https://{$DOMAIN}{uri} permanent
+}
+
 grafana.{$DOMAIN} {
     reverse_proxy grafana:3000
 }

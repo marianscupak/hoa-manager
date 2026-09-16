@@ -177,3 +177,22 @@ jobs:
                     && docker compose run --rm api node dist/infrastructure/db/migrate \
                     && docker compose up -d --remove-orphans \
                     && docker image prune -f'
+
+            - name: Verify the deployed API answers
+              run: |
+                  # `docker compose up -d` returns once the containers exist,
+                  # not once they work, so an API crash-looping on a bad
+                  # migration or config would otherwise deploy green. Calling
+                  # the public URL exercises the whole chain — DNS, Caddy, the
+                  # API process and its database connection.
+                  for attempt in $(seq 1 30); do
+                      if curl -fsS --max-time 5 "https://${DOMAIN}/api/health" | grep -q '"status":"ok"'; then
+                          echo "API reported healthy after ${attempt} attempt(s)."
+                          exit 0
+                      fi
+                      echo "Attempt ${attempt}/30: not healthy yet, retrying in 5s."
+                      sleep 5
+                  done
+                  echo "::error::API did not report healthy within 150s of deploy."
+                  ssh "$SSH_DEST" 'cd /opt/hoa-manager && docker compose logs --tail 50 api' || true
+                  exit 1

@@ -4,6 +4,7 @@ export * from './vote-rulesets';
 export * from './vote-questions';
 export * from './vote-options';
 export * from './vote-unit-consents';
+export * from './vote-attendance';
 export * from './vote-electorate-units';
 export * from './ballots';
 export * from './ballot-answers';

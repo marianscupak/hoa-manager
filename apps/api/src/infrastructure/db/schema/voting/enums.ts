@@ -49,6 +49,11 @@ export const voteUnitConsentStatusEnum = pgEnum('vote_unit_consent_status', [
   'REVOKED',
 ]);
 
+export const voteAttendanceStatusEnum = pgEnum('vote_attendance_status', [
+  'PRESENT',
+  'ABSENT',
+]);
+
 export const electorateEligibilityStatusEnum = pgEnum(
   'electorate_eligibility_status',
   ['ELIGIBLE', 'INELIGIBLE'],

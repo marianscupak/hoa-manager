@@ -70,10 +70,10 @@ export function AdminRecordDelegation() {
 
     const filteredVotes = votesOpenForDelegation(votes);
 
-    // The Zmocnitel (grantor) list comes from the selected unit's actual
+    // The represented-owner list comes from the selected unit's actual
     // owners — including owners without a user account (e.g. an SJM spouse)
     // — not from tenant memberships, since anyone who owns the unit may
-    // grant a paper power of attorney (requires majority-of-shares consent).
+    // name a representative (requires majority-of-shares consent).
     const { data: unitDetail } = useUnitControllerGetUnitDetail(
         selectedUnitId,
         {
@@ -97,9 +97,9 @@ export function AdminRecordDelegation() {
         return [...byOwnerId.values()];
     }, [unitDetail]);
 
-    // The Zmocněnec (delegate) side may be any active member of the
-    // association — a consent is a power of attorney, not a co-ownership
-    // matter — so it keeps using every tenant membership.
+    // The representative may be any active member of the association —
+    // who represents the unit is not itself a co-ownership matter — so it
+    // keeps using every tenant membership.
     const { data: delegateCandidates } =
         useVotesControllerGetDelegationCandidates(
             selectedVoteId,

@@ -330,7 +330,7 @@ describe('VotingAuditFormatter', () => {
         viewerLanguage: 'cs',
       });
       expect(entry.message).toBe(
-        'Alice (board) zaznamenal/a delegaci jednotky 12 z Bob na Carol.',
+        'Alice (board) zaznamenal/a zastoupení jednotky 12: vlastníka Bob zastupuje Carol.',
       );
     });
 
@@ -395,7 +395,7 @@ describe('VotingAuditFormatter', () => {
         viewerLanguage: 'cs',
       });
       expect(entry.message).toBe(
-        'Alice (board) zrušil/a delegaci jednotky 12 z Bob na Carol.',
+        'Alice (board) zrušil/a zastoupení jednotky 12: vlastníka Bob zastupoval/a Carol.',
       );
     });
 

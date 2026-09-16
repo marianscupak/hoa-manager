@@ -69,17 +69,17 @@ const STRINGS: Record<
     'vote.question.deleted.privileged': (v) =>
       `${v.actor} odstranil/a otázku "${v.question}" z "${v.title}".`,
     'vote.consent.created.privileged': (v) =>
-      `${v.owner} delegoval/a jednotku ${v.unit} na ${v.delegate}.`,
+      `${v.owner} určil/a pro jednotku ${v.unit} zástupce ${v.delegate}.`,
     'vote.consent.revoked.privileged': (v) =>
-      `${v.actor} zrušil/a delegaci pro jednotku ${v.unit}.`,
+      `${v.actor} zrušil/a zastoupení pro jednotku ${v.unit}.`,
     'vote.consent.created.self': (v) =>
-      `${v.owner} delegoval/a jednotku ${v.unit} na ${v.delegate}.`,
+      `${v.owner} určil/a pro jednotku ${v.unit} zástupce ${v.delegate}.`,
     'vote.consent.created.byRecorder': (v) =>
-      `${v.recorder} zaznamenal/a delegaci jednotky ${v.unit} z ${v.owner} na ${v.delegate}.`,
+      `${v.recorder} zaznamenal/a zastoupení jednotky ${v.unit}: vlastníka ${v.owner} zastupuje ${v.delegate}.`,
     'vote.consent.revoked.self': (v) =>
-      `${v.owner} zrušil/a delegaci jednotky ${v.unit} na ${v.delegate}.`,
+      `${v.owner} zrušil/a zastoupení jednotky ${v.unit} zástupcem ${v.delegate}.`,
     'vote.consent.revoked.byRecorder': (v) =>
-      `${v.recorder} zrušil/a delegaci jednotky ${v.unit} z ${v.owner} na ${v.delegate}.`,
+      `${v.recorder} zrušil/a zastoupení jednotky ${v.unit}: vlastníka ${v.owner} zastupoval/a ${v.delegate}.`,
     'ballot.cast.privileged': (v) =>
       `${v.actor} hlasoval/a za jednotku ${v.unit}.`,
     'ballot.cast.proxy.privileged': (v) =>

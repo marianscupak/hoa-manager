@@ -8,7 +8,7 @@ export const dashboard = {
         ctaOpen: "Otevřít hlasování",
         personalUncast: "Ještě jste nehlasovali",
         personalCast: "Hlasovali jste",
-        personalDelegated: "Delegovali jste svůj hlas",
+        personalDelegated: "Určili jste zástupce",
         emptyTitle: "Žádná hlasování nejsou aktuálně otevřená ani naplánovaná.",
         errorMessage: "Nepodařilo se načíst hlasování.",
         turnoutLine: "Hlasovalo {{voted}} z {{total}} jednotek",

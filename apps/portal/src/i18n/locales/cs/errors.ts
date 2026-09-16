@@ -60,7 +60,7 @@ export default {
     VOTE_SCHEDULE_IN_PAST: "Naplánovaná data nemohou být v minulosti.",
     VOTE_SCHEDULE_INVALID_RANGE: "Harmonogram hlasování je neplatný.",
     INVALID_VOTE_STATUS_FOR_DELEGATION:
-        "Delegování je povoleno pouze pokud je hlasování v naplánovaném stavu.",
+        "Zastoupení lze určit pouze v naplánovaném hlasování.",
     NOT_A_UNIT_OWNER: "Nejste vlastníkem této jednotky.",
     UNIT_NOT_ELIGIBLE: "Tato jednotka v tomto hlasování nemá hlas.",
     MEMBERSHIP_HAS_NO_ASSOCIATED_OWNER:
@@ -68,7 +68,7 @@ export default {
     LAST_ADMIN_CANNOT_BE_REMOVED:
         "Posledního administrátora nelze odstranit ani mu změnit roli.",
     BALLOT_ALREADY_CAST: "V tomto hlasování jste již odevzdali svůj hlas.",
-    DELEGATION_NOT_FOUND: "Požadované delegování nebylo nalezeno.",
+    DELEGATION_NOT_FOUND: "Požadované zastoupení nebylo nalezeno.",
     FORBIDDEN: "K provedení této akce nemáte dostatečná oprávnění.",
     INCOMPLETE_VOTE: "Konfigurace hlasování není úplná.",
     INVALID_BALLOT_ANSWERS: "Odevzdané odpovědi v hlasování jsou neplatné.",
@@ -103,5 +103,5 @@ export default {
         "Nahrávání se nedokončilo. Zkuste to prosím znovu.",
     DOCUMENT_STORAGE_NOT_CONFIGURED: "Úložiště dokumentů není nakonfigurováno.",
     CONSENT_ALREADY_RECORDED:
-        "Plná moc od tohoto vlastníka už je pro toto hlasování zaevidována. Nejprve ji odvolejte.",
+        "Zastoupení od tohoto vlastníka už je pro toto hlasování zaevidováno. Nejprve ho zrušte.",
 } as const;

@@ -38,7 +38,7 @@ export function RunningCountCard({
     const entered = totals.presentUnitCount - totals.unitsAwaitingEntry;
 
     return (
-        <div className="rounded-card bg-card shadow-clay-card border p-4 px-5">
+        <div className="rounded-card bg-card shadow-clay-card flex h-full flex-col border p-4 px-5">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <p className="text-faint text-[11px] font-semibold tracking-wide uppercase">
                     {t("voting:assemblyRecord.tally.eyebrow")}
@@ -100,7 +100,7 @@ export function RunningCountCard({
                 ))}
             </ol>
 
-            <p className="text-faint mt-3 text-[11.5px]">
+            <p className="text-faint mt-auto pt-3 text-[11.5px]">
                 {t(
                     weightBasis === "UNIT_SHARE"
                         ? "voting:assemblyRecord.tally.footnoteShare"

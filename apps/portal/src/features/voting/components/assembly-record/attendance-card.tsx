@@ -32,7 +32,7 @@ export function AttendanceCard({ totals, unitCount }: AttendanceCardProps) {
     const fillPercent = Math.min(100, (presentPercent / allPercent) * 100);
 
     return (
-        <div className="rounded-card bg-card shadow-clay-card border p-4 px-5 pb-[18px]">
+        <div className="rounded-card bg-card shadow-clay-card flex h-full flex-col border p-4 px-5 pb-[18px]">
             <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                     <p className="font-display text-[28px] leading-none font-black tracking-[-0.6px]">
@@ -44,7 +44,9 @@ export function AttendanceCard({ totals, unitCount }: AttendanceCardProps) {
                 </div>
 
                 <div className="text-right">
-                    <StatusChip variant={totals.quorate ? "success" : "warning"}>
+                    <StatusChip
+                        variant={totals.quorate ? "success" : "warning"}
+                    >
                         {t(
                             totals.quorate
                                 ? "voting:assemblyRecord.attendance.quorate"
@@ -58,29 +60,36 @@ export function AttendanceCard({ totals, unitCount }: AttendanceCardProps) {
                         })}
                     </p>
                     <p className="text-muted-foreground text-[12.5px]">
-                        {t("voting:assemblyRecord.attendance.absentAndNoOwner", {
-                            absent: totals.absentUnitCount,
-                            ineligible: totals.ineligibleUnitCount,
-                        })}
+                        {t(
+                            "voting:assemblyRecord.attendance.absentAndNoOwner",
+                            {
+                                absent: totals.absentUnitCount,
+                                ineligible: totals.ineligibleUnitCount,
+                            },
+                        )}
                     </p>
                 </div>
             </div>
 
-            <div className="bg-accent mt-4 h-2 w-full overflow-hidden rounded-full">
-                <div
-                    className="bg-primary h-full rounded-full transition-[width] motion-reduce:transition-none"
-                    style={{ width: `${fillPercent}%` }}
-                />
-            </div>
+            <div className="mt-auto pt-4">
+                <div className="bg-accent h-2 w-full overflow-hidden rounded-full">
+                    <div
+                        className="bg-primary h-full rounded-full transition-[width] motion-reduce:transition-none"
+                        style={{ width: `${fillPercent}%` }}
+                    />
+                </div>
 
-            <div className="text-faint mt-2 flex flex-wrap justify-between gap-2 text-[11.5px]">
-                <span>{t("voting:assemblyRecord.attendance.quorumRule")}</span>
-                <span>
-                    {t("voting:assemblyRecord.attendance.sharesOnRecord", {
-                        num: totals.allVotesWeight.num,
-                        den: totals.allVotesWeight.den,
-                    })}
-                </span>
+                <div className="text-faint mt-2 flex flex-wrap justify-between gap-2 text-[11.5px]">
+                    <span>
+                        {t("voting:assemblyRecord.attendance.quorumRule")}
+                    </span>
+                    <span>
+                        {t("voting:assemblyRecord.attendance.sharesOnRecord", {
+                            num: totals.allVotesWeight.num,
+                            den: totals.allVotesWeight.den,
+                        })}
+                    </span>
+                </div>
             </div>
         </div>
     );

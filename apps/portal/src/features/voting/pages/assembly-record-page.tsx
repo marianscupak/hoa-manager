@@ -110,7 +110,7 @@ export function AssemblyRecordPage() {
             </header>
 
             <main className="mx-auto max-w-[1200px] space-y-4 px-4 py-5 pb-24">
-                <div className="grid items-start gap-4 lg:grid-cols-2">
+                <div className="grid gap-4 lg:grid-cols-2">
                     <AttendanceCard
                         totals={record.totals}
                         unitCount={units.length}

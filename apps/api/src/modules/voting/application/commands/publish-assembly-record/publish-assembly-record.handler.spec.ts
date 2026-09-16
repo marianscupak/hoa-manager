@@ -10,7 +10,13 @@ import {
 import { type VoteWriteRepository } from '@/modules/voting/application/ports/vote-write.repository.port';
 import { VotingAuditLabelResolver } from '@/modules/voting/audit/label-resolver.service';
 import { type VoteAggregate } from '@/modules/voting/domain/vote/vote.aggregate';
-import { VoteMode, VoteStatus } from '@/modules/voting/domain/vote/vote.types';
+import {
+  ElectorateEligibilityStatus,
+  ElectorateIneligibleReason,
+  type ElectorateUnit,
+  VoteMode,
+  VoteStatus,
+} from '@/modules/voting/domain/vote/vote.types';
 import { type Clock } from '@/shared/application/ports/clock.port';
 import { type UnitOfWork } from '@/shared/application/ports/unit-of-work.port';
 
@@ -25,6 +31,27 @@ const ACTOR: AuditActor = {
 
 const MEETING_DATE = new Date('2026-09-12T18:30:00Z');
 const NOW = new Date('2026-09-16T12:00:00Z');
+/** The association filled its unit register in after the meeting. */
+const OWNERSHIP_RECORDED_FROM = new Date('2026-09-15T00:00:00Z');
+
+const UNITS: ElectorateUnit[] = [
+  {
+    unitId: 'u1',
+    representativeMembershipId: 'member-9',
+    eligibilityStatus: ElectorateEligibilityStatus.ELIGIBLE,
+    ineligibleReason: null,
+    weightNum: 1,
+    weightDen: 2,
+  },
+  {
+    unitId: 'u2',
+    representativeMembershipId: null,
+    eligibilityStatus: ElectorateEligibilityStatus.INELIGIBLE,
+    ineligibleReason: ElectorateIneligibleReason.ASSOCIATION_OWNED,
+    weightNum: 1,
+    weightDen: 2,
+  },
+];
 
 function build(options?: {
   mode?: VoteMode;
@@ -55,7 +82,7 @@ function build(options?: {
 
   const calls = {
     resolvedAt: null as Date | null,
-    snapshotted: false,
+    snapshotted: null as ElectorateUnit[] | null,
     resultsSaved: false,
   };
 
@@ -64,8 +91,8 @@ function build(options?: {
     {
       findById: jest.fn().mockResolvedValue(vote),
       findUnitIdsWithBallot: jest.fn(async () => ballotUnitIds),
-      saveElectorateUnits: jest.fn(async () => {
-        calls.snapshotted = true;
+      saveElectorateUnits: jest.fn(async (_t, _v, units: ElectorateUnit[]) => {
+        calls.snapshotted = units;
       }),
       save: jest.fn(),
       saveResults: jest.fn(async () => {
@@ -76,9 +103,20 @@ function build(options?: {
       findByVote: jest.fn(async () => attendance),
     } as unknown as VoteAttendanceRepository,
     {
+      // Models the ownership table: an as-of query before the records begin
+      // finds no owner at all, so nothing can be classified. This is the
+      // normal state of a building whose register was filled in after the
+      // meeting it is now writing up.
       resolveElectorate: jest.fn(async (_v: VoteAggregate, at: Date) => {
         calls.resolvedAt = at;
-        return [];
+        return at < OWNERSHIP_RECORDED_FROM
+          ? UNITS.map((u) => ({
+              ...u,
+              representativeMembershipId: null,
+              eligibilityStatus: ElectorateEligibilityStatus.INELIGIBLE,
+              ineligibleReason: ElectorateIneligibleReason.MISSING_OWNERSHIP,
+            }))
+          : UNITS;
       }),
     } as unknown as ElectorateService,
     {
@@ -117,7 +155,7 @@ describe('PublishAssemblyRecordHandler', () => {
     await expect(handler.execute(command())).rejects.toMatchObject({
       code: 'ASSEMBLY_RECORD_INCOMPLETE',
     });
-    expect(calls.snapshotted).toBe(false);
+    expect(calls.snapshotted).toBeNull();
   });
 
   it('ignores absent units when checking the gate', async () => {
@@ -132,12 +170,36 @@ describe('PublishAssemblyRecordHandler', () => {
     await expect(handler.execute(command())).resolves.toBeUndefined();
   });
 
-  it('resolves the electorate as of the meeting date, not today', async () => {
+  it('keeps the association\'s own unit out of the published electorate', async () => {
+    // § 1206(1): a unit the association owns carries no vote, so it is not
+    // part of the "all votes" the quorum is measured against. That
+    // classification comes from the ownership records, and resolving as of
+    // the meeting date — before this building's register begins — erased it:
+    // the unit came back MISSING_OWNERSHIP, which *is* counted, and a quorate
+    // assembly published as inquorate.
     const { handler, calls } = build();
 
     await handler.execute(command());
 
-    expect(calls.resolvedAt).toEqual(MEETING_DATE);
+    expect(calls.resolvedAt).toEqual(NOW);
+    expect(calls.snapshotted).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          unitId: 'u2',
+          ineligibleReason: ElectorateIneligibleReason.ASSOCIATION_OWNED,
+        }),
+      ]),
+    );
+  });
+
+  it('snapshots the electorate the recording screen resolved', async () => {
+    // The board marked attendance against the live roster; the record has to
+    // be computed against that same set or it contradicts what they entered.
+    const { handler, calls } = build();
+
+    await handler.execute(command());
+
+    expect(calls.snapshotted).toEqual(UNITS);
   });
 
   it('snapshots the electorate, closes the vote and persists results', async () => {
@@ -145,7 +207,7 @@ describe('PublishAssemblyRecordHandler', () => {
 
     await handler.execute(command());
 
-    expect(calls.snapshotted).toBe(true);
+    expect(calls.snapshotted).not.toBeNull();
     expect(closed.value).toBe(true);
     expect(calls.resultsSaved).toBe(true);
   });
@@ -184,7 +246,7 @@ describe('PublishAssemblyRecordHandler', () => {
     await expect(handler.execute(command())).rejects.toMatchObject({
       code: 'ASSEMBLY_RECORD_INCOMPLETE',
     });
-    expect(calls.snapshotted).toBe(false);
+    expect(calls.snapshotted).toBeNull();
   });
 
   it('publishes a meeting where every unit was marked absent', async () => {

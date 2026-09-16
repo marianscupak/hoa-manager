@@ -512,6 +512,7 @@ export const voting = {
             checks: {
                 VOTE_SCHEDULE_MISSING_DATES:
                     "Opening and closing dates are set",
+                ASSEMBLY_MEETING_DATE_MISSING: "Meeting date is set",
                 VOTE_SCHEDULE_IN_PAST: "Opening date is in the future",
                 VOTE_RULESET_REQUIRED: "Voting rules are configured",
                 VOTE_MISSING_QUESTIONS: "At least one question exists",

@@ -163,6 +163,32 @@ describe("buildReviewChecks", () => {
         ).toBe(false);
     });
 
+    it("calls the date check a meeting date for an assembly record", () => {
+        // The finding is the server's `VOTE_SCHEDULE_MISSING_DATES` either
+        // way, but this mode has one date and no window — "opening and
+        // closing dates are set" promises something that does not exist here.
+        const vote = buildVote({
+            mode: "ASSEMBLY_RECORD",
+            scheduledFrom: new Date(Date.now() - 4 * DAY_MS).toISOString(),
+            ruleset: completeVote.ruleset,
+            questions: completeVote.questions,
+        });
+
+        expect(
+            findCheck(buildReviewChecks(vote), "VOTE_SCHEDULE_MISSING_DATES")
+                .labelCode,
+        ).toBe("ASSEMBLY_MEETING_DATE_MISSING");
+    });
+
+    it("leaves the label alone for a mode the server wording fits", () => {
+        expect(
+            findCheck(
+                buildReviewChecks(completeVote),
+                "VOTE_SCHEDULE_MISSING_DATES",
+            ).labelCode,
+        ).toBeUndefined();
+    });
+
     it("still requires both dates and a future start for per rollam", () => {
         const codes = buildReviewChecks(completeVote).map((c) => c.code);
 

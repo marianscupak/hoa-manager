@@ -10,7 +10,15 @@ import { VoteDetailResponseDto } from "@/api/generated/model";
 import type { WizardStepId } from "..";
 
 export interface ReviewCheck {
+    /** The server `INCOMPLETE_VOTE` finding this mirrors. */
     code: string;
+    /**
+     * Translation key under `voting:wizard.review.checks`, when the server's
+     * own wording does not fit the mode. The same finding reads differently
+     * for an assembly record, which has a single meeting date and no window.
+     * Defaults to `code`.
+     */
+    labelCode?: string;
     ok: boolean;
     severity: "error" | "warning";
     step: WizardStepId;
@@ -41,6 +49,9 @@ export function buildReviewChecks(vote: VoteDetailResponseDto): ReviewCheck[] {
     const checks: ReviewCheck[] = [
         {
             code: "VOTE_SCHEDULE_MISSING_DATES",
+            labelCode: isAssemblyRecord
+                ? "ASSEMBLY_MEETING_DATE_MISSING"
+                : undefined,
             ok: isAssemblyRecord ? !!from : !!from && !!to,
             severity: "error",
             step: "details",
@@ -110,9 +121,10 @@ function ReviewCheckRow({ check, onEditStep }: ReviewCheckRowProps) {
                 <Icon className="h-3.5 w-3.5" strokeWidth={3} />
             </span>
             <span className="flex-1 text-sm font-medium">
-                {t(`voting:wizard.review.checks.${check.code}`, {
-                    defaultValue: check.code,
-                })}
+                {t(
+                    `voting:wizard.review.checks.${check.labelCode ?? check.code}`,
+                    { defaultValue: check.code },
+                )}
             </span>
             {!check.ok && (
                 <Button

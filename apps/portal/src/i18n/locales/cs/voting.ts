@@ -520,6 +520,8 @@ export const voting = {
             checks: {
                 VOTE_SCHEDULE_MISSING_DATES:
                     "Datum zahájení a ukončení je vyplněno",
+                ASSEMBLY_MEETING_DATE_MISSING:
+                    "Datum konání zasedání je vyplněno",
                 VOTE_SCHEDULE_IN_PAST: "Zahájení je v budoucnosti",
                 VOTE_RULESET_REQUIRED: "Pravidla hlasování jsou nastavena",
                 VOTE_MISSING_QUESTIONS: "Existuje alespoň jedna otázka",

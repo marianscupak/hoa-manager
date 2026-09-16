@@ -230,7 +230,6 @@ export const voting = {
         },
         thresholdPicker: {
             customLabel: "Vlastní zlomek",
-            customPlaceholder: "Např. 3/5 nebo 60 %",
             comparatorLabel: "Podmínka",
             comparator: {
                 AT_LEAST: "alespoň",

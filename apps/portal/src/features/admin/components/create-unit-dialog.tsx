@@ -29,6 +29,8 @@ import {
     useUnitControllerCreateUnit,
 } from "@/api/generated/property-units/property-units";
 
+import { useBuildingDenominator } from "../utils/use-building-denominator";
+
 import { unitFormSchema, type UnitFormValues } from "./unit-form-schema";
 
 interface CreateUnitDialogProps {
@@ -43,6 +45,7 @@ export function CreateUnitDialog({
     onSuccess,
 }: CreateUnitDialogProps) {
     const { t } = useTranslation(["admin"]);
+    const buildingDenominator = useBuildingDenominator(open);
     const queryClient = useQueryClient();
 
     const createUnit = useUnitControllerCreateUnit({
@@ -125,9 +128,7 @@ export function CreateUnitDialog({
                                     <FractionInput
                                         value={field.value}
                                         onChange={field.onChange}
-                                        placeholder={t(
-                                            "units.create.buildingSharePlaceholder",
-                                        )}
+                                        defaultDenominator={buildingDenominator}
                                         aria-invalid={!!fieldState.error}
                                     />
                                     <FormMessage />

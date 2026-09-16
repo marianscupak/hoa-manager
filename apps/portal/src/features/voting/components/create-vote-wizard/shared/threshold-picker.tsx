@@ -70,12 +70,12 @@ export function ThresholdPicker({
                     <label className="text-muted-foreground text-xs font-semibold">
                         {t("voting:create.thresholdPicker.customLabel")}
                     </label>
+                    {/* No defaultDenominator: a threshold is a share of the
+                        vote, not of the house, so there is nothing sensible
+                        to pre-fill the denominator with. */}
                     <FractionInput
                         value={value ?? null}
                         onChange={(next) => onChange(next ?? undefined)}
-                        placeholder={t(
-                            "voting:create.thresholdPicker.customPlaceholder",
-                        )}
                     />
                 </div>
                 <div className="space-y-1.5">

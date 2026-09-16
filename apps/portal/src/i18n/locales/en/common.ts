@@ -2,6 +2,11 @@ export default {
     form: {
         optional: "optional",
     },
+    fractionInput: {
+        numerator: "Numerator",
+        denominator: "Denominator",
+        percent: "Percent",
+    },
     loading: "Loading...",
     loadingApp: "Loading application…",
     save: "Save",

@@ -32,6 +32,8 @@ import {
     useUnitControllerUpdateUnit,
 } from "@/api/generated/property-units/property-units";
 
+import { useBuildingDenominator } from "../utils/use-building-denominator";
+
 import { unitFormSchema, type UnitFormValues } from "./unit-form-schema";
 
 interface UpdateUnitDialogProps {
@@ -48,6 +50,7 @@ export function UpdateUnitDialog({
     onSuccess,
 }: UpdateUnitDialogProps) {
     const { t } = useTranslation(["admin", "common"]);
+    const buildingDenominator = useBuildingDenominator(open);
     const queryClient = useQueryClient();
 
     const updateUnit = useUnitControllerUpdateUnit({
@@ -150,9 +153,7 @@ export function UpdateUnitDialog({
                                     <FractionInput
                                         value={field.value}
                                         onChange={field.onChange}
-                                        placeholder={t(
-                                            "units.create.buildingSharePlaceholder",
-                                        )}
+                                        defaultDenominator={buildingDenominator}
                                         aria-invalid={!!fieldState.error}
                                     />
                                     <FormMessage />

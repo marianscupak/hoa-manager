@@ -2,6 +2,11 @@ export default {
     form: {
         optional: "nepovinné",
     },
+    fractionInput: {
+        numerator: "Čitatel",
+        denominator: "Jmenovatel",
+        percent: "Procenta",
+    },
     loading: "Načítání...",
     loadingApp: "Načítání aplikace…",
     save: "Uložit",

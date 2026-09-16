@@ -288,13 +288,4 @@ export default {
         },
         lastAdminHint: "Posledního správce nelze odebrat.",
     },
-    property: {
-        title: "Nemovitost",
-        addUnit: "Přidat jednotku",
-        addOwner: "Přidat vlastníka",
-        tabs: {
-            units: "Jednotky",
-            owners: "Vlastníci",
-        },
-    },
 } as const;

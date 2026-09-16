@@ -8,9 +8,8 @@ import { AdminGuard } from "@/components/shell/admin-guard";
 import { AppShell } from "@/components/shell/app-shell";
 import { AuthGuard } from "@/components/shell/auth-guard";
 import { KatastrImportPage } from "@/features/admin/pages/katastr-import-page";
-import { PropertyPage } from "@/features/admin/pages/property-page";
 import { UnitDetailPage } from "@/features/admin/pages/unit-detail-page";
-import { UsersPage } from "@/features/admin/pages/users-page";
+import { UnitsPage } from "@/features/admin/pages/units-page";
 import { GoogleCallbackPage } from "@/features/auth/pages/google-callback-page";
 import { LoginPage } from "@/features/auth/pages/login-page";
 import { SelectTenantPage } from "@/features/auth/pages/select-tenant-page";
@@ -122,15 +121,17 @@ export const router = createBrowserRouter([
                             },
                             {
                                 path: "units",
-                                element: <PropertyPage tab="units" />,
+                                element: <UnitsPage />,
                             },
                             {
                                 path: "units/import",
                                 element: <KatastrImportPage />,
                             },
+                            // The owner register and the member list became
+                            // one module; the old paths may be bookmarked.
                             {
                                 path: "owners",
-                                element: <PropertyPage tab="owners" />,
+                                element: <Navigate to="/people" replace />,
                             },
                             {
                                 path: "units/:id",
@@ -138,7 +139,7 @@ export const router = createBrowserRouter([
                             },
                             {
                                 path: "users",
-                                element: <UsersPage />,
+                                element: <Navigate to="/people" replace />,
                             },
                         ],
                     },

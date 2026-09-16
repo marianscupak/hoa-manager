@@ -1,16 +1,21 @@
-import { AlertTriangleIcon } from "lucide-react";
+import { useAtomValue } from "jotai";
+import { AlertTriangleIcon, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { NavLink } from "react-router";
 
 import {
     Button,
     DataTable,
     ErrorState,
     formatPercentValue,
+    PageHeader,
 } from "@hoa-mngr/ui";
 
 import type { UnitResponseDto } from "@/api/generated/model";
 import { useUnitControllerGetUnits } from "@/api/generated/property-units/property-units";
+import { tenantContextAtom } from "@/auth/atoms";
+import { Role } from "@/auth/roles";
 
 import { CreateUnitDialog } from "../components/create-unit-dialog";
 import { DeleteUnitDialog } from "../components/delete-unit-dialog";
@@ -19,14 +24,15 @@ import {
     UNITS_TABLE_GRID_TEMPLATE,
 } from "../components/units-table/units-table-columns";
 
-export interface UnitsPageProps {
-    createOpen: boolean;
-    onCreateOpenChange: (open: boolean) => void;
-}
-
-export function UnitsPage({ createOpen, onCreateOpenChange }: UnitsPageProps) {
-    const { t } = useTranslation("admin");
+export function UnitsPage() {
+    const { t } = useTranslation(["admin", "katastr"]);
     const { t: tCommon } = useTranslation("common");
+    const tenantCtx = useAtomValue(tenantContextAtom);
+    // The import is a bulk write that is hard to unwind, so it follows the
+    // ADMIN-only rule the endpoint itself enforces — a board member, allowed
+    // everywhere else on this page, must not be offered it.
+    const isAdmin = !!tenantCtx?.roles.includes(Role.ADMIN);
+    const [createOpen, setCreateOpen] = useState(false);
     const [deletingUnit, setDeletingUnit] = useState<UnitResponseDto | null>(
         null,
     );
@@ -83,6 +89,25 @@ export function UnitsPage({ createOpen, onCreateOpenChange }: UnitsPageProps) {
 
     return (
         <div className="space-y-6">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+                <PageHeader
+                    title={t("units.title")}
+                    description={t("units.description")}
+                />
+                <div className="flex items-center gap-3">
+                    {isAdmin && (
+                        <Button asChild variant="outline">
+                            <NavLink to="/admin/units/import">
+                                {t("katastr:title")}
+                            </NavLink>
+                        </Button>
+                    )}
+                    <Button onClick={() => setCreateOpen(true)}>
+                        <Plus /> {t("units.addUnit")}
+                    </Button>
+                </div>
+            </div>
+
             {!isSumValid && units && units.length > 0 && (
                 <div className="rounded-panel border-warning-tint-border bg-warning-muted shadow-clay-card-amber flex items-center gap-3 border px-[18px] py-3">
                     <AlertTriangleIcon className="text-warning-tint-foreground h-4 w-4 shrink-0" />
@@ -122,7 +147,7 @@ export function UnitsPage({ createOpen, onCreateOpenChange }: UnitsPageProps) {
 
             <CreateUnitDialog
                 open={createOpen}
-                onOpenChange={onCreateOpenChange}
+                onOpenChange={setCreateOpen}
                 onSuccess={refetch}
             />
 

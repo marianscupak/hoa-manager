@@ -42,7 +42,7 @@ export function deriveAttentionItems(
         items.push({
             key: "pendingInvites",
             tone: "primary",
-            to: "/admin/owners",
+            to: "/people",
             labelKey: "dashboard:attention.pendingInvites",
             labelParams: { count: overview.invites.pending },
             count: overview.invites.pending,

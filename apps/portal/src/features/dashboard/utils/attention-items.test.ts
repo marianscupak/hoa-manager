@@ -55,6 +55,6 @@ describe("deriveAttentionItems", () => {
         expect(unitsItem?.count).toBe(3);
         expect(unitsItem?.to).toBe("/admin/units");
         expect(invitesItem?.count).toBe(2);
-        expect(invitesItem?.to).toBe("/admin/owners");
+        expect(invitesItem?.to).toBe("/people");
     });
 });

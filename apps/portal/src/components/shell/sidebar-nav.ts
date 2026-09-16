@@ -37,17 +37,16 @@ export const MAIN_NAV: SidebarNavItem[] = [
         isActive: (p) => p.startsWith("/units"),
     },
     { labelKey: "common:nav.voting", to: "/voting", icon: Vote },
+    { labelKey: "common:nav.people", to: "/people", icon: Users },
 ];
 
 export const ADMIN_NAV: SidebarNavItem[] = [
     {
-        labelKey: "common:nav.property",
+        labelKey: "common:nav.units",
         to: "/admin/units",
         icon: Building2,
-        isActive: (p) =>
-            p.startsWith("/admin/units") || p.startsWith("/admin/owners"),
+        isActive: (p) => p.startsWith("/admin/units"),
     },
-    { labelKey: "common:nav.members", to: "/admin/users", icon: Users },
 ];
 
 export const PLANNED_NAV: PlannedNavItem[] = [

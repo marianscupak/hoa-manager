@@ -281,13 +281,4 @@ export default {
         },
         lastAdminHint: "The last administrator cannot be demoted.",
     },
-    property: {
-        title: "Property",
-        addUnit: "Add unit",
-        addOwner: "Add owner",
-        tabs: {
-            units: "Units",
-            owners: "Owners",
-        },
-    },
 } as const;

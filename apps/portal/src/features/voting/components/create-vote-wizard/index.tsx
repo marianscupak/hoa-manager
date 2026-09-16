@@ -281,7 +281,9 @@ export function CreateVoteWizard({
                 // An assembly record is never scheduled: the meeting already
                 // happened, so the wizard hands over to the recording screen.
                 <Button
-                    onClick={() => navigate(`/voting/${voteId}/assembly-record`)}
+                    onClick={() =>
+                        navigate(`/voting/${voteId}/assembly-record`)
+                    }
                     disabled={scheduleDisabled}
                 >
                     <Send />

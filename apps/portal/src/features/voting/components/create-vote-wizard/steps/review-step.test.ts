@@ -158,7 +158,8 @@ describe("buildReviewChecks", () => {
         });
 
         expect(
-            findCheck(buildReviewChecks(vote), "VOTE_SCHEDULE_MISSING_DATES").ok,
+            findCheck(buildReviewChecks(vote), "VOTE_SCHEDULE_MISSING_DATES")
+                .ok,
         ).toBe(false);
     });
 

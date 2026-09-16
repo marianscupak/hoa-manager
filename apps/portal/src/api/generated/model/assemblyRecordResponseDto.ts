@@ -6,12 +6,14 @@
  * OpenAPI spec version: 1.0
  */
 import type { AssemblyRecordQuestionDto } from "./assemblyRecordQuestionDto";
+import type { AssemblyRecordResponseDtoStatus } from "./assemblyRecordResponseDtoStatus";
 import type { AssemblyRecordResponseDtoWeightBasis } from "./assemblyRecordResponseDtoWeightBasis";
 import type { AssemblyRecordTotalsDto } from "./assemblyRecordTotalsDto";
 import type { AssemblyRecordUnitDto } from "./assemblyRecordUnitDto";
 
 export interface AssemblyRecordResponseDto {
     voteTitle: string;
+    status: AssemblyRecordResponseDtoStatus;
     /** @nullable */
     meetingDate: string | null;
     weightBasis: AssemblyRecordResponseDtoWeightBasis;

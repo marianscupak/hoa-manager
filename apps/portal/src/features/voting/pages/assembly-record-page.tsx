@@ -1,11 +1,12 @@
-import { CheckCircle2, EyeOff, Loader2 } from "lucide-react";
+import { CheckCircle2, Loader2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useParams } from "react-router";
+import { Link, Navigate, useParams } from "react-router";
 
-import { Button, ErrorState, PageLoading, StatusChip } from "@hoa-mngr/ui";
+import { Button, ErrorState, PageLoading } from "@hoa-mngr/ui";
 
 import { AttendanceCard } from "@/features/voting/components/assembly-record/attendance-card";
+import { RecordHeader } from "@/features/voting/components/assembly-record/record-header";
 import {
     rosterState,
     type RosterFilter,
@@ -72,42 +73,23 @@ export function AssemblyRecordPage() {
         return <ErrorState message={t("voting:assemblyRecord.loadError")} />;
     }
 
+    // Nothing on this screen can be saved once the record is published, and
+    // every control here would answer with a 409. The published screen is
+    // where that state belongs.
+    if (record.status !== "DRAFT") {
+        return <Navigate to={`/voting/${id}/assembly-record/review`} replace />;
+    }
+
     const awaiting = record.totals.unitsAwaitingEntry;
 
     return (
         <div className="bg-background min-h-screen">
-            <header className="bg-card sticky top-0 z-10 border-b">
-                <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-3 px-4 py-3">
-                    <Button variant="outline" size="sm" asChild>
-                        <Link to={`/voting/${id}`}>
-                            {t("voting:assemblyRecord.header.exit")}
-                        </Link>
-                    </Button>
-                    <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold">
-                            {t("voting:assemblyRecord.header.title", {
-                                title: record.voteTitle,
-                            })}
-                        </p>
-                        <p className="text-muted-foreground truncate text-xs">
-                            {record.meetingDate
-                                ? t("voting:assemblyRecord.header.heldOn", {
-                                      date: new Date(
-                                          record.meetingDate,
-                                      ).toLocaleString(),
-                                  })
-                                : t("voting:assemblyRecord.header.noDate")}
-                        </p>
-                    </div>
-                    <StatusChip variant="primary">
-                        {t("voting:assemblyRecord.header.recording")}
-                    </StatusChip>
-                    <StatusChip variant="neutral">
-                        <EyeOff className="mr-1 h-3 w-3" />
-                        {t("voting:assemblyRecord.header.hidden")}
-                    </StatusChip>
-                </div>
-            </header>
+            <RecordHeader
+                voteId={id}
+                title={record.voteTitle}
+                meetingDate={record.meetingDate}
+                published={false}
+            />
 
             <main className="mx-auto max-w-[1200px] space-y-4 px-4 py-5 pb-24">
                 <div className="grid gap-4 lg:grid-cols-2">

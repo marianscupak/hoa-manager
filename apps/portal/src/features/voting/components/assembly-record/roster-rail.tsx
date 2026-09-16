@@ -113,7 +113,7 @@ export function RosterRail({
                                     "flex w-full cursor-pointer items-center gap-2.5 border-l-[3px] py-2 pr-2 pl-2.5 text-left transition-colors",
                                     selected
                                         ? "border-l-primary bg-primary-faint"
-                                        : "border-l-transparent hover:bg-accent",
+                                        : "hover:bg-accent border-l-transparent",
                                 )}
                             >
                                 <span

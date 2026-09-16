@@ -33,8 +33,10 @@ export function useAssemblyRecord(voteId: string) {
     };
 
     const setAttendance = useVotesControllerSetUnitAttendance(mutationOptions);
-    const recordBallot = useVotesControllerRecordAssemblyBallot(mutationOptions);
-    const deleteBallot = useVotesControllerDeleteAssemblyBallot(mutationOptions);
+    const recordBallot =
+        useVotesControllerRecordAssemblyBallot(mutationOptions);
+    const deleteBallot =
+        useVotesControllerDeleteAssemblyBallot(mutationOptions);
     const publish = useVotesControllerPublishAssemblyRecord({
         mutation: { onError: showApiError },
     });

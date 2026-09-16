@@ -6,9 +6,13 @@
  * OpenAPI spec version: 1.0
  */
 import type { AssemblyRecordOptionDto } from "./assemblyRecordOptionDto";
+import type { AssemblyRecordPreviewDto } from "./assemblyRecordPreviewDto";
+import type { AssemblyRecordQuestionDtoType } from "./assemblyRecordQuestionDtoType";
 
 export interface AssemblyRecordQuestionDto {
     questionId: string;
     title: string;
+    type: AssemblyRecordQuestionDtoType;
     options: AssemblyRecordOptionDto[];
+    preview: AssemblyRecordPreviewDto | null;
 }

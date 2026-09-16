@@ -847,6 +847,37 @@ class AssemblyRecordOptionDto {
   unitCount!: number;
 }
 
+/**
+ * What publishing would write, recomputed on every read.
+ *
+ * The review screen tells the board "Přijato" before it commits, and the only
+ * way that promise holds is for the same `computeVoteResults` the publish path
+ * runs to produce it: the tie rule, the exclusion of abstentions from the
+ * winner and the choice of denominator all live in that one function.
+ *
+ * `null` until the vote has a ruleset — without one there is no threshold to
+ * compare anything against.
+ */
+class AssemblyRecordPreviewDto {
+  @ApiProperty({ enum: ['APPROVED', 'REJECTED', 'WINNER', 'NOT_DECIDED'] })
+  outcome!: QuestionOutcome;
+
+  @ApiProperty()
+  majorityMet!: boolean;
+
+  @ApiProperty({ type: 'string', nullable: true })
+  winningOptionId!: string | null;
+
+  @ApiProperty({ type: RulesetFractionDto })
+  majorityThreshold!: RulesetFractionDto;
+
+  @ApiProperty({ enum: ThresholdComparator })
+  majorityComparator!: ThresholdComparator;
+
+  @ApiProperty({ type: FractionDto })
+  majorityDenominator!: FractionDto;
+}
+
 class AssemblyRecordQuestionDto {
   @ApiProperty()
   questionId!: string;
@@ -854,8 +885,14 @@ class AssemblyRecordQuestionDto {
   @ApiProperty()
   title!: string;
 
+  @ApiProperty({ enum: VoteQuestionType })
+  type!: VoteQuestionType;
+
   @ApiProperty({ type: [AssemblyRecordOptionDto] })
   options!: AssemblyRecordOptionDto[];
+
+  @ApiProperty({ type: AssemblyRecordPreviewDto, nullable: true })
+  preview!: AssemblyRecordPreviewDto | null;
 }
 
 class AssemblyRecordTotalsDto {
@@ -885,6 +922,10 @@ class AssemblyRecordTotalsDto {
 export class AssemblyRecordResponseDto {
   @ApiProperty()
   voteTitle!: string;
+
+  /** Leaves DRAFT only at publish, which is what the review screen keys off. */
+  @ApiProperty({ enum: VoteStatus })
+  status!: VoteStatus;
 
   @ApiProperty({ nullable: true, type: String })
   meetingDate!: string | null;

@@ -22,6 +22,7 @@ import { MyUnitDetailPage } from "@/features/units/pages/my-unit-detail-page";
 import { MyUnitsPage } from "@/features/units/pages/my-units-page";
 import { VotingAdminGuard } from "@/features/voting/guards/voting-admin-guard";
 import { AssemblyRecordPage } from "@/features/voting/pages/assembly-record-page";
+import { AssemblyRecordReviewPage } from "@/features/voting/pages/assembly-record-review-page";
 import { CastVotePage } from "@/features/voting/pages/cast-vote-page";
 import { CreateVotePage } from "@/features/voting/pages/create-vote-page";
 import { DelegateVotePage } from "@/features/voting/pages/delegate-vote-page";
@@ -157,6 +158,10 @@ export const router = createBrowserRouter([
                     {
                         path: "voting/:id/assembly-record",
                         element: <AssemblyRecordPage />,
+                    },
+                    {
+                        path: "voting/:id/assembly-record/review",
+                        element: <AssemblyRecordReviewPage />,
                     },
                 ],
             },

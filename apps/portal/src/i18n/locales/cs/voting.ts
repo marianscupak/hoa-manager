@@ -164,8 +164,7 @@ export const voting = {
                 label: "Konec hlasování",
                 description: "Kdy se má hlasování automaticky uzavřít?",
                 errors: {
-                    beforeStart:
-                        "Konec hlasování musí být až po jeho začátku.",
+                    beforeStart: "Konec hlasování musí být až po jeho začátku.",
                     tooShortPerRollam:
                         "Hlasování per rollam musí trvat nejméně 15 dní. Posuňte konec hlasování dál.",
                 },
@@ -304,16 +303,22 @@ export const voting = {
             heldOn: "Zasedání {{date}} · zapisují se sebrané hlasy",
             noDate: "Datum konání není vyplněno",
             exit: "Ukončit zápis",
+            exitPublished: "Zpět na hlasování",
+            heldOnPublished: "Zasedání {{date}} · záznam publikován",
             recording: "Zapisuje se",
+            closed: "Uzavřeno",
             hidden: "Skryto vlastníkům",
+            visible: "Viditelné vlastníkům",
         },
         attendance: {
             ofAllVotes: "všech hlasů bylo přítomno",
             quorate: "Usnášeníschopné",
             belowQuorum: "Pod hranicí",
             presentOf: "{{present}} z {{total}} jednotek přítomno",
-            absentAndNoOwner: "{{absent}} nepřítomno · {{ineligible}} nemůže hlasovat",
-            quorumRule: "Usnášeníschopnost vyžaduje víc než polovinu všech hlasů",
+            absentAndNoOwner:
+                "{{absent}} nepřítomno · {{ineligible}} nemůže hlasovat",
+            quorumRule:
+                "Usnášeníschopnost vyžaduje víc než polovinu všech hlasů",
             sharesOnRecord: "Podíly v evidenci: {{num}}/{{den}}",
         },
         tally: {
@@ -322,7 +327,8 @@ export const voting = {
             units_one: "{{count}} jednotka",
             units_few: "{{count}} jednotky",
             units_other: "{{count}} jednotek",
-            footnoteShare: "Jen pro výbor · podíly ze všech hlasů v domě · průběžné do publikace",
+            footnoteShare:
+                "Jen pro výbor · podíly ze všech hlasů v domě · průběžné do publikace",
             footnoteUnits: "Jen pro výbor · průběžné do publikace",
         },
         roster: {
@@ -360,12 +366,17 @@ export const voting = {
             voterProxy: "Někdo jiný na plnou moc",
             voterProxyPlaceholder: "Jméno zmocněnce",
             resolution: "Usnesení {{index}}",
-            answersIncomplete: "Zbývá zodpovědět {{count}} usnesení — hlas se uloží, až budou vyplněná všechna.",
-            answersFootnote: "Zapište, co uvádí zápis ze zasedání. Přítomná jednotka, která o usnesení nehlasovala, se zaznamená jako „zdržel se“.",
-            absentExplainer: "Označeno jako nepřítomná — není co zapisovat. Většina se počítá z hlasů přítomných, takže {{percent}} této jednotky do ní nevstupuje. Do usnášeníschopnosti se tentýž podíl počítá dál.",
+            answersIncomplete:
+                "Zbývá zodpovědět {{count}} usnesení — hlas se uloží, až budou vyplněná všechna.",
+            answersFootnote:
+                "Zapište, co uvádí zápis ze zasedání. Přítomná jednotka, která o usnesení nehlasovala, se zaznamená jako „zdržel se“.",
+            absentExplainer:
+                "Označeno jako nepřítomná — není co zapisovat. Většina se počítá z hlasů přítomných, takže {{percent}} této jednotky do ní nevstupuje. Do usnášeníschopnosti se tentýž podíl počítá dál.",
             ineligible: {
-                MISSING_OWNERSHIP: "Jednotka nemá zapsaného vlastníka. Do usnášeníschopnosti se počítá, ale hlasovat za ni nelze — vlastníka doplníte v evidenci jednotek.",
-                ASSOCIATION_OWNED: "Jednotku vlastní společenství, takže nehlasuje a do usnášeníschopnosti se nepočítá.",
+                MISSING_OWNERSHIP:
+                    "Jednotka nemá zapsaného vlastníka. Do usnášeníschopnosti se počítá, ale hlasovat za ni nelze — vlastníka doplníte v evidenci jednotek.",
+                ASSOCIATION_OWNED:
+                    "Jednotku vlastní společenství, takže nehlasuje a do usnášeníschopnosti se nepočítá.",
             },
         },
         footer: {
@@ -374,6 +385,99 @@ export const voting = {
             allEntered: "všechny přítomné jednotky zadány",
             nextToEnter: "Další jednotka k zadání",
             review: "Zkontrolovat a publikovat",
+        },
+        review: {
+            back: "Zpět k zápisu",
+            title: "Zkontrolujte záznam ze zasedání",
+            lead: "Tohle je poslední místo, kde jde cokoli opravit. Publikací se spočítá výsledek a hlasování se zpřístupní vlastníkům.",
+            attendanceEyebrow: "Docházka",
+            statPresent: "přítomno · {{percent}} hlasů",
+            statAbsent: "nepřítomno · {{percent}} hlasů",
+            statIneligible: "nemůže hlasovat · {{percent}} hlasů",
+            quorumOkTitle: "Zasedání bylo usnášeníschopné",
+            quorumOkBody:
+                "Přítomni byli vlastníci s {{percent}} všech hlasů, tedy s víc než polovinou. O usneseních rozhoduje většina hlasů přítomných.",
+            quorumShortTitle: "Zasedání nebylo usnášeníschopné",
+            quorumShortBody:
+                "Přítomni byli vlastníci jen s {{percent}} všech hlasů. Nic, o čem se na zasedání hlasovalo, nelze přijmout — publikací se každé usnesení zaznamená jako nerozhodnuté.",
+            checksEyebrow: "Před publikací",
+            checks: {
+                attendanceOkTitle:
+                    "Docházka je zapsaná u všech jednotek ({{total}})",
+                attendanceOkBody:
+                    "{{present}} přítomno · {{absent}} nepřítomno · {{ineligible}} nemůže hlasovat",
+                attendanceMissingTitle_one:
+                    "U {{count}} jednotky není docházka zapsaná",
+                attendanceMissingTitle_few:
+                    "U {{count}} jednotek není docházka zapsaná",
+                attendanceMissingTitle_other:
+                    "U {{count}} jednotek není docházka zapsaná",
+                attendanceMissingBody:
+                    "Nezapsaná jednotka se do výsledku počítá jako nepřítomná.",
+                attendanceEmptyTitle: "Zatím není zapsaná žádná docházka",
+                attendanceEmptyBody:
+                    "Záznam, ve kterém není zapsaná jediná jednotka, publikovat nelze.",
+                attendanceAction: "Projít jednotky",
+                answersOkTitle: "Každá přítomná jednotka má zapsaný hlas",
+                answersOkBody_one: "Zapsán {{count}} hlas.",
+                answersOkBody_few: "Zapsány {{count}} hlasy.",
+                answersOkBody_other: "Zapsáno {{count}} hlasů.",
+                answersMissingTitle_one:
+                    "{{count}} přítomná jednotka nemá zapsaný hlas",
+                answersMissingTitle_few:
+                    "{{count}} přítomné jednotky nemají zapsaný hlas",
+                answersMissingTitle_other:
+                    "{{count}} přítomných jednotek nemá zapsaný hlas",
+                answersMissingBody:
+                    "Dokud hlasy nezadáte, jejich podíly se do většiny nepočítají.",
+                answersActionAbstain: "Zapsat všem „zdržuji se“",
+                answersActionGo: "Jít je zadat",
+                quorumBody:
+                    "Přítomno {{percent}} všech hlasů · potřeba víc než polovina",
+                dateOkTitle: "Datum konání je vyplněné",
+                dateMissingTitle: "Datum konání chybí",
+                dateMissingBody:
+                    "Bez data se vlastníci určí podle dnešního stavu, ne podle stavu v den zasedání.",
+            },
+            outcomesEyebrow: "Co se publikuje",
+            resolution: "Usnesení {{index}}",
+            reasonApproved:
+                "Pro hlasovalo {{percent}} rozhodujících hlasů — nad hranicí {{threshold}}.",
+            reasonRejected:
+                "Pro hlasovalo {{percent}} rozhodujících hlasů — na hranici {{threshold}} to nestačí.",
+            reasonWinner:
+                "Nejvíc hlasů získala možnost {{option}} ({{percent}}).",
+            reasonNoQuorum:
+                "Zasedání nebylo usnášeníschopné, takže se usnesení nepřijalo.",
+            reasonNoMajority: "Žádná z možností nedosáhla potřebné většiny.",
+            denominatorVotesCast: "Procenta jsou z hlasů přítomných.",
+            denominatorAllVotes: "Procenta jsou ze všech hlasů v domě.",
+            noPreview:
+                "Hlasování zatím nemá nastavená pravidla, takže výsledek spočítat nelze.",
+            noQuestions: "Hlasování nemá žádná usnesení.",
+            publishTitle: "Publikovat záznam",
+            publishBody:
+                "Publikací se hlasování uzavře, spočítá se výsledek a vlastníci hlasování i s výsledky uvidí poprvé. Zadané hlasy se stanou konečnými a už je nepůjde změnit — oprava by znamenala nový záznam.",
+            confirm: "Potvrzuji, že záznam odpovídá zápisu ze zasedání.",
+            confirmWithDate:
+                "Potvrzuji, že záznam odpovídá zápisu ze zasedání konaného {{date}}.",
+            publish: "Publikovat výsledky",
+            keepRecording: "Pokračovat v zápisu",
+            blocked: "Nejdřív doplňte, co chybí výš",
+        },
+        published: {
+            title: "Záznam je publikovaný",
+            lead: "Hlasování {{title}} je uzavřené a vlastníci ho vidí i s výsledky.",
+            rowAttendance: "Docházka",
+            rowAttendanceValue:
+                "{{present}} z {{total}} jednotek · {{percent}}",
+            rowBallots: "Zapsaných hlasů",
+            rowVisibleTo: "Viditelné pro",
+            rowVisibleToValue: "Všechny vlastníky jednotek",
+            auditNote:
+                "Každý zapsaný hlas je v protokolu i s tím, kdo ho zadal a kdy.",
+            results: "Zobrazit výsledky",
+            back: "Zpět na hlasování",
         },
     },
     wizard: {

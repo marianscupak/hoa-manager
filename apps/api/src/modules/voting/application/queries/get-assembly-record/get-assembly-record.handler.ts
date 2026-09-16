@@ -22,6 +22,8 @@ import {
   type VoteWriteRepository,
 } from '@/modules/voting/application/ports/vote-write.repository.port';
 import { isRecordableAtAssembly } from '@/modules/voting/domain/vote/assembly-eligibility';
+import { deriveQuestionOutcome } from '@/modules/voting/domain/vote/question-outcome';
+import { computeVoteResults } from '@/modules/voting/domain/vote/tally';
 import {
   ElectorateIneligibleReason,
   QuorumMeasure,
@@ -132,27 +134,100 @@ export class GetAssemblyRecordHandler
         )
       : false;
 
-    const questions = vote.questions.map((question) => ({
-      questionId: question.id,
-      title: question.title,
-      options: question.options.map((option) => {
-        const voters = units.filter((u) =>
-          u.answers.some((a) => a.optionId === option.id),
-        );
-        return {
-          optionId: option.id,
-          optionKey: option.optionKey,
-          label: option.label,
-          weight: toFractionDto(
-            Rational.sum(voters.map((u) => weightOf(u.unitId))),
+    // The same `computeVoteResults` the publish path runs, over the ballots
+    // entered so far. The review screen promises the board an outcome before
+    // it commits to one, and that promise only holds if a single function
+    // produces both answers — the tie rule, the exclusion of abstentions from
+    // the winner and the denominator basis all live in there.
+    const ruleset = vote.ruleset;
+    const withBallot = units.filter((u) => u.answers.length > 0);
+    const tally = ruleset
+      ? computeVoteResults({
+          mode: vote.mode,
+          quorum: ruleset.quorum,
+          questions: vote.questions.map((question) => {
+            const effective = question.rulesetOverride ?? ruleset;
+            return {
+              id: question.id,
+              options: question.options.map((option) => ({
+                id: option.id,
+                optionKey: option.optionKey,
+              })),
+              rules: {
+                basis: effective.majorityDenominatorBasis,
+                threshold: effective.majorityThreshold,
+                comparator: effective.majorityComparator,
+              },
+            };
+          }),
+          electorate,
+          // One synthetic ballot per unit that has answers: the tally only
+          // uses the id to join an answer back to its unit, and emitting one
+          // per *present* unit instead would overstate participation.
+          ballots: withBallot.map((u) => ({
+            ballotId: u.unitId,
+            unitId: u.unitId,
+          })),
+          answers: withBallot.flatMap((u) =>
+            u.answers.map((a) => ({ ballotId: u.unitId, ...a })),
           ),
-          unitCount: voters.length,
-        };
-      }),
-    }));
+        })
+      : null;
+
+    const tallyByQuestion = new Map(
+      (tally?.questionResults ?? []).map((q) => [q.questionId, q]),
+    );
+
+    const questions = vote.questions.map((question) => {
+      const result = tallyByQuestion.get(question.id) ?? null;
+      const optionResults = new Map(
+        (result?.optionResults ?? []).map((o) => [o.optionId, o]),
+      );
+      const winningOptionKey =
+        question.options.find((o) => o.id === result?.winningOptionId)
+          ?.optionKey ?? null;
+
+      return {
+        questionId: question.id,
+        title: question.title,
+        type: question.type,
+        options: question.options.map((option) => {
+          const tallied = optionResults.get(option.id);
+          return {
+            optionId: option.id,
+            optionKey: option.optionKey,
+            label: option.label,
+            weight: toFractionDto(tallied?.voteWeight ?? Rational.zero()),
+            unitCount: tallied?.voteUnitCount ?? 0,
+          };
+        }),
+        preview: result
+          ? {
+              // Quorum is the attendance the screen shows, not the tally's
+              // ballot-based participation. The two diverge while the board
+              // types — every question would read "not decided" until the
+              // last ballot landed — and coincide at publish, which is what
+              // the completeness gate is for. A ruleset with no quorum rule
+              // passes null through, the way `tally.ts` does.
+              outcome: deriveQuestionOutcome({
+                questionType: question.type,
+                quorumMet: ruleset?.quorum ? quorate : null,
+                majorityMet: result.majorityMet,
+                winningOptionKey,
+              }),
+              majorityMet: result.majorityMet,
+              winningOptionId: result.winningOptionId,
+              majorityThreshold: result.majorityThreshold,
+              majorityComparator: result.majorityComparator,
+              majorityDenominator: toFractionDto(result.majorityDenominator),
+            }
+          : null,
+      };
+    });
 
     return {
       voteTitle: vote.title,
+      status: vote.status,
       meetingDate: vote.scheduledFrom?.toISOString() ?? null,
       weightBasis: vote.ruleset?.weightBasis ?? 'UNIT_SHARE',
       totals: {

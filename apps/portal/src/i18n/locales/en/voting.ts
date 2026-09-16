@@ -303,8 +303,12 @@ export const voting = {
             heldOn: "Meeting held {{date}} · entering the collected ballots",
             noDate: "No meeting date recorded",
             exit: "Exit",
+            exitPublished: "Back to voting",
+            heldOnPublished: "Meeting held {{date}} · record published",
             recording: "Recording",
+            closed: "Closed",
             hidden: "Hidden from owners",
+            visible: "Visible to owners",
         },
         attendance: {
             ofAllVotes: "of all votes present",
@@ -320,7 +324,8 @@ export const voting = {
             entered: "{{entered}} of {{present}} present units entered",
             units_one: "{{count}} unit",
             units_other: "{{count}} units",
-            footnoteShare: "Board only · shares of all votes in the building · provisional until published",
+            footnoteShare:
+                "Board only · shares of all votes in the building · provisional until published",
             footnoteUnits: "Board only · provisional until published",
         },
         roster: {
@@ -358,12 +363,17 @@ export const voting = {
             voterProxy: "Someone else, by power of attorney",
             voterProxyPlaceholder: "Name of the person who voted",
             resolution: "Resolution {{index}}",
-            answersIncomplete: "{{count}} resolutions still to answer — the ballot is saved once every one is filled in.",
-            answersFootnote: "Enter what the minutes record for this unit. A present unit that did not vote on a resolution is recorded as abstaining.",
-            absentExplainer: "Marked absent — nothing to enter. The majority is counted from the votes of those present, so this unit's {{percent}} is left out of it. The same share still counts toward quorum.",
+            answersIncomplete:
+                "{{count}} resolutions still to answer — the ballot is saved once every one is filled in.",
+            answersFootnote:
+                "Enter what the minutes record for this unit. A present unit that did not vote on a resolution is recorded as abstaining.",
+            absentExplainer:
+                "Marked absent — nothing to enter. The majority is counted from the votes of those present, so this unit's {{percent}} is left out of it. The same share still counts toward quorum.",
             ineligible: {
-                MISSING_OWNERSHIP: "The unit has no registered owner. It counts toward quorum but cannot vote — add an owner in the unit register.",
-                ASSOCIATION_OWNED: "The association owns this unit, so it does not vote and does not count toward quorum.",
+                MISSING_OWNERSHIP:
+                    "The unit has no registered owner. It counts toward quorum but cannot vote — add an owner in the unit register.",
+                ASSOCIATION_OWNED:
+                    "The association owns this unit, so it does not vote and does not count toward quorum.",
             },
         },
         footer: {
@@ -372,6 +382,94 @@ export const voting = {
             allEntered: "all present units entered",
             nextToEnter: "Next unit to enter",
             review: "Review & publish",
+        },
+        review: {
+            back: "Back to recording",
+            title: "Review the assembly record",
+            lead: "This is the last point at which anything can be corrected. Publishing computes the result and reveals the vote to owners.",
+            attendanceEyebrow: "Attendance",
+            statPresent: "present · {{percent}} of votes",
+            statAbsent: "absent · {{percent}} of votes",
+            statIneligible: "cannot vote · {{percent}} of votes",
+            quorumOkTitle: "The assembly was quorate",
+            quorumOkBody:
+                "Owners holding {{percent}} of all votes were present, more than half. Resolutions are decided by a majority of those present.",
+            quorumShortTitle: "The assembly was not quorate",
+            quorumShortBody:
+                "Owners holding only {{percent}} of all votes were present. Nothing voted on at the meeting can be adopted — publishing records every resolution as not decided.",
+            checksEyebrow: "Before publishing",
+            checks: {
+                attendanceOkTitle:
+                    "Attendance recorded for all {{total}} units",
+                attendanceOkBody:
+                    "{{present}} present · {{absent}} absent · {{ineligible}} cannot vote",
+                attendanceMissingTitle_one:
+                    "{{count}} unit has no attendance recorded",
+                attendanceMissingTitle_other:
+                    "{{count}} units have no attendance recorded",
+                attendanceMissingBody:
+                    "A unit left unset counts as absent in the result.",
+                attendanceEmptyTitle: "No attendance recorded yet",
+                attendanceEmptyBody:
+                    "A record with not a single unit entered cannot be published.",
+                attendanceAction: "Go through the units",
+                answersOkTitle: "Every present unit has a ballot",
+                answersOkBody_one: "{{count}} ballot entered.",
+                answersOkBody_other: "{{count}} ballots entered.",
+                answersMissingTitle_one:
+                    "{{count}} present unit has no ballot yet",
+                answersMissingTitle_other:
+                    "{{count}} present units have no ballot yet",
+                answersMissingBody:
+                    "Their shares stay out of the count until entered.",
+                answersActionAbstain: "Record all as Abstain",
+                answersActionGo: "Go enter them",
+                quorumBody:
+                    "{{percent}} of all votes present · more than half required",
+                dateOkTitle: "Meeting date recorded",
+                dateMissingTitle: "Meeting date is missing",
+                dateMissingBody:
+                    "Without it the owners are resolved as of today rather than as of the meeting.",
+            },
+            outcomesEyebrow: "What will be published",
+            resolution: "Resolution {{index}}",
+            reasonApproved:
+                "{{percent}} of the deciding votes were in favour — above the {{threshold}} bar.",
+            reasonRejected:
+                "{{percent}} of the deciding votes were in favour — short of the {{threshold}} bar.",
+            reasonWinner: "{{option}} drew the most votes ({{percent}}).",
+            reasonNoQuorum:
+                "The assembly was not quorate, so the resolution was not adopted.",
+            reasonNoMajority: "No option reached the required majority.",
+            denominatorVotesCast: "Percentages are of the votes present.",
+            denominatorAllVotes:
+                "Percentages are of all votes in the building.",
+            noPreview:
+                "The vote has no rules set yet, so no result can be computed.",
+            noQuestions: "This vote has no resolutions.",
+            publishTitle: "Publish the record",
+            publishBody:
+                "Publishing closes the vote, computes the final result and shows the vote and its results to unit owners for the first time. Entered ballots become final and cannot be changed afterwards — a correction would need a new record.",
+            confirm:
+                "I confirm this record matches the minutes of the assembly.",
+            confirmWithDate:
+                "I confirm this record matches the minutes of the assembly held on {{date}}.",
+            publish: "Publish results",
+            keepRecording: "Keep recording",
+            blocked: "Fix what is missing above first",
+        },
+        published: {
+            title: "The record is published",
+            lead: "{{title}} is closed and visible to all unit owners, together with its results.",
+            rowAttendance: "Attendance",
+            rowAttendanceValue: "{{present}} of {{total}} units · {{percent}}",
+            rowBallots: "Ballots entered",
+            rowVisibleTo: "Visible to",
+            rowVisibleToValue: "All unit owners",
+            auditNote:
+                "Every entered ballot is in the audit log, with the board member who entered it and the time.",
+            results: "View results",
+            back: "Back to voting",
         },
     },
     wizard: {
@@ -434,7 +532,8 @@ export const voting = {
             voteAction: "Vote",
             manageDelegation: "Manage representation",
             readyToVoteSubtitle: "You are eligible when voting opens.",
-            alreadyDelegatedSubtitle: "You have chosen a common representative.",
+            alreadyDelegatedSubtitle:
+                "You have chosen a common representative.",
             scheduledSubtitle: "This vote has not started yet.",
             viewDetails: "View Details",
             alreadyDelegatedOpenSubtitle:

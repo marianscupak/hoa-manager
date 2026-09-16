@@ -6610,6 +6610,48 @@
           "unitCount"
         ]
       },
+      "AssemblyRecordPreviewDto": {
+        "type": "object",
+        "properties": {
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "APPROVED",
+              "REJECTED",
+              "WINNER",
+              "NOT_DECIDED"
+            ]
+          },
+          "majorityMet": {
+            "type": "boolean"
+          },
+          "winningOptionId": {
+            "type": "string",
+            "nullable": true
+          },
+          "majorityThreshold": {
+            "$ref": "#/components/schemas/RulesetFractionDto"
+          },
+          "majorityComparator": {
+            "type": "string",
+            "enum": [
+              "STRICT_GREATER",
+              "AT_LEAST"
+            ]
+          },
+          "majorityDenominator": {
+            "$ref": "#/components/schemas/FractionDto"
+          }
+        },
+        "required": [
+          "outcome",
+          "majorityMet",
+          "winningOptionId",
+          "majorityThreshold",
+          "majorityComparator",
+          "majorityDenominator"
+        ]
+      },
       "AssemblyRecordQuestionDto": {
         "type": "object",
         "properties": {
@@ -6619,17 +6661,34 @@
           "title": {
             "type": "string"
           },
+          "type": {
+            "type": "string",
+            "enum": [
+              "YES_NO",
+              "SINGLE_CHOICE"
+            ]
+          },
           "options": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/AssemblyRecordOptionDto"
             }
+          },
+          "preview": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AssemblyRecordPreviewDto"
+              }
+            ]
           }
         },
         "required": [
           "questionId",
           "title",
-          "options"
+          "type",
+          "options",
+          "preview"
         ]
       },
       "AssemblyRecordResponseDto": {
@@ -6637,6 +6696,16 @@
         "properties": {
           "voteTitle": {
             "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "SCHEDULED",
+              "OPEN",
+              "CLOSED",
+              "CANCELLED"
+            ]
           },
           "meetingDate": {
             "type": "string",
@@ -6667,6 +6736,7 @@
         },
         "required": [
           "voteTitle",
+          "status",
           "meetingDate",
           "weightBasis",
           "totals",

@@ -28,7 +28,10 @@ const answers = (n: number) =>
 describe("rosterState", () => {
     it("is complete when a present unit has answered every question", () => {
         expect(
-            rosterState(unit({ attendance: "PRESENT", answers: answers(2) }), 2),
+            rosterState(
+                unit({ attendance: "PRESENT", answers: answers(2) }),
+                2,
+            ),
         ).toBe("complete");
     });
 
@@ -36,7 +39,10 @@ describe("rosterState", () => {
         // This is the state the publish gate blocks on, so the roster has to
         // separate it from "absent" and from "not looked at yet".
         expect(
-            rosterState(unit({ attendance: "PRESENT", answers: answers(1) }), 2),
+            rosterState(
+                unit({ attendance: "PRESENT", answers: answers(1) }),
+                2,
+            ),
         ).toBe("toEnter");
     });
 
@@ -63,7 +69,9 @@ describe("rosterState", () => {
 
     it("treats a vote with no questions as complete once a unit is present", () => {
         // Guards against `0 < 0` reading as incomplete and stranding the board.
-        expect(rosterState(unit({ attendance: "PRESENT" }), 0)).toBe("complete");
+        expect(rosterState(unit({ attendance: "PRESENT" }), 0)).toBe(
+            "complete",
+        );
     });
 });
 
@@ -90,9 +98,9 @@ describe("filterRoster", () => {
     ];
 
     it("matches the search against the unit number", () => {
-        expect(filterRoster(rows, 2, "all", "B-2").map((u) => u.unitId)).toEqual(
-            ["c"],
-        );
+        expect(
+            filterRoster(rows, 2, "all", "B-2").map((u) => u.unitId),
+        ).toEqual(["c"]);
     });
 
     it("matches the search against an owner name, ignoring case", () => {
@@ -108,12 +116,12 @@ describe("filterRoster", () => {
     });
 
     it("treats a unit nobody has reached as neither present nor absent", () => {
-        expect(filterRoster(rows, 2, "present", "").map((u) => u.unitId)).toEqual(
-            ["a"],
-        );
-        expect(filterRoster(rows, 2, "absent", "").map((u) => u.unitId)).toEqual(
-            ["b"],
-        );
+        expect(
+            filterRoster(rows, 2, "present", "").map((u) => u.unitId),
+        ).toEqual(["a"]);
+        expect(
+            filterRoster(rows, 2, "absent", "").map((u) => u.unitId),
+        ).toEqual(["b"]);
     });
 
     it("returns everything for the all filter and an empty search", () => {

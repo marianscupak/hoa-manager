@@ -17,6 +17,7 @@ import {
   QuorumMeasure,
   ThresholdComparator,
   VoteMode,
+  VoteQuestionType,
   VoteStatus,
   VoteWeightBasis,
 } from '@/modules/voting/domain/vote/vote.types';
@@ -51,6 +52,8 @@ function build(options: {
   units: UnitSpec[];
   attendance?: AttendanceRow[];
   weightBasis?: VoteWeightBasis;
+  /** A vote can reach the recording screen before its rules are set. */
+  noRuleset?: boolean;
 }) {
   const vote = {
     id: 'vote-1',
@@ -59,11 +62,14 @@ function build(options: {
     mode: VoteMode.ASSEMBLY_RECORD,
     status: VoteStatus.DRAFT,
     scheduledFrom: new Date('2026-09-12T18:30:00Z'),
-    ruleset: { ...RULESET, weightBasis: options.weightBasis ?? RULESET.weightBasis },
+    ruleset: options.noRuleset
+      ? null
+      : { ...RULESET, weightBasis: options.weightBasis ?? RULESET.weightBasis },
     questions: [
       {
         id: 'q1',
         title: 'Approve the budget?',
+        type: VoteQuestionType.YES_NO,
         options: [
           { id: 'o-yes', optionKey: 'YES', label: 'Ano' },
           { id: 'o-no', optionKey: 'NO', label: 'Ne' },
@@ -248,6 +254,115 @@ describe('GetAssemblyRecordHandler', () => {
     const result = await handler.execute(query());
 
     expect(result.totals.quorate).toBe(true);
+  });
+
+  it('previews the outcome publishing would write', async () => {
+    // The review screen tells the board "Approved" before it commits. That
+    // promise only holds because the same `computeVoteResults` produces both
+    // this preview and the published result.
+    const { handler } = build({
+      units: [
+        {
+          unitId: 'u1',
+          weight: [3, 4],
+          answers: [{ questionId: 'q1', optionId: 'o-yes' }],
+        },
+        {
+          unitId: 'u2',
+          weight: [1, 4],
+          answers: [{ questionId: 'q1', optionId: 'o-no' }],
+        },
+      ],
+      attendance: [present('u1'), present('u2')],
+    });
+
+    const result = await handler.execute(query());
+
+    expect(result.questions[0].preview).toMatchObject({
+      outcome: 'APPROVED',
+      majorityMet: true,
+      winningOptionId: 'o-yes',
+      // Votes cast, not all votes: both units voted, so the two coincide.
+      majorityDenominator: { num: '1', den: '1' },
+    });
+  });
+
+  it('reads a yes/no question the NO side won as rejected', async () => {
+    // `majorityMet` alone never means approved — the winning option decides.
+    const { handler } = build({
+      units: [
+        {
+          unitId: 'u1',
+          weight: [3, 4],
+          answers: [{ questionId: 'q1', optionId: 'o-no' }],
+        },
+      ],
+      attendance: [present('u1')],
+    });
+
+    const result = await handler.execute(query());
+
+    expect(result.questions[0].preview).toMatchObject({
+      outcome: 'REJECTED',
+      majorityMet: true,
+      winningOptionId: 'o-no',
+    });
+  });
+
+  it('measures the preview quorum by attendance, not by ballots entered', async () => {
+    // Both units are in the room, so the assembly is quorate — but only one
+    // ballot is typed in so far. Judging quorum by the ballots would read
+    // every question as not decided until the last one landed.
+    const { handler } = build({
+      units: [
+        {
+          unitId: 'u1',
+          weight: [1, 4],
+          answers: [{ questionId: 'q1', optionId: 'o-yes' }],
+        },
+        { unitId: 'u2', weight: [3, 4] },
+      ],
+      attendance: [present('u1'), present('u2')],
+    });
+
+    const result = await handler.execute(query());
+
+    expect(result.totals.quorate).toBe(true);
+    expect(result.questions[0].preview!.outcome).toBe('APPROVED');
+  });
+
+  it('leaves every question undecided while the assembly is short of quorum', async () => {
+    // The one unit in the room voted yes unanimously, and it still decides
+    // nothing.
+    const { handler } = build({
+      units: [
+        {
+          unitId: 'u1',
+          weight: [1, 4],
+          answers: [{ questionId: 'q1', optionId: 'o-yes' }],
+        },
+        { unitId: 'u2', weight: [3, 4] },
+      ],
+      attendance: [present('u1')],
+    });
+
+    const result = await handler.execute(query());
+
+    expect(result.totals.quorate).toBe(false);
+    expect(result.questions[0].preview).toMatchObject({
+      outcome: 'NOT_DECIDED',
+      majorityMet: true,
+    });
+  });
+
+  it('has no preview before the vote has a ruleset', async () => {
+    // Nothing to compare a majority against, so the review screen shows no
+    // verdicts rather than inventing a threshold.
+    const { handler } = build({ units: [{ unitId: 'u1' }], noRuleset: true });
+
+    const result = await handler.execute(query());
+
+    expect(result.questions[0].preview).toBeNull();
   });
 
   it('carries the meeting date and the weight basis the screen needs', async () => {

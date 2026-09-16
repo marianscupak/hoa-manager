@@ -6,6 +6,7 @@ import { AuditProjectionsModule } from '@/modules/core/audit-projections/audit-p
 import { AuthModule } from '@/modules/core/auth/auth.module';
 import { IdentityModule } from '@/modules/core/identity/identity.module';
 import { MemberController } from '@/modules/core/tenancy/api/member.controller';
+import { PeopleController } from '@/modules/core/tenancy/api/people.controller';
 import { TenancyController } from '@/modules/core/tenancy/api/tenancy.controller';
 import { CreateMembershipHandler } from '@/modules/core/tenancy/application/handlers/create-membership.handler';
 import { CreateTenantHandler } from '@/modules/core/tenancy/application/handlers/create-tenant.handler';
@@ -14,7 +15,10 @@ import { GetMembershipsByUserIdHandler } from '@/modules/core/tenancy/applicatio
 import { GetTenantByIdHandler } from '@/modules/core/tenancy/application/handlers/get-tenant-by-id.handler';
 import { GetUserTenantsHandler } from '@/modules/core/tenancy/application/handlers/get-user-tenants.handler';
 import { ListTenantContactsHandler } from '@/modules/core/tenancy/application/handlers/list-tenant-contacts.handler';
+import { ListPeopleHandler } from '@/modules/core/tenancy/application/handlers/list-people.handler';
 import { ListTenantMembersHandler } from '@/modules/core/tenancy/application/handlers/list-tenant-members.handler';
+import { PEOPLE_HOLDINGS_REPOSITORY } from '@/modules/core/tenancy/application/ports/people-holdings.repository.port';
+import { DrizzlePeopleHoldingsRepository } from '@/modules/core/tenancy/infrastructure/persistence/drizzle-people-holdings.repository';
 import { UpdateMemberRoleHandler } from '@/modules/core/tenancy/application/handlers/update-member-role.handler';
 import { UpdateMembershipStatusHandler } from '@/modules/core/tenancy/application/handlers/update-membership-status.handler';
 import {
@@ -40,6 +44,7 @@ const QueryHandlers = [
   GetMembershipsByUserIdHandler,
   ListTenantMembersHandler,
   ListTenantContactsHandler,
+  ListPeopleHandler,
 ];
 
 @Module({
@@ -50,10 +55,14 @@ const QueryHandlers = [
     forwardRef(() => AuditModule),
     AuditProjectionsModule,
   ],
-  controllers: [TenancyController, MemberController],
+  controllers: [TenancyController, MemberController, PeopleController],
   providers: [
     { provide: TENANT_REPOSITORY, useClass: DrizzleTenantRepository },
     { provide: MEMBERSHIP_REPOSITORY, useClass: DrizzleMembershipRepository },
+    {
+      provide: PEOPLE_HOLDINGS_REPOSITORY,
+      useClass: DrizzlePeopleHoldingsRepository,
+    },
     TenancyAuditRegistration,
     ...CommandHandlers,
     ...QueryHandlers,

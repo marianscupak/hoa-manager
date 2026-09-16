@@ -13,9 +13,7 @@ import { MembershipStatusUpdatedAuditEvent } from '@/modules/core/tenancy/audit/
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 
 @CommandHandler(UpdateMembershipStatusCommand)
-export class UpdateMembershipStatusHandler
-  implements ICommandHandler<UpdateMembershipStatusCommand>
-{
+export class UpdateMembershipStatusHandler implements ICommandHandler<UpdateMembershipStatusCommand> {
   constructor(
     @Inject(MEMBERSHIP_REPOSITORY)
     private readonly membershipRepo: MembershipRepository,

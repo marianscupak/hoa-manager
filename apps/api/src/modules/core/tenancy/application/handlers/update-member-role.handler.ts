@@ -20,9 +20,7 @@ import { DomainException } from '@/shared/errors/domain.exception';
 import { ErrorCode } from '@/shared/errors/error-codes';
 
 @CommandHandler(UpdateMemberRoleCommand)
-export class UpdateMemberRoleHandler
-  implements ICommandHandler<UpdateMemberRoleCommand>
-{
+export class UpdateMemberRoleHandler implements ICommandHandler<UpdateMemberRoleCommand> {
   constructor(
     @Inject(MEMBERSHIP_REPOSITORY)
     private readonly membershipRepository: MembershipRepository,

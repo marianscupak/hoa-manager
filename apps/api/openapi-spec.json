@@ -517,6 +517,70 @@
         ]
       }
     },
+    "/api/people": {
+      "get": {
+        "operationId": "PeopleController_getPeople",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PersonResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Validation or Domain logic error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "People"
+        ]
+      }
+    },
     "/api/identity/users/me/language": {
       "put": {
         "operationId": "IdentityController_updateLanguage",
@@ -3931,6 +3995,106 @@
         },
         "required": [
           "role"
+        ]
+      },
+      "PersonResponseDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "OWNER",
+              "MEMBER"
+            ]
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "ownerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "PERSON",
+              "LEGAL_ENTITY",
+              "ASSOCIATION"
+            ],
+            "nullable": true
+          },
+          "ico": {
+            "type": "string",
+            "nullable": true
+          },
+          "unitCount": {
+            "type": "number"
+          },
+          "sharePercent": {
+            "type": "string"
+          },
+          "hasOwnershipRecords": {
+            "type": "boolean"
+          },
+          "membershipId": {
+            "type": "string",
+            "nullable": true
+          },
+          "userId": {
+            "type": "string",
+            "nullable": true
+          },
+          "role": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "nullable": true
+          },
+          "joinedAt": {
+            "type": "string",
+            "nullable": true
+          },
+          "inviteStatus": {
+            "type": "string",
+            "nullable": true
+          },
+          "inviteCreatedAt": {
+            "type": "string",
+            "nullable": true
+          },
+          "suggestedCounterpartKey": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "key",
+          "source",
+          "displayName",
+          "email",
+          "ownerId",
+          "kind",
+          "ico",
+          "unitCount",
+          "sharePercent",
+          "hasOwnershipRecords",
+          "membershipId",
+          "userId",
+          "role",
+          "status",
+          "joinedAt",
+          "inviteStatus",
+          "inviteCreatedAt",
+          "suggestedCounterpartKey"
         ]
       },
       "UpdateUserLanguageDto": {

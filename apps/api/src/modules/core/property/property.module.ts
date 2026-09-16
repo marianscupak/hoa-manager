@@ -25,6 +25,8 @@ import { PreviewKatastrImportHandler } from '@/modules/core/property/application
 import { ReplaceUnitOwnershipHandler } from '@/modules/core/property/application/handlers/replace-unit-ownership.handler';
 import { SetOwnerEmailHandler } from '@/modules/core/property/application/handlers/set-owner-email.handler';
 import { SetOwnerUserIdHandler } from '@/modules/core/property/application/handlers/set-owner-user-id.handler';
+import { LinkOwnerToAccountHandler } from '@/modules/core/property/application/handlers/link-owner-to-account.handler';
+import { UnlinkOwnerFromAccountHandler } from '@/modules/core/property/application/handlers/unlink-owner-from-account.handler';
 import { UpdateUnitHandler } from '@/modules/core/property/application/handlers/update-unit.handler';
 import { KATASTR_SNAPSHOT_REPOSITORY } from '@/modules/core/property/application/ports/katastr-snapshot.repository.port';
 import { OWNER_READ_REPOSITORY } from '@/modules/core/property/application/ports/owner-read.repository.port';
@@ -54,6 +56,8 @@ const CommandHandlers = [
   CancelScheduledOwnershipTransferHandler,
   SetOwnerEmailHandler,
   SetOwnerUserIdHandler,
+  LinkOwnerToAccountHandler,
+  UnlinkOwnerFromAccountHandler,
   UpdateUnitHandler,
   DeleteUnitHandler,
   DeleteOwnerHandler,

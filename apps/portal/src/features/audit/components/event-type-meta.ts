@@ -9,6 +9,7 @@ import {
     Home,
     Import,
     Link2,
+    Unlink,
     Lock,
     MailPlus,
     MailX,
@@ -104,6 +105,7 @@ const META: Record<string, EventTypeMeta> = {
     },
     "CORE.OWNER_EMAIL_ADDED": { icon: MailPlus, dotColor: "bg-faint" },
     "CORE.OWNER_USER_LINKED": { icon: Link2, dotColor: "bg-faint" },
+    "CORE.OWNER_USER_UNLINKED": { icon: Unlink, dotColor: "bg-faint" },
     "CORE.OWNER_INVITE_SENT": { icon: MailPlus, dotColor: "bg-faint" },
     "CORE.OWNER_INVITE_REVOKED": {
         icon: MailX,

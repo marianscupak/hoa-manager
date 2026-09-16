@@ -38,6 +38,7 @@ export const audit = {
             "Naplánovaná změna vlastnictví zrušena",
         OWNER_EMAIL_ADDED: "Vlastníkovi přidán e-mail",
         OWNER_USER_LINKED: "Vlastník propojen s uživatelem",
+        OWNER_USER_UNLINKED: "Propojení vlastníka s účtem zrušeno",
         OWNER_INVITE_SENT: "Pozvánka odeslána",
         OWNER_INVITE_REVOKED: "Pozvánka zrušena",
         OWNER_INVITE_ACCEPTED: "Nový vlastník se přidal",

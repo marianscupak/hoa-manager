@@ -128,6 +128,14 @@ const PAYLOADS: Record<CoreEventType, Record<string, unknown>> = {
       linkedBy: 'Alice Admin',
     },
   },
+  [CoreEventType.OWNER_USER_UNLINKED]: {
+    userId: '11111111-1111-1111-1111-111111111111',
+    labels: {
+      ownerName: 'Bob Owner',
+      userName: 'Bob User',
+      unlinkedBy: 'Alice Admin',
+    },
+  },
   [CoreEventType.OWNER_EMAIL_ADDED]: {
     labels: { ownerName: 'Bob Owner', addedBy: 'Alice Admin' },
   },

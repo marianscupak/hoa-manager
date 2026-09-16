@@ -86,6 +86,7 @@ export * from "./katastrImportPreviewResponseDtoUnitsNotInFileItem";
 export * from "./katastrImportPreviewResponseDtoWarningsItem";
 export * from "./katastrImportResultResponseDto";
 export * from "./katastrImportResultResponseDtoCounts";
+export * from "./linkOwnerAccountDto";
 export * from "./loginDto";
 export * from "./memberResponseDto";
 export * from "./memberResponseDtoRole";

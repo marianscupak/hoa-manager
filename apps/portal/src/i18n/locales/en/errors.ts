@@ -57,6 +57,11 @@ export default {
     RULESET_CHANGE_BLOCKED:
         "Voting ruleset cannot be changed anymore as the vote has started or already contains questions.",
     VOTE_SCHEDULE_IN_PAST: "Scheduled dates cannot be in the past.",
+    OWNER_ALREADY_LINKED:
+        "This owner already has an account linked. Remove the link first.",
+    OWNER_NOT_LINKED: "This owner has no account linked.",
+    USER_ALREADY_LINKED_TO_OWNER:
+        "This account already stands for another owner. An account can be linked to one owner only.",
     ASSEMBLY_MEETING_BEFORE_OWNERSHIP_RECORDS:
         "The meeting is dated before the ownership register begins ({{param}}). Who owned the units on that day is not on record, so it cannot be written up — pick a date from {{param}} onwards.",
     VOTE_SCHEDULE_INVALID_RANGE: "Invalid vote schedule range.",

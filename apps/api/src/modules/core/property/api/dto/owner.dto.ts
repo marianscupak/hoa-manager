@@ -28,6 +28,12 @@ export const setOwnerEmailSchema = z.object({
 
 export class SetOwnerEmailDto extends createZodDto(setOwnerEmailSchema) {}
 
+export const linkOwnerAccountSchema = z.object({
+  membershipId: z.uuid(),
+});
+
+export class LinkOwnerAccountDto extends createZodDto(linkOwnerAccountSchema) {}
+
 export class CreateOwnerResponseDto {
   @ApiProperty({
     description: 'The unique identifier of the newly created owner',

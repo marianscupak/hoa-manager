@@ -31,6 +31,27 @@ export class DuplicateOwnerEmailException extends DomainException {
   }
 }
 
+/** The owner already stands for an account; overwriting silently would move
+ *  the right to vote for their units without anyone noticing. */
+export class OwnerAlreadyLinkedException extends DomainException {
+  constructor() {
+    super(ErrorCode.OWNER_ALREADY_LINKED);
+  }
+}
+
+export class OwnerNotLinkedException extends DomainException {
+  constructor() {
+    super(ErrorCode.OWNER_NOT_LINKED);
+  }
+}
+
+/** `owners_tenant_user_unique`: one account may stand for one owner. */
+export class UserAlreadyLinkedToOwnerException extends DomainException {
+  constructor() {
+    super(ErrorCode.USER_ALREADY_LINKED_TO_OWNER);
+  }
+}
+
 export class OwnerEmailAlreadySetException extends DomainException {
   constructor() {
     super(ErrorCode.OWNER_EMAIL_ALREADY_SET);

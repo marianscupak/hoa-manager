@@ -223,6 +223,19 @@ export class CoreAuditFormatter implements AuditEventFormatter, OnModuleInit {
           }),
         };
       }
+      case CoreEventType.OWNER_USER_UNLINKED: {
+        const p = event.payload as {
+          labels: { ownerName: string; userName: string; unlinkedBy: string };
+        };
+        return {
+          ...base,
+          message: t(lang, 'owner.user.unlinked.privileged', {
+            actor: p.labels.unlinkedBy,
+            owner: p.labels.ownerName,
+            user: p.labels.userName,
+          }),
+        };
+      }
       case CoreEventType.OWNER_INVITE_SENT: {
         const p = event.payload as {
           labels: { ownerName: string; emailMasked: string; sentBy: string };

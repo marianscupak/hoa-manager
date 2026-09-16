@@ -58,6 +58,11 @@ export default {
     RULESET_CHANGE_BLOCKED:
         "Pravidla hlasování již nelze měnit, protože hlasování bylo zahájeno nebo již obsahuje otázky.",
     VOTE_SCHEDULE_IN_PAST: "Naplánovaná data nemohou být v minulosti.",
+    OWNER_ALREADY_LINKED:
+        "Tento vlastník už má propojený účet. Nejdřív propojení zrušte.",
+    OWNER_NOT_LINKED: "Tento vlastník nemá propojený účet.",
+    USER_ALREADY_LINKED_TO_OWNER:
+        "Tento účet už zastupuje jiného vlastníka. Jeden účet může být propojený jen s jedním vlastníkem.",
     ASSEMBLY_MEETING_BEFORE_OWNERSHIP_RECORDS:
         "Zasedání je datované před začátkem evidence vlastnictví ({{param}}). K tomu dni není známo, kdo jednotky vlastnil, takže zápis nelze pořídit — zvolte datum od {{param}} dál.",
     VOTE_SCHEDULE_INVALID_RANGE: "Harmonogram hlasování je neplatný.",

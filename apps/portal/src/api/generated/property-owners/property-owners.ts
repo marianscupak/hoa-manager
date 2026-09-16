@@ -25,6 +25,7 @@ import type {
     CreateOwnerDto,
     CreateOwnerResponseDto,
     ErrorResponseDto,
+    LinkOwnerAccountDto,
     OwnerResponseDto,
     SetOwnerEmailDto,
 } from ".././model";
@@ -516,6 +517,176 @@ export const useOwnerControllerRevokeInvite = <
 > => {
     return useMutation(
         getOwnerControllerRevokeInviteMutationOptions(options),
+        queryClient,
+    );
+};
+export const ownerControllerLinkAccount = (
+    ownerId: string,
+    linkOwnerAccountDto: BodyType<LinkOwnerAccountDto>,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<void>(
+        {
+            url: `/api/owners/${ownerId}/account`,
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            data: linkOwnerAccountDto,
+            signal,
+        },
+        options,
+    );
+};
+
+export const getOwnerControllerLinkAccountMutationOptions = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof ownerControllerLinkAccount>>,
+        TError,
+        { ownerId: string; data: BodyType<LinkOwnerAccountDto> },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof ownerControllerLinkAccount>>,
+    TError,
+    { ownerId: string; data: BodyType<LinkOwnerAccountDto> },
+    TContext
+> => {
+    const mutationKey = ["ownerControllerLinkAccount"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof ownerControllerLinkAccount>>,
+        { ownerId: string; data: BodyType<LinkOwnerAccountDto> }
+    > = (props) => {
+        const { ownerId, data } = props ?? {};
+
+        return ownerControllerLinkAccount(ownerId, data, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type OwnerControllerLinkAccountMutationResult = NonNullable<
+    Awaited<ReturnType<typeof ownerControllerLinkAccount>>
+>;
+export type OwnerControllerLinkAccountMutationBody =
+    BodyType<LinkOwnerAccountDto>;
+export type OwnerControllerLinkAccountMutationError =
+    ErrorType<ErrorResponseDto>;
+
+export const useOwnerControllerLinkAccount = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof ownerControllerLinkAccount>>,
+            TError,
+            { ownerId: string; data: BodyType<LinkOwnerAccountDto> },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof ownerControllerLinkAccount>>,
+    TError,
+    { ownerId: string; data: BodyType<LinkOwnerAccountDto> },
+    TContext
+> => {
+    return useMutation(
+        getOwnerControllerLinkAccountMutationOptions(options),
+        queryClient,
+    );
+};
+export const ownerControllerUnlinkAccount = (
+    ownerId: string,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<void>(
+        { url: `/api/owners/${ownerId}/account`, method: "DELETE", signal },
+        options,
+    );
+};
+
+export const getOwnerControllerUnlinkAccountMutationOptions = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof ownerControllerUnlinkAccount>>,
+        TError,
+        { ownerId: string },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof ownerControllerUnlinkAccount>>,
+    TError,
+    { ownerId: string },
+    TContext
+> => {
+    const mutationKey = ["ownerControllerUnlinkAccount"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof ownerControllerUnlinkAccount>>,
+        { ownerId: string }
+    > = (props) => {
+        const { ownerId } = props ?? {};
+
+        return ownerControllerUnlinkAccount(ownerId, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type OwnerControllerUnlinkAccountMutationResult = NonNullable<
+    Awaited<ReturnType<typeof ownerControllerUnlinkAccount>>
+>;
+
+export type OwnerControllerUnlinkAccountMutationError =
+    ErrorType<ErrorResponseDto>;
+
+export const useOwnerControllerUnlinkAccount = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof ownerControllerUnlinkAccount>>,
+            TError,
+            { ownerId: string },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof ownerControllerUnlinkAccount>>,
+    TError,
+    { ownerId: string },
+    TContext
+> => {
+    return useMutation(
+        getOwnerControllerUnlinkAccountMutationOptions(options),
         queryClient,
     );
 };

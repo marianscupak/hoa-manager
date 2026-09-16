@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Patch,
+  Put,
   Delete,
   Body,
   Param,
@@ -24,11 +25,14 @@ import {
   CreateOwnerDto,
   CreateOwnerResponseDto,
   OwnerResponseDto,
+  LinkOwnerAccountDto,
   SetOwnerEmailDto,
 } from '@/modules/core/property/api/dto/owner.dto';
 import { CreateOwnerCommand } from '@/modules/core/property/application/commands/create-owner.command';
 import { DeleteOwnerCommand } from '@/modules/core/property/application/commands/delete-owner.command';
+import { LinkOwnerToAccountCommand } from '@/modules/core/property/application/commands/link-owner-to-account.command';
 import { SetOwnerEmailCommand } from '@/modules/core/property/application/commands/set-owner-email.command';
+import { UnlinkOwnerFromAccountCommand } from '@/modules/core/property/application/commands/unlink-owner-from-account.command';
 import { ListOwnersQuery } from '@/modules/core/property/application/queries/list-owners.query';
 import type { OwnerKind } from '@/modules/core/property/domain/ownership-plan';
 import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
@@ -138,6 +142,42 @@ export class OwnerController {
   ): Promise<void> {
     return this.commandBus.execute<RevokeOwnerInviteCommand, void>(
       new RevokeOwnerInviteCommand(tenantCtx.tenantId, ownerId),
+    );
+  }
+
+  /**
+   * Board members maintain the owner register already — adding e-mails and
+   * sending invites — and linking an account is the same kind of work.
+   * Deleting an owner and changing a role stay with ADMIN.
+   */
+  @Put(':ownerId/account')
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({ description: 'Account linked to the owner' })
+  async linkAccount(
+    @Tenant() tenantCtx: TenantContext,
+    @Param('ownerId') ownerId: string,
+    @Body() dto: LinkOwnerAccountDto,
+  ): Promise<void> {
+    await this.commandBus.execute(
+      new LinkOwnerToAccountCommand(
+        tenantCtx.tenantId,
+        ownerId,
+        dto.membershipId,
+      ),
+    );
+  }
+
+  @Delete(':ownerId/account')
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({ description: 'Account unlinked from the owner' })
+  async unlinkAccount(
+    @Tenant() tenantCtx: TenantContext,
+    @Param('ownerId') ownerId: string,
+  ): Promise<void> {
+    await this.commandBus.execute(
+      new UnlinkOwnerFromAccountCommand(tenantCtx.tenantId, ownerId),
     );
   }
 

@@ -29,6 +29,8 @@ export const STRINGS: Record<
       `${v.actor} added an email address for owner ${v.owner}.`,
     'owner.user.linked.privileged': (v) =>
       `${v.actor} linked owner ${v.owner} to user ${v.user}.`,
+    'owner.user.unlinked.privileged': (v) =>
+      `${v.actor} removed the link between owner ${v.owner} and user ${v.user}.`,
     'invite.sent.privileged': (v) =>
       `${v.actor} sent an invitation to ${v.email} for owner ${v.owner}.`,
     'invite.revoked.privileged': (v) =>
@@ -65,6 +67,8 @@ export const STRINGS: Record<
       `${v.actor} přidal/a e-mail vlastníkovi ${v.owner}.`,
     'owner.user.linked.privileged': (v) =>
       `${v.actor} propojil/a vlastníka ${v.owner} s uživatelem ${v.user}.`,
+    'owner.user.unlinked.privileged': (v) =>
+      `${v.actor} zrušil/a propojení vlastníka ${v.owner} s uživatelem ${v.user}.`,
     'invite.sent.privileged': (v) =>
       `${v.actor} odeslal/a pozvánku na ${v.email} pro vlastníka ${v.owner}.`,
     'invite.revoked.privileged': (v) =>

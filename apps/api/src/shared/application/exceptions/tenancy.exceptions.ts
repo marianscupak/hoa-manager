@@ -6,3 +6,9 @@ export class TenantNotFoundException extends DomainException {
     super(ErrorCode.TENANT_NOT_FOUND);
   }
 }
+
+export class MembershipNotFoundException extends DomainException {
+  constructor() {
+    super(ErrorCode.MEMBERSHIP_NOT_FOUND);
+  }
+}

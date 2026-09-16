@@ -124,6 +124,14 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
       };
     });
 
+    // EXISTS rather than COUNT: the aggregate only needs to know whether the
+    // vote is frozen to editing, not how many ballots there are.
+    const ballotRow = await this.db
+      .select({ id: ballots.id })
+      .from(ballots)
+      .where(and(eq(ballots.tenantId, tenantId), eq(ballots.voteId, id)))
+      .limit(1);
+
     return VoteAggregate.rehydrate({
       ...vote,
       status: vote.status as VoteStatus,
@@ -131,6 +139,7 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
       description: vote.description ?? '',
       ruleset: ruleset ? mapRulesetRow(ruleset) : null,
       questions,
+      hasRecordedBallots: ballotRow.length > 0,
     });
   }
 

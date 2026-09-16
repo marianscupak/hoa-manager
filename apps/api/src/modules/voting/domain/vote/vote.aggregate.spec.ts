@@ -4,6 +4,7 @@ import {
   InvalidVoteQuestionException,
   RulesetOverrideNotStricterException,
   VoteNotDraftException,
+  VoteNotOpenException,
   VoteRulesetRequiredException,
   VoteScheduleInPastException,
   VoteScheduleInvalidRangeException,
@@ -15,6 +16,7 @@ import { VoteAggregate, type CreateVoteInput } from './vote.aggregate';
 import {
   MajorityDenominatorBasis,
   MajorityRuleType,
+  QuorumMeasure,
   ThresholdComparator,
   VoteMode,
   VoteOptionSemantic,
@@ -925,5 +927,137 @@ describe('VoteAggregate — modes and tiered validation', () => {
     ).toThrow(
       expect.objectContaining({ code: 'VOTE_RULESET_OVERRIDE_NOT_STRICTER' }),
     );
+  });
+});
+
+describe('VoteAggregate — assembly record invariants', () => {
+  const now = new Date('2026-09-16T10:00:00Z');
+  const meetingDate = new Date(now.getTime() - 4 * 86_400_000);
+
+  const ruleset: VoteRuleset = {
+    weightBasis: VoteWeightBasis.UNIT_SHARE,
+    quorum: {
+      measure: QuorumMeasure.UNIT_SHARE,
+      threshold: { num: 1, den: 2 },
+      comparator: ThresholdComparator.STRICT_GREATER,
+    },
+    majorityRuleType: MajorityRuleType.SIMPLE_MAJORITY,
+    majorityDenominatorBasis: MajorityDenominatorBasis.VOTES_CAST,
+    majorityThreshold: { num: 1, den: 2 },
+    majorityComparator: ThresholdComparator.STRICT_GREATER,
+    allowAbstain: true,
+    acknowledgedNonStatutory: false,
+  };
+
+  const buildAssembly = (hasRecordedBallots = false) =>
+    VoteAggregate.rehydrate({
+      id: 'v1',
+      tenantId: 't1',
+      title: 'Assembly',
+      description: '',
+      status: VoteStatus.DRAFT,
+      mode: VoteMode.ASSEMBLY_RECORD,
+      createdAt: now,
+      createdByMembershipId: 'm1',
+      scheduledFrom: meetingDate,
+      ruleset,
+      questions: [],
+      hasRecordedBallots,
+    });
+
+  it('refuses to schedule an assembly record', () => {
+    // The meeting already happened; this mode has its own path to CLOSED and
+    // never passes through SCHEDULED.
+    expect(() => buildAssembly().schedule(now)).toThrow(
+      expect.objectContaining({ code: 'ASSEMBLY_RECORD_NOT_SCHEDULABLE' }),
+    );
+  });
+
+  it('still schedules a per rollam vote', () => {
+    const vote = VoteAggregate.create(
+      {
+        title: 'T',
+        description: null,
+        mode: VoteMode.PER_ROLLAM,
+        scheduledFrom: new Date(now.getTime() + 86_400_000),
+        scheduledTo: new Date(now.getTime() + 20 * 86_400_000),
+      },
+      't1',
+      'm1',
+      now,
+    );
+    vote.setRuleset({
+      ...ruleset,
+      quorum: null,
+      majorityDenominatorBasis: MajorityDenominatorBasis.ALL_VOTES,
+    });
+    vote.addQuestion({
+      title: 'Q',
+      description: null,
+      type: VoteQuestionType.YES_NO,
+    });
+
+    expect(() => vote.schedule(now)).not.toThrow();
+  });
+
+  it('freezes questions once a ballot exists', () => {
+    const vote = buildAssembly(true);
+
+    expect(() =>
+      vote.addQuestion({
+        title: 'Late question',
+        description: null,
+        type: VoteQuestionType.YES_NO,
+      }),
+    ).toThrow(expect.objectContaining({ code: 'VOTE_HAS_BALLOTS' }));
+  });
+
+  it('freezes the ruleset once a ballot exists', () => {
+    // `allowAbstain` regenerates the option set, which would orphan answers
+    // already recorded against the old options.
+    const vote = buildAssembly(true);
+
+    expect(() => vote.setRuleset(ruleset)).toThrow(
+      expect.objectContaining({ code: 'VOTE_HAS_BALLOTS' }),
+    );
+  });
+
+  it('leaves the draft editable until the first ballot', () => {
+    // The board transcribing minutes may discover a resolution they had not
+    // entered as a question.
+    const vote = buildAssembly(false);
+
+    expect(() =>
+      vote.addQuestion({
+        title: 'Resolution 1',
+        description: null,
+        type: VoteQuestionType.YES_NO,
+      }),
+    ).not.toThrow();
+  });
+
+  it('closes an assembly record straight from DRAFT', () => {
+    const vote = buildAssembly(true);
+
+    vote.close('m1', now);
+
+    expect(vote.status).toBe(VoteStatus.CLOSED);
+  });
+
+  it('still refuses to close a per rollam vote that is not open', () => {
+    const vote = VoteAggregate.rehydrate({
+      id: 'v2',
+      tenantId: 't1',
+      title: 'Per rollam',
+      description: '',
+      status: VoteStatus.DRAFT,
+      mode: VoteMode.PER_ROLLAM,
+      createdAt: now,
+      createdByMembershipId: 'm1',
+      ruleset,
+      questions: [],
+    });
+
+    expect(() => vote.close('m1', now)).toThrow(VoteNotOpenException);
   });
 });

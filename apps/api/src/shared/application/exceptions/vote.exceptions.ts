@@ -214,3 +214,24 @@ export class ConsentAlreadyRecordedException extends DomainException {
     super(ErrorCode.CONSENT_ALREADY_RECORDED);
   }
 }
+
+/**
+ * An assembly record documents a meeting that already happened. It has its own
+ * path from DRAFT to CLOSED and never passes through SCHEDULED, so scheduling
+ * it would apply future-date rules that cannot hold for it.
+ */
+export class AssemblyRecordNotSchedulableException extends DomainException {
+  constructor() {
+    super(ErrorCode.ASSEMBLY_RECORD_NOT_SCHEDULABLE);
+  }
+}
+
+/**
+ * A question added after a ballot exists would leave that ballot partial, and
+ * changing `allowAbstain` rewrites the option set underneath recorded answers.
+ */
+export class VoteHasBallotsException extends DomainException {
+  constructor() {
+    super(ErrorCode.VOTE_HAS_BALLOTS);
+  }
+}

@@ -8,11 +8,13 @@ import {
   VoteStatus,
 } from '@/modules/voting/domain/vote/vote.types';
 import {
+  AssemblyRecordNotSchedulableException,
   InvalidVoteQuestionException,
   RulesetAcknowledgementRequiredException,
   RulesetOverrideNotStricterException,
   SubLegalRulesetException,
   VoteWindowTooShortPerRollamException,
+  VoteHasBallotsException,
   VoteNotDraftException,
   VoteQuestionNotFoundException,
   VoteRulesetRequiredException,
@@ -76,6 +78,11 @@ export class VoteAggregate {
     public readonly updatedAt?: Date,
     public ruleset?: VoteRuleset,
     questions?: VoteQuestion[],
+    /**
+     * Whether any ballot has been recorded against this vote. A boolean rather
+     * than a count: the aggregate only needs to know whether it is frozen.
+     */
+    public readonly hasRecordedBallots: boolean = false,
   ) {
     if (questions) {
       this.questions = questions;
@@ -127,6 +134,12 @@ export class VoteAggregate {
   }
 
   schedule(now: Date): void {
+    // An assembly record documents a meeting that already happened; it goes
+    // from DRAFT straight to CLOSED when the board publishes it.
+    if (this.mode === VoteMode.ASSEMBLY_RECORD) {
+      throw new AssemblyRecordNotSchedulableException();
+    }
+
     this.assertEditable();
 
     const errors: { code: ErrorCode; param?: string }[] = [];
@@ -216,7 +229,13 @@ export class VoteAggregate {
   }
 
   close(closedByMembershipId: string | undefined, now: Date): void {
-    if (this.status !== VoteStatus.OPEN) {
+    // Publishing an assembly record closes it from DRAFT: it was never open,
+    // because nobody voted in the app.
+    const closableFrom =
+      this.mode === VoteMode.ASSEMBLY_RECORD
+        ? [VoteStatus.DRAFT, VoteStatus.OPEN]
+        : [VoteStatus.OPEN];
+    if (!closableFrom.includes(this.status)) {
       throw new VoteNotOpenException();
     }
 
@@ -264,6 +283,7 @@ export class VoteAggregate {
     updatedAt?: Date | null;
     ruleset?: VoteRuleset | null;
     questions?: VoteQuestion[];
+    hasRecordedBallots?: boolean;
   }): VoteAggregate {
     return new VoteAggregate(
       props.id,
@@ -283,6 +303,7 @@ export class VoteAggregate {
       props.updatedAt ?? undefined,
       props.ruleset ?? undefined,
       props.questions ?? [],
+      props.hasRecordedBallots ?? false,
     );
   }
 
@@ -410,6 +431,13 @@ export class VoteAggregate {
   private assertEditable(): void {
     if (this.status !== VoteStatus.DRAFT) {
       throw new VoteNotDraftException();
+    }
+    // A question added after a ballot exists would make that ballot partial,
+    // and changing `allowAbstain` rewrites the option set underneath recorded
+    // answers. Derived from current state rather than latched, so deleting the
+    // last ballot lifts the freeze again.
+    if (this.hasRecordedBallots) {
+      throw new VoteHasBallotsException();
     }
   }
 

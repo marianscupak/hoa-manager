@@ -1,4 +1,5 @@
 import {
+  VoteMode,
   VoteStatus,
   VoteUnitConsentStatus,
 } from '@/modules/voting/domain/vote/vote.types';
@@ -17,12 +18,15 @@ function buildHandler(overrides?: {
   isActiveUnitOwner?: boolean;
   ownerIdByMembership?: string | null;
   saveImpl?: () => Promise<string>;
+  mode?: VoteMode;
+  status?: VoteStatus;
 }) {
   const voteWriteRepo = {
     findById: jest.fn().mockResolvedValue({
       id: VOTE,
       tenantId: TENANT,
-      status: VoteStatus.SCHEDULED,
+      mode: overrides?.mode ?? VoteMode.PER_ROLLAM,
+      status: overrides?.status ?? VoteStatus.SCHEDULED,
       title: 'Vote 1',
     }),
   };
@@ -240,5 +244,74 @@ describe('CreateVoteConsentHandler', () => {
         ),
       ),
     ).rejects.toMatchObject({ code: 'CONSENT_ALREADY_RECORDED' });
+  });
+
+  it('accepts a representation for an assembly record still in draft', async () => {
+    // At a meeting the co-owners settle representation in the room, often with
+    // a power of attorney handed over on the spot. Requiring it in advance, as
+    // per rollam does, would leave those units permanently ineligible.
+    const { handler, consentWriteRepo } = buildHandler({
+      isActiveUnitOwner: true,
+      mode: VoteMode.ASSEMBLY_RECORD,
+      status: VoteStatus.DRAFT,
+    });
+
+    await handler.execute(
+      new CreateVoteConsentCommand(
+        TENANT,
+        VOTE,
+        UNIT,
+        RECORDER_MEMBERSHIP,
+        DELEGATE_MEMBERSHIP,
+        ['ADMIN'],
+        'owner-accountless-1',
+      ),
+    );
+
+    expect(consentWriteRepo.save).toHaveBeenCalled();
+  });
+
+  it('still requires a scheduled vote for per rollam', async () => {
+    const { handler } = buildHandler({
+      isActiveUnitOwner: true,
+      mode: VoteMode.PER_ROLLAM,
+      status: VoteStatus.DRAFT,
+    });
+
+    await expect(
+      handler.execute(
+        new CreateVoteConsentCommand(
+          TENANT,
+          VOTE,
+          UNIT,
+          RECORDER_MEMBERSHIP,
+          DELEGATE_MEMBERSHIP,
+          ['ADMIN'],
+          'owner-accountless-1',
+        ),
+      ),
+    ).rejects.toMatchObject({ code: 'INVALID_VOTE_STATUS_FOR_DELEGATION' });
+  });
+
+  it('refuses a representation for an assembly record already published', async () => {
+    const { handler } = buildHandler({
+      isActiveUnitOwner: true,
+      mode: VoteMode.ASSEMBLY_RECORD,
+      status: VoteStatus.CLOSED,
+    });
+
+    await expect(
+      handler.execute(
+        new CreateVoteConsentCommand(
+          TENANT,
+          VOTE,
+          UNIT,
+          RECORDER_MEMBERSHIP,
+          DELEGATE_MEMBERSHIP,
+          ['ADMIN'],
+          'owner-accountless-1',
+        ),
+      ),
+    ).rejects.toMatchObject({ code: 'INVALID_VOTE_STATUS_FOR_DELEGATION' });
   });
 });

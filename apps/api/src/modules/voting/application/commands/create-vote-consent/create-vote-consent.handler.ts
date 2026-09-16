@@ -18,6 +18,7 @@ import {
 import { VoteConsentCreatedAuditEvent } from '@/modules/voting/audit/events/vote-consent-created.event';
 import { VotingAuditLabelResolver } from '@/modules/voting/audit/label-resolver.service';
 import {
+  VoteMode,
   VoteStatus,
   VoteUnitConsentStatus,
 } from '@/modules/voting/domain/vote/vote.types';
@@ -66,7 +67,15 @@ export class CreateVoteConsentHandler
       throw new VoteNotFoundException();
     }
 
-    if (vote.status !== VoteStatus.SCHEDULED) {
+    // At an assembly the co-owners settle representation in the room, often
+    // with a power of attorney handed over on the spot, and the board records
+    // it while writing the meeting up. Per rollam keeps needing it agreed in
+    // advance, before the vote opens.
+    const allowedStatus =
+      vote.mode === VoteMode.ASSEMBLY_RECORD
+        ? VoteStatus.DRAFT
+        : VoteStatus.SCHEDULED;
+    if (vote.status !== allowedStatus) {
       throw new InvalidVoteStatusForDelegationException();
     }
 

@@ -81,6 +81,11 @@ export function UnitPanel({
         defaultVoter(unit),
     );
     const [proxyName, setProxyName] = useState(unit.voterNote ?? "");
+    // Marked present here but not yet on the server, because naming the voter
+    // is what the write actually records. Lets the attendance question come
+    // first while keeping "Present" clickable at all times — without it,
+    // switching back from absent was impossible.
+    const [intendPresent, setIntendPresent] = useState(false);
     // Answers picked but not yet complete. A ballot answers every question at
     // once, so partial picks live here until the last one lands.
     const [pending, setPending] = useState<Record<string, string>>({});
@@ -89,6 +94,7 @@ export function UnitPanel({
         setVoterChoice(defaultVoter(unit));
         setProxyName(unit.voterNote ?? "");
         setPending({});
+        setIntendPresent(false);
         // Keyed on the unit alone: a refetch for the same unit must not wipe a
         // pick the board has just made.
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -107,6 +113,7 @@ export function UnitPanel({
     const voterChosen =
         voterChoice !== null &&
         (voterChoice !== PROXY || proxyName.trim().length > 0);
+    const showAsPresent = unit.attendance === "PRESENT" || intendPresent;
 
     const commitPresent = (choice: string | null, note: string) => {
         if (!choice) return;
@@ -205,73 +212,88 @@ export function UnitPanel({
                 </div>
             ) : (
                 <>
-                    {/* The voter comes first: the API refuses a ballot for a
-                        unit whose voter has not been recorded, and naming them
-                        is what "present" actually means here. */}
-                    <p className="mt-5 text-sm font-semibold">
-                        {t("voting:assemblyRecord.unit.voterQuestion")}
-                    </p>
-                    <div className="mt-2 space-y-2">
-                        {unit.owners.map((owner) => (
-                            <RadioRow
-                                key={owner.ownerId}
-                                checked={voterChoice === owner.ownerId}
-                                label={owner.displayName}
-                                hint={t("voting:assemblyRecord.unit.voterOwner")}
-                                onSelect={() => {
-                                    setVoterChoice(owner.ownerId);
-                                    if (unit.attendance === "PRESENT") {
-                                        commitPresent(owner.ownerId, "");
-                                    }
-                                }}
-                            />
-                        ))}
-                        <RadioRow
-                            checked={voterChoice === PROXY}
-                            label={t("voting:assemblyRecord.unit.voterProxy")}
-                            onSelect={() => setVoterChoice(PROXY)}
-                        />
-                        {voterChoice === PROXY && (
-                            <Input
-                                value={proxyName}
-                                onChange={(e) => setProxyName(e.target.value)}
-                                onBlur={() => {
-                                    if (unit.attendance === "PRESENT") {
-                                        commitPresent(PROXY, proxyName);
-                                    }
-                                }}
-                                placeholder={t(
-                                    "voting:assemblyRecord.unit.voterProxyPlaceholder",
-                                )}
-                            />
-                        )}
-                    </div>
-
                     <p className="mt-5 text-sm font-semibold">
                         {t("voting:assemblyRecord.unit.attendanceQuestion")}
                     </p>
                     <div className="mt-2 grid gap-3 sm:grid-cols-2">
                         <SelectionCard
-                            selected={unit.attendance === "PRESENT"}
+                            selected={showAsPresent}
                             title={t("voting:assemblyRecord.unit.present")}
-                            hint={
-                                voterChosen
-                                    ? t("voting:assemblyRecord.unit.presentHint")
-                                    : t(
-                                          "voting:assemblyRecord.unit.presentNeedsVoter",
-                                      )
-                            }
-                            onClick={() => commitPresent(voterChoice, proxyName)}
-                            disabled={!voterChosen}
+                            hint={t("voting:assemblyRecord.unit.presentHint")}
+                            onClick={() => {
+                                setIntendPresent(true);
+                                // A sole owner is already picked, so this is
+                                // one click for the commonest case.
+                                if (voterChosen) {
+                                    commitPresent(voterChoice, proxyName);
+                                }
+                            }}
                         />
                         <SelectionCard
                             selected={unit.attendance === "ABSENT"}
                             neutral
                             title={t("voting:assemblyRecord.unit.absent")}
                             hint={t("voting:assemblyRecord.unit.absentHint")}
-                            onClick={onAbsent}
+                            onClick={() => {
+                                setIntendPresent(false);
+                                onAbsent();
+                            }}
                         />
                     </div>
+
+                    {/* Only once the unit was in the room is there anyone to
+                        name — an absent unit has no voter to pick. */}
+                    {showAsPresent && (
+                        <div className="mt-5">
+                            <p className="text-sm font-semibold">
+                                {t("voting:assemblyRecord.unit.voterQuestion")}
+                            </p>
+                            <div className="mt-2 space-y-2">
+                                {unit.owners.map((owner) => (
+                                    <RadioRow
+                                        key={owner.ownerId}
+                                        checked={voterChoice === owner.ownerId}
+                                        label={owner.displayName}
+                                        hint={t(
+                                            "voting:assemblyRecord.unit.voterOwner",
+                                        )}
+                                        onSelect={() => {
+                                            setVoterChoice(owner.ownerId);
+                                            commitPresent(owner.ownerId, "");
+                                        }}
+                                    />
+                                ))}
+                                <RadioRow
+                                    checked={voterChoice === PROXY}
+                                    label={t(
+                                        "voting:assemblyRecord.unit.voterProxy",
+                                    )}
+                                    onSelect={() => setVoterChoice(PROXY)}
+                                />
+                                {voterChoice === PROXY && (
+                                    <Input
+                                        value={proxyName}
+                                        onChange={(e) =>
+                                            setProxyName(e.target.value)
+                                        }
+                                        onBlur={() =>
+                                            commitPresent(PROXY, proxyName)
+                                        }
+                                        placeholder={t(
+                                            "voting:assemblyRecord.unit.voterProxyPlaceholder",
+                                        )}
+                                    />
+                                )}
+                            </div>
+                            {unit.attendance !== "PRESENT" && (
+                                <p className="text-warning-tint-foreground mt-2 text-[11.5px]">
+                                    {t(
+                                        "voting:assemblyRecord.unit.presentNeedsVoter",
+                                    )}
+                                </p>
+                            )}
+                        </div>
+                    )}
 
                     {unit.attendance === "PRESENT" && (
                         <div className="mt-6 space-y-4">
@@ -365,27 +387,19 @@ function SelectionCard({
     title,
     hint,
     onClick,
-    disabled,
 }: {
     selected: boolean;
     neutral?: boolean;
     title: string;
     hint: string;
     onClick: () => void;
-    disabled?: boolean;
 }) {
-    // A selected card is never dimmed, even while the choice that led to it is
-    // being re-picked — that is what made "Present" look broken once chosen.
-    const blocked = disabled && !selected;
-
     return (
         <button
             type="button"
             onClick={onClick}
-            disabled={blocked}
             className={cn(
-                "rounded-tile border-2 p-3 text-left transition-colors",
-                blocked ? "cursor-not-allowed opacity-50" : "cursor-pointer",
+                "rounded-tile cursor-pointer border-2 p-3 text-left transition-colors",
                 selected && !neutral && "border-primary bg-primary-faint",
                 // Absent is a deliberate, neutral choice — never an error tone.
                 selected && neutral && "border-secondary-foreground bg-accent",
@@ -426,7 +440,9 @@ function RadioRow({
                     checked ? "border-primary" : "border-border",
                 )}
             >
-                {checked && <span className="bg-primary h-2 w-2 rounded-full" />}
+                {checked && (
+                    <span className="bg-primary h-2 w-2 rounded-full" />
+                )}
             </span>
             <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-medium">

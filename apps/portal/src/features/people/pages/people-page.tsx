@@ -125,27 +125,34 @@ export function PeoplePage() {
                 countLabel={(info) =>
                     t("people.table.count", { count: info.total })
                 }
+                // Only for callers who see the account side. Every pill but
+                // "Vše" is defined on data a unit owner is not given, so for
+                // them "S přístupem" would read 0 and "Bez účtu" would read
+                // everyone — two statements about their neighbours that are
+                // false.
                 toolbarEnd={
-                    <div className="flex flex-wrap gap-1.5">
-                        {PEOPLE_FILTERS.map((f) => (
-                            <button
-                                key={f}
-                                type="button"
-                                onClick={() => setFilter(f)}
-                                className={cn(
-                                    "h-7 cursor-pointer rounded-full px-3 text-xs font-semibold transition-colors",
-                                    f === filter
-                                        ? "bg-primary text-primary-foreground shadow-clay-btn-sm"
-                                        : "bg-accent text-secondary-foreground hover:bg-border",
-                                )}
-                            >
-                                {t(FILTER_LABEL[f] as "people.filters.all")}{" "}
-                                <span className="font-medium opacity-70">
-                                    {filterPeople(allRows, f).length}
-                                </span>
-                            </button>
-                        ))}
-                    </div>
+                    canSeeAccounts ? (
+                        <div className="flex flex-wrap gap-1.5">
+                            {PEOPLE_FILTERS.map((f) => (
+                                <button
+                                    key={f}
+                                    type="button"
+                                    onClick={() => setFilter(f)}
+                                    className={cn(
+                                        "h-7 cursor-pointer rounded-full px-3 text-xs font-semibold transition-colors",
+                                        f === filter
+                                            ? "bg-primary text-primary-foreground shadow-clay-btn-sm"
+                                            : "bg-accent text-secondary-foreground hover:bg-border",
+                                    )}
+                                >
+                                    {t(FILTER_LABEL[f] as "people.filters.all")}{" "}
+                                    <span className="font-medium opacity-70">
+                                        {filterPeople(allRows, f).length}
+                                    </span>
+                                </button>
+                            ))}
+                        </div>
+                    ) : undefined
                 }
             />
 

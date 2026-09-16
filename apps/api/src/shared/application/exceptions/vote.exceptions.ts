@@ -235,3 +235,21 @@ export class VoteHasBallotsException extends DomainException {
     super(ErrorCode.VOTE_HAS_BALLOTS);
   }
 }
+
+/** The command only makes sense for a vote recorded from a physical meeting. */
+export class NotAnAssemblyRecordException extends DomainException {
+  constructor() {
+    super(ErrorCode.NOT_AN_ASSEMBLY_RECORD);
+  }
+}
+
+/**
+ * A unit the association owns casts no vote at all, and a unit with no
+ * ownership on record has nobody who could have stood up in the room. Missing
+ * only a common representative is different: the board settles that on the spot.
+ */
+export class UnitNotEligibleForAttendanceException extends DomainException {
+  constructor() {
+    super(ErrorCode.UNIT_NOT_ELIGIBLE_FOR_ATTENDANCE);
+  }
+}

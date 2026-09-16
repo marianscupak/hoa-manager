@@ -17,6 +17,18 @@ export interface VoteWriteRepository {
   findById(tenantId: string, id: string): Promise<VoteAggregate | null>;
   save(vote: VoteAggregate): Promise<void>;
   delete(tenantId: string, voteId: string): Promise<void>;
+  /**
+   * Removes a unit's ballot and its answers.
+   *
+   * Only ever reached from the assembly recording flow, where flipping a unit
+   * back to absent discards what was entered for it. A cast ballot stays final
+   * everywhere else; the callers enforce that.
+   */
+  deleteBallotForUnit(
+    tenantId: string,
+    voteId: string,
+    unitId: string,
+  ): Promise<void>;
   saveElectorateUnits(
     tenantId: string,
     voteId: string,

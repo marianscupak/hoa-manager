@@ -34,6 +34,7 @@ import type {
     RequestBallotAttachmentUploadResponseDto,
     RequestDocumentUploadDto,
     RequestDocumentUploadResponseDto,
+    SetUnitAttendanceDto,
     SetVoteRulesetDto,
     SetVoteRulesetResponseDto,
     SubmitBallotDto,
@@ -2072,6 +2073,104 @@ export const useVotesControllerSubmitBallot = <
 > => {
     return useMutation(
         getVotesControllerSubmitBallotMutationOptions(options),
+        queryClient,
+    );
+};
+export const votesControllerSetUnitAttendance = (
+    id: string,
+    unitId: string,
+    setUnitAttendanceDto: BodyType<SetUnitAttendanceDto>,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<void>(
+        {
+            url: `/api/votes/${id}/attendance/${unitId}`,
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            data: setUnitAttendanceDto,
+            signal,
+        },
+        options,
+    );
+};
+
+export const getVotesControllerSetUnitAttendanceMutationOptions = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof votesControllerSetUnitAttendance>>,
+        TError,
+        { id: string; unitId: string; data: BodyType<SetUnitAttendanceDto> },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof votesControllerSetUnitAttendance>>,
+    TError,
+    { id: string; unitId: string; data: BodyType<SetUnitAttendanceDto> },
+    TContext
+> => {
+    const mutationKey = ["votesControllerSetUnitAttendance"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof votesControllerSetUnitAttendance>>,
+        { id: string; unitId: string; data: BodyType<SetUnitAttendanceDto> }
+    > = (props) => {
+        const { id, unitId, data } = props ?? {};
+
+        return votesControllerSetUnitAttendance(
+            id,
+            unitId,
+            data,
+            requestOptions,
+        );
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type VotesControllerSetUnitAttendanceMutationResult = NonNullable<
+    Awaited<ReturnType<typeof votesControllerSetUnitAttendance>>
+>;
+export type VotesControllerSetUnitAttendanceMutationBody =
+    BodyType<SetUnitAttendanceDto>;
+export type VotesControllerSetUnitAttendanceMutationError = ErrorType<unknown>;
+
+export const useVotesControllerSetUnitAttendance = <
+    TError = ErrorType<unknown>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof votesControllerSetUnitAttendance>>,
+            TError,
+            {
+                id: string;
+                unitId: string;
+                data: BodyType<SetUnitAttendanceDto>;
+            },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof votesControllerSetUnitAttendance>>,
+    TError,
+    { id: string; unitId: string; data: BodyType<SetUnitAttendanceDto> },
+    TContext
+> => {
+    return useMutation(
+        getVotesControllerSetUnitAttendanceMutationOptions(options),
         queryClient,
     );
 };

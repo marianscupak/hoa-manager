@@ -3092,6 +3092,47 @@
         ]
       }
     },
+    "/api/votes/{id}/attendance/{unitId}": {
+      "put": {
+        "operationId": "VotesController_setUnitAttendance",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "unitId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetUnitAttendanceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Records whether a unit was represented at the assembly"
+          }
+        },
+        "tags": [
+          "Votes"
+        ]
+      }
+    },
     "/api/votes/{id}/paper-ballots": {
       "post": {
         "operationId": "VotesController_recordPaperBallot",
@@ -6211,6 +6252,33 @@
         },
         "required": [
           "submittedAt"
+        ]
+      },
+      "SetUnitAttendanceDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "PRESENT",
+              "ABSENT"
+            ]
+          },
+          "voterOwnerId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "nullable": true
+          },
+          "voterNote": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "nullable": true
+          }
+        },
+        "required": [
+          "status"
         ]
       },
       "RecordPaperBallotDto": {

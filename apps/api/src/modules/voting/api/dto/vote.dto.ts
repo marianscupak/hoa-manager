@@ -228,6 +228,17 @@ export const createVoteQuestionSchema = z
       path: ['options'],
     },
   );
+export const setUnitAttendanceSchema = z.object({
+  status: z.enum(['PRESENT', 'ABSENT']),
+  /** The entitled voter, when they are an owner on record. */
+  voterOwnerId: z.uuid().nullish(),
+  /** A proxy holder who is not an owner — provenance only, never authority. */
+  voterNote: z.string().trim().min(1).max(200).nullish(),
+});
+export class SetUnitAttendanceDto extends createZodDto(
+  setUnitAttendanceSchema,
+) {}
+
 export class CreateVoteQuestionDto extends createZodDto(
   createVoteQuestionSchema,
 ) {}

@@ -11,6 +11,7 @@ export const audit = {
         VOTE_QUESTION_CREATED: "Question added",
         VOTE_QUESTION_UPDATED: "Question edited",
         VOTE_QUESTION_DELETED: "Question removed",
+        ASSEMBLY_ATTENDANCE_RECORDED: "Attendance recorded",
         VOTE_CONSENT_CREATED: "Representation recorded",
         VOTE_CONSENT_REVOKED: "Representation revoked",
         BALLOT_CAST_DIRECT: "Ballot cast",

@@ -108,6 +108,8 @@ export * from "./requestDocumentUploadDto";
 export * from "./requestDocumentUploadResponseDto";
 export * from "./rulesetFractionDto";
 export * from "./setOwnerEmailDto";
+export * from "./setUnitAttendanceDto";
+export * from "./setUnitAttendanceDtoStatus";
 export * from "./setVoteRulesetDto";
 export * from "./setVoteRulesetDtoMajorityComparator";
 export * from "./setVoteRulesetDtoMajorityDenominatorBasis";

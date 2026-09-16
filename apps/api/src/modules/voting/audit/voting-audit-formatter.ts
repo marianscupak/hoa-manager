@@ -166,6 +166,32 @@ export class VotingAuditFormatter implements AuditEventFormatter, OnModuleInit {
           details: { answers: p.labels.answers },
         };
       }
+      case VotingEventType.ASSEMBLY_ATTENDANCE_RECORDED: {
+        const p = event.payload as {
+          status: 'PRESENT' | 'ABSENT';
+          labels: {
+            unitLabel: string;
+            voterLabel: string | null;
+            recordedBy: string;
+          };
+        };
+        return {
+          ...base,
+          message: t(
+            lang,
+            p.status === 'PRESENT'
+              ? 'assembly.attendance.present.privileged'
+              : 'assembly.attendance.absent.privileged',
+            {
+              actor: p.labels.recordedBy,
+              unit: p.labels.unitLabel,
+              // A present unit always has a voter by the time it can be
+              // published; while recording it may not yet.
+              voter: p.labels.voterLabel ?? '—',
+            },
+          ),
+        };
+      }
       case VotingEventType.VOTE_CLOSED: {
         const p = event.payload as { labels: { voteTitle: string } };
         return {

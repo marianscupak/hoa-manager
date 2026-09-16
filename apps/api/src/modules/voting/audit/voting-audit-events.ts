@@ -1,3 +1,4 @@
+import { AssemblyAttendanceRecordedAuditEvent } from './events/assembly-attendance-recorded.event';
 import { BallotCastDirectAuditEvent } from './events/ballot-cast-direct.event';
 import { BallotCastProxyAuditEvent } from './events/ballot-cast-proxy.event';
 import { VoteClosedAuditEvent } from './events/vote-closed.event';
@@ -19,6 +20,7 @@ import { VoteScheduledAuditEvent } from './events/vote-scheduled.event';
 import { VoteUpdatedAuditEvent } from './events/vote-updated.event';
 
 export const VOTING_AUDIT_EVENTS = [
+  AssemblyAttendanceRecordedAuditEvent,
   VoteCreatedAuditEvent,
   VoteUpdatedAuditEvent,
   VoteDeletedAuditEvent,

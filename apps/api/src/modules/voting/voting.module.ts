@@ -4,6 +4,9 @@ import { ScheduleModule } from '@nestjs/schedule';
 
 import { ConfigModule } from '@/infrastructure/config/config.module';
 import { AuditModule } from '@/modules/core/audit/audit.module';
+import { SetUnitAttendanceHandler } from '@/modules/voting/application/commands/set-unit-attendance/set-unit-attendance.handler';
+import { VOTE_ATTENDANCE_REPOSITORY } from '@/modules/voting/application/ports/vote-attendance.repository.port';
+import { DrizzleVoteAttendanceRepository } from '@/modules/voting/infrastructure/persistence/drizzle-vote-attendance.repository';
 
 import { VotesController } from './api/votes.controller';
 import { VotingAuditLabelResolver } from './audit/label-resolver.service';
@@ -70,6 +73,7 @@ import { VoteDocumentCleanupService } from './infrastructure/vote-document-clean
 import { VoteSchedulerService } from './infrastructure/vote-scheduler.service';
 
 const COMMAND_HANDLERS = [
+  SetUnitAttendanceHandler,
   CloseVoteCommandHandler,
   CreateVoteHandler,
   SetVoteRulesetHandler,
@@ -108,6 +112,10 @@ const QUERY_HANDLERS = [
 ];
 const REPOSITORIES = [
   { provide: VOTE_WRITE_REPOSITORY, useClass: DrizzleVoteWriteRepository },
+  {
+    provide: VOTE_ATTENDANCE_REPOSITORY,
+    useClass: DrizzleVoteAttendanceRepository,
+  },
   { provide: VOTE_READ_REPOSITORY, useClass: DrizzleVoteReadRepository },
   {
     provide: VOTE_CONSENT_WRITE_REPOSITORY,

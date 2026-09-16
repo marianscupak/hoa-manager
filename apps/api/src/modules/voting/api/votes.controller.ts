@@ -48,6 +48,7 @@ import {
   SubmitBallotDto,
   SubmitBallotResponseDto,
   RecordPaperBallotDto,
+  SetUnitAttendanceDto,
   VoteResultsResponseDto,
   VoteTurnoutResponseDto,
   VoteParticipationResponseDto,
@@ -78,6 +79,7 @@ import { RequestBallotAttachmentUploadCommand } from '../application/commands/re
 import { RequestDocumentUploadCommand } from '../application/commands/request-document-upload/request-document-upload.command';
 import { RevokeConsentCommand } from '../application/commands/revoke-consent/revoke-consent.command';
 import { ScheduleVoteCommand } from '../application/commands/schedule-vote/schedule-vote.command';
+import { SetUnitAttendanceCommand } from '../application/commands/set-unit-attendance/set-unit-attendance.command';
 import { SetVoteRulesetCommand } from '../application/commands/set-vote-ruleset/set-vote-ruleset.command';
 import { SubmitBallotCommand } from '../application/commands/submit-ballot/submit-ballot.command';
 import { UpdateVoteCommand } from '../application/commands/update-vote/update-vote.command';
@@ -438,6 +440,32 @@ export class VotesController {
         id,
         tenantCtx.membershipId,
         body.ballots,
+      ),
+    );
+  }
+
+  @Put(':id/attendance/:unitId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({
+    description: 'Records whether a unit was represented at the assembly',
+  })
+  @UseGuards(AccessTokenAuthGuard, TenantContextGuard, RolesGuard)
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  setUnitAttendance(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('unitId', ParseUUIDPipe) unitId: string,
+    @Body() body: SetUnitAttendanceDto,
+    @Tenant() tenantCtx: TenantContext,
+  ) {
+    return this.commandBus.execute(
+      new SetUnitAttendanceCommand(
+        tenantCtx.tenantId,
+        id,
+        tenantCtx.membershipId,
+        unitId,
+        body.status,
+        body.voterOwnerId ?? null,
+        body.voterNote ?? null,
       ),
     );
   }

@@ -12,6 +12,7 @@ export const audit = {
         VOTE_QUESTION_CREATED: "Otázka přidána",
         VOTE_QUESTION_UPDATED: "Otázka upravena",
         VOTE_QUESTION_DELETED: "Otázka odstraněna",
+        ASSEMBLY_ATTENDANCE_RECORDED: "Docházka zaznamenána",
         VOTE_CONSENT_CREATED: "Zastoupení zaznamenáno",
         VOTE_CONSENT_REVOKED: "Zastoupení zrušeno",
         BALLOT_CAST_DIRECT: "Hlas odevzdán",

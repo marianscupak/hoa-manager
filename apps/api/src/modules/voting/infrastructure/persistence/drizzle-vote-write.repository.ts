@@ -475,6 +475,24 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
       .where(and(eq(votes.tenantId, tenantId), eq(votes.id, voteId)));
   }
 
+  async deleteBallotForUnit(
+    tenantId: string,
+    voteId: string,
+    unitId: string,
+  ): Promise<void> {
+    // ballot_answers cascade on the ballot's foreign key, so one delete is
+    // enough; doing it explicitly would risk the two going out of step.
+    await this.db
+      .delete(ballots)
+      .where(
+        and(
+          eq(ballots.tenantId, tenantId),
+          eq(ballots.voteId, voteId),
+          eq(ballots.unitId, unitId),
+        ),
+      );
+  }
+
   async saveElectorateUnits(
     tenantId: string,
     voteId: string,

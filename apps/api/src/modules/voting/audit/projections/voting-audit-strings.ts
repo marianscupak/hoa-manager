@@ -34,6 +34,10 @@ const STRINGS: Record<
       `${v.owner} revoked ${v.delegate} representing unit ${v.unit}.`,
     'vote.consent.revoked.byRecorder': (v) =>
       `${v.recorder} revoked ${v.delegate} representing ${v.owner} for unit ${v.unit}.`,
+    'assembly.attendance.present.privileged': (v) =>
+      `${v.actor} recorded unit ${v.unit} as present; voted by ${v.voter}.`,
+    'assembly.attendance.absent.privileged': (v) =>
+      `${v.actor} recorded unit ${v.unit} as absent.`,
     'ballot.cast.privileged': (v) =>
       `${v.actor} cast ballot for unit ${v.unit}.`,
     'ballot.cast.proxy.privileged': (v) =>
@@ -80,6 +84,10 @@ const STRINGS: Record<
       `${v.owner} zrušil/a zastoupení jednotky ${v.unit} zástupcem ${v.delegate}.`,
     'vote.consent.revoked.byRecorder': (v) =>
       `${v.recorder} zrušil/a zastoupení jednotky ${v.unit}: vlastníka ${v.owner} zastupoval/a ${v.delegate}.`,
+    'assembly.attendance.present.privileged': (v) =>
+      `${v.actor} zaznamenal/a jednotku ${v.unit} jako přítomnou; hlasoval/a ${v.voter}.`,
+    'assembly.attendance.absent.privileged': (v) =>
+      `${v.actor} zaznamenal/a jednotku ${v.unit} jako nepřítomnou.`,
     'ballot.cast.privileged': (v) =>
       `${v.actor} hlasoval/a za jednotku ${v.unit}.`,
     'ballot.cast.proxy.privileged': (v) =>

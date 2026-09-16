@@ -202,6 +202,43 @@ export default {
         },
         sumBanner: "Shares sum to {{sum}} % — off by {{off}} %.",
     },
+    people: {
+        title: "People",
+        description: "Unit owners and association accounts in one place.",
+        addOwner: "Add owner",
+        empty: "Nobody here yet.",
+        kind: {
+            LEGAL_ENTITY: "Legal entity",
+            ASSOCIATION: "Association",
+        },
+        access: {
+            noAccount: "No account",
+            invited: "Invitation sent",
+        },
+        filters: {
+            all: "All",
+            owners: "Owners",
+            withAccess: "With access",
+            withoutAccount: "No account",
+        },
+        table: {
+            name: "Name",
+            email: "Email",
+            holdings: "Owns",
+            access: "Access",
+            searchPlaceholder: "Search for a person…",
+            noMatch: "Nobody matches that search.",
+            unitCount_one: "{{count}} unit",
+            unitCount_other: "{{count}} units",
+            count_one: "{{count}} person",
+            count_other: "{{count}} people",
+            sharesNote:
+                "Spouses in joint ownership hold one undivided share, shown in full for both — so the column need not add up to 100 %.",
+        },
+        link: {
+            suggested: "Looks like the same person",
+        },
+    },
     users: {
         title: "User Management",
         description: "Manage users and their roles within the association.",

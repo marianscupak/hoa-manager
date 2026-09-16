@@ -205,6 +205,46 @@ export default {
         },
         sumBanner: "Součet podílů je {{sum}} % — rozdíl {{off}} %.",
     },
+    people: {
+        title: "Lidé",
+        description:
+            "Vlastníci jednotek a účty ve společenství na jednom místě.",
+        addOwner: "Přidat vlastníka",
+        empty: "Zatím tu nikdo není.",
+        kind: {
+            LEGAL_ENTITY: "Právnická osoba",
+            ASSOCIATION: "Společenství",
+        },
+        access: {
+            noAccount: "Bez účtu",
+            invited: "Pozvánka odeslána",
+        },
+        filters: {
+            all: "Vše",
+            owners: "Vlastníci",
+            withAccess: "S přístupem",
+            withoutAccount: "Bez účtu",
+        },
+        table: {
+            name: "Jméno",
+            email: "E-mail",
+            holdings: "Vlastní",
+            access: "Přístup",
+            searchPlaceholder: "Hledat osobu…",
+            noMatch: "Hledání nikoho nenašlo.",
+            unitCount_one: "{{count}} jednotka",
+            unitCount_few: "{{count}} jednotky",
+            unitCount_other: "{{count}} jednotek",
+            count_one: "{{count}} osoba",
+            count_few: "{{count}} osoby",
+            count_other: "{{count}} osob",
+            sharesNote:
+                "Manželé ve společném jmění drží jeden nedílný podíl, který se u obou uvádí celý — součet sloupce proto nemusí dát 100 %.",
+        },
+        link: {
+            suggested: "Vypadá jako táž osoba",
+        },
+    },
     users: {
         title: "Správa uživatelů",
         description: "Správa uživatelů a jejich rolí ve společenství.",

@@ -16,6 +16,7 @@ import { LoginPage } from "@/features/auth/pages/login-page";
 import { SelectTenantPage } from "@/features/auth/pages/select-tenant-page";
 import { DashboardPage } from "@/features/dashboard/pages/dashboard-page";
 import { OwnerInvitePage } from "@/features/invite/pages/owner-invite-page";
+import { PeoplePage } from "@/features/people/pages/people-page";
 import { ProfilePage } from "@/features/profile/pages/profile-page";
 import { CreateTenantPage } from "@/features/tenants/pages/create-tenant-page";
 import { MyUnitDetailPage } from "@/features/units/pages/my-unit-detail-page";
@@ -106,6 +107,10 @@ export const router = createBrowserRouter([
                                 element: <LiveResultsPage />,
                             },
                         ],
+                    },
+                    {
+                        path: "people",
+                        element: <PeoplePage />,
                     },
                     {
                         path: "admin",

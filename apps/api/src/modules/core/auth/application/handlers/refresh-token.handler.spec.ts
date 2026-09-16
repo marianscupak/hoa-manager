@@ -96,6 +96,13 @@ function makeSessionRepository(
         if (s.userId === userId && !s.revokedAt) s.revokedAt = clock.now();
       }
     },
+    async deleteExpired(cutoff) {
+      const dead = [...store.sessions.values()].filter(
+        (s) => s.expiresAt < cutoff,
+      );
+      dead.forEach((s) => store.sessions.delete(s.id));
+      return dead.length;
+    },
   };
 }
 

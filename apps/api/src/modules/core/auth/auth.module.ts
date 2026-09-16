@@ -25,6 +25,7 @@ import {
   TOKEN_VERIFIER,
 } from '@/modules/core/auth/application/ports/auth.utils.port';
 import { GOOGLE_OIDC_SERVICE } from '@/modules/core/auth/application/ports/google-oidc.service.port';
+import { SessionCleanupService } from '@/modules/core/auth/application/services/session-cleanup.service';
 import {
   AUTH_SESSION_SERVICE,
   AuthSessionServiceImpl,
@@ -75,6 +76,7 @@ import { TenancyModule } from '@/modules/core/tenancy/tenancy.module';
       provide: AUTH_EXCHANGE_CODE_REPOSITORY,
       useClass: DrizzleAuthExchangeCodeRepository,
     },
+    SessionCleanupService,
     { provide: PASSWORD_HASHER, useClass: BcryptPasswordHasher },
     { provide: TOKEN_SIGNER, useClass: JwtTokenService },
     { provide: TOKEN_VERIFIER, useClass: JwtTokenService },

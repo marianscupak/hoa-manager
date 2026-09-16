@@ -23,6 +23,8 @@ export interface AuthSessionRepository {
   ): Promise<AuthSession>;
   markRevoked(id: string): Promise<void>;
   revokeAllForUser(userId: string): Promise<void>;
+  /** Drops sessions already past `expiresAt`; returns how many went. */
+  deleteExpired(cutoff: Date): Promise<number>;
 }
 
 export const AUTH_SESSION_REPOSITORY = Symbol('AUTH_SESSION_REPOSITORY');

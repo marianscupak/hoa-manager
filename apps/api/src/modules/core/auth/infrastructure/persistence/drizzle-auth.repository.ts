@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { eq, and, isNull } from 'drizzle-orm';
+import { eq, and, isNull, lt } from 'drizzle-orm';
 
 import { SystemClock } from '@/infrastructure/clock/system-clock';
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
@@ -115,6 +115,14 @@ export class DrizzleAuthSessionRepository implements AuthSessionRepository {
       .update(authSessions)
       .set({ revokedAt: this.clock.now() })
       .where(and(eq(authSessions.id, id), isNull(authSessions.revokedAt)));
+  }
+
+  async deleteExpired(cutoff: Date): Promise<number> {
+    const deleted = await this.db
+      .delete(authSessions)
+      .where(lt(authSessions.expiresAt, cutoff))
+      .returning({ id: authSessions.id });
+    return deleted.length;
   }
 
   async revokeAllForUser(userId: string): Promise<void> {

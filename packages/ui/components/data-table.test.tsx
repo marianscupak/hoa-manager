@@ -47,6 +47,28 @@ const EXPANDABLE = {
     collapseRowLabel: (row: Row) => `Collapse row ${row.name}`,
 };
 
+describe("DataTable horizontal scroll", () => {
+    it("lets the rows scroll sideways instead of squeezing when given a floor", () => {
+        // The toolbar and the pager must not move with them, or the search box
+        // slides out of reach on the narrow screen the scroll is there for.
+        setup({ minWidth: "900px" });
+
+        const scroller = document.querySelector(".overflow-x-auto");
+        expect(scroller).not.toBeNull();
+        expect(
+            (scroller?.firstElementChild as HTMLElement | null)?.style.minWidth,
+        ).toBe("900px");
+    });
+
+    it("squeezes as it always did when no floor is given", () => {
+        setup();
+
+        const inner = document.querySelector(".overflow-x-auto")
+            ?.firstElementChild as HTMLElement | null;
+        expect(inner?.style.minWidth).toBe("");
+    });
+});
+
 describe("DataTable row expansion", () => {
     it("renders no expander when the props are absent", () => {
         setup();

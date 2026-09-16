@@ -56,6 +56,15 @@ export interface DataTableProps<TData extends { id: string }> {
     searchPlaceholder?: string;
     /** Extra toolbar content, right-aligned (e.g. a filter select). */
     toolbarEnd?: React.ReactNode;
+    /**
+     * Width below which the rows scroll sideways instead of squeezing, e.g.
+     * `"900px"`. Omit and the table behaves as it always has: the columns
+     * shrink to whatever space there is.
+     *
+     * The toolbar and the footer stay put — only the header row and the rows
+     * move, so the search box and the pager never slide out of reach.
+     */
+    minWidth?: string;
     pageSize?: number;
     zebra?: boolean;
     initialSorting?: SortingState;
@@ -98,6 +107,7 @@ export function DataTable<TData extends { id: string }>({
     emptySearchMessage,
     searchPlaceholder,
     toolbarEnd,
+    minWidth,
     pageSize = 10,
     zebra = true,
     initialSorting,
@@ -188,163 +198,181 @@ export function DataTable<TData extends { id: string }>({
                 </div>
             )}
 
-            <div
-                role="row"
-                className="bg-background border-hairline grid items-center gap-3 border-b px-5 py-[9px]"
-                style={{ gridTemplateColumns: gridTemplate }}
-            >
-                {headers.map((header) => {
-                    const canSort = header.column.getCanSort();
-                    const sorted = header.column.getIsSorted();
-                    const align = header.column.columnDef.meta?.align;
-                    const label = header.isPlaceholder
-                        ? null
-                        : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                          );
-                    return (
-                        <div
-                            role="columnheader"
-                            aria-sort={
-                                sorted === "asc"
-                                    ? "ascending"
-                                    : sorted === "desc"
-                                      ? "descending"
-                                      : undefined
-                            }
-                            key={header.id}
-                            className={cn(
-                                "min-w-0",
-                                align === "right" && "flex justify-end",
-                            )}
-                        >
-                            {canSort ? (
-                                <button
-                                    type="button"
-                                    onClick={header.column.getToggleSortingHandler()}
+            <div className="overflow-x-auto">
+                <div style={minWidth ? { minWidth } : undefined}>
+                    <div
+                        role="row"
+                        className="bg-background border-hairline grid items-center gap-3 border-b px-5 py-[9px]"
+                        style={{ gridTemplateColumns: gridTemplate }}
+                    >
+                        {headers.map((header) => {
+                            const canSort = header.column.getCanSort();
+                            const sorted = header.column.getIsSorted();
+                            const align = header.column.columnDef.meta?.align;
+                            const label = header.isPlaceholder
+                                ? null
+                                : flexRender(
+                                      header.column.columnDef.header,
+                                      header.getContext(),
+                                  );
+                            return (
+                                <div
+                                    role="columnheader"
+                                    aria-sort={
+                                        sorted === "asc"
+                                            ? "ascending"
+                                            : sorted === "desc"
+                                              ? "descending"
+                                              : undefined
+                                    }
+                                    key={header.id}
                                     className={cn(
-                                        "focus-visible:ring-ring inline-flex cursor-pointer items-center gap-2 text-xs font-semibold tracking-[0.3px] uppercase focus-visible:ring-2 focus-visible:outline-none",
-                                        sorted
-                                            ? "text-primary-hover font-bold"
-                                            : "text-muted-foreground",
+                                        "min-w-0",
+                                        align === "right" && "flex justify-end",
                                     )}
                                 >
-                                    {label}
-                                    {sorted && (
-                                        // Deliberate off-scale size: decorative sort-direction glyph, not readable text.
-                                        <span
-                                            aria-hidden
-                                            className="text-[8px] leading-none"
+                                    {canSort ? (
+                                        <button
+                                            type="button"
+                                            onClick={header.column.getToggleSortingHandler()}
+                                            className={cn(
+                                                "focus-visible:ring-ring inline-flex cursor-pointer items-center gap-2 text-xs font-semibold tracking-[0.3px] uppercase focus-visible:ring-2 focus-visible:outline-none",
+                                                sorted
+                                                    ? "text-primary-hover font-bold"
+                                                    : "text-muted-foreground",
+                                            )}
                                         >
-                                            {sorted === "asc" ? "▲" : "▼"}
+                                            {label}
+                                            {sorted && (
+                                                // Deliberate off-scale size: decorative sort-direction glyph, not readable text.
+                                                <span
+                                                    aria-hidden
+                                                    className="text-[8px] leading-none"
+                                                >
+                                                    {sorted === "asc"
+                                                        ? "▲"
+                                                        : "▼"}
+                                                </span>
+                                            )}
+                                        </button>
+                                    ) : (
+                                        <span className="text-muted-foreground text-xs font-semibold tracking-[0.3px] uppercase">
+                                            {label}
                                         </span>
                                     )}
-                                </button>
-                            ) : (
-                                <span className="text-muted-foreground text-xs font-semibold tracking-[0.3px] uppercase">
-                                    {label}
-                                </span>
-                            )}
-                        </div>
-                    );
-                })}
-            </div>
-
-            <div>
-                {isLoading ? (
-                    <div className="text-muted-foreground text-detail px-5 py-8 text-center">
-                        {loadingMessage ?? "…"}
-                    </div>
-                ) : rows.length === 0 ? (
-                    <div className="text-muted-foreground text-detail px-5 py-8 text-center">
-                        {globalFilter
-                            ? emptySearchMessage ?? emptyMessage
-                            : emptyMessage}
-                    </div>
-                ) : (
-                    rows.map((row, rowIndex) => {
-                        const canExpand = !!renderSubRow && row.getCanExpand();
-                        const isExpanded = canExpand && row.getIsExpanded();
-                        return (
-                            <React.Fragment key={row.id}>
-                                <div
-                                    role="row"
-                                    className={cn(
-                                        "border-hairline hover:bg-muted grid items-center gap-3 border-b px-5 py-[9px] text-sm",
-                                        !isExpanded && "last:border-b-0",
-                                        zebra &&
-                                            rowIndex % 2 === 0 &&
-                                            "bg-surface-zebra",
-                                    )}
-                                    style={{
-                                        gridTemplateColumns: gridTemplate,
-                                    }}
-                                >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <div
-                                            role="cell"
-                                            key={cell.id}
-                                            className={cn(
-                                                "min-w-0",
-                                                cell.column.columnDef.meta
-                                                    ?.align === "right" &&
-                                                    "flex justify-end",
-                                                cell.column.columnDef.meta
-                                                    ?.className,
-                                            )}
-                                        >
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext(),
-                                            )}
-                                        </div>
-                                    ))}
-                                    {renderSubRow && (
-                                        <div
-                                            role="cell"
-                                            className="flex justify-end"
-                                        >
-                                            {canExpand && (
-                                                <button
-                                                    type="button"
-                                                    aria-expanded={isExpanded}
-                                                    aria-label={
-                                                        isExpanded
-                                                            ? collapseRowLabel?.(
-                                                                  row.original,
-                                                              )
-                                                            : expandRowLabel?.(
-                                                                  row.original,
-                                                              )
-                                                    }
-                                                    onClick={row.getToggleExpandedHandler()}
-                                                    className="text-muted-foreground hover:text-foreground focus-visible:ring-ring flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg focus-visible:ring-2 focus-visible:outline-none"
-                                                >
-                                                    <ChevronDownIcon
-                                                        className={cn(
-                                                            "h-4 w-4 motion-safe:transition-transform",
-                                                            isExpanded &&
-                                                                "rotate-180",
-                                                        )}
-                                                    />
-                                                </button>
-                                            )}
-                                        </div>
-                                    )}
                                 </div>
-                                {isExpanded && (
-                                    <div
-                                        role="region"
-                                        className="border-hairline bg-background border-b px-5 py-3 last:border-b-0"
-                                    >
-                                        {renderSubRow(row.original)}
-                                    </div>
-                                )}
-                            </React.Fragment>
-                        );
-                    })
-                )}
+                            );
+                        })}
+                    </div>
+
+                    <div>
+                        {isLoading ? (
+                            <div className="text-muted-foreground text-detail px-5 py-8 text-center">
+                                {loadingMessage ?? "…"}
+                            </div>
+                        ) : rows.length === 0 ? (
+                            <div className="text-muted-foreground text-detail px-5 py-8 text-center">
+                                {globalFilter
+                                    ? emptySearchMessage ?? emptyMessage
+                                    : emptyMessage}
+                            </div>
+                        ) : (
+                            rows.map((row, rowIndex) => {
+                                const canExpand =
+                                    !!renderSubRow && row.getCanExpand();
+                                const isExpanded =
+                                    canExpand && row.getIsExpanded();
+                                return (
+                                    <React.Fragment key={row.id}>
+                                        <div
+                                            role="row"
+                                            className={cn(
+                                                "border-hairline hover:bg-muted grid items-center gap-3 border-b px-5 py-[9px] text-sm",
+                                                !isExpanded &&
+                                                    "last:border-b-0",
+                                                zebra &&
+                                                    rowIndex % 2 === 0 &&
+                                                    "bg-surface-zebra",
+                                            )}
+                                            style={{
+                                                gridTemplateColumns:
+                                                    gridTemplate,
+                                            }}
+                                        >
+                                            {row
+                                                .getVisibleCells()
+                                                .map((cell) => (
+                                                    <div
+                                                        role="cell"
+                                                        key={cell.id}
+                                                        className={cn(
+                                                            "min-w-0",
+                                                            cell.column
+                                                                .columnDef.meta
+                                                                ?.align ===
+                                                                "right" &&
+                                                                "flex justify-end",
+                                                            cell.column
+                                                                .columnDef.meta
+                                                                ?.className,
+                                                        )}
+                                                    >
+                                                        {flexRender(
+                                                            cell.column
+                                                                .columnDef.cell,
+                                                            cell.getContext(),
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            {renderSubRow && (
+                                                <div
+                                                    role="cell"
+                                                    className="flex justify-end"
+                                                >
+                                                    {canExpand && (
+                                                        <button
+                                                            type="button"
+                                                            aria-expanded={
+                                                                isExpanded
+                                                            }
+                                                            aria-label={
+                                                                isExpanded
+                                                                    ? collapseRowLabel?.(
+                                                                          row.original,
+                                                                      )
+                                                                    : expandRowLabel?.(
+                                                                          row.original,
+                                                                      )
+                                                            }
+                                                            onClick={row.getToggleExpandedHandler()}
+                                                            className="text-muted-foreground hover:text-foreground focus-visible:ring-ring flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg focus-visible:ring-2 focus-visible:outline-none"
+                                                        >
+                                                            <ChevronDownIcon
+                                                                className={cn(
+                                                                    "h-4 w-4 motion-safe:transition-transform",
+                                                                    isExpanded &&
+                                                                        "rotate-180",
+                                                                )}
+                                                            />
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                        {isExpanded && (
+                                            <div
+                                                role="region"
+                                                className="border-hairline bg-background border-b px-5 py-3 last:border-b-0"
+                                            >
+                                                {renderSubRow(row.original)}
+                                            </div>
+                                        )}
+                                    </React.Fragment>
+                                );
+                            })
+                        )}
+                    </div>
+                </div>
             </div>
 
             <div className="bg-background border-hairline flex items-center justify-between gap-3 border-t py-[9px] pr-3.5 pl-5">

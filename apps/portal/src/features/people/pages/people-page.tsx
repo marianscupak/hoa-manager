@@ -109,8 +109,13 @@ export function PeoplePage() {
                 columns={columns}
                 data={rows}
                 gridTemplate={
-                    canSeeAccounts ? "1.6fr 1.5fr 0.9fr 1fr 150px" : "2fr 1fr"
+                    canSeeAccounts ? "1.6fr 1.5fr 0.9fr 190px 230px" : "2fr 1fr"
                 }
+                // The admin view carries five columns, two of which hold
+                // controls rather than text; below this they stop fitting and
+                // scrolling beats squeezing. The owner's two columns always
+                // fit, so they get no floor.
+                minWidth={canSeeAccounts ? "980px" : undefined}
                 isLoading={isLoading}
                 loadingMessage={tCommon("loading")}
                 emptyMessage={t("people.empty")}

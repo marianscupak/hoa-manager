@@ -120,7 +120,7 @@ export function ReplaceOwnershipFieldItem({
 
                 {/* The field's own full width — enough for both numbers, the
                     slash and the mode pill without crowding. */}
-                <div className="w-[232px] shrink-0">
+                <div className="w-[192px] shrink-0">
                     <FormField
                         control={control}
                         name={`ownerships.${index}.share`}

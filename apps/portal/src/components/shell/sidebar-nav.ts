@@ -31,7 +31,7 @@ export const MAIN_NAV: SidebarNavItem[] = [
         end: true,
     },
     {
-        labelKey: "common:nav.myUnits",
+        labelKey: "common:nav.units",
         to: "/units",
         icon: House,
         isActive: (p) => p.startsWith("/units"),
@@ -42,7 +42,7 @@ export const MAIN_NAV: SidebarNavItem[] = [
 
 export const ADMIN_NAV: SidebarNavItem[] = [
     {
-        labelKey: "common:nav.units",
+        labelKey: "common:nav.unitsRegister",
         to: "/admin/units",
         icon: Building2,
         isActive: (p) => p.startsWith("/admin/units"),

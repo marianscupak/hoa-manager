@@ -101,6 +101,24 @@ export class UnitResponseDto {
   })
   owners!: string[];
 
+  /** True when the caller holds a share in this unit today. */
+  @ApiProperty()
+  mine!: boolean;
+
+  @ApiProperty({
+    type: 'number',
+    nullable: true,
+    description: "Numerator of the caller's share of this unit; null if none",
+  })
+  myShareNumerator!: number | null;
+
+  @ApiProperty({
+    type: 'number',
+    nullable: true,
+    description: "Denominator of the caller's share of this unit; null if none",
+  })
+  myShareDenominator!: number | null;
+
   @ApiProperty({
     nullable: true,
     type: String,

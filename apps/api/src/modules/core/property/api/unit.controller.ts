@@ -77,8 +77,13 @@ export class UnitController {
     );
   }
 
+  /**
+   * No `@Roles`: every member may read the register. Which unit belongs to
+   * whom, and how large it is, is public in the cadastre and in the
+   * prohlášení vlastníka — and this response carries nothing else. The
+   * caller's own units come back marked, with their share.
+   */
   @Get()
-  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
     description: 'List of all units within the current tenant',
@@ -87,7 +92,9 @@ export class UnitController {
   async getUnits(
     @Tenant() tenantCtx: TenantContext,
   ): Promise<UnitResponseDto[]> {
-    return this.queryBus.execute(new ListUnitsQuery(tenantCtx.tenantId));
+    return this.queryBus.execute(
+      new ListUnitsQuery(tenantCtx.tenantId, tenantCtx.membershipId),
+    );
   }
 
   @Post()

@@ -18,8 +18,8 @@ import { OwnerInvitePage } from "@/features/invite/pages/owner-invite-page";
 import { PeoplePage } from "@/features/people/pages/people-page";
 import { ProfilePage } from "@/features/profile/pages/profile-page";
 import { CreateTenantPage } from "@/features/tenants/pages/create-tenant-page";
+import { BuildingUnitsPage } from "@/features/units/pages/building-units-page";
 import { MyUnitDetailPage } from "@/features/units/pages/my-unit-detail-page";
-import { MyUnitsPage } from "@/features/units/pages/my-units-page";
 import { VotingAdminGuard } from "@/features/voting/guards/voting-admin-guard";
 import { AssemblyRecordPage } from "@/features/voting/pages/assembly-record-page";
 import { AssemblyRecordReviewPage } from "@/features/voting/pages/assembly-record-review-page";
@@ -55,14 +55,14 @@ export const router = createBrowserRouter([
                         element: <ProfilePage />,
                     },
                     {
-                        // Owner-facing; every member may open it. The
-                        // admin views of the same units live under
-                        // /admin/units.
+                        // The building's register, readable by every member.
+                        // The admin views of the same units, with the actions,
+                        // live under /admin/units.
                         path: "units",
                         children: [
                             {
                                 index: true,
-                                element: <MyUnitsPage />,
+                                element: <BuildingUnitsPage />,
                             },
                             {
                                 path: ":id",

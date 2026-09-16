@@ -4653,6 +4653,19 @@
               "type": "string"
             }
           },
+          "mine": {
+            "type": "boolean"
+          },
+          "myShareNumerator": {
+            "type": "number",
+            "nullable": true,
+            "description": "Numerator of the caller's share of this unit; null if none"
+          },
+          "myShareDenominator": {
+            "type": "number",
+            "nullable": true,
+            "description": "Denominator of the caller's share of this unit; null if none"
+          },
           "usageCode": {
             "type": "string",
             "nullable": true,
@@ -4679,6 +4692,9 @@
           "buildingShareNumerator",
           "buildingShareDenominator",
           "owners",
+          "mine",
+          "myShareNumerator",
+          "myShareDenominator",
           "usageCode",
           "usageName",
           "createdAt",
@@ -4883,6 +4899,19 @@
               "type": "string"
             }
           },
+          "mine": {
+            "type": "boolean"
+          },
+          "myShareNumerator": {
+            "type": "number",
+            "nullable": true,
+            "description": "Numerator of the caller's share of this unit; null if none"
+          },
+          "myShareDenominator": {
+            "type": "number",
+            "nullable": true,
+            "description": "Denominator of the caller's share of this unit; null if none"
+          },
           "usageCode": {
             "type": "string",
             "nullable": true,
@@ -4915,6 +4944,9 @@
           "buildingShareNumerator",
           "buildingShareDenominator",
           "owners",
+          "mine",
+          "myShareNumerator",
+          "myShareDenominator",
           "usageCode",
           "usageName",
           "createdAt",

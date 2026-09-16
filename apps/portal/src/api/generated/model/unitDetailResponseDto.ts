@@ -17,6 +17,17 @@ export interface UnitDetailResponseDto {
     buildingShareDenominator: number;
     /** Display names of the current owners of this unit */
     owners: string[];
+    mine: boolean;
+    /**
+     * Numerator of the caller's share of this unit; null if none
+     * @nullable
+     */
+    myShareNumerator: number | null;
+    /**
+     * Denominator of the caller's share of this unit; null if none
+     * @nullable
+     */
+    myShareDenominator: number | null;
     /**
      * Cadastre usage code, e.g. '1' for a flat. Null when unknown
      * @nullable

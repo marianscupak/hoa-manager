@@ -1,5 +1,5 @@
 import { Inject } from '@nestjs/common';
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { IQueryHandler, QueryBus, QueryHandler } from '@nestjs/cqrs';
 
 import {
   OWNER_REPOSITORY,
@@ -9,7 +9,13 @@ import {
   type UnitOwnershipRepository,
   type UnitRepository,
 } from '@/modules/core/property/application/ports/property.repository.port';
+import { type OwnedUnitResponseDto } from '@/modules/core/property/api/dto/owned-unit-response.dto';
+import { GetOwnedUnitsQuery } from '@/modules/core/property/application/queries/get-owned-units/get-owned-units.query';
 import { ListUnitsQuery } from '@/modules/core/property/application/queries/list-units.query';
+import {
+  markOwnUnits,
+  type MarkedUnit,
+} from '@/modules/core/property/domain/mark-own-units';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 
 // Named explicitly rather than `extends Unit`: `katastr_unit_id` is an
@@ -29,10 +35,13 @@ export interface UnitWithStatus {
   owners: string[];
 }
 
+export type ListedUnit = MarkedUnit<UnitWithStatus>;
+
 @QueryHandler(ListUnitsQuery)
-export class ListUnitsHandler
-  implements IQueryHandler<ListUnitsQuery, UnitWithStatus[]>
-{
+export class ListUnitsHandler implements IQueryHandler<
+  ListUnitsQuery,
+  ListedUnit[]
+> {
   constructor(
     @Inject(UNIT_REPOSITORY)
     private readonly unitRepo: UnitRepository,
@@ -42,12 +51,18 @@ export class ListUnitsHandler
     private readonly ownerRepo: OwnerRepository,
     @Inject(CLOCK)
     private readonly clock: Clock,
+    private readonly queryBus: QueryBus,
   ) {}
 
-  async execute(query: ListUnitsQuery): Promise<UnitWithStatus[]> {
-    const [units, tenantOwners] = await Promise.all([
+  async execute(query: ListUnitsQuery): Promise<ListedUnit[]> {
+    // The caller's own units come from the query that already owns that
+    // filter, so "which are mine" cannot drift from what `/units/mine` says.
+    const [units, tenantOwners, owned] = await Promise.all([
       this.unitRepo.listByTenant(query.tenantId),
       this.ownerRepo.listByTenant(query.tenantId),
+      this.queryBus.execute<GetOwnedUnitsQuery, OwnedUnitResponseDto[]>(
+        new GetOwnedUnitsQuery(query.tenantId, query.membershipId),
+      ),
     ]);
     const namesById = new Map(tenantOwners.map((o) => [o.id, o.displayName]));
     const now = this.clock.now();
@@ -86,6 +101,6 @@ export class ListUnitsHandler
       });
     }
 
-    return result;
+    return markOwnUnits(result, owned);
   }
 }

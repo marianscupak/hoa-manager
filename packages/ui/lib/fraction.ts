@@ -139,3 +139,40 @@ export function formatPercentValue(value: number, dp = 2): string {
 export function formatPercent(value: number, dp = 2): string {
     return `${formatPercentValue(value, dp)} %`;
 }
+
+/**
+ * Converts typed percent text into a fraction, optionally expressed over a
+ * given denominator.
+ *
+ * Without `denominator` the exact reduced fraction comes back, identical to
+ * `parseFraction("8.56 %")` -> 107/1250. With one, the value is snapped to
+ * the nearest share over that denominator (`8.56 %` over 1332 -> 114/1332),
+ * because a house's shares are conventionally all written over the same
+ * common denominator and `107/1250` would not line up with its neighbours.
+ * An exact percent needs no rounding and falls out of the same formula
+ * (`50 %` over 1332 -> 666/1332).
+ *
+ * Accepts "," or "." as the decimal separator. Returns `null` for empty,
+ * non-numeric, zero or negative input, and for a value so small it would
+ * round away to nothing over `denominator`.
+ */
+export function percentToFractionOver(
+    percentText: string,
+    denominator?: number,
+): Fraction | null {
+    const exact = parseFraction(`${percentText.trim().replace(",", ".")} %`);
+    if (!exact) return null;
+    if (
+        denominator === undefined ||
+        !Number.isSafeInteger(denominator) ||
+        denominator <= 0
+    ) {
+        return exact;
+    }
+    const num = BigInt(exact.num) * BigInt(denominator);
+    const den = BigInt(exact.den);
+    // Round half up in BigInt so a long decimal cannot drift the way
+    // `percent * denominator / 100` would in floating point.
+    const scaled = (2n * num + den) / (2n * den);
+    return scaled > 0n ? { num: Number(scaled), den: denominator } : null;
+}

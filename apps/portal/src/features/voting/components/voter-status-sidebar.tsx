@@ -340,6 +340,31 @@ export function VoterStatusSidebar({ vote }: VoterStatusSidebarProps) {
                 </Card>
             )}
 
+            {isAdmin &&
+                vote.status === "DRAFT" &&
+                vote.mode === "ASSEMBLY_RECORD" && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-muted-foreground text-detail font-semibold tracking-wide uppercase">
+                                {t("voting:assemblyRecord.entry.title")}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                            <p className="text-muted-foreground text-sm">
+                                {t("voting:assemblyRecord.entry.prompt")}
+                            </p>
+                        </CardContent>
+                        <CardFooter>
+                            <Button size="sm" asChild>
+                                <Link to={`/voting/${voteId}/assembly-record`}>
+                                    <FileText />
+                                    {t("voting:assemblyRecord.entry.action")}
+                                </Link>
+                            </Button>
+                        </CardFooter>
+                    </Card>
+                )}
+
             {isAdmin && vote.status === "OPEN" && (
                 <Card>
                     <CardHeader>

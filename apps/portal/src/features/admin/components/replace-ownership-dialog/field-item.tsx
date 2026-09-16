@@ -118,7 +118,9 @@ export function ReplaceOwnershipFieldItem({
                     />
                 </div>
 
-                <div className="w-36">
+                {/* The compound field needs room for both numbers, the slash
+                    and the mode pill; below ~280px they start to crowd. */}
+                <div className="w-[288px] shrink-0">
                     <FormField
                         control={control}
                         name={`ownerships.${index}.share`}
@@ -127,12 +129,13 @@ export function ReplaceOwnershipFieldItem({
                                 <FormLabel>
                                     {t("units.ownershipEditor.shareLabel")}
                                 </FormLabel>
+                                {/* No defaultDenominator: this is the owner's
+                                    share of one unit (the shares must sum to
+                                    1), not a share of the house, so the
+                                    house's denominator would be wrong here. */}
                                 <FractionInput
                                     value={field.value}
                                     onChange={field.onChange}
-                                    placeholder={t(
-                                        "units.ownershipEditor.sharePlaceholder",
-                                    )}
                                     aria-invalid={!!fieldState.error}
                                 />
                                 <FormMessage />

@@ -205,13 +205,13 @@ export function FractionInput({
 
     const fieldInvalid = ariaInvalid || invalid;
     const innerInput = cn(
-        "min-w-0 flex-1 bg-transparent font-mono text-[15px] font-semibold tabular-nums",
-        "placeholder:font-normal placeholder:text-muted-foreground",
+        "min-w-0 flex-1 bg-transparent font-mono text-md font-semibold tabular-nums",
+        "placeholder:text-faint placeholder:font-normal",
         "outline-none disabled:cursor-not-allowed",
     );
     const segment = (active: boolean) =>
         cn(
-            "h-6 cursor-pointer rounded-sm px-2 font-mono text-[11.5px] font-bold transition-colors",
+            "h-6 cursor-pointer rounded-sm px-2 font-mono text-2xs font-bold transition-colors",
             active
                 ? "bg-card text-primary-hover shadow-sm"
                 : "text-primary hover:text-primary-pressed",

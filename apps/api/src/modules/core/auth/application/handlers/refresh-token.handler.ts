@@ -57,41 +57,55 @@ export class RefreshTokenHandler
   ) {}
 
   async execute(command: RefreshTokenCommand): Promise<RefreshTokenResult> {
-    return this.uow.execute(async () => {
-      const oldClaims = await this.verifyOldToken(command.oldAccessToken);
+    // Validation runs outside the unit of work on purpose. Replay detection
+    // revokes every session the user has and then rejects the request; while
+    // that happened inside the transaction, the rejection rolled the
+    // revocation back and the defence never took effect. `findByHash` takes
+    // no row lock, so reading out here gives up no guarantee the transaction
+    // was providing.
+    const oldClaims = await this.verifyOldToken(command.oldAccessToken);
 
-      const session = await this.findAndValidateSession(
-        command.refreshToken,
-        oldClaims?.sub,
-      );
+    const session = await this.findAndValidateSession(
+      command.refreshToken,
+      oldClaims?.sub,
+    );
 
-      const userId = session.userId;
+    const userId = session.userId;
 
-      // Enforce expiry and revocation-replay detection. Outside the
-      // grace period, a reused revoked token triggers revokeAllForUser.
-      await this.validateSessionStatus(session, userId);
+    // Enforce expiry and revocation-replay detection. Outside the
+    // grace period, a reused revoked token triggers revokeAllForUser.
+    await this.validateSessionStatus(session, userId);
 
-      const user = await this.queryBus.execute<
-        GetUserByIdQuery,
-        GetUserByIdResult
-      >(new GetUserByIdQuery(userId));
+    const user = await this.queryBus.execute<
+      GetUserByIdQuery,
+      GetUserByIdResult
+    >(new GetUserByIdQuery(userId));
 
-      if (!user || !user.isActive) {
-        throw new UserInactiveException();
+    if (!user || !user.isActive) {
+      throw new UserInactiveException();
+    }
+
+    const scopedClaims = await this.resolveTenantScope(
+      oldClaims ?? { sub: userId },
+      userId,
+    );
+
+    // Add user identity to claims
+    scopedClaims.email = user.email;
+    scopedClaims.fullName = user.fullName;
+    scopedClaims.preferredLanguage = user.preferredLanguage;
+
+    const { rawToken, hash, expiresAt } = this.generateNewRefreshToken();
+
+    // Rotation is the only part that has to be atomic: the old session must
+    // not be retired without its replacement existing.
+    await this.uow.execute(async () => {
+      // A reuse tolerated inside the grace period must not restart the
+      // window, so only a session that is still live gets stamped. Otherwise
+      // replaying every 20 seconds keeps a revoked token usable forever.
+      if (!session.revokedAt) {
+        await this.authSessionRepository.markRevoked(session.id);
       }
-
-      const scopedClaims = await this.resolveTenantScope(
-        oldClaims ?? { sub: userId },
-        userId,
-      );
-
-      // Add user identity to claims
-      scopedClaims.email = user.email;
-      scopedClaims.fullName = user.fullName;
-      scopedClaims.preferredLanguage = user.preferredLanguage;
-
-      await this.authSessionRepository.markRevoked(session.id);
-      const { rawToken, hash, expiresAt } = this.generateNewRefreshToken();
 
       await this.authSessionRepository.create({
         userId,
@@ -99,26 +113,26 @@ export class RefreshTokenHandler
         rotatedFromSessionId: session.id,
         expiresAt,
       });
-
-      // Strip technical JWT fields if they exist from old token
-      const {
-        iat: _iat,
-        exp: _exp,
-        nbf: _nbf,
-        jti: _jti,
-        ...claimsToSign
-      } = scopedClaims as any;
-
-      const newAccessToken = await this.tokenSigner.signToken(
-        claimsToSign,
-        15 * 60,
-      );
-
-      return {
-        accessToken: newAccessToken,
-        refreshToken: rawToken,
-      };
     });
+
+    // Strip technical JWT fields if they exist from old token
+    const {
+      iat: _iat,
+      exp: _exp,
+      nbf: _nbf,
+      jti: _jti,
+      ...claimsToSign
+    } = scopedClaims as any;
+
+    const newAccessToken = await this.tokenSigner.signToken(
+      claimsToSign,
+      15 * 60,
+    );
+
+    return {
+      accessToken: newAccessToken,
+      refreshToken: rawToken,
+    };
   }
 
   private async verifyOldToken(

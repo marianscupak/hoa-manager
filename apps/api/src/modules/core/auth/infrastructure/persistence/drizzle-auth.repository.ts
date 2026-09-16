@@ -107,10 +107,14 @@ export class DrizzleAuthSessionRepository implements AuthSessionRepository {
   }
 
   async markRevoked(id: string): Promise<void> {
+    // Idempotent, the same way `revokeAllForUser` below is: revoking means
+    // "this session is retired as of the first time we said so", not "stamp
+    // it again". Re-stamping turned the reuse grace period into a window an
+    // attacker could hold open indefinitely.
     await this.db
       .update(authSessions)
       .set({ revokedAt: this.clock.now() })
-      .where(eq(authSessions.id, id));
+      .where(and(eq(authSessions.id, id), isNull(authSessions.revokedAt)));
   }
 
   async revokeAllForUser(userId: string): Promise<void> {

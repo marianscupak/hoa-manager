@@ -2,7 +2,6 @@ import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
 
-import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
 import { EmailModule } from '@/infrastructure/email/email.module';
 import { AuditModule } from '@/modules/core/audit/audit.module';
 import { AuditProjectionsModule } from '@/modules/core/audit-projections/audit-projections.module';
@@ -22,7 +21,6 @@ import { DrizzleInviteReadRepository } from '@/modules/core/invitation/infrastru
 import { DrizzleOwnerInviteRepository } from '@/modules/core/invitation/infrastructure/persistence/drizzle-owner-invite.repository';
 import { PropertyModule } from '@/modules/core/property/property.module';
 import { TenancyModule } from '@/modules/core/tenancy/tenancy.module';
-import { UNIT_OF_WORK } from '@/shared/application/ports/unit-of-work.port';
 
 const CommandHandlers = [
   SendOwnerInviteHandler,
@@ -60,7 +58,6 @@ const QueryHandlers = [
       provide: INVITE_READ_REPOSITORY,
       useClass: DrizzleInviteReadRepository,
     },
-    { provide: UNIT_OF_WORK, useClass: DrizzleUnitOfWork },
     InvitationAuditRegistration,
   ],
   exports: [OWNER_INVITE_REPOSITORY, INVITE_READ_REPOSITORY],

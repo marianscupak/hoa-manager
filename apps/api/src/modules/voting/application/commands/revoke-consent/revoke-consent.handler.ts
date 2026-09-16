@@ -1,7 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
 import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
 import { AuditService } from '@/modules/core/audit/application/services/audit.service';
 import {
@@ -18,6 +17,10 @@ import { VoteUnitConsentStatus } from '@/modules/voting/domain/vote/vote.types';
 import { ForbiddenException } from '@/shared/application/exceptions/auth.exceptions';
 import { DelegationNotFoundException } from '@/shared/application/exceptions/vote.exceptions';
 import { type Clock, CLOCK } from '@/shared/application/ports/clock.port';
+import {
+  UNIT_OF_WORK,
+  type UnitOfWork,
+} from '@/shared/application/ports/unit-of-work.port';
 
 import { RevokeConsentCommand } from './revoke-consent.command';
 
@@ -30,7 +33,8 @@ export class RevokeConsentHandler
     private readonly consentWriteRepo: VoteConsentWriteRepository,
     @Inject(VOTE_READ_REPOSITORY)
     private readonly voteReadRepo: VoteReadRepository,
-    private readonly unitOfWork: DrizzleUnitOfWork,
+    @Inject(UNIT_OF_WORK)
+    private readonly unitOfWork: UnitOfWork,
     @Inject(CLOCK)
     private readonly clock: Clock,
     private readonly auditService: AuditService,

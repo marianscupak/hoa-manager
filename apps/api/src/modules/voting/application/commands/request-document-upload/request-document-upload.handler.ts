@@ -1,7 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
 import {
   VOTE_DOCUMENT_ALLOWED_CONTENT_TYPES,
   VOTE_DOCUMENT_MAX_COUNT,
@@ -16,6 +15,10 @@ import {
   VoteNotDraftException,
   VoteNotFoundException,
 } from '@/shared/application/exceptions/vote.exceptions';
+import {
+  UNIT_OF_WORK,
+  type UnitOfWork,
+} from '@/shared/application/ports/unit-of-work.port';
 
 import { RequestDocumentUploadCommand } from './request-document-upload.command';
 import {
@@ -47,7 +50,8 @@ export class RequestDocumentUploadHandler
     private readonly documentRepository: VoteDocumentRepository,
     @Inject(DOCUMENT_STORAGE)
     private readonly storage: DocumentStoragePort,
-    private readonly unitOfWork: DrizzleUnitOfWork,
+    @Inject(UNIT_OF_WORK)
+    private readonly unitOfWork: UnitOfWork,
   ) {}
 
   async execute(

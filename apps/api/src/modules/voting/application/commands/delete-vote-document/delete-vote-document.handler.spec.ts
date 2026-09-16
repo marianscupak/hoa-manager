@@ -1,15 +1,14 @@
-import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
 import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
 import { AuditService } from '@/modules/core/audit/application/services/audit.service';
 import type { AuditActor } from '@/modules/core/audit/domain/actor';
-import { VotingAuditLabelResolver } from '@/modules/voting/audit/label-resolver.service';
-import { VotingEventType } from '@/modules/voting/audit/voting-event-types';
 import { type DocumentStoragePort } from '@/modules/voting/application/ports/document-storage.port';
 import {
   type VoteDocumentRecord,
   type VoteDocumentRepository,
 } from '@/modules/voting/application/ports/vote-document.repository.port';
 import { type VoteWriteRepository } from '@/modules/voting/application/ports/vote-write.repository.port';
+import { VotingAuditLabelResolver } from '@/modules/voting/audit/label-resolver.service';
+import { VotingEventType } from '@/modules/voting/audit/voting-event-types';
 import { type VoteAggregate } from '@/modules/voting/domain/vote/vote.aggregate';
 import { VoteStatus } from '@/modules/voting/domain/vote/vote.types';
 import {
@@ -17,6 +16,7 @@ import {
   VoteNotDraftException,
 } from '@/shared/application/exceptions/vote.exceptions';
 import { type Clock } from '@/shared/application/ports/clock.port';
+import { type UnitOfWork } from '@/shared/application/ports/unit-of-work.port';
 
 import { DeleteVoteDocumentCommand } from './delete-vote-document.command';
 import { DeleteVoteDocumentHandler } from './delete-vote-document.handler';
@@ -73,7 +73,7 @@ describe('DeleteVoteDocumentHandler', () => {
     } as unknown as jest.Mocked<AuditService>;
     const unitOfWork = {
       execute: jest.fn((work: () => Promise<unknown>) => work()),
-    } as unknown as DrizzleUnitOfWork;
+    } as unknown as UnitOfWork;
     const auditContext = {
       requireActor: jest.fn().mockReturnValue(ACTOR),
     } as unknown as AuditContextService;

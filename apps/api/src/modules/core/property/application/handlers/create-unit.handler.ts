@@ -1,7 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
 import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
 import { AuditService } from '@/modules/core/audit/application/services/audit.service';
 import { CoreAuditLabelResolver } from '@/modules/core/audit-projections/core-audit-label-resolver.service';
@@ -16,6 +15,10 @@ import {
   InvalidOwnershipShareException,
 } from '@/shared/application/exceptions/property.exceptions';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
+import {
+  UNIT_OF_WORK,
+  type UnitOfWork,
+} from '@/shared/application/ports/unit-of-work.port';
 import { isUniqueViolation } from '@/shared/errors/pg-errors';
 
 @CommandHandler(CreateUnitCommand)
@@ -27,7 +30,8 @@ export class CreateUnitHandler
     private readonly unitRepo: UnitRepository,
     @Inject(CLOCK)
     private readonly clock: Clock,
-    private readonly uow: DrizzleUnitOfWork,
+    @Inject(UNIT_OF_WORK)
+    private readonly uow: UnitOfWork,
     private readonly auditService: AuditService,
     private readonly auditContext: AuditContextService,
     private readonly labelResolver: CoreAuditLabelResolver,

@@ -1,7 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
 import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
 import { AuditService } from '@/modules/core/audit/application/services/audit.service';
 import { VoteQuestionUpdatedAuditEvent } from '@/modules/voting/audit/events/vote-question-updated.event';
@@ -9,6 +8,10 @@ import { VotingAuditLabelResolver } from '@/modules/voting/audit/label-resolver.
 import { materializeRuleset } from '@/modules/voting/domain/vote/ruleset-validation';
 import { VoteNotFoundException } from '@/shared/application/exceptions/vote.exceptions';
 import { type Clock, CLOCK } from '@/shared/application/ports/clock.port';
+import {
+  UNIT_OF_WORK,
+  type UnitOfWork,
+} from '@/shared/application/ports/unit-of-work.port';
 
 import { UpdateVoteQuestionCommand } from './update-vote-question.command';
 import { VOTE_WRITE_REPOSITORY } from '../../ports/vote-write.repository.port';
@@ -21,7 +24,8 @@ export class UpdateVoteQuestionHandler
   constructor(
     @Inject(VOTE_WRITE_REPOSITORY)
     private readonly voteWriteRepository: VoteWriteRepository,
-    private readonly unitOfWork: DrizzleUnitOfWork,
+    @Inject(UNIT_OF_WORK)
+    private readonly unitOfWork: UnitOfWork,
     @Inject(CLOCK)
     private readonly clock: Clock,
     private readonly auditService: AuditService,

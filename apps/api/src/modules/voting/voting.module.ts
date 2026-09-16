@@ -3,7 +3,6 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { ScheduleModule } from '@nestjs/schedule';
 
 import { ConfigModule } from '@/infrastructure/config/config.module';
-import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
 import { AuditModule } from '@/modules/core/audit/audit.module';
 
 import { VotesController } from './api/votes.controller';
@@ -132,7 +131,6 @@ const REPOSITORIES = [
     useClass: DrizzleVoteDocumentRepository,
   },
   { provide: DOCUMENT_STORAGE, useClass: R2DocumentStorageService },
-  DrizzleUnitOfWork,
   VoteSchedulerService,
   VoteDocumentCleanupService,
 ];

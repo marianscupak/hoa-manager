@@ -1,7 +1,6 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
-import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
 import { AuditModule } from '@/modules/core/audit/audit.module';
 import { AuditProjectionsModule } from '@/modules/core/audit-projections/audit-projections.module';
 import { AuthModule } from '@/modules/core/auth/auth.module';
@@ -85,7 +84,6 @@ const Repositories = [
     provide: KATASTR_SNAPSHOT_REPOSITORY,
     useClass: DrizzleKatastrSnapshotRepository,
   },
-  DrizzleUnitOfWork,
 ];
 
 @Module({

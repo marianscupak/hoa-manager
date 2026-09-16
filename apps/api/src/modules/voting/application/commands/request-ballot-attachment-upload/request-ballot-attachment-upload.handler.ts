@@ -1,7 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
 import {
   BALLOT_SCAN_ALLOWED_CONTENT_TYPES,
   BALLOT_SCAN_MAX_SIZE_BYTES,
@@ -14,6 +13,10 @@ import {
   VoteNotFoundException,
   VoteNotOpenException,
 } from '@/shared/application/exceptions/vote.exceptions';
+import {
+  UNIT_OF_WORK,
+  type UnitOfWork,
+} from '@/shared/application/ports/unit-of-work.port';
 
 import { RequestBallotAttachmentUploadCommand } from './request-ballot-attachment-upload.command';
 import {
@@ -45,7 +48,8 @@ export class RequestBallotAttachmentUploadHandler
     private readonly documentRepository: VoteDocumentRepository,
     @Inject(DOCUMENT_STORAGE)
     private readonly storage: DocumentStoragePort,
-    private readonly unitOfWork: DrizzleUnitOfWork,
+    @Inject(UNIT_OF_WORK)
+    private readonly unitOfWork: UnitOfWork,
   ) {}
 
   async execute(

@@ -1,7 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
 import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
 import { AuditService } from '@/modules/core/audit/application/services/audit.service';
 import { CoreAuditLabelResolver } from '@/modules/core/audit-projections/core-audit-label-resolver.service';
@@ -30,6 +29,10 @@ import {
   UnitNotFoundException,
 } from '@/shared/application/exceptions/property.exceptions';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
+import {
+  UNIT_OF_WORK,
+  type UnitOfWork,
+} from '@/shared/application/ports/unit-of-work.port';
 import { formatAssociationDate } from '@/shared/domain/association-date';
 
 @CommandHandler(ReplaceUnitOwnershipCommand)
@@ -43,7 +46,8 @@ export class ReplaceUnitOwnershipHandler
     private readonly ownerRepo: OwnerRepository,
     @Inject(UNIT_OWNERSHIP_REPOSITORY)
     private readonly ownershipRepo: UnitOwnershipRepository,
-    private readonly unitOfWork: DrizzleUnitOfWork,
+    @Inject(UNIT_OF_WORK)
+    private readonly unitOfWork: UnitOfWork,
     @Inject(CLOCK)
     private readonly clock: Clock,
     private readonly auditService: AuditService,

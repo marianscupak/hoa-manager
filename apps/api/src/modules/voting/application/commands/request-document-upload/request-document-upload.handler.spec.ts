@@ -1,4 +1,3 @@
-import { DrizzleUnitOfWork } from '@/infrastructure/db/drizzle.unit-of-work';
 import { type DocumentStoragePort } from '@/modules/voting/application/ports/document-storage.port';
 import { type VoteDocumentRepository } from '@/modules/voting/application/ports/vote-document.repository.port';
 import { type VoteWriteRepository } from '@/modules/voting/application/ports/vote-write.repository.port';
@@ -12,6 +11,7 @@ import {
   VoteNotDraftException,
   VoteNotFoundException,
 } from '@/shared/application/exceptions/vote.exceptions';
+import { type UnitOfWork } from '@/shared/application/ports/unit-of-work.port';
 
 import { RequestDocumentUploadCommand } from './request-document-upload.command';
 import { RequestDocumentUploadHandler } from './request-document-upload.handler';
@@ -43,7 +43,7 @@ describe('RequestDocumentUploadHandler', () => {
     } as unknown as jest.Mocked<DocumentStoragePort>;
     const unitOfWork = {
       execute: jest.fn((work: () => Promise<unknown>) => work()),
-    } as unknown as DrizzleUnitOfWork;
+    } as unknown as UnitOfWork;
     handler = new RequestDocumentUploadHandler(
       voteWriteRepository,
       documentRepository,

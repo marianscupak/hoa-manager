@@ -152,6 +152,10 @@ export const voting = {
                 label: "Description",
                 placeholder: "e.g. Describe the purpose of this vote.",
             },
+            meetingDate: {
+                label: "Meeting date and time",
+                description: "When was the meeting held?",
+            },
             scheduledFrom: {
                 label: "Scheduled From",
                 description: "When should the vote automatically open?",
@@ -314,6 +318,7 @@ export const voting = {
                 "Once scheduled, owners are notified and the setup can no longer be edited.",
             keepDraft: "Keep as draft",
             scheduleAction: "Schedule vote",
+            startRecordingAction: "Start recording",
             quorumLine: "Quorum: {{comparator}} {{threshold}}.",
             majorityLine: "Majority: {{comparator}} {{threshold}}.",
             checks: {

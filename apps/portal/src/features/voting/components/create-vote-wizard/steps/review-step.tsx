@@ -33,19 +33,28 @@ export interface ReviewCheck {
 export function buildReviewChecks(vote: VoteDetailResponseDto): ReviewCheck[] {
     const from = vote.scheduledFrom ? new Date(vote.scheduledFrom) : null;
     const to = vote.scheduledTo ? new Date(vote.scheduledTo) : null;
+    // An assembly record documents a meeting that already happened: it has one
+    // date rather than a window, and that date being in the past is the normal
+    // case rather than a problem.
+    const isAssemblyRecord = vote.mode === "ASSEMBLY_RECORD";
+
     const checks: ReviewCheck[] = [
         {
             code: "VOTE_SCHEDULE_MISSING_DATES",
-            ok: !!from && !!to,
+            ok: isAssemblyRecord ? !!from : !!from && !!to,
             severity: "error",
             step: "details",
         },
-        {
-            code: "VOTE_SCHEDULE_IN_PAST",
-            ok: !from || from.getTime() > Date.now(),
-            severity: "error",
-            step: "details",
-        },
+        ...(isAssemblyRecord
+            ? []
+            : [
+                  {
+                      code: "VOTE_SCHEDULE_IN_PAST",
+                      ok: !from || from.getTime() > Date.now(),
+                      severity: "error" as const,
+                      step: "details" as const,
+                  },
+              ]),
         {
             code: "VOTE_RULESET_REQUIRED",
             ok: !!vote.ruleset,

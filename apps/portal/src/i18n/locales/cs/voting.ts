@@ -152,6 +152,10 @@ export const voting = {
                 label: "Popis",
                 placeholder: "Popište účel tohoto hlasování.",
             },
+            meetingDate: {
+                label: "Datum a čas konání zasedání",
+                description: "Kdy se zasedání konalo?",
+            },
             scheduledFrom: {
                 label: "Začátek hlasování",
                 description: "Kdy se má hlasování automaticky otevřít?",
@@ -315,6 +319,7 @@ export const voting = {
                 "Po naplánování budou vlastníci informováni a nastavení už nepůjde upravit.",
             keepDraft: "Ponechat jako koncept",
             scheduleAction: "Naplánovat hlasování",
+            startRecordingAction: "Zahájit zápis",
             quorumLine: "Kvórum: {{comparator}} {{threshold}}.",
             majorityLine: "Většina: {{comparator}} {{threshold}}.",
             checks: {

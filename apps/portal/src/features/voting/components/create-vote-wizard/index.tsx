@@ -277,6 +277,16 @@ export function CreateVoteWizard({
                 <Button onClick={() => goToStep("review")}>
                     {t("voting:wizard.toReview")}
                 </Button>
+            ) : activeStep === "review" && mode === "ASSEMBLY_RECORD" ? (
+                // An assembly record is never scheduled: the meeting already
+                // happened, so the wizard hands over to the recording screen.
+                <Button
+                    onClick={() => navigate(`/voting/${voteId}/assembly-record`)}
+                    disabled={scheduleDisabled}
+                >
+                    <Send />
+                    {t("voting:wizard.review.startRecordingAction")}
+                </Button>
             ) : activeStep === "review" ? (
                 // Mirrors the review card's primary Schedule action — same
                 // disabled logic, same dialog (opened via setIsConfirmOpen).

@@ -11,6 +11,7 @@ import {
     FormTextarea,
     toast,
 } from "@hoa-mngr/ui";
+import { cn } from "@hoa-mngr/ui/lib/utils";
 
 import { showApiError } from "@/api/error-utils";
 import { VoteDetailResponseDto } from "@/api/generated/model";
@@ -218,26 +219,41 @@ export function CreateVoteBasicInfoStep({
                         rows={3}
                     />
 
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {/* An assembly record has one date — when the meeting
+                        was held — rather than a voting window. */}
+                    <div
+                        className={cn(
+                            "grid grid-cols-1 gap-4",
+                            mode === "PER_ROLLAM" && "sm:grid-cols-2",
+                        )}
+                    >
                         <FormDatetimePicker
                             name="scheduledFrom"
                             label={t(
-                                "voting:create.fields.scheduledFrom.label",
+                                mode === "ASSEMBLY_RECORD"
+                                    ? "voting:create.fields.meetingDate.label"
+                                    : "voting:create.fields.scheduledFrom.label",
                             )}
                             description={t(
-                                "voting:create.fields.scheduledFrom.description",
+                                mode === "ASSEMBLY_RECORD"
+                                    ? "voting:create.fields.meetingDate.description"
+                                    : "voting:create.fields.scheduledFrom.description",
                             )}
                             timeLabel={t("voting:create.fields.time")}
                         />
 
-                        <FormDatetimePicker
-                            name="scheduledTo"
-                            label={t("voting:create.fields.scheduledTo.label")}
-                            description={t(
-                                "voting:create.fields.scheduledTo.description",
-                            )}
-                            timeLabel={t("voting:create.fields.time")}
-                        />
+                        {mode === "PER_ROLLAM" && (
+                            <FormDatetimePicker
+                                name="scheduledTo"
+                                label={t(
+                                    "voting:create.fields.scheduledTo.label",
+                                )}
+                                description={t(
+                                    "voting:create.fields.scheduledTo.description",
+                                )}
+                                timeLabel={t("voting:create.fields.time")}
+                            />
+                        )}
                     </div>
                 </div>
             </form>

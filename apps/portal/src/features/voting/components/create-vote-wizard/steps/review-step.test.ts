@@ -115,4 +115,57 @@ describe("buildReviewChecks", () => {
         );
         expect(checks.every((c) => c.severity === "error")).toBe(true);
     });
+
+    it("omits the in-past check for an assembly record", () => {
+        // The meeting already happened, so its date is supposed to be in the
+        // past; keeping the check would make the wizard impossible to finish.
+        const vote = buildVote({
+            mode: "ASSEMBLY_RECORD",
+            scheduledFrom: new Date(Date.now() - 4 * DAY_MS).toISOString(),
+            scheduledTo: null,
+            ruleset: completeVote.ruleset,
+            questions: completeVote.questions,
+        });
+
+        expect(buildReviewChecks(vote).map((c) => c.code)).toEqual([
+            "VOTE_SCHEDULE_MISSING_DATES",
+            "VOTE_RULESET_REQUIRED",
+            "VOTE_MISSING_QUESTIONS",
+        ]);
+    });
+
+    it("needs only the meeting date for an assembly record", () => {
+        // `scheduledTo` is unused for this mode, so requiring both dates would
+        // block a record that is in fact complete.
+        const vote = buildVote({
+            mode: "ASSEMBLY_RECORD",
+            scheduledFrom: new Date(Date.now() - 4 * DAY_MS).toISOString(),
+            scheduledTo: null,
+            ruleset: completeVote.ruleset,
+            questions: completeVote.questions,
+        });
+
+        expect(buildReviewChecks(vote).every((c) => c.ok)).toBe(true);
+    });
+
+    it("fails the meeting-date check when an assembly record has no date", () => {
+        const vote = buildVote({
+            mode: "ASSEMBLY_RECORD",
+            scheduledFrom: null,
+            scheduledTo: null,
+            ruleset: completeVote.ruleset,
+            questions: completeVote.questions,
+        });
+
+        expect(
+            findCheck(buildReviewChecks(vote), "VOTE_SCHEDULE_MISSING_DATES").ok,
+        ).toBe(false);
+    });
+
+    it("still requires both dates and a future start for per rollam", () => {
+        const codes = buildReviewChecks(completeVote).map((c) => c.code);
+
+        expect(codes).toContain("VOTE_SCHEDULE_IN_PAST");
+        expect(codes).toContain("VOTE_SCHEDULE_MISSING_DATES");
+    });
 });

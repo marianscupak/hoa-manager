@@ -69,10 +69,13 @@ export class SetUnitAttendanceHandler
       }
 
       if (status === 'PRESENT') {
-        const electorate = await this.electorateService.resolveElectorate(
-          vote,
-          this.clock.now(),
-        );
+        // The same electorate the roster offered, or this command would
+        // refuse a unit the board can see and click.
+        const electorate =
+          await this.electorateService.resolveAssemblyElectorate(
+            vote,
+            this.clock.now(),
+          );
         const row = electorate.find((e) => e.unitId === unitId);
         if (!row || !isRecordableAtAssembly(row.ineligibleReason)) {
           throw new UnitNotEligibleForAttendanceException();

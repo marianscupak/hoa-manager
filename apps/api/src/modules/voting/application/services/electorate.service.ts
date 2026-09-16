@@ -49,4 +49,18 @@ export class ElectorateDomainService implements ElectorateService {
       weightBasis,
     );
   }
+
+  /**
+   * The meeting already happened, so the electorate is the owners as they
+   * stood on the day — who was in the room, whose names the minutes give, and
+   * whose units carried a vote. `CreateVote` and `UpdateVote` refuse a meeting
+   * date the ownership register does not reach back to, so this always has
+   * records to read.
+   */
+  async resolveAssemblyElectorate(
+    vote: VoteAggregate,
+    now: Date,
+  ): Promise<ElectorateUnit[]> {
+    return await this.resolveElectorate(vote, vote.scheduledFrom ?? now);
+  }
 }

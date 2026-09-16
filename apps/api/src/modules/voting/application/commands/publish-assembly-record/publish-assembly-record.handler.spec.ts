@@ -31,9 +31,6 @@ const ACTOR: AuditActor = {
 
 const MEETING_DATE = new Date('2026-09-12T18:30:00Z');
 const NOW = new Date('2026-09-16T12:00:00Z');
-/** The association filled its unit register in after the meeting. */
-const OWNERSHIP_RECORDED_FROM = new Date('2026-09-15T00:00:00Z');
-
 const UNITS: ElectorateUnit[] = [
   {
     unitId: 'u1',
@@ -103,20 +100,9 @@ function build(options?: {
       findByVote: jest.fn(async () => attendance),
     } as unknown as VoteAttendanceRepository,
     {
-      // Models the ownership table: an as-of query before the records begin
-      // finds no owner at all, so nothing can be classified. This is the
-      // normal state of a building whose register was filled in after the
-      // meeting it is now writing up.
-      resolveElectorate: jest.fn(async (_v: VoteAggregate, at: Date) => {
-        calls.resolvedAt = at;
-        return at < OWNERSHIP_RECORDED_FROM
-          ? UNITS.map((u) => ({
-              ...u,
-              representativeMembershipId: null,
-              eligibilityStatus: ElectorateEligibilityStatus.INELIGIBLE,
-              ineligibleReason: ElectorateIneligibleReason.MISSING_OWNERSHIP,
-            }))
-          : UNITS;
+      resolveAssemblyElectorate: jest.fn(async () => {
+        calls.resolvedAt = MEETING_DATE;
+        return UNITS;
       }),
     } as unknown as ElectorateService,
     {
@@ -170,18 +156,20 @@ describe('PublishAssemblyRecordHandler', () => {
     await expect(handler.execute(command())).resolves.toBeUndefined();
   });
 
-  it('keeps the association\'s own unit out of the published electorate', async () => {
-    // § 1206(1): a unit the association owns carries no vote, so it is not
-    // part of the "all votes" the quorum is measured against. That
-    // classification comes from the ownership records, and resolving as of
-    // the meeting date — before this building's register begins — erased it:
-    // the unit came back MISSING_OWNERSHIP, which *is* counted, and a quorate
-    // assembly published as inquorate.
+  it('snapshots exactly the electorate the recording screen resolved', async () => {
+    // Publishing used to resolve the electorate itself, as of the meeting
+    // date, while the roster resolved its own. The board entered the record
+    // against one set of units and it was computed against another: in a
+    // building whose register did not reach back that far, the association's
+    // own unit came back MISSING_OWNERSHIP instead of ASSOCIATION_OWNED,
+    // counted toward "all votes" it has no vote in (§ 1206 odst. 1), and a
+    // quorate assembly published as inquorate. Both now go through one entry
+    // point, and `CreateVote` refuses a meeting the register cannot reach.
     const { handler, calls } = build();
 
     await handler.execute(command());
 
-    expect(calls.resolvedAt).toEqual(NOW);
+    expect(calls.snapshotted).toEqual(UNITS);
     expect(calls.snapshotted).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -190,16 +178,6 @@ describe('PublishAssemblyRecordHandler', () => {
         }),
       ]),
     );
-  });
-
-  it('snapshots the electorate the recording screen resolved', async () => {
-    // The board marked attendance against the live roster; the record has to
-    // be computed against that same set or it contradicts what they entered.
-    const { handler, calls } = build();
-
-    await handler.execute(command());
-
-    expect(calls.snapshotted).toEqual(UNITS);
   });
 
   it('snapshots the electorate, closes the vote and persists results', async () => {

@@ -7,6 +7,7 @@ import {
   VOTE_WRITE_REPOSITORY,
   type VoteWriteRepository,
 } from '@/modules/voting/application/ports/vote-write.repository.port';
+import { AssemblyMeetingDateGuard } from '@/modules/voting/application/services/assembly-meeting-date.guard';
 import { VoteCreatedAuditEvent } from '@/modules/voting/audit/events/vote-created.event';
 import { VotingAuditLabelResolver } from '@/modules/voting/audit/label-resolver.service';
 import { VoteAggregate } from '@/modules/voting/domain/vote/vote.aggregate';
@@ -33,9 +34,16 @@ export class CreateVoteHandler implements ICommandHandler<CreateVoteCommand> {
     private readonly auditService: AuditService,
     private readonly auditContext: AuditContextService,
     private readonly labelResolver: VotingAuditLabelResolver,
+    private readonly meetingDateGuard: AssemblyMeetingDateGuard,
   ) {}
 
   async execute(command: CreateVoteCommand): Promise<CreateVoteResult> {
+    await this.meetingDateGuard.assertWithinOwnershipRegister(
+      command.tenantId,
+      command.data.mode,
+      command.data.scheduledFrom,
+    );
+
     const vote = VoteAggregate.create(
       {
         title: command.data.title,

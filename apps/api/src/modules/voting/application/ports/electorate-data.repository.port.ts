@@ -39,6 +39,10 @@ export interface ElectorateDataRepository {
     tenantId: string,
     voteId: string,
   ): Promise<ElectorateConsentData[]>;
+  /** Start of the earliest ownership period on record, or null if there is
+   *  none. An assembly held before this cannot be read literally — see
+   *  `assemblyElectorateAsOf`. */
+  findOwnershipRegisterStart(tenantId: string): Promise<Date | null>;
 }
 
 export const ELECTORATE_DATA_REPOSITORY = Symbol('ELECTORATE_DATA_REPOSITORY');

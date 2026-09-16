@@ -61,7 +61,7 @@ function build(options: {
     title: 'Assembly 12 Sep',
     mode: VoteMode.ASSEMBLY_RECORD,
     status: VoteStatus.DRAFT,
-    scheduledFrom: new Date('2026-09-12T18:30:00Z'),
+    scheduledFrom: MEETING_DATE,
     ruleset: options.noRuleset
       ? null
       : { ...RULESET, weightBasis: options.weightBasis ?? RULESET.weightBasis },
@@ -79,6 +79,8 @@ function build(options: {
     ],
   } as unknown as VoteAggregate;
 
+  const calls = { contextReadAt: null as Date | null };
+
   const context: AssemblyUnitContext[] = options.units.map((u) => ({
     unitId: u.unitId,
     unitNo: u.unitId.toUpperCase(),
@@ -89,13 +91,18 @@ function build(options: {
   const handler = new GetAssemblyRecordHandler(
     { findById: jest.fn().mockResolvedValue(vote) } as unknown as VoteWriteRepository,
     {
-      findAssemblyUnitContext: jest.fn(async () => context),
+      findAssemblyUnitContext: jest.fn(
+        async (_t: string, _v: string, at: Date) => {
+          calls.contextReadAt = at;
+          return context;
+        },
+      ),
     } as unknown as VoteReadRepository,
     {
       findByVote: jest.fn(async () => options.attendance ?? []),
     } as unknown as VoteAttendanceRepository,
     {
-      resolveElectorate: jest.fn(async () =>
+      resolveAssemblyElectorate: jest.fn(async () =>
         options.units.map((u) => ({
           unitId: u.unitId,
           eligibilityStatus: u.ineligibleReason
@@ -111,8 +118,10 @@ function build(options: {
     { now: () => new Date('2026-09-16T12:00:00Z') } as Clock,
   );
 
-  return { handler };
+  return { handler, calls };
 }
+
+const MEETING_DATE = new Date('2026-09-12T18:30:00Z');
 
 const query = () => new GetAssemblyRecordQuery('tenant-1', 'vote-1');
 
@@ -363,6 +372,20 @@ describe('GetAssemblyRecordHandler', () => {
     const result = await handler.execute(query());
 
     expect(result.questions[0].preview).toBeNull();
+  });
+
+  it('offers the owners who held the units on the day of the meeting', async () => {
+    // The roster's owner list and the eligibility rules have to be read at one
+    // instant. They were not: eligibility came from the meeting date and the
+    // names from today, so the board was offered people the rules had never
+    // seen — and the published record disagreed with the screen it was
+    // entered on.
+    const { handler, calls } = build({ units: [{ unitId: 'u1' }] });
+
+    const result = await handler.execute(query());
+
+    expect(calls.contextReadAt).toEqual(MEETING_DATE);
+    expect(result.units[0].owners).toHaveLength(1);
   });
 
   it('carries the meeting date and the weight basis the screen needs', async () => {

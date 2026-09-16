@@ -93,6 +93,25 @@ export class RulesetOverrideNotStricterException extends DomainException {
   }
 }
 
+/**
+ * A meeting cannot be recorded for a day the ownership register knows nothing
+ * about. Read literally the register would say nobody owned anything then: no
+ * unit could be marked present, and a unit the association owns would lose the
+ * classification that keeps its non-existent vote out of the quorum. The
+ * register cannot be backdated either, so the only honest answer is to refuse
+ * the date rather than to guess at it.
+ */
+export class AssemblyMeetingBeforeOwnershipRecordsException extends DomainException {
+  constructor(registerStart: string) {
+    super(ErrorCode.ASSEMBLY_MEETING_BEFORE_OWNERSHIP_RECORDS, [
+      {
+        code: ErrorCode.ASSEMBLY_MEETING_BEFORE_OWNERSHIP_RECORDS,
+        param: registerStart,
+      },
+    ]);
+  }
+}
+
 export class VoteWindowTooShortPerRollamException extends DomainException {
   constructor() {
     super(ErrorCode.VOTE_WINDOW_TOO_SHORT_PER_ROLLAM);

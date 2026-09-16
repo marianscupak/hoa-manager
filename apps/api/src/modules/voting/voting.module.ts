@@ -61,6 +61,7 @@ import { GetVoteTurnoutHandler } from './application/queries/get-vote-turnout/ge
 import { GetVoterStatusHandler } from './application/queries/get-voter-status/get-voter-status.handler';
 import { GetVotesHandler } from './application/queries/get-votes/get-votes.handler';
 import { PreviewConsentOutcomeHandler } from './application/queries/preview-consent-outcome/preview-consent-outcome.handler';
+import { AssemblyMeetingDateGuard } from './application/services/assembly-meeting-date.guard';
 import { ElectorateDomainService } from './application/services/electorate.service';
 import { ResultCalculationDomainService } from './application/services/result-calculation.service';
 import { TenantLookup } from './audit/exporter/tenant.lookup';
@@ -134,6 +135,7 @@ const REPOSITORIES = [
     useClass: DrizzleElectorateDataRepository,
   },
   { provide: ELECTORATE_SERVICE, useClass: ElectorateDomainService },
+  AssemblyMeetingDateGuard,
   {
     provide: RESULT_CALCULATION_DATA_REPOSITORY,
     useClass: DrizzleResultCalculationDataRepository,

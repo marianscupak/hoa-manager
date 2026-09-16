@@ -57,6 +57,8 @@ export default {
     RULESET_CHANGE_BLOCKED:
         "Voting ruleset cannot be changed anymore as the vote has started or already contains questions.",
     VOTE_SCHEDULE_IN_PAST: "Scheduled dates cannot be in the past.",
+    ASSEMBLY_MEETING_BEFORE_OWNERSHIP_RECORDS:
+        "The meeting is dated before the ownership register begins ({{param}}). Who owned the units on that day is not on record, so it cannot be written up — pick a date from {{param}} onwards.",
     VOTE_SCHEDULE_INVALID_RANGE: "Invalid vote schedule range.",
     INVALID_VOTE_STATUS_FOR_DELEGATION:
         "A representative can only be named while the vote is scheduled.",

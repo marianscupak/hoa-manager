@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, asc, eq, inArray } from 'drizzle-orm';
 
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
 import {
@@ -38,6 +38,16 @@ export class DrizzleElectorateDataRepository
       })
       .from(units)
       .where(eq(units.tenantId, tenantId));
+  }
+
+  async findOwnershipRegisterStart(tenantId: string): Promise<Date | null> {
+    const [row] = await this.drizzle.db
+      .select({ validFrom: unitOwnerships.validFrom })
+      .from(unitOwnerships)
+      .where(eq(unitOwnerships.tenantId, tenantId))
+      .orderBy(asc(unitOwnerships.validFrom))
+      .limit(1);
+    return row?.validFrom ?? null;
   }
 
   async findOwnershipParties(

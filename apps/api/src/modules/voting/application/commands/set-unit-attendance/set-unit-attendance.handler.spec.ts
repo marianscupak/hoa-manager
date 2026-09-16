@@ -76,7 +76,7 @@ function build(options?: {
   } as unknown as VoteWriteRepository;
 
   const electorateService = {
-    resolveElectorate: jest.fn(async () => [
+    resolveAssemblyElectorate: jest.fn(async () => [
       electorateRow('unit-1', options?.ineligible?.['unit-1'] ?? null),
       electorateRow('unit-9', options?.ineligible?.['unit-9'] ?? null),
     ]),

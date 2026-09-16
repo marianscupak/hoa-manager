@@ -36,11 +36,19 @@ describe('ElectorateDomainService', () => {
       ruleset,
     }) as VoteAggregate;
 
+  const assemblyHeldOn = (scheduledFrom: Date) =>
+    ({
+      id: defaultVoteId,
+      tenantId: defaultTenantId,
+      scheduledFrom,
+    }) as VoteAggregate;
+
   beforeEach(async () => {
     dataRepo = {
       findAllUnits: jest.fn(),
       findOwnershipParties: jest.fn(),
       findValidConsents: jest.fn(),
+    findOwnershipRegisterStart: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -108,6 +116,23 @@ describe('ElectorateDomainService', () => {
 
     expect(result[0].weightNum).toBe(25);
     expect(result[0].weightDen).toBe(148);
+  });
+
+  it('reads the register as it stood on the day of the assembly', async () => {
+    // The roster, the attendance command, the running count and the published
+    // snapshot all come through here, so they cannot disagree about which
+    // owners were the owners.
+    const meetingDate = new Date('2026-09-12T18:30:00Z');
+    dataRepo.findAllUnits.mockResolvedValue([]);
+    dataRepo.findOwnershipParties.mockResolvedValue([]);
+    dataRepo.findValidConsents.mockResolvedValue([]);
+
+    await service.resolveAssemblyElectorate(assemblyHeldOn(meetingDate), NOW);
+
+    expect(dataRepo.findOwnershipParties).toHaveBeenCalledWith(
+      defaultTenantId,
+      meetingDate,
+    );
   });
 
   it('resolves ownership as of the date it is given, not today', async () => {

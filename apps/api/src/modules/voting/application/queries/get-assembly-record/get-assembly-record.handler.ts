@@ -69,13 +69,19 @@ export class GetAssemblyRecordHandler
       throw new NotAnAssemblyRecordException();
     }
 
-    const now = this.clock.now();
-    // Resolved live, not from the snapshot: the board records representations
-    // while writing the meeting up, and the roster has to show the effect
-    // immediately. The snapshot is taken once, at publish.
+    // Resolved live rather than from the snapshot: the board records
+    // representations while writing the meeting up, and the roster has to show
+    // the effect immediately. The snapshot is taken once, at publish.
+    //
+    // Live means "not frozen", not "as of today". The register is read as it
+    // stood on the day of the meeting — those are the owners the minutes name
+    // and the ones the roster must offer — and the owner list has to be read
+    // at the very same instant, or the screen would offer names the
+    // eligibility rules never saw.
+    const asOf = vote.scheduledFrom ?? this.clock.now();
     const [electorate, context, attendance] = await Promise.all([
-      this.electorateService.resolveElectorate(vote, now),
-      this.voteReadRepository.findAssemblyUnitContext(tenantId, voteId, now),
+      this.electorateService.resolveAssemblyElectorate(vote, this.clock.now()),
+      this.voteReadRepository.findAssemblyUnitContext(tenantId, voteId, asOf),
       this.attendanceRepo.findByVote(tenantId, voteId),
     ]);
 

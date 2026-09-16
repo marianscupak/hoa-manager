@@ -7,6 +7,7 @@ import {
   VOTE_WRITE_REPOSITORY,
   type VoteWriteRepository,
 } from '@/modules/voting/application/ports/vote-write.repository.port';
+import { AssemblyMeetingDateGuard } from '@/modules/voting/application/services/assembly-meeting-date.guard';
 import { VoteUpdatedAuditEvent } from '@/modules/voting/audit/events/vote-updated.event';
 import { VotingAuditLabelResolver } from '@/modules/voting/audit/label-resolver.service';
 import { type Clock, CLOCK } from '@/shared/application/ports/clock.port';
@@ -34,6 +35,7 @@ export class UpdateVoteHandler implements ICommandHandler<UpdateVoteCommand> {
     private readonly auditService: AuditService,
     private readonly auditContext: AuditContextService,
     private readonly labelResolver: VotingAuditLabelResolver,
+    private readonly meetingDateGuard: AssemblyMeetingDateGuard,
   ) {}
 
   async execute(command: UpdateVoteCommand): Promise<UpdateVoteResult> {
@@ -51,6 +53,14 @@ export class UpdateVoteHandler implements ICommandHandler<UpdateVoteCommand> {
     if (command.data.mode && command.data.mode !== vote.mode) {
       throw new DomainException(ErrorCode.RULESET_CHANGE_BLOCKED);
     }
+
+    // The wizard sets the meeting date here, not at create, so this is the
+    // call that usually has to refuse it.
+    await this.meetingDateGuard.assertWithinOwnershipRegister(
+      command.tenantId,
+      vote.mode,
+      command.data.scheduledFrom,
+    );
 
     vote.update({ ...command.data, mode: vote.mode }, this.clock.now());
 

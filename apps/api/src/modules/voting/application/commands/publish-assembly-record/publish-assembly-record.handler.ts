@@ -89,25 +89,12 @@ export class PublishAssemblyRecordHandler
         throw new AssemblyRecordIncompleteException();
       }
 
-      // 2. The same electorate the board recorded against.
-      //
-      //    This used to resolve as of `scheduledFrom`, the meeting date, on
-      //    the theory that a unit sold since the meeting should still count
-      //    for the owner who attended. It bought nothing: who voted for a
-      //    unit is settled by the attendance row's `voterOwnerId`, which the
-      //    board picks from the live roster, not by the electorate. And it
-      //    cost a silent, severe failure — the ownership history frequently
-      //    does not reach back to the meeting, which is inherent to a mode
-      //    for writing up a meeting that already happened. When it does not,
-      //    every unit resolves as MISSING_OWNERSHIP, and a unit the
-      //    association owns loses the ASSOCIATION_OWNED classification that
-      //    keeps it out of the quorum denominator — the vote it has no right
-      //    to under § 1206(1) reappears in "all votes", and a quorate
-      //    assembly publishes as inquorate.
-      //
-      //    Resolving here at the same instant the recording screen does makes
-      //    the published record agree with what the board saw and entered.
-      const electorate = await this.electorateService.resolveElectorate(
+      // 2. The electorate the board recorded against — the register as it
+      //    stood on the day of the meeting. One shared entry point with the
+      //    roster, the attendance command and the running count: the record
+      //    was entered against that electorate and has to be computed against
+      //    the same one.
+      const electorate = await this.electorateService.resolveAssemblyElectorate(
         vote,
         this.clock.now(),
       );

@@ -58,6 +58,8 @@ export default {
     RULESET_CHANGE_BLOCKED:
         "Pravidla hlasování již nelze měnit, protože hlasování bylo zahájeno nebo již obsahuje otázky.",
     VOTE_SCHEDULE_IN_PAST: "Naplánovaná data nemohou být v minulosti.",
+    ASSEMBLY_MEETING_BEFORE_OWNERSHIP_RECORDS:
+        "Zasedání je datované před začátkem evidence vlastnictví ({{param}}). K tomu dni není známo, kdo jednotky vlastnil, takže zápis nelze pořídit — zvolte datum od {{param}} dál.",
     VOTE_SCHEDULE_INVALID_RANGE: "Harmonogram hlasování je neplatný.",
     INVALID_VOTE_STATUS_FOR_DELEGATION:
         "Zastoupení lze určit pouze v naplánovaném hlasování.",

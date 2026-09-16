@@ -53,7 +53,7 @@ export default {
             buildingShare: "Share of the building",
             owners: "Owners",
             myShare: "Your share of the unit",
-            mine: "yours",
+            mine: "Yours",
             coOwned: "co-owned",
             noOwner: "no registered owner",
             openDetail: "Open unit {{unitNo}}",

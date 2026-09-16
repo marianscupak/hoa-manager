@@ -53,7 +53,7 @@ export default {
             buildingShare: "Podíl na domě",
             owners: "Vlastníci",
             myShare: "Váš podíl na jednotce",
-            mine: "moje",
+            mine: "Moje",
             coOwned: "spoluvlastnictví",
             noOwner: "bez zapsaného vlastníka",
             openDetail: "Zobrazit jednotku {{unitNo}}",

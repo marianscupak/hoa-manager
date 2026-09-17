@@ -2374,6 +2374,79 @@
         ]
       }
     },
+    "/api/units/{id}/ownership/period": {
+      "patch": {
+        "operationId": "UnitController_updateOwnershipPeriod",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOwnershipPeriodDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Bounds of one ownership period moved"
+          },
+          "400": {
+            "description": "Bad Request - Validation or Domain logic error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Property Units"
+        ]
+      }
+    },
     "/api/units/{id}/ownership/scheduled": {
       "delete": {
         "operationId": "UnitController_cancelScheduledOwnershipTransfer",
@@ -5124,6 +5197,35 @@
         "required": [
           "effectiveFrom",
           "ownerships"
+        ]
+      },
+      "UpdateOwnershipPeriodDto": {
+        "type": "object",
+        "properties": {
+          "periodValidFrom": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "description": "Calendar date the period currently starts on; identifies which period to move."
+          },
+          "validFrom": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "description": "New start of the period."
+          },
+          "validTo": {
+            "description": "New end of the period. Leave it out to keep the period open-ended — the generated client speaks OpenAPI 3.0, where an absent value says this more cleanly than a nullable one.",
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "acknowledged": {
+            "default": false,
+            "description": "Set once the board has seen the votes the move reaches and chosen to go ahead.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "periodValidFrom",
+          "validFrom"
         ]
       },
       "PreviewKatastrImportDto": {

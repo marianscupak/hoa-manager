@@ -119,6 +119,14 @@ const PAYLOADS: Record<CoreEventType, Record<string, unknown>> = {
       owners: ['Bob Owner'],
     },
   },
+  [CoreEventType.OWNERSHIP_PERIOD_UPDATED]: {
+    previousValidFrom: '2026-01-01T00:00:00.000Z',
+    previousValidTo: null,
+    validFrom: '2026-03-01T00:00:00.000Z',
+    validTo: null,
+    affectedVoteCount: 0,
+    labels: { unit: '1', changedBy: 'Alice Admin' },
+  },
   [CoreEventType.OWNER_RENAMED]: {
     labels: {
       previousName: 'Jana Dvořáková',

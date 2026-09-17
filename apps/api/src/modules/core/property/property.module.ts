@@ -19,18 +19,20 @@ import { GetOwnerByIdHandler } from '@/modules/core/property/application/handler
 import { GetUnitDetailHandler } from '@/modules/core/property/application/handlers/get-unit-detail.handler';
 import { GetUnitOwnershipHistoryHandler } from '@/modules/core/property/application/handlers/get-unit-ownership-history.handler';
 import { ImportKatastrDataHandler } from '@/modules/core/property/application/handlers/import-katastr-data.handler';
+import { LinkOwnerToAccountHandler } from '@/modules/core/property/application/handlers/link-owner-to-account.handler';
 import { ListOwnersHandler } from '@/modules/core/property/application/handlers/list-owners.handler';
 import { ListUnitsHandler } from '@/modules/core/property/application/handlers/list-units.handler';
 import { PreviewKatastrImportHandler } from '@/modules/core/property/application/handlers/preview-katastr-import.handler';
-import { ReplaceUnitOwnershipHandler } from '@/modules/core/property/application/handlers/replace-unit-ownership.handler';
 import { RenameOwnerHandler } from '@/modules/core/property/application/handlers/rename-owner.handler';
+import { ReplaceUnitOwnershipHandler } from '@/modules/core/property/application/handlers/replace-unit-ownership.handler';
 import { SetOwnerEmailHandler } from '@/modules/core/property/application/handlers/set-owner-email.handler';
 import { SetOwnerUserIdHandler } from '@/modules/core/property/application/handlers/set-owner-user-id.handler';
-import { LinkOwnerToAccountHandler } from '@/modules/core/property/application/handlers/link-owner-to-account.handler';
 import { UnlinkOwnerFromAccountHandler } from '@/modules/core/property/application/handlers/unlink-owner-from-account.handler';
+import { UpdateOwnershipPeriodHandler } from '@/modules/core/property/application/handlers/update-ownership-period.handler';
 import { UpdateUnitHandler } from '@/modules/core/property/application/handlers/update-unit.handler';
 import { KATASTR_SNAPSHOT_REPOSITORY } from '@/modules/core/property/application/ports/katastr-snapshot.repository.port';
 import { OWNER_READ_REPOSITORY } from '@/modules/core/property/application/ports/owner-read.repository.port';
+import { OWNERSHIP_VOTE_LOOKUP } from '@/modules/core/property/application/ports/ownership-vote-lookup.port';
 import {
   OWNER_REPOSITORY,
   UNIT_OWNERSHIP_REPOSITORY,
@@ -42,6 +44,7 @@ import { GetPropertyOverviewHandler } from '@/modules/core/property/application/
 import { PropertyAuditRegistration } from '@/modules/core/property/audit/property-audit.registration';
 import { DrizzleKatastrSnapshotRepository } from '@/modules/core/property/infrastructure/persistence/drizzle-katastr-snapshot.repository';
 import { DrizzleOwnerReadRepository } from '@/modules/core/property/infrastructure/persistence/drizzle-owner-read.repository';
+import { DrizzleOwnershipVoteLookup } from '@/modules/core/property/infrastructure/persistence/drizzle-ownership-vote-lookup';
 import {
   DrizzleOwnerRepository,
   DrizzleUnitOwnershipRepository,
@@ -56,6 +59,7 @@ const CommandHandlers = [
   ReplaceUnitOwnershipHandler,
   CancelScheduledOwnershipTransferHandler,
   RenameOwnerHandler,
+  UpdateOwnershipPeriodHandler,
   SetOwnerEmailHandler,
   SetOwnerUserIdHandler,
   LinkOwnerToAccountHandler,
@@ -83,6 +87,10 @@ const Repositories = [
   {
     provide: UNIT_OWNERSHIP_REPOSITORY,
     useClass: DrizzleUnitOwnershipRepository,
+  },
+  {
+    provide: OWNERSHIP_VOTE_LOOKUP,
+    useClass: DrizzleOwnershipVoteLookup,
   },
   { provide: UNIT_READ_REPOSITORY, useClass: DrizzleUnitReadRepository },
   { provide: OWNER_READ_REPOSITORY, useClass: DrizzleOwnerReadRepository },

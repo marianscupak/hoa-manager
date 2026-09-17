@@ -171,6 +171,7 @@ export * from "./unitResponseDto";
 export * from "./unitsOverviewDto";
 export * from "./updateMemberRoleDto";
 export * from "./updateMemberRoleDtoRole";
+export * from "./updateOwnershipPeriodDto";
 export * from "./updateUnitDto";
 export * from "./updateUserLanguageDto";
 export * from "./updateVoteDto";

@@ -111,6 +111,13 @@ export interface UnitOwnershipRepository {
   existsMemberRowForOwner(tenantId: string, ownerId: string): Promise<boolean>;
   /** Ids of every owner referenced by at least one party, for list flags. */
   listReferencedOwnerIds(tenantId: string): Promise<Set<string>>;
+  /** Moves both bounds of every party that makes up one period. */
+  setPeriodBounds(
+    tenantId: string,
+    partyIds: string[],
+    validFrom: Date,
+    validTo: Date | null,
+  ): Promise<void>;
   closeParties(tenantId: string, partyIds: string[], at: Date): Promise<void>;
   reopenParties(tenantId: string, partyIds: string[]): Promise<void>;
   deleteParties(tenantId: string, partyIds: string[]): Promise<void>;

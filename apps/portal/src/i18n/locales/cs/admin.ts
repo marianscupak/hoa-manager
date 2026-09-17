@@ -149,6 +149,30 @@ export default {
                 scheduledBanner:
                     "Změna vlastnictví je naplánována od {{date}}.",
                 cancelScheduled: "Zrušit naplánovanou změnu",
+                editPeriod: {
+                    action: "Upravit platnost",
+                    close: "Ukončit vlastnictví",
+                    title: "Upravit platnost vlastnictví",
+                    description:
+                        "Změna posune, od kdy a do kdy toto vlastnictví platí. Ponecháte-li konec prázdný, vlastnictví zůstává otevřené; vyplněním konce jednotka od toho dne zůstane bez vlastníka.",
+                    fromLabel: "Platné od",
+                    toLabel: "Platné do",
+                    toHint: "Nechte prázdné, pokud vlastnictví pokračuje.",
+                    endBeforeStart: "Konec musí být až po začátku",
+                    affectedTitle_one: "Změna se dotkne {{count}} hlasování",
+                    affectedTitle_few: "Změna se dotkne {{count}} hlasování",
+                    affectedTitle_other: "Změna se dotkne {{count}} hlasování",
+                    affectedHint:
+                        "U rozpracovaného záznamu se přepočítá, kdo je oprávněn hlasovat, a už zapsané hlasy jednotky mohou zůstat bez platnosti. U uzavřených hlasování zůstává výsledek beze změny, jen se evidence v tomto místě rozejde s tím, co bylo zaznamenáno.",
+                    impact: {
+                        LIVE: "přepočítá se",
+                        FROZEN: "výsledek zůstává",
+                    },
+                    submit: "Uložit platnost",
+                    confirm: "Přesto uložit",
+                    submitting: "Ukládání...",
+                    success: "Platnost vlastnictví byla změněna",
+                },
                 editBlockedHint: "Nejdříve zrušte naplánovanou změnu.",
                 cancelDialog: {
                     title: "Zrušit naplánovanou změnu",

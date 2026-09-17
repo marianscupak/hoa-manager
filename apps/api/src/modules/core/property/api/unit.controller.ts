@@ -29,11 +29,13 @@ import {
   UnitResponseDto,
   UnitDetailResponseDto,
   UnitOwnershipHistoryResponseDto,
+  UpdateOwnershipPeriodDto,
 } from '@/modules/core/property/api/dto/unit.dto';
 import { CancelScheduledOwnershipTransferCommand } from '@/modules/core/property/application/commands/cancel-scheduled-ownership-transfer.command';
 import { CreateUnitCommand } from '@/modules/core/property/application/commands/create-unit.command';
 import { DeleteUnitCommand } from '@/modules/core/property/application/commands/delete-unit.command';
 import { ReplaceUnitOwnershipCommand } from '@/modules/core/property/application/commands/replace-unit-ownership.command';
+import { UpdateOwnershipPeriodCommand } from '@/modules/core/property/application/commands/update-ownership-period.command';
 import { UpdateUnitCommand } from '@/modules/core/property/application/commands/update-unit.command';
 import { GetOwnedUnitsQuery } from '@/modules/core/property/application/queries/get-owned-units/get-owned-units.query';
 import { GetUnitDetailQuery } from '@/modules/core/property/application/queries/get-unit-detail.query';
@@ -204,6 +206,36 @@ export class UnitController {
           partyType: o.partyType as OwnershipPartyType,
         })),
         effectiveAt,
+      ),
+    );
+  }
+
+  @Patch(':id/ownership/period')
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({
+    description: 'Bounds of one ownership period moved',
+  })
+  async updateOwnershipPeriod(
+    @Tenant() tenantCtx: TenantContext,
+    @Param('id') unitId: string,
+    @Body() dto: UpdateOwnershipPeriodDto,
+  ): Promise<void> {
+    const periodValidFrom = parseAssociationDate(dto.periodValidFrom);
+    const validFrom = parseAssociationDate(dto.validFrom);
+    const validTo = dto.validTo ? parseAssociationDate(dto.validTo) : null;
+    if (!periodValidFrom || !validFrom || (dto.validTo && !validTo)) {
+      // Unreachable after the zod refine; keeps the command strictly typed.
+      throw new BadRequestException('dates must be calendar dates');
+    }
+    await this.commandBus.execute(
+      new UpdateOwnershipPeriodCommand(
+        tenantCtx.tenantId,
+        unitId,
+        periodValidFrom,
+        validFrom,
+        validTo,
+        dto.acknowledged,
       ),
     );
   }

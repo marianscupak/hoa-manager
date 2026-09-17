@@ -380,6 +380,24 @@ export class DrizzleUnitOwnershipRepository implements UnitOwnershipRepository {
     return new Set(rows.map((r: { ownerId: string }) => r.ownerId));
   }
 
+  async setPeriodBounds(
+    tenantId: string,
+    partyIds: string[],
+    validFrom: Date,
+    validTo: Date | null,
+  ): Promise<void> {
+    if (partyIds.length === 0) return;
+    await this.db
+      .update(unitOwnerships)
+      .set({ validFrom, validTo })
+      .where(
+        and(
+          eq(unitOwnerships.tenantId, tenantId),
+          inArray(unitOwnerships.id, partyIds),
+        ),
+      );
+  }
+
   async closeParties(
     tenantId: string,
     partyIds: string[],

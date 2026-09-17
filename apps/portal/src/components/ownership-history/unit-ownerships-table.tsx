@@ -1,4 +1,5 @@
 import { TFunction } from "i18next";
+import type React from "react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -28,6 +29,12 @@ const STATUS_CHIP: Record<
 
 export function getUnitOwnershipColumns(
     t: TFunction<"admin" | "common">,
+    /**
+     * Rendered once per period, against its first row — the board reads the
+     * same table as the owners, so the actions arrive from the admin page
+     * rather than being baked in here.
+     */
+    renderPeriodActions?: (row: OwnershipHistoryRow) => React.ReactNode,
 ): ColumnDef<OwnershipHistoryRow>[] {
     return [
         {
@@ -93,12 +100,33 @@ export function getUnitOwnershipColumns(
                 );
             },
         },
+        ...(renderPeriodActions
+            ? [
+                  {
+                      id: "actions",
+                      header: "",
+                      enableSorting: false,
+                      enableGlobalFilter: false,
+                      cell: ({
+                          row,
+                      }: {
+                          row: { original: OwnershipHistoryRow };
+                      }) =>
+                          row.original.isPeriodStart ? (
+                              <div className="flex justify-end gap-1.5">
+                                  {renderPeriodActions(row.original)}
+                              </div>
+                          ) : null,
+                  } as ColumnDef<OwnershipHistoryRow>,
+              ]
+            : []),
     ];
 }
 
 interface UnitOwnershipsTableProps {
     periods: UnitOwnershipPeriodResponseDto[] | undefined;
     isLoading: boolean;
+    renderPeriodActions?: (row: OwnershipHistoryRow) => React.ReactNode;
 }
 
 /**
@@ -109,16 +137,21 @@ interface UnitOwnershipsTableProps {
 export function UnitOwnershipsTable({
     periods,
     isLoading,
+    renderPeriodActions,
 }: UnitOwnershipsTableProps) {
     const { t } = useTranslation(["admin", "common"]);
-    const columns = getUnitOwnershipColumns(t);
+    const columns = getUnitOwnershipColumns(t, renderPeriodActions);
     const rows = useMemo(() => flattenPeriods(periods), [periods]);
 
     return (
         <DataTable
             columns={columns}
             data={rows}
-            gridTemplate="1.5fr 1fr 1.4fr 130px"
+            gridTemplate={
+                renderPeriodActions
+                    ? "1.5fr 1fr 1.4fr 130px 160px"
+                    : "1.5fr 1fr 1.4fr 130px"
+            }
             isLoading={isLoading}
             loadingMessage={t("loading", { ns: "common" })}
             emptyMessage={t("units.details.ownership.empty")}

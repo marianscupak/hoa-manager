@@ -210,6 +210,26 @@ export class CoreAuditFormatter implements AuditEventFormatter, OnModuleInit {
           }),
         };
       }
+      case CoreEventType.OWNERSHIP_PERIOD_UPDATED: {
+        const p = event.payload as {
+          previousValidFrom: string;
+          previousValidTo: string | null;
+          validFrom: string;
+          validTo: string | null;
+          labels: { unit: string; changedBy: string };
+        };
+        const span = (from: string, to: string | null) =>
+          `${from.slice(0, 10)} – ${to ? to.slice(0, 10) : '…'}`;
+        return {
+          ...base,
+          message: t(lang, 'unit.ownership.periodUpdated.privileged', {
+            actor: p.labels.changedBy,
+            unit: p.labels.unit,
+            previousRange: span(p.previousValidFrom, p.previousValidTo),
+            range: span(p.validFrom, p.validTo),
+          }),
+        };
+      }
       case CoreEventType.OWNER_RENAMED: {
         const p = event.payload as {
           labels: {

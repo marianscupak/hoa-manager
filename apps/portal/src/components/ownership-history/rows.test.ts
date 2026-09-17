@@ -79,3 +79,24 @@ describe("findScheduledPeriod / latestPeriodStart", () => {
         expect(latestPeriodStart(undefined)).toBeUndefined();
     });
 });
+
+describe("flattenPeriods period markers", () => {
+    it("marks only the first row of each period, so a per-period action renders once", () => {
+        const rows = flattenPeriods([
+            {
+                validFrom: "2026-01-01T00:00:00.000Z",
+                validTo: null,
+                status: "ACTIVE",
+                parties: [party("p1", "A"), party("p2", "B")],
+            },
+            {
+                validFrom: "2024-01-01T00:00:00.000Z",
+                validTo: "2026-01-01T00:00:00.000Z",
+                status: "CLOSED",
+                parties: [party("p0", "C")],
+            },
+        ] as never);
+
+        expect(rows.map((r) => r.isPeriodStart)).toEqual([true, false, true]);
+    });
+});

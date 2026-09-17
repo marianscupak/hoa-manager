@@ -59,6 +59,47 @@ const ownershipPartySchema = z.object({
   memberOwnerIds: z.array(z.string().uuid()).min(1).max(2),
 });
 
+export const updateOwnershipPeriodSchema = z.object({
+  periodValidFrom: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be a YYYY-MM-DD calendar date')
+    .refine((v) => parseAssociationDate(v) !== null, {
+      message: 'Must be a real calendar date',
+    })
+    .describe(
+      'Calendar date the period currently starts on; identifies which period to move.',
+    ),
+  validFrom: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be a YYYY-MM-DD calendar date')
+    .refine((v) => parseAssociationDate(v) !== null, {
+      message: 'Must be a real calendar date',
+    })
+    .describe('New start of the period.'),
+  validTo: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be a YYYY-MM-DD calendar date')
+    .refine((v) => parseAssociationDate(v) !== null, {
+      message: 'Must be a real calendar date',
+    })
+    .optional()
+    .describe(
+      'New end of the period. Leave it out to keep the period open-ended — ' +
+        'the generated client speaks OpenAPI 3.0, where an absent value says ' +
+        'this more cleanly than a nullable one.',
+    ),
+  acknowledged: z
+    .boolean()
+    .default(false)
+    .describe(
+      'Set once the board has seen the votes the move reaches and chosen to go ahead.',
+    ),
+});
+
+export class UpdateOwnershipPeriodDto extends createZodDto(
+  updateOwnershipPeriodSchema,
+) {}
+
 export const replaceOwnershipsSchema = z.object({
   effectiveFrom: z
     .string()

@@ -129,6 +129,31 @@ export class OwnerHasOwnershipRecordsException extends DomainException {
   }
 }
 
+export class OwnershipPeriodNotFoundException extends DomainException {
+  constructor() {
+    super(ErrorCode.OWNERSHIP_PERIOD_NOT_FOUND);
+  }
+}
+
+export class OwnershipPeriodOverlapsException extends DomainException {
+  constructor() {
+    super(ErrorCode.OWNERSHIP_PERIOD_OVERLAPS);
+  }
+}
+
+export class OwnershipPeriodEndBeforeStartException extends DomainException {
+  constructor() {
+    super(ErrorCode.OWNERSHIP_PERIOD_END_BEFORE_START);
+  }
+}
+
+/** Carries the votes the move reaches so the board can see them and decide. */
+export class OwnershipPeriodAffectsVotesException extends UnprocessableEntityException {
+  constructor(votes: unknown[]) {
+    super({ code: 'OWNERSHIP_PERIOD_AFFECTS_VOTES', votes });
+  }
+}
+
 export class KatastrFileRejectedException extends BadRequestException {
   constructor(errors: unknown[]) {
     super({ code: 'KATASTR_FILE_REJECTED', errors });

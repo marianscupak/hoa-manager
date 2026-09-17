@@ -30,6 +30,7 @@ import type {
     UnitDetailResponseDto,
     UnitOwnershipHistoryResponseDto,
     UnitResponseDto,
+    UpdateOwnershipPeriodDto,
     UpdateUnitDto,
 } from ".././model";
 
@@ -1009,6 +1010,95 @@ export const useUnitControllerReplaceUnitOwnership = <
 > => {
     return useMutation(
         getUnitControllerReplaceUnitOwnershipMutationOptions(options),
+        queryClient,
+    );
+};
+export const unitControllerUpdateOwnershipPeriod = (
+    id: string,
+    updateOwnershipPeriodDto: BodyType<UpdateOwnershipPeriodDto>,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<void>(
+        {
+            url: `/api/units/${id}/ownership/period`,
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            data: updateOwnershipPeriodDto,
+            signal,
+        },
+        options,
+    );
+};
+
+export const getUnitControllerUpdateOwnershipPeriodMutationOptions = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof unitControllerUpdateOwnershipPeriod>>,
+        TError,
+        { id: string; data: BodyType<UpdateOwnershipPeriodDto> },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof unitControllerUpdateOwnershipPeriod>>,
+    TError,
+    { id: string; data: BodyType<UpdateOwnershipPeriodDto> },
+    TContext
+> => {
+    const mutationKey = ["unitControllerUpdateOwnershipPeriod"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof unitControllerUpdateOwnershipPeriod>>,
+        { id: string; data: BodyType<UpdateOwnershipPeriodDto> }
+    > = (props) => {
+        const { id, data } = props ?? {};
+
+        return unitControllerUpdateOwnershipPeriod(id, data, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type UnitControllerUpdateOwnershipPeriodMutationResult = NonNullable<
+    Awaited<ReturnType<typeof unitControllerUpdateOwnershipPeriod>>
+>;
+export type UnitControllerUpdateOwnershipPeriodMutationBody =
+    BodyType<UpdateOwnershipPeriodDto>;
+export type UnitControllerUpdateOwnershipPeriodMutationError =
+    ErrorType<ErrorResponseDto>;
+
+export const useUnitControllerUpdateOwnershipPeriod = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof unitControllerUpdateOwnershipPeriod>>,
+            TError,
+            { id: string; data: BodyType<UpdateOwnershipPeriodDto> },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof unitControllerUpdateOwnershipPeriod>>,
+    TError,
+    { id: string; data: BodyType<UpdateOwnershipPeriodDto> },
+    TContext
+> => {
+    return useMutation(
+        getUnitControllerUpdateOwnershipPeriodMutationOptions(options),
         queryClient,
     );
 };

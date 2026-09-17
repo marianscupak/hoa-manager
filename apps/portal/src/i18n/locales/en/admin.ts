@@ -147,6 +147,29 @@ export default {
                 scheduledBanner:
                     "An ownership change is scheduled from {{date}}.",
                 cancelScheduled: "Cancel scheduled change",
+                editPeriod: {
+                    action: "Edit the dates",
+                    close: "End the ownership",
+                    title: "Edit when the ownership applies",
+                    description:
+                        "Moves the dates this ownership holds between. Leave the end empty to keep it open; fill it in and the unit has no owner from that day.",
+                    fromLabel: "Valid from",
+                    toLabel: "Valid until",
+                    toHint: "Leave empty if the ownership continues.",
+                    endBeforeStart: "The end has to come after the start",
+                    affectedTitle_one: "The change reaches {{count}} vote",
+                    affectedTitle_other: "The change reaches {{count}} votes",
+                    affectedHint:
+                        "A draft record recomputes who may vote, and ballots already entered for the unit can be left stranded. A closed vote keeps its result; only the register and what was recorded stop agreeing.",
+                    impact: {
+                        LIVE: "recomputes",
+                        FROZEN: "result stands",
+                    },
+                    submit: "Save the dates",
+                    confirm: "Save anyway",
+                    submitting: "Saving...",
+                    success: "The ownership dates were changed",
+                },
                 editBlockedHint: "Cancel the scheduled change first.",
                 cancelDialog: {
                     title: "Cancel scheduled change",

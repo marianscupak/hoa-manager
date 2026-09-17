@@ -12,6 +12,12 @@ export interface OwnershipHistoryRow {
     validFrom: string;
     validTo: string | null;
     status: UnitOwnershipPeriodResponseDto["status"];
+    /**
+     * True on the first row of each period. A period spans as many rows as it
+     * has parties, so anything that belongs to the period rather than to one
+     * party — an action on its dates, say — renders against this flag.
+     */
+    isPeriodStart: boolean;
 }
 
 /** One table row per party; periods arrive newest first from the API. */
@@ -19,12 +25,13 @@ export function flattenPeriods(
     periods: UnitOwnershipPeriodResponseDto[] | undefined,
 ): OwnershipHistoryRow[] {
     return (periods ?? []).flatMap((period) =>
-        period.parties.map((party) => ({
+        period.parties.map((party, index) => ({
             id: party.id,
             party,
             validFrom: period.validFrom,
             validTo: period.validTo,
             status: period.status,
+            isPeriodStart: index === 0,
         })),
     );
 }

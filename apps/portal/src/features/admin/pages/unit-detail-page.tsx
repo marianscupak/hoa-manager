@@ -16,6 +16,7 @@ import {
 } from "@/components/ownership-history/rows";
 import { ScheduledTransferBanner } from "@/components/ownership-history/scheduled-transfer-banner";
 import { UnitOwnershipsTable } from "@/components/ownership-history/unit-ownerships-table";
+import { UpdatePeriodDialog } from "@/features/admin/components/ownership-history/update-period-dialog";
 
 import { CancelScheduledTransferDialog } from "../components/ownership-history/cancel-scheduled-transfer-dialog";
 import { ReplaceOwnershipDialog } from "../components/replace-ownership-dialog/dialog";
@@ -28,6 +29,10 @@ export function UnitDetailPage() {
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isUnitEditOpen, setIsUnitEditOpen] = useState(false);
     const [isCancelOpen, setIsCancelOpen] = useState(false);
+    const [editingPeriod, setEditingPeriod] = useState<{
+        validFrom: string;
+        validTo: string | null;
+    } | null>(null);
 
     if (!id) {
         throw new Error("No unit id provided");
@@ -128,6 +133,26 @@ export function UnitDetailPage() {
                 <UnitOwnershipsTable
                     periods={history?.periods}
                     isLoading={isHistoryLoading}
+                    renderPeriodActions={(row) => (
+                        <Button
+                            variant="tableAction"
+                            size="tableText"
+                            onClick={() =>
+                                setEditingPeriod({
+                                    validFrom: row.validFrom,
+                                    validTo: row.validTo,
+                                })
+                            }
+                        >
+                            {row.validTo === null
+                                ? t(
+                                      "admin:units.details.ownership.editPeriod.close",
+                                  )
+                                : t(
+                                      "admin:units.details.ownership.editPeriod.action",
+                                  )}
+                        </Button>
+                    )}
                 />
             </div>
 
@@ -137,6 +162,14 @@ export function UnitDetailPage() {
                 onOpenChange={setIsEditOpen}
                 currentOwnerships={unit?.ownerships}
                 minEffectiveFrom={minEffectiveFrom}
+                onSuccess={refetchAll}
+            />
+
+            <UpdatePeriodDialog
+                unitId={id}
+                period={editingPeriod}
+                open={editingPeriod !== null}
+                onOpenChange={(open) => !open && setEditingPeriod(null)}
                 onSuccess={refetchAll}
             />
 

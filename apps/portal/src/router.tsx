@@ -10,6 +10,8 @@ import { AuthGuard } from "@/components/shell/auth-guard";
 import { KatastrImportPage } from "@/features/admin/pages/katastr-import-page";
 import { GoogleCallbackPage } from "@/features/auth/pages/google-callback-page";
 import { LoginPage } from "@/features/auth/pages/login-page";
+import { RegisterPage } from "@/features/auth/pages/register-page";
+import { VerifyEmailPage } from "@/features/auth/pages/verify-email-page";
 import { SelectTenantPage } from "@/features/auth/pages/select-tenant-page";
 import { DashboardPage } from "@/features/dashboard/pages/dashboard-page";
 import { OwnerInvitePage } from "@/features/invite/pages/owner-invite-page";
@@ -201,6 +203,14 @@ export const router = createBrowserRouter([
             {
                 path: "login",
                 element: <LoginPage />,
+            },
+            {
+                path: "register",
+                element: <RegisterPage />,
+            },
+            {
+                path: "register/verify",
+                element: <VerifyEmailPage />,
             },
         ],
     },

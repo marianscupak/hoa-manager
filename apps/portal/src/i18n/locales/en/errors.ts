@@ -2,6 +2,8 @@ export default {
     USER_ALREADY_EXISTS: "A user with this email already exists.",
     USER_NOT_FOUND: "User not found.",
     INVALID_CREDENTIALS: "Invalid email or password.",
+    INVALID_VERIFICATION_CODE:
+        "The code is invalid or has expired. Request a new one.",
     INVALID_TOKEN: "Your session has expired. Please log in again.",
     UNAUTHORIZED: "You are not authorized to perform this action.",
     REPLAY_ATTACK: "Security violation detected. Please log in again.",

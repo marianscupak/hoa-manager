@@ -2,6 +2,8 @@ export default {
     USER_ALREADY_EXISTS: "Uživatel s tímto e-mailem již existuje.",
     USER_NOT_FOUND: "Uživatel nenalezen.",
     INVALID_CREDENTIALS: "Nesprávný e-mail nebo heslo.",
+    INVALID_VERIFICATION_CODE:
+        "Kód je neplatný nebo vypršel. Nechte si poslat nový.",
     INVALID_TOKEN: "Vaše relace vypršela. Přihlaste se prosím znovu.",
     UNAUTHORIZED: "K provedení této akce nemáte oprávnění.",
     REPLAY_ATTACK:

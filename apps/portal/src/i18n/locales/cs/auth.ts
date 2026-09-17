@@ -16,6 +16,12 @@ export default {
         loading: "Čekejte prosím, dokončuje se ověření přes Google...",
         returnToLogin: "Návrat k přihlášení",
         error: "Ověření pomocí Google se nezdařilo.",
+        errors: {
+            ACCOUNT_EXISTS:
+                "Na tuto adresu už účet existuje. Přihlaste se heslem a Google si pak připojte v profilu.",
+            EMAIL_NOT_VERIFIED:
+                "Tento účet zatím nemá potvrzenou e-mailovou adresu.",
+        },
     },
     loginPage: {
         title: "Přihlášení",
@@ -29,6 +35,33 @@ export default {
         submitting: "Přihlašuji...",
         dividerOauth: "Nebo pokračujte pomocí",
         googleSignIn: "Přihlásit se přes Google",
+        noAccount: "Nemáte účet?",
+        register: "Zaregistrujte se",
+    },
+    register: {
+        invalidName: "Vyplňte prosím jméno.",
+        invalidPassword: "Heslo musí mít alespoň 8 znaků.",
+    },
+    registerPage: {
+        title: "Registrace",
+        subtitle: "Založte si účet a začněte spravovat své společenství.",
+        nameLabel: "Jméno a příjmení",
+        namePlaceholder: "Jan Novák",
+        submit: "Zaregistrovat se",
+        submitting: "Zakládám účet...",
+        haveAccount: "Už máte účet?",
+        signIn: "Přihlaste se",
+    },
+    verifyEmail: {
+        title: "Potvrďte e-mail",
+        subtitle: "Poslali jsme šestimístný kód na {{email}}. Zadejte ho níže.",
+        codeLabel: "Ověřovací kód",
+        submit: "Potvrdit",
+        submitting: "Ověřuji...",
+        resend: "Poslat kód znovu",
+        resendIn: "Poslat znovu za {{seconds}} s",
+        resent: "Kód jsme poslali znovu.",
+        invalidCode: "Kód má šest číslic.",
     },
     createTenant: {
         title: "Vytvořit společenství",

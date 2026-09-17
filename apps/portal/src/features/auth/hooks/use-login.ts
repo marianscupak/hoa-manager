@@ -9,6 +9,8 @@ import { useSessionManager } from "@/auth/use-session-manager";
 import { STORAGE_KEYS } from "@/storage/keys";
 import { StorageService } from "@/storage/storage";
 
+import { decideLoginFailure } from "../login-outcome";
+
 const formSchema = z.object({
     email: z.string().email("auth:login.invalidEmail"),
     password: z.string().min(1, "auth:login.invalidPassword"),
@@ -52,7 +54,15 @@ export function useLogin() {
                         navigate("/tenant", { replace: true });
                     }
                 },
-                onError: showApiError,
+                onError: (error) => {
+                    if (decideLoginFailure(error).kind === "verify") {
+                        navigate("/register/verify", {
+                            state: { email: values.email },
+                        });
+                        return;
+                    }
+                    showApiError(error);
+                },
             },
         );
     };

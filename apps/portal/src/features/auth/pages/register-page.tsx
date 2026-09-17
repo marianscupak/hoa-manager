@@ -3,29 +3,34 @@ import { Link } from "react-router";
 
 import { Form, FormInput, Button } from "@hoa-mngr/ui";
 
-import { GoogleLoginButton } from "../components/google-login-button";
-import { useLogin } from "../hooks/use-login";
+import { useRegister } from "../hooks/use-register";
 
-export function LoginPage() {
+export function RegisterPage() {
     const { t } = useTranslation("auth");
-    const { form, handleLogin, isPending } = useLogin();
+    const { form, handleRegister, isPending } = useRegister();
 
     return (
         <div className="bg-card w-full rounded-xl border p-8 px-6 shadow-sm sm:px-10">
             <div className="mb-6 text-center">
                 <h1 className="text-foreground text-2xl font-bold tracking-tight">
-                    {t("loginPage.title")}
+                    {t("registerPage.title")}
                 </h1>
                 <p className="text-muted-foreground mt-2 text-sm">
-                    {t("loginPage.subtitle")}
+                    {t("registerPage.subtitle")}
                 </p>
             </div>
 
             <Form {...form}>
                 <form
-                    onSubmit={form.handleSubmit(handleLogin)}
+                    onSubmit={form.handleSubmit(handleRegister)}
                     className="space-y-4"
                 >
+                    <FormInput
+                        name="fullName"
+                        label={t("registerPage.nameLabel")}
+                        placeholder={t("registerPage.namePlaceholder")}
+                        disabled={isPending}
+                    />
                     <FormInput
                         name="email"
                         label={t("loginPage.emailLabel")}
@@ -49,27 +54,17 @@ export function LoginPage() {
                             className="w-full"
                         >
                             {isPending
-                                ? t("loginPage.submitting")
-                                : t("loginPage.submit")}
+                                ? t("registerPage.submitting")
+                                : t("registerPage.submit")}
                         </Button>
                     </div>
                 </form>
             </Form>
 
-            <div className="mt-6 flex items-center justify-center">
-                <span className="bg-card text-muted-foreground px-2 text-sm">
-                    {t("loginPage.dividerOauth")}
-                </span>
-            </div>
-
-            <div className="mt-6">
-                <GoogleLoginButton disabled={isPending} />
-            </div>
-
             <p className="text-muted-foreground mt-6 text-center text-sm">
-                {t("loginPage.noAccount")}{" "}
-                <Link to="/register" className="text-primary font-medium">
-                    {t("loginPage.register")}
+                {t("registerPage.haveAccount")}{" "}
+                <Link to="/login" className="text-primary font-medium">
+                    {t("registerPage.signIn")}
                 </Link>
             </p>
         </div>

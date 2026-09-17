@@ -17,6 +17,12 @@ import { parseJwt } from "@/auth/jwt";
 import { STORAGE_KEYS } from "@/storage/keys";
 import { StorageService } from "@/storage/storage";
 
+/** Codes the API redirects here with; anything else falls back to the generic line. */
+const CALLBACK_ERROR_KEYS = {
+    ACCOUNT_EXISTS: "googleCallback.errors.ACCOUNT_EXISTS",
+    EMAIL_NOT_VERIFIED: "googleCallback.errors.EMAIL_NOT_VERIFIED",
+} as const;
+
 export function GoogleCallbackPage() {
     const { t } = useTranslation("auth");
     const location = useLocation();
@@ -73,12 +79,23 @@ export function GoogleCallbackPage() {
 
     const params = new URLSearchParams(location.search);
     const code = params.get("code");
-    const error = !code ? t("googleCallback.error") : mutationError;
+    // The API redirects failures here rather than rendering JSON on its own
+    // origin, where Google left the browser standing.
+    const errorCode = params.get("error");
+    const errorKey =
+        errorCode && errorCode in CALLBACK_ERROR_KEYS
+            ? CALLBACK_ERROR_KEYS[errorCode as keyof typeof CALLBACK_ERROR_KEYS]
+            : "googleCallback.error";
+    const error = errorCode
+        ? t(errorKey)
+        : !code
+          ? t("googleCallback.error")
+          : mutationError;
 
     const hasFetched = useRef(false);
 
     useEffect(() => {
-        if (!code || hasFetched.current) {
+        if (!code || errorCode || hasFetched.current) {
             return;
         }
         hasFetched.current = true;

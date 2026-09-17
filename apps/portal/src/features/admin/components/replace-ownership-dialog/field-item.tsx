@@ -96,61 +96,17 @@ export function ReplaceOwnershipFieldItem({
     };
 
     return (
-        <div className="border-border bg-muted/60 hover:border-primary/30 space-y-4 rounded-xl border p-4 transition-colors">
-            <div className="flex items-start gap-4">
-                <div className="min-w-0 flex-1">
-                    <FormSelect
-                        name={`ownerships.${index}.partyType`}
-                        label={t("units.ownershipEditor.partyType.label")}
-                        options={[
-                            {
-                                label: t(
-                                    "units.ownershipEditor.partyType.sole",
-                                ),
-                                value: "SOLE",
-                            },
-                            {
-                                label: t("units.ownershipEditor.partyType.sjm"),
-                                value: "SJM",
-                            },
-                        ]}
-                        onValueChange={handlePartyTypeChange}
-                    />
-                </div>
-
-                {/* Half the row each, so neither the ownership type nor the
-                    share is truncated. `FractionInput` keeps its own minimum
-                    width, so the pair never collapses below what the numbers,
-                    the slash and the mode pill need. */}
-                <div className="min-w-0 flex-1">
-                    <FormField
-                        control={control}
-                        name={`ownerships.${index}.share`}
-                        render={({ field, fieldState }) => (
-                            <FormItem>
-                                <FormLabel>
-                                    {t("units.ownershipEditor.shareLabel")}
-                                </FormLabel>
-                                {/* No defaultDenominator: this is the owner's
-                                    share of one unit (the shares must sum to
-                                    1), not a share of the house, so the
-                                    house's denominator would be wrong here. */}
-                                <FractionInput
-                                    value={field.value}
-                                    onChange={field.onChange}
-                                    aria-invalid={!!fieldState.error}
-                                />
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
-
+        <div className="border-border bg-muted/60 hover:border-primary/30 rounded-xl border p-4 transition-colors">
+            {/* Its own row in the corner. Sharing the first row cost the two
+                fields a button's width, so the top row came out narrower than
+                the owner pickers below it, and the icon sat off the inputs'
+                baseline however it was nudged. */}
+            <div className="-mt-2 -mr-1 mb-1 flex justify-end">
                 <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="text-muted-foreground hover:text-destructive mt-7"
+                    className="text-muted-foreground hover:text-destructive h-8 w-8"
                     onClick={() => onRemove(index)}
                     disabled={!canRemove}
                 >
@@ -158,45 +114,99 @@ export function ReplaceOwnershipFieldItem({
                 </Button>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {partyType === "SJM" ? (
-                    <>
+            <div className="space-y-4">
+                <div className="flex items-start gap-4">
+                    <div className="min-w-0 flex-1">
+                        <FormSelect
+                            name={`ownerships.${index}.partyType`}
+                            label={t("units.ownershipEditor.partyType.label")}
+                            options={[
+                                {
+                                    label: t(
+                                        "units.ownershipEditor.partyType.sole",
+                                    ),
+                                    value: "SOLE",
+                                },
+                                {
+                                    label: t(
+                                        "units.ownershipEditor.partyType.sjm",
+                                    ),
+                                    value: "SJM",
+                                },
+                            ]}
+                            onValueChange={handlePartyTypeChange}
+                        />
+                    </div>
+
+                    {/* Half the row each, so neither the ownership type nor the
+                    share is truncated. `FractionInput` keeps its own minimum
+                    width, so the pair never collapses below what the numbers,
+                    the slash and the mode pill need. */}
+                    <div className="min-w-0 flex-1">
+                        <FormField
+                            control={control}
+                            name={`ownerships.${index}.share`}
+                            render={({ field, fieldState }) => (
+                                <FormItem>
+                                    <FormLabel>
+                                        {t("units.ownershipEditor.shareLabel")}
+                                    </FormLabel>
+                                    {/* No defaultDenominator: this is the owner's
+                                    share of one unit (the shares must sum to
+                                    1), not a share of the house, so the
+                                    house's denominator would be wrong here. */}
+                                    <FractionInput
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                        aria-invalid={!!fieldState.error}
+                                    />
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {partyType === "SJM" ? (
+                        <>
+                            <OwnerPicker
+                                index={index}
+                                slot={0}
+                                label={t("units.ownershipEditor.spouseOne")}
+                                options={personOptions}
+                                // Only people may hold a unit in SJM, so a legal
+                                // entity created here would never appear in this
+                                // field's options.
+                                lockedKind="PERSON"
+                                onCreate={startCreatingOwner}
+                            />
+                            <OwnerPicker
+                                index={index}
+                                slot={1}
+                                label={t("units.ownershipEditor.spouseTwo")}
+                                options={personOptions}
+                                lockedKind="PERSON"
+                                onCreate={startCreatingOwner}
+                            />
+                        </>
+                    ) : (
                         <OwnerPicker
                             index={index}
                             slot={0}
-                            label={t("units.ownershipEditor.spouseOne")}
-                            options={personOptions}
-                            // Only people may hold a unit in SJM, so a legal
-                            // entity created here would never appear in this
-                            // field's options.
-                            lockedKind="PERSON"
+                            label={t("units.ownershipEditor.ownerLabel")}
+                            options={ownerOptions}
                             onCreate={startCreatingOwner}
                         />
-                        <OwnerPicker
-                            index={index}
-                            slot={1}
-                            label={t("units.ownershipEditor.spouseTwo")}
-                            options={personOptions}
-                            lockedKind="PERSON"
-                            onCreate={startCreatingOwner}
-                        />
-                    </>
-                ) : (
-                    <OwnerPicker
-                        index={index}
-                        slot={0}
-                        label={t("units.ownershipEditor.ownerLabel")}
-                        options={ownerOptions}
-                        onCreate={startCreatingOwner}
-                    />
+                    )}
+                </div>
+
+                {membersError && (
+                    <p className="text-destructive text-detail font-medium">
+                        {membersError}
+                    </p>
                 )}
             </div>
-
-            {membersError && (
-                <p className="text-destructive text-detail font-medium">
-                    {membersError}
-                </p>
-            )}
 
             <CreateOwnerDialog
                 open={!!pendingOwner}

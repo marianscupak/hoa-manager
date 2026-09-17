@@ -17,4 +17,14 @@ export default defineConfig({
             },
         },
     },
+    test: {
+        // `src/config/env.ts` validates the frontend environment the moment it
+        // is imported, and a test that reaches any API client pulls it in. On
+        // a developer's machine `.env.local` satisfies it; CI has no env file,
+        // so the same tests threw there and nowhere else. The value is never
+        // called in a test — it only has to exist.
+        env: {
+            VITE_API_URL: "http://localhost:3000",
+        },
+    },
 });

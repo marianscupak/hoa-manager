@@ -1,6 +1,7 @@
 import { Inject } from '@nestjs/common';
-import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
+import { QueryHandler, IQueryHandler, QueryBus } from '@nestjs/cqrs';
 
+import { GetUserByEmailQuery } from '@/modules/core/identity/application/queries/get-user-by-email.query';
 import {
   OWNER_INVITE_REPOSITORY,
   type OwnerInviteRepository,
@@ -14,6 +15,8 @@ export interface InviteStatusResult {
   status: InviteStatus;
   emailMasked?: string;
   expiresAt?: Date;
+  /** Only meaningful on a `valid` invite. */
+  accountExists?: boolean;
 }
 
 function maskEmail(email: string): string {
@@ -32,6 +35,7 @@ export class GetOwnerInviteStatusHandler
     private readonly inviteRepo: OwnerInviteRepository,
     @Inject(CLOCK)
     private readonly clock: Clock,
+    private readonly queryBus: QueryBus,
   ) {}
 
   async execute(query: GetOwnerInviteStatusQuery): Promise<InviteStatusResult> {
@@ -52,10 +56,18 @@ export class GetOwnerInviteStatusHandler
       return { status: 'expired' };
     }
 
+    // The token is itself the secret and its holder received the invite mail,
+    // so this tells them nothing they did not already know — and without it
+    // the page would offer a registration that is bound to fail.
+    const existing = await this.queryBus.execute(
+      new GetUserByEmailQuery(invite.emailNormalized),
+    );
+
     return {
       status: 'valid',
       emailMasked: maskEmail(invite.emailNormalized),
       expiresAt: invite.expiresAt,
+      accountExists: !!existing,
     };
   }
 }

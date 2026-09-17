@@ -6147,6 +6147,10 @@
             "format": "date-time",
             "type": "string",
             "nullable": true
+          },
+          "accountExists": {
+            "type": "boolean",
+            "nullable": true
           }
         },
         "required": [

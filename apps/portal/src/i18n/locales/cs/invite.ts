@@ -15,6 +15,8 @@ export default {
         signInDescription: "Máte již účet? Přihlaste se a přijměte pozvánku.",
         createAccount: "Vytvořit účet",
         createAccountDescription: "Jste tu poprvé? Vytvořte si účet a začněte.",
+        accountExists:
+            "Na tuto adresu už účet existuje. Přihlaste se a pozvánku pak rovnou přijmete.",
     },
     register: {
         title: "Vytvořte si účet",

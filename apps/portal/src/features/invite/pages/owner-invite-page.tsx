@@ -41,6 +41,7 @@ export function OwnerInvitePage() {
     const status = isLoading ? "loading" : statusData?.status ?? "not_found";
     const emailMasked = statusData?.emailMasked ?? "";
     const expiresAt = statusData?.expiresAt;
+    const accountExists = statusData?.accountExists ?? false;
 
     const { switchTenant } = useTenantSwitcher();
 
@@ -131,6 +132,7 @@ export function OwnerInvitePage() {
                 ) : (
                     <InviteActionPicker
                         token={token}
+                        accountExists={accountExists}
                         onCreateAccount={() => setShowRegisterForm(true)}
                     />
                 )}

@@ -15,6 +15,8 @@ export default {
         signInDescription: "Already have an account? Sign in to accept.",
         createAccount: "Create Account",
         createAccountDescription: "New here? Create an account to get started.",
+        accountExists:
+            "An account with this address already exists. Sign in and you can accept the invitation straight away.",
     },
     register: {
         title: "Create Your Account",

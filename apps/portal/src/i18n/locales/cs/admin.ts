@@ -158,7 +158,13 @@ export default {
             title: "Upravit vlastnictví",
             description:
                 "Přiřaďte vlastníky a jejich podíly pro tuto jednotku. Celkový podíl musí být přesně 1/1.",
-            addOwner: "Přidat vlastníka",
+            addOwner: "Přidat spoluvlastníka",
+            help: {
+                label: "Jak zadat spoluvlastnictví",
+                party: "Každého spoluvlastníka zadejte zvlášť — dalšího přidáte tlačítkem „{{button}}“. Sourozenci, kteří mají po polovině, tak budou dva, každý s podílem 1/2.",
+                sjm: "Výjimkou jsou manželé ve společném jmění: jednotku vlastní společně, takže patří do jednoho bloku jako dvě jména.",
+                sum: "Součet podílů musí být přesně 1/1.",
+            },
             effectiveFromLabel: "Platné od",
             effectiveFromHint:
                 "Datum, od kterého nové vlastnictví platí. Může být i v budoucnu.",

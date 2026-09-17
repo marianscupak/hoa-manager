@@ -23,6 +23,7 @@ export * from "./checkbox";
 export * from "./tabs";
 export * from "./tooltip";
 export * from "./fraction-input";
+export * from "./help-hint";
 export * from "./confirm-dialog";
 export * from "./empty-state";
 export * from "./file-dropzone";

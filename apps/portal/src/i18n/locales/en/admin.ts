@@ -155,7 +155,13 @@ export default {
             title: "Edit Ownership",
             description:
                 "Assign owners and their shares for this unit. The total share must equal 1/1.",
-            addOwner: "Add Owner",
+            addOwner: "Add a co-owner",
+            help: {
+                label: "How to record co-ownership",
+                party: "Add every co-owner separately — the “{{button}}” button adds another. Siblings who own a half each end up as two, with a 1/2 share apiece.",
+                sjm: "Spouses in joint marital property are the exception: they own the unit together, so they go in one block as two names.",
+                sum: "The shares have to add up to exactly 1/1.",
+            },
             effectiveFromLabel: "Effective from",
             effectiveFromHint:
                 "The date the new ownership takes effect. It may lie in the future.",

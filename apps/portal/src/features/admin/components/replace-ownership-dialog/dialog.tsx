@@ -13,6 +13,7 @@ import {
     DialogDescription,
     DialogFooter,
     DialogHeader,
+    HelpHint,
     DialogTitle,
     Form,
     FormDatePicker,
@@ -184,15 +185,48 @@ export function ReplaceOwnershipDialog({
                         )}
 
                         <div className="flex items-center justify-between border-t pt-4">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => append(emptyRow())}
-                            >
-                                <PlusIcon className="mr-2 h-4 w-4" />
-                                {t("units.ownershipEditor.addOwner")}
-                            </Button>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => append(emptyRow())}
+                                >
+                                    <PlusIcon className="mr-2 h-4 w-4" />
+                                    {t("units.ownershipEditor.addOwner")}
+                                </Button>
+
+                                {/* Three of six participants in the usability
+                                    study got the ownership type wrong: two
+                                    reached for SJM to put siblings on one
+                                    unit, because it was the only visible way
+                                    to name two people, and one never found it
+                                    for an actual married couple. The rule is
+                                    one entry per co-owner, with SJM as the
+                                    exception — so it is spelled out right
+                                    where a second co-owner is added. */}
+                                <HelpHint
+                                    showLabel
+                                    label={t(
+                                        "units.ownershipEditor.help.label",
+                                    )}
+                                >
+                                    <p>
+                                        {/* The button's own label, so the
+                                            hint cannot drift from what the
+                                            button actually says. */}
+                                        {t("units.ownershipEditor.help.party", {
+                                            button: t(
+                                                "units.ownershipEditor.addOwner",
+                                            ),
+                                        })}
+                                    </p>
+                                    <p>{t("units.ownershipEditor.help.sjm")}</p>
+                                    <p className="text-muted-foreground">
+                                        {t("units.ownershipEditor.help.sum")}
+                                    </p>
+                                </HelpHint>
+                            </div>
 
                             <div className="text-right text-sm font-medium">
                                 <span className="text-muted-foreground">

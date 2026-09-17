@@ -861,7 +861,7 @@ export const voting = {
             searchPlaceholder: "Search unit or owner…",
             columns: {
                 unit: "Unit",
-                share: "Share",
+                share: "Share of common parts",
                 status: "Status",
                 action: "Action",
             },
@@ -986,7 +986,11 @@ export const voting = {
             board: "Search unit or owner…",
             owner: "Search unit…",
         },
-        columns: { unit: "Unit", share: "Share", status: "Status" },
+        columns: {
+            unit: "Unit",
+            share: "Share of common parts",
+            status: "Status",
+        },
         status: {
             voted: "Voted",
             notVoted: "Not voted",

@@ -50,7 +50,7 @@ export default {
         table: {
             unitNumber: "Jednotka",
             usage: "Využití",
-            buildingShare: "Podíl na domě",
+            buildingShare: "Podíl na společných částech",
             owners: "Vlastníci",
             myShare: "Váš podíl na jednotce",
             mine: "Moje",
@@ -70,7 +70,7 @@ export default {
         table: {
             unitNumber: "Číslo jednotky",
             ownerShare: "Váš podíl na jednotce",
-            buildingShare: "Podíl na společných částech domu",
+            buildingShare: "Podíl na společných částech",
             coOwned: "spoluvlastnictví",
             openDetail: "Zobrazit jednotku",
             count_one: "{{count}} jednotka",

@@ -876,7 +876,7 @@ export const voting = {
             searchPlaceholder: "Hledat jednotku nebo vlastníka…",
             columns: {
                 unit: "Jednotka",
-                share: "Podíl",
+                share: "Podíl na společných částech",
                 status: "Stav",
                 action: "Akce",
             },
@@ -1004,7 +1004,11 @@ export const voting = {
             board: "Hledat jednotku nebo vlastníka…",
             owner: "Hledat jednotku…",
         },
-        columns: { unit: "Jednotka", share: "Podíl", status: "Stav" },
+        columns: {
+            unit: "Jednotka",
+            share: "Podíl na společných částech",
+            status: "Stav",
+        },
         status: {
             voted: "Hlasovalo",
             notVoted: "Nehlasovalo",

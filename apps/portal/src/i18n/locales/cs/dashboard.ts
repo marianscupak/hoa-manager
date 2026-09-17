@@ -48,7 +48,7 @@ export const dashboard = {
     ownedUnits: {
         sectionTitle: "Moje jednotky",
         columnUnit: "Jednotka",
-        columnOwnerShare: "Váš podíl",
+        columnOwnerShare: "Váš podíl na jednotce",
         columnBuildingShare: "Podíl na společných částech",
         emptyTitle: "Zatím vám nejsou přiřazeny žádné jednotky",
         errorMessage: "Nepodařilo se načíst vaše jednotky.",

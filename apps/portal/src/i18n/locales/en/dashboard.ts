@@ -48,7 +48,7 @@ export const dashboard = {
     ownedUnits: {
         sectionTitle: "My units",
         columnUnit: "Unit",
-        columnOwnerShare: "Your share",
+        columnOwnerShare: "Your share of the unit",
         columnBuildingShare: "Share of common parts",
         emptyTitle: "No units assigned to you yet",
         errorMessage: "Couldn't load your units.",

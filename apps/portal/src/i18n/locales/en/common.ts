@@ -50,7 +50,7 @@ export default {
         table: {
             unitNumber: "Unit",
             usage: "Use",
-            buildingShare: "Share of the building",
+            buildingShare: "Share of common parts",
             owners: "Owners",
             myShare: "Your share of the unit",
             mine: "Yours",
@@ -69,7 +69,7 @@ export default {
         table: {
             unitNumber: "Unit number",
             ownerShare: "Your share of the unit",
-            buildingShare: "Share of the building's common parts",
+            buildingShare: "Share of common parts",
             coOwned: "co-owned",
             openDetail: "Open unit",
             count_one: "{{count}} unit",

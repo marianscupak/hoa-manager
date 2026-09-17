@@ -38,10 +38,9 @@ export interface UnitWithStatus {
 export type ListedUnit = MarkedUnit<UnitWithStatus>;
 
 @QueryHandler(ListUnitsQuery)
-export class ListUnitsHandler implements IQueryHandler<
-  ListUnitsQuery,
-  ListedUnit[]
-> {
+export class ListUnitsHandler
+  implements IQueryHandler<ListUnitsQuery, ListedUnit[]>
+{
   constructor(
     @Inject(UNIT_REPOSITORY)
     private readonly unitRepo: UnitRepository,

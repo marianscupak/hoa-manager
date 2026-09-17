@@ -84,7 +84,9 @@ function build(options?: {
   };
 
   const handler = new PublishAssemblyRecordHandler(
-    { execute: jest.fn((work: () => Promise<unknown>) => work()) } as unknown as UnitOfWork,
+    {
+      execute: jest.fn((work: () => Promise<unknown>) => work()),
+    } as unknown as UnitOfWork,
     {
       findById: jest.fn().mockResolvedValue(vote),
       findUnitIdsWithBallot: jest.fn(async () => ballotUnitIds),
@@ -113,7 +115,9 @@ function build(options?: {
     } as unknown as ResultCalculationService,
     { now: () => NOW } as Clock,
     { append: jest.fn() } as unknown as AuditService,
-    { requireActor: jest.fn().mockReturnValue(ACTOR) } as unknown as AuditContextService,
+    {
+      requireActor: jest.fn().mockReturnValue(ACTOR),
+    } as unknown as AuditContextService,
     {
       resolveActorLabel: jest.fn().mockResolvedValue('Board Member'),
     } as unknown as VotingAuditLabelResolver,
@@ -132,8 +136,18 @@ describe('PublishAssemblyRecordHandler', () => {
     // rule belongs here.
     const { handler, calls } = build({
       attendance: [
-        { unitId: 'u1', status: 'PRESENT', voterOwnerId: 'o1', voterNote: null },
-        { unitId: 'u2', status: 'PRESENT', voterOwnerId: 'o2', voterNote: null },
+        {
+          unitId: 'u1',
+          status: 'PRESENT',
+          voterOwnerId: 'o1',
+          voterNote: null,
+        },
+        {
+          unitId: 'u2',
+          status: 'PRESENT',
+          voterOwnerId: 'o2',
+          voterNote: null,
+        },
       ],
       ballotUnitIds: ['u1'],
     });
@@ -147,7 +161,12 @@ describe('PublishAssemblyRecordHandler', () => {
   it('ignores absent units when checking the gate', async () => {
     const { handler } = build({
       attendance: [
-        { unitId: 'u1', status: 'PRESENT', voterOwnerId: 'o1', voterNote: null },
+        {
+          unitId: 'u1',
+          status: 'PRESENT',
+          voterOwnerId: 'o1',
+          voterNote: null,
+        },
         { unitId: 'u2', status: 'ABSENT', voterOwnerId: null, voterNote: null },
       ],
       ballotUnitIds: ['u1'],

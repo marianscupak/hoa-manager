@@ -17,12 +17,16 @@ function build(options?: { mode?: VoteMode; status?: VoteStatus }) {
   const deleted: string[] = [];
 
   const handler = new DeleteAssemblyBallotHandler(
-    { execute: jest.fn((work: () => Promise<unknown>) => work()) } as unknown as UnitOfWork,
+    {
+      execute: jest.fn((work: () => Promise<unknown>) => work()),
+    } as unknown as UnitOfWork,
     {
       findById: jest.fn().mockResolvedValue(vote),
-      deleteBallotForUnit: jest.fn(async (_t: string, _v: string, u: string) => {
-        deleted.push(u);
-      }),
+      deleteBallotForUnit: jest.fn(
+        async (_t: string, _v: string, u: string) => {
+          deleted.push(u);
+        },
+      ),
     } as unknown as VoteWriteRepository,
   );
 
@@ -34,7 +38,12 @@ describe('DeleteAssemblyBallotHandler', () => {
     const { handler, deleted } = build();
 
     await handler.execute(
-      new DeleteAssemblyBallotCommand('tenant-1', 'vote-1', 'member-1', 'unit-1'),
+      new DeleteAssemblyBallotCommand(
+        'tenant-1',
+        'vote-1',
+        'member-1',
+        'unit-1',
+      ),
     );
 
     expect(deleted).toEqual(['unit-1']);
@@ -47,7 +56,12 @@ describe('DeleteAssemblyBallotHandler', () => {
 
     await expect(
       handler.execute(
-        new DeleteAssemblyBallotCommand('tenant-1', 'vote-1', 'member-1', 'unit-1'),
+        new DeleteAssemblyBallotCommand(
+          'tenant-1',
+          'vote-1',
+          'member-1',
+          'unit-1',
+        ),
       ),
     ).rejects.toMatchObject({ code: 'NOT_AN_ASSEMBLY_RECORD' });
     expect(deleted).toEqual([]);
@@ -58,7 +72,12 @@ describe('DeleteAssemblyBallotHandler', () => {
 
     await expect(
       handler.execute(
-        new DeleteAssemblyBallotCommand('tenant-1', 'vote-1', 'member-1', 'unit-1'),
+        new DeleteAssemblyBallotCommand(
+          'tenant-1',
+          'vote-1',
+          'member-1',
+          'unit-1',
+        ),
       ),
     ).rejects.toMatchObject({ code: 'VOTE_NOT_DRAFT' });
     expect(deleted).toEqual([]);

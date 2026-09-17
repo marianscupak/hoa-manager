@@ -91,12 +91,10 @@ export class ListPeopleHandler implements IQueryHandler<ListPeopleQuery> {
       userId: query.canSeeAccounts ? p.userId : null,
       role: query.canSeeAccounts ? p.role : null,
       status: query.canSeeAccounts ? p.status : null,
-      joinedAt: query.canSeeAccounts
-        ? (p.joinedAt?.toISOString() ?? null)
-        : null,
+      joinedAt: query.canSeeAccounts ? p.joinedAt?.toISOString() ?? null : null,
       inviteStatus: query.canSeeAccounts ? p.inviteStatus : null,
       inviteCreatedAt: query.canSeeAccounts
-        ? (p.inviteCreatedAt?.toISOString() ?? null)
+        ? p.inviteCreatedAt?.toISOString() ?? null
         : null,
       suggestedCounterpartKey: query.canSeeAccounts
         ? p.suggestedCounterpartKey

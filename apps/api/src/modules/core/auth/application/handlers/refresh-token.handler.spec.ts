@@ -69,9 +69,8 @@ function makeSessionRepository(
   return {
     async findByHash(hash) {
       return (
-        [...store.sessions.values()].find(
-          (s) => s.refreshTokenHash === hash,
-        ) ?? null
+        [...store.sessions.values()].find((s) => s.refreshTokenHash === hash) ??
+        null
       );
     },
     async create(session) {
@@ -200,8 +199,8 @@ describe('RefreshTokenHandler', () => {
 
     expect(store.sessions.get('session-1')!.revokedAt).toEqual(NOW);
     expect(result.refreshToken).not.toBe(RAW_TOKEN);
-    expect([...store.sessions.values()].filter((s) => !s.revokedAt)).toHaveLength(
-      1,
-    );
+    expect(
+      [...store.sessions.values()].filter((s) => !s.revokedAt),
+    ).toHaveLength(1);
   });
 });

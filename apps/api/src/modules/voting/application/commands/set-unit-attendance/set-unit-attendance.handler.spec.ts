@@ -83,13 +83,17 @@ function build(options?: {
   } as unknown as ElectorateService;
 
   const handler = new SetUnitAttendanceHandler(
-    { execute: jest.fn((work: () => Promise<unknown>) => work()) } as unknown as UnitOfWork,
+    {
+      execute: jest.fn((work: () => Promise<unknown>) => work()),
+    } as unknown as UnitOfWork,
     voteRepository,
     attendanceRepo,
     electorateService,
     { now: () => new Date('2026-09-16T12:00:00Z') } as Clock,
     { append: jest.fn() } as unknown as AuditService,
-    { requireActor: jest.fn().mockReturnValue(ACTOR) } as unknown as AuditContextService,
+    {
+      requireActor: jest.fn().mockReturnValue(ACTOR),
+    } as unknown as AuditContextService,
     {
       resolveActorLabel: jest.fn().mockResolvedValue('Board Member'),
       resolveOwnerLabel: jest.fn().mockResolvedValue('Jana Nováková'),

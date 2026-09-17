@@ -34,9 +34,7 @@ export function FormTextarea({
             render={({ field }) => (
                 <FormItem>
                     {label && (
-                        <FormLabel optional={optional}>
-                            {label}
-                        </FormLabel>
+                        <FormLabel optional={optional}>{label}</FormLabel>
                     )}
                     <FormControl>
                         <Textarea {...field} {...props} />

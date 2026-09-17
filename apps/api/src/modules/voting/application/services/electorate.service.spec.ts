@@ -48,7 +48,7 @@ describe('ElectorateDomainService', () => {
       findAllUnits: jest.fn(),
       findOwnershipParties: jest.fn(),
       findValidConsents: jest.fn(),
-    findOwnershipRegisterStart: jest.fn(),
+      findOwnershipRegisterStart: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({

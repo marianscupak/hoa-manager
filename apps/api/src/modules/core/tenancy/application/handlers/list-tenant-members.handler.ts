@@ -9,7 +9,9 @@ import {
 import { ListTenantMembersQuery } from '@/modules/core/tenancy/application/queries/list-tenant-members.query';
 
 @QueryHandler(ListTenantMembersQuery)
-export class ListTenantMembersHandler implements IQueryHandler<ListTenantMembersQuery> {
+export class ListTenantMembersHandler
+  implements IQueryHandler<ListTenantMembersQuery>
+{
   constructor(
     @Inject(MEMBERSHIP_REPOSITORY)
     private readonly membershipRepository: MembershipRepository,

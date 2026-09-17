@@ -121,10 +121,8 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
                 render={({ field }) => (
                     <FormItem>
                         {label && (
-                        <FormLabel optional={optional}>
-                            {label}
-                        </FormLabel>
-                    )}
+                            <FormLabel optional={optional}>{label}</FormLabel>
+                        )}
                         {isPassword ? (
                             <InputWithReveal
                                 revealLabel={revealLabel}

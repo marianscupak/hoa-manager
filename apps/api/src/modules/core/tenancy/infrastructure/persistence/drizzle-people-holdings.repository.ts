@@ -19,7 +19,9 @@ import { type PeopleHoldingRow } from '@/modules/core/tenancy/domain/people-unio
  * `owners` and `tenant_memberships`. Nothing here writes.
  */
 @Injectable()
-export class DrizzlePeopleHoldingsRepository implements PeopleHoldingsRepository {
+export class DrizzlePeopleHoldingsRepository
+  implements PeopleHoldingsRepository
+{
   constructor(private readonly drizzle: DrizzleService) {}
 
   async findHoldings(tenantId: string, now: Date): Promise<PeopleHoldingRow[]> {

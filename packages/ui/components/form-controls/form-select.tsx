@@ -51,9 +51,7 @@ export const FormSelect = ({
             render={({ field }) => (
                 <FormItem>
                     {label && (
-                        <FormLabel optional={optional}>
-                            {label}
-                        </FormLabel>
+                        <FormLabel optional={optional}>{label}</FormLabel>
                     )}
                     <Select
                         onValueChange={(value) => {

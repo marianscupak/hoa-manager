@@ -240,9 +240,7 @@ export class SetUnitAttendanceDto extends createZodDto(
 ) {}
 
 export const recordAssemblyBallotSchema = z.object({
-  answers: z.array(
-    z.object({ questionId: z.uuid(), optionId: z.uuid() }),
-  ),
+  answers: z.array(z.object({ questionId: z.uuid(), optionId: z.uuid() })),
 });
 export class RecordAssemblyBallotDto extends createZodDto(
   recordAssemblyBallotSchema,

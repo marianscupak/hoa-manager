@@ -47,10 +47,7 @@ export class DrizzleVoteAttendanceRepository
       });
   }
 
-  async findByVote(
-    tenantId: string,
-    voteId: string,
-  ): Promise<AttendanceRow[]> {
+  async findByVote(tenantId: string, voteId: string): Promise<AttendanceRow[]> {
     const rows = await this.db
       .select({
         unitId: voteAttendance.unitId,

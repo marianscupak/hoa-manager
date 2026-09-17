@@ -29,7 +29,9 @@ import { UnlinkOwnerFromAccountCommand } from '../commands/unlink-owner-from-acc
  * and nobody would notice until a vote had been cast by the wrong person.
  */
 @CommandHandler(UnlinkOwnerFromAccountCommand)
-export class UnlinkOwnerFromAccountHandler implements ICommandHandler<UnlinkOwnerFromAccountCommand> {
+export class UnlinkOwnerFromAccountHandler
+  implements ICommandHandler<UnlinkOwnerFromAccountCommand>
+{
   constructor(
     @Inject(UNIT_OF_WORK) private readonly uow: UnitOfWork,
     @Inject(OWNER_REPOSITORY) private readonly ownerRepo: OwnerRepository,

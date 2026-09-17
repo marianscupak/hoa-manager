@@ -93,11 +93,14 @@ export class GetAssemblyRecordHandler
     // owns, so a unit with no common representative still counts toward the
     // quorum denominator even though it cannot vote.
     const countable = electorate.filter(
-      (e) => e.ineligibleReason !== ElectorateIneligibleReason.ASSOCIATION_OWNED,
+      (e) =>
+        e.ineligibleReason !== ElectorateIneligibleReason.ASSOCIATION_OWNED,
     );
     const weightOf = (unitId: string) => {
       const row = countable.find((e) => e.unitId === unitId);
-      return row ? Rational.from(row.weightNum, row.weightDen) : Rational.zero();
+      return row
+        ? Rational.from(row.weightNum, row.weightDen)
+        : Rational.zero();
     };
 
     const units = countable.map((row) => {

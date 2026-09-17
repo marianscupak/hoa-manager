@@ -24,10 +24,9 @@ import {
 } from '@/shared/application/ports/unit-of-work.port';
 
 @CommandHandler(CreateTenantCommand)
-export class CreateTenantHandler implements ICommandHandler<
-  CreateTenantCommand,
-  { tenantId: string }
-> {
+export class CreateTenantHandler
+  implements ICommandHandler<CreateTenantCommand, { tenantId: string }>
+{
   constructor(
     @Inject(TENANT_REPOSITORY)
     private readonly tenantRepository: TenantRepository,

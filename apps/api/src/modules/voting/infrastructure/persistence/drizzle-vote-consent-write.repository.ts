@@ -13,7 +13,9 @@ import { ConsentAlreadyRecordedException } from '@/shared/application/exceptions
 import { isUniqueViolation } from '@/shared/errors/pg-errors';
 
 @Injectable()
-export class DrizzleVoteConsentWriteRepository implements VoteConsentWriteRepository {
+export class DrizzleVoteConsentWriteRepository
+  implements VoteConsentWriteRepository
+{
   constructor(private readonly drizzle: DrizzleService) {}
 
   private get db() {

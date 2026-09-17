@@ -367,9 +367,7 @@ describe('VotingAuditFormatter', () => {
         payload: { ...basePayload, revokedByMembershipId: 'owner-m-1' },
       });
       const entry = formatter.format(e, VIEWER_ADMIN);
-      expect(entry.message).toBe(
-        'Bob revoked Carol representing unit 12.',
-      );
+      expect(entry.message).toBe('Bob revoked Carol representing unit 12.');
     });
 
     it('renders byRecorder variant when admin revoked on behalf (en)', () => {

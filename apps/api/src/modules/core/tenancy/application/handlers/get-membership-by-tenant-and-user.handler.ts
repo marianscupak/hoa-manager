@@ -8,7 +8,9 @@ import {
 import { GetMembershipByTenantAndUserQuery } from '@/modules/core/tenancy/application/queries/get-membership-by-tenant-and-user.query';
 
 @QueryHandler(GetMembershipByTenantAndUserQuery)
-export class GetMembershipByTenantAndUserHandler implements IQueryHandler<GetMembershipByTenantAndUserQuery> {
+export class GetMembershipByTenantAndUserHandler
+  implements IQueryHandler<GetMembershipByTenantAndUserQuery>
+{
   constructor(
     @Inject(MEMBERSHIP_REPOSITORY)
     private readonly membershipRepo: MembershipRepository,

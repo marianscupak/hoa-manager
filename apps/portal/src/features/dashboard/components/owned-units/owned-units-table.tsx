@@ -59,18 +59,38 @@ export function OwnedUnitsTable({ units }: OwnedUnitsTableProps) {
                         </td>
                         <td className="py-2 text-right tabular-nums">
                             <span className="text-foreground block font-medium">
-                                {shareCellValues(u.shareNumerator, u.shareDenominator).value}
+                                {
+                                    shareCellValues(
+                                        u.shareNumerator,
+                                        u.shareDenominator,
+                                    ).value
+                                }
                             </span>
                             <span className="text-faint text-detail">
-                                {shareCellValues(u.shareNumerator, u.shareDenominator).secondary}
+                                {
+                                    shareCellValues(
+                                        u.shareNumerator,
+                                        u.shareDenominator,
+                                    ).secondary
+                                }
                             </span>
                         </td>
                         <td className="py-2 text-right tabular-nums">
                             <span className="text-foreground block font-medium">
-                                {shareCellValues(u.buildingShareNumerator, u.buildingShareDenominator).value}
+                                {
+                                    shareCellValues(
+                                        u.buildingShareNumerator,
+                                        u.buildingShareDenominator,
+                                    ).value
+                                }
                             </span>
                             <span className="text-faint text-detail">
-                                {shareCellValues(u.buildingShareNumerator, u.buildingShareDenominator).secondary}
+                                {
+                                    shareCellValues(
+                                        u.buildingShareNumerator,
+                                        u.buildingShareDenominator,
+                                    ).secondary
+                                }
                             </span>
                         </td>
                     </tr>

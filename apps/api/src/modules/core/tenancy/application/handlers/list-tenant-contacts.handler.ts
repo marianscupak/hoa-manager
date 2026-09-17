@@ -23,7 +23,9 @@ export interface TenantContact {
  * can be served to any authenticated member of the tenant.
  */
 @QueryHandler(ListTenantContactsQuery)
-export class ListTenantContactsHandler implements IQueryHandler<ListTenantContactsQuery> {
+export class ListTenantContactsHandler
+  implements IQueryHandler<ListTenantContactsQuery>
+{
   constructor(
     @Inject(MEMBERSHIP_REPOSITORY)
     private readonly membershipRepository: MembershipRepository,

@@ -84,12 +84,16 @@ function build(options: {
   const context: AssemblyUnitContext[] = options.units.map((u) => ({
     unitId: u.unitId,
     unitNo: u.unitId.toUpperCase(),
-    owners: [{ ownerId: `owner-${u.unitId}`, displayName: `Owner ${u.unitId}` }],
+    owners: [
+      { ownerId: `owner-${u.unitId}`, displayName: `Owner ${u.unitId}` },
+    ],
     answers: u.answers ?? [],
   }));
 
   const handler = new GetAssemblyRecordHandler(
-    { findById: jest.fn().mockResolvedValue(vote) } as unknown as VoteWriteRepository,
+    {
+      findById: jest.fn().mockResolvedValue(vote),
+    } as unknown as VoteWriteRepository,
     {
       findAssemblyUnitContext: jest.fn(
         async (_t: string, _v: string, at: Date) => {
@@ -138,8 +142,16 @@ describe('GetAssemblyRecordHandler', () => {
     // read model carries both and lets the screen choose.
     const { handler } = build({
       units: [
-        { unitId: 'u1', weight: [1, 4], answers: [{ questionId: 'q1', optionId: 'o-yes' }] },
-        { unitId: 'u2', weight: [3, 4], answers: [{ questionId: 'q1', optionId: 'o-no' }] },
+        {
+          unitId: 'u1',
+          weight: [1, 4],
+          answers: [{ questionId: 'q1', optionId: 'o-yes' }],
+        },
+        {
+          unitId: 'u2',
+          weight: [3, 4],
+          answers: [{ questionId: 'q1', optionId: 'o-no' }],
+        },
       ],
       attendance: [present('u1'), present('u2')],
     });
@@ -147,11 +159,15 @@ describe('GetAssemblyRecordHandler', () => {
     const result = await handler.execute(query());
     const options = result.questions[0].options;
 
-    expect(options.find((o: { optionKey: string }) => o.optionKey === 'YES')).toMatchObject({
+    expect(
+      options.find((o: { optionKey: string }) => o.optionKey === 'YES'),
+    ).toMatchObject({
       unitCount: 1,
       weight: { num: '1', den: '4' },
     });
-    expect(options.find((o: { optionKey: string }) => o.optionKey === 'NO')).toMatchObject({
+    expect(
+      options.find((o: { optionKey: string }) => o.optionKey === 'NO'),
+    ).toMatchObject({
       unitCount: 1,
       weight: { num: '3', den: '4' },
     });
@@ -173,7 +189,10 @@ describe('GetAssemblyRecordHandler', () => {
       absentUnitCount: 1,
       unitsAwaitingEntry: 1,
     });
-    expect(result.units.find((u: { unitId: string }) => u.unitId === 'u3')!.attendance).toBeNull();
+    expect(
+      result.units.find((u: { unitId: string }) => u.unitId === 'u3')!
+        .attendance,
+    ).toBeNull();
   });
 
   it('counts a present unit with no ballot as awaiting entry', async () => {

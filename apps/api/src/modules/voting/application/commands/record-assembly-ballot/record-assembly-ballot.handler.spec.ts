@@ -65,7 +65,9 @@ function build(options?: {
   const deleted: string[] = [];
 
   const handler = new RecordAssemblyBallotHandler(
-    { execute: jest.fn((work: () => Promise<unknown>) => work()) } as unknown as UnitOfWork,
+    {
+      execute: jest.fn((work: () => Promise<unknown>) => work()),
+    } as unknown as UnitOfWork,
     {
       findDetailById: jest.fn().mockResolvedValue(vote),
     } as unknown as VoteReadRepository,
@@ -83,18 +85,22 @@ function build(options?: {
         }
         return b.map((x, i) => ({ ballotId: `ballot-${i}`, unitId: x.unitId }));
       }),
-      deleteBallotForUnit: jest.fn(async (_t: string, _v: string, u: string) => {
-        deleted.push(u);
-        const at = saved.findIndex((s) => s.unitId === u);
-        if (at >= 0) saved.splice(at, 1);
-      }),
+      deleteBallotForUnit: jest.fn(
+        async (_t: string, _v: string, u: string) => {
+          deleted.push(u);
+          const at = saved.findIndex((s) => s.unitId === u);
+          if (at >= 0) saved.splice(at, 1);
+        },
+      ),
     } as unknown as VoteWriteRepository,
     {
       findByVote: jest.fn(async () => (attendanceRow ? [attendanceRow] : [])),
     } as unknown as VoteAttendanceRepository,
     { now: () => new Date('2026-09-16T12:00:00Z') } as Clock,
     { append: jest.fn() } as unknown as AuditService,
-    { requireActor: jest.fn().mockReturnValue(ACTOR) } as unknown as AuditContextService,
+    {
+      requireActor: jest.fn().mockReturnValue(ACTOR),
+    } as unknown as AuditContextService,
     {
       resolveActorLabel: jest.fn().mockResolvedValue('Board Member'),
       resolveOwnerLabel: jest.fn().mockResolvedValue('Jana Nováková'),
@@ -272,20 +278,30 @@ describe('RecordAssemblyBallotHandler', () => {
     const { handler, saved, deleted } = build();
 
     await handler.execute(
-      new RecordAssemblyBallotCommand('tenant-1', 'vote-1', 'member-1', 'unit-1', [
-        YES,
-      ]),
+      new RecordAssemblyBallotCommand(
+        'tenant-1',
+        'vote-1',
+        'member-1',
+        'unit-1',
+        [YES],
+      ),
     );
     await handler.execute(
-      new RecordAssemblyBallotCommand('tenant-1', 'vote-1', 'member-1', 'unit-1', [
-        { questionId: 'q1', optionId: 'o-no-1' },
-      ]),
+      new RecordAssemblyBallotCommand(
+        'tenant-1',
+        'vote-1',
+        'member-1',
+        'unit-1',
+        [{ questionId: 'q1', optionId: 'o-no-1' }],
+      ),
     );
 
     // The delete runs before every save, so the first one is a no-op; what
     // matters is that the unit ends up with exactly one, corrected ballot.
     expect(deleted).toContain('unit-1');
     expect(saved).toHaveLength(1);
-    expect(saved[0].answers).toEqual([{ questionId: 'q1', optionId: 'o-no-1' }]);
+    expect(saved[0].answers).toEqual([
+      { questionId: 'q1', optionId: 'o-no-1' },
+    ]);
   });
 });

@@ -1,6 +1,10 @@
 import { decideIdentityLink } from './link-identity';
 
-const ACCOUNT = { id: 'u1', email: 'marian@example.com' };
+const ACCOUNT = {
+  id: 'u1',
+  email: 'marian@example.com',
+  isEmailVerified: true,
+};
 
 describe('decideIdentityLink', () => {
   it('links when the verified Google address is the account’s own', () => {
@@ -59,6 +63,19 @@ describe('decideIdentityLink', () => {
         identityOwnerId: 'u2',
       }),
     ).toEqual({ outcome: 'REFUSE', reason: 'IDENTITY_ALREADY_LINKED' });
+  });
+
+  it('refuses an account that never proved its own address', () => {
+    // Google proved the address; this account never did. Attaching them would
+    // hand the account to whoever holds the mailbox.
+    expect(
+      decideIdentityLink({
+        account: { ...ACCOUNT, isEmailVerified: false },
+        googleEmail: 'marian@example.com',
+        emailVerified: true,
+        identityOwnerId: null,
+      }),
+    ).toEqual({ outcome: 'REFUSE', reason: 'ACCOUNT_EMAIL_NOT_VERIFIED' });
   });
 
   it('treats a repeat of the same link as done, not as an error', () => {

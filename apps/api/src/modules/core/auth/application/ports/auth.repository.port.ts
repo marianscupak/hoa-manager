@@ -13,6 +13,8 @@ export interface AuthIdentityRepository {
   create(
     identity: Omit<AuthIdentity, 'id' | 'createdAt' | 'lastUsedAt'>,
   ): Promise<AuthIdentity>;
+  /** Replaces the password of a LOCAL identity — the re-registration path. */
+  updatePassword(id: string, passwordHash: string): Promise<void>;
   updateLastUsed(id: string): Promise<void>;
   deleteByUserAndProvider(userId: string, provider: string): Promise<void>;
 }
@@ -83,4 +85,33 @@ export interface AuthExchangeCodeRepository {
 
 export const AUTH_EXCHANGE_CODE_REPOSITORY = Symbol(
   'AUTH_EXCHANGE_CODE_REPOSITORY',
+);
+
+export interface EmailVerificationCode {
+  id: string;
+  userId: string;
+  codeHash: string;
+  expiresAt: Date;
+  attempts: number;
+  consumedAt: Date | null;
+  createdAt: Date;
+}
+
+export interface EmailVerificationCodeRepository {
+  create(
+    code: Omit<
+      EmailVerificationCode,
+      'id' | 'createdAt' | 'attempts' | 'consumedAt'
+    >,
+  ): Promise<EmailVerificationCode>;
+  /** The newest code for the user that has not been consumed yet. */
+  findActiveByUser(userId: string): Promise<EmailVerificationCode | null>;
+  /** Issuing a new code retires every earlier one, so only one is ever live. */
+  consumeAllForUser(userId: string, at: Date): Promise<void>;
+  incrementAttempts(id: string): Promise<void>;
+  markConsumed(id: string, at: Date): Promise<void>;
+}
+
+export const EMAIL_VERIFICATION_CODE_REPOSITORY = Symbol(
+  'EMAIL_VERIFICATION_CODE_REPOSITORY',
 );

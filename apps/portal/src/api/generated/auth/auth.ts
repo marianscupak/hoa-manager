@@ -29,8 +29,11 @@ import type {
     GoogleLinkStartResponseDto,
     IdentityResponseDto,
     LoginDto,
+    RegisterDto,
+    ResendVerificationDto,
     SuccessResponseDto,
     SwitchTenantDto,
+    VerifyEmailDto,
 } from ".././model";
 
 import { customInstance } from "../../axios";
@@ -121,6 +124,267 @@ export const useAuthControllerLogin = <
 > => {
     return useMutation(
         getAuthControllerLoginMutationOptions(options),
+        queryClient,
+    );
+};
+export const authControllerRegister = (
+    registerDto: BodyType<RegisterDto>,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<void>(
+        {
+            url: `/api/auth/register`,
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            data: registerDto,
+            signal,
+        },
+        options,
+    );
+};
+
+export const getAuthControllerRegisterMutationOptions = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof authControllerRegister>>,
+        TError,
+        { data: BodyType<RegisterDto> },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof authControllerRegister>>,
+    TError,
+    { data: BodyType<RegisterDto> },
+    TContext
+> => {
+    const mutationKey = ["authControllerRegister"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof authControllerRegister>>,
+        { data: BodyType<RegisterDto> }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return authControllerRegister(data, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type AuthControllerRegisterMutationResult = NonNullable<
+    Awaited<ReturnType<typeof authControllerRegister>>
+>;
+export type AuthControllerRegisterMutationBody = BodyType<RegisterDto>;
+export type AuthControllerRegisterMutationError = ErrorType<ErrorResponseDto>;
+
+export const useAuthControllerRegister = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof authControllerRegister>>,
+            TError,
+            { data: BodyType<RegisterDto> },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof authControllerRegister>>,
+    TError,
+    { data: BodyType<RegisterDto> },
+    TContext
+> => {
+    return useMutation(
+        getAuthControllerRegisterMutationOptions(options),
+        queryClient,
+    );
+};
+export const authControllerVerifyEmail = (
+    verifyEmailDto: BodyType<VerifyEmailDto>,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<AuthResponseDto>(
+        {
+            url: `/api/auth/verify-email`,
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            data: verifyEmailDto,
+            signal,
+        },
+        options,
+    );
+};
+
+export const getAuthControllerVerifyEmailMutationOptions = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof authControllerVerifyEmail>>,
+        TError,
+        { data: BodyType<VerifyEmailDto> },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof authControllerVerifyEmail>>,
+    TError,
+    { data: BodyType<VerifyEmailDto> },
+    TContext
+> => {
+    const mutationKey = ["authControllerVerifyEmail"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof authControllerVerifyEmail>>,
+        { data: BodyType<VerifyEmailDto> }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return authControllerVerifyEmail(data, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type AuthControllerVerifyEmailMutationResult = NonNullable<
+    Awaited<ReturnType<typeof authControllerVerifyEmail>>
+>;
+export type AuthControllerVerifyEmailMutationBody = BodyType<VerifyEmailDto>;
+export type AuthControllerVerifyEmailMutationError =
+    ErrorType<ErrorResponseDto>;
+
+export const useAuthControllerVerifyEmail = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof authControllerVerifyEmail>>,
+            TError,
+            { data: BodyType<VerifyEmailDto> },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof authControllerVerifyEmail>>,
+    TError,
+    { data: BodyType<VerifyEmailDto> },
+    TContext
+> => {
+    return useMutation(
+        getAuthControllerVerifyEmailMutationOptions(options),
+        queryClient,
+    );
+};
+export const authControllerResendVerification = (
+    resendVerificationDto: BodyType<ResendVerificationDto>,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<void>(
+        {
+            url: `/api/auth/verify-email/resend`,
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            data: resendVerificationDto,
+            signal,
+        },
+        options,
+    );
+};
+
+export const getAuthControllerResendVerificationMutationOptions = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof authControllerResendVerification>>,
+        TError,
+        { data: BodyType<ResendVerificationDto> },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof authControllerResendVerification>>,
+    TError,
+    { data: BodyType<ResendVerificationDto> },
+    TContext
+> => {
+    const mutationKey = ["authControllerResendVerification"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof authControllerResendVerification>>,
+        { data: BodyType<ResendVerificationDto> }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return authControllerResendVerification(data, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type AuthControllerResendVerificationMutationResult = NonNullable<
+    Awaited<ReturnType<typeof authControllerResendVerification>>
+>;
+export type AuthControllerResendVerificationMutationBody =
+    BodyType<ResendVerificationDto>;
+export type AuthControllerResendVerificationMutationError =
+    ErrorType<ErrorResponseDto>;
+
+export const useAuthControllerResendVerification = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof authControllerResendVerification>>,
+            TError,
+            { data: BodyType<ResendVerificationDto> },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof authControllerResendVerification>>,
+    TError,
+    { data: BodyType<ResendVerificationDto> },
+    TContext
+> => {
+    return useMutation(
+        getAuthControllerResendVerificationMutationOptions(options),
         queryClient,
     );
 };

@@ -16,6 +16,12 @@ export default {
         loading: "Please wait while we complete the Google authentication...",
         returnToLogin: "Return to login",
         error: "Failed to authenticate with Google.",
+        errors: {
+            ACCOUNT_EXISTS:
+                "An account with this address already exists. Sign in with your password, then link Google from your profile.",
+            EMAIL_NOT_VERIFIED:
+                "This account has not confirmed its email address yet.",
+        },
     },
     loginPage: {
         title: "Sign in",
@@ -29,6 +35,33 @@ export default {
         submitting: "Signing in...",
         dividerOauth: "Or continue with",
         googleSignIn: "Sign in with Google",
+        noAccount: "No account yet?",
+        register: "Sign up",
+    },
+    register: {
+        invalidName: "Please enter your name.",
+        invalidPassword: "The password must be at least 8 characters.",
+    },
+    registerPage: {
+        title: "Sign up",
+        subtitle: "Create an account and start running your association.",
+        nameLabel: "Full name",
+        namePlaceholder: "Jane Smith",
+        submit: "Sign up",
+        submitting: "Creating your account...",
+        haveAccount: "Already have an account?",
+        signIn: "Sign in",
+    },
+    verifyEmail: {
+        title: "Confirm your email",
+        subtitle: "We sent a six-digit code to {{email}}. Enter it below.",
+        codeLabel: "Verification code",
+        submit: "Confirm",
+        submitting: "Verifying...",
+        resend: "Resend the code",
+        resendIn: "Resend in {{seconds}}s",
+        resent: "We sent the code again.",
+        invalidCode: "The code has six digits.",
     },
     createTenant: {
         title: "Create an Association",

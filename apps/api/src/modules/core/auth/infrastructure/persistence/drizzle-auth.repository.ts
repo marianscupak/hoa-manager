@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { eq, and, isNull, lt } from 'drizzle-orm';
+import { eq, and, isNull, lt, desc, sql } from 'drizzle-orm';
 
 import { SystemClock } from '@/infrastructure/clock/system-clock';
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
@@ -9,14 +9,17 @@ import {
   authSessions,
   oidcLoginAttempts,
   authExchangeCodes,
+  emailVerificationCodes,
 } from '@/infrastructure/db/schema';
 import {
   AuthIdentityRepository,
   AuthSessionRepository,
   OidcLoginAttemptRepository,
   AuthExchangeCodeRepository,
+  EmailVerificationCodeRepository,
   OidcLoginAttempt,
   AuthExchangeCode,
+  EmailVerificationCode,
 } from '@/modules/core/auth/application/ports/auth.repository.port';
 import {
   AuthIdentity,
@@ -82,6 +85,13 @@ export class DrizzleAuthIdentityRepository implements AuthIdentityRepository {
       })
       .returning();
     return inserted;
+  }
+
+  async updatePassword(id: string, passwordHash: string): Promise<void> {
+    await this.db
+      .update(authIdentities)
+      .set({ passwordHash })
+      .where(eq(authIdentities.id, id));
   }
 
   async updateLastUsed(id: string): Promise<void> {
@@ -223,5 +233,68 @@ export class DrizzleAuthExchangeCodeRepository
       .update(authExchangeCodes)
       .set({ usedAt: this.clock.now() })
       .where(eq(authExchangeCodes.id, id));
+  }
+}
+
+@Injectable()
+export class DrizzleEmailVerificationCodeRepository
+  implements EmailVerificationCodeRepository
+{
+  constructor(private readonly drizzle: DrizzleService) {}
+
+  private get db() {
+    return DRIZZLE_TX_STORAGE.getStore() ?? this.drizzle.db;
+  }
+
+  async create(
+    code: Omit<
+      EmailVerificationCode,
+      'id' | 'createdAt' | 'attempts' | 'consumedAt'
+    >,
+  ): Promise<EmailVerificationCode> {
+    const [inserted] = await this.db
+      .insert(emailVerificationCodes)
+      .values(code)
+      .returning();
+    return inserted as EmailVerificationCode;
+  }
+
+  async findActiveByUser(
+    userId: string,
+  ): Promise<EmailVerificationCode | null> {
+    const row = await this.db.query.emailVerificationCodes.findFirst({
+      where: and(
+        eq(emailVerificationCodes.userId, userId),
+        isNull(emailVerificationCodes.consumedAt),
+      ),
+      orderBy: desc(emailVerificationCodes.createdAt),
+    });
+    return (row as EmailVerificationCode) ?? null;
+  }
+
+  async consumeAllForUser(userId: string, at: Date): Promise<void> {
+    await this.db
+      .update(emailVerificationCodes)
+      .set({ consumedAt: at })
+      .where(
+        and(
+          eq(emailVerificationCodes.userId, userId),
+          isNull(emailVerificationCodes.consumedAt),
+        ),
+      );
+  }
+
+  async incrementAttempts(id: string): Promise<void> {
+    await this.db
+      .update(emailVerificationCodes)
+      .set({ attempts: sql`${emailVerificationCodes.attempts} + 1` })
+      .where(eq(emailVerificationCodes.id, id));
+  }
+
+  async markConsumed(id: string, at: Date): Promise<void> {
+    await this.db
+      .update(emailVerificationCodes)
+      .set({ consumedAt: at })
+      .where(eq(emailVerificationCodes.id, id));
   }
 }

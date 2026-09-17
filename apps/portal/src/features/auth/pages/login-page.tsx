@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router";
 
 import { Form, FormInput, Button } from "@hoa-mngr/ui";
 
@@ -64,6 +65,13 @@ export function LoginPage() {
             <div className="mt-6">
                 <GoogleLoginButton disabled={isPending} />
             </div>
+
+            <p className="text-muted-foreground mt-6 text-center text-sm">
+                {t("loginPage.noAccount")}{" "}
+                <Link to="/register" className="text-primary font-medium">
+                    {t("loginPage.register")}
+                </Link>
+            </p>
         </div>
     );
 }

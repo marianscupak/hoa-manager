@@ -13,4 +13,6 @@ export interface InviteStatusResponseDto {
     emailMasked?: string | null;
     /** @nullable */
     expiresAt?: string | null;
+    /** @nullable */
+    accountExists?: boolean | null;
 }

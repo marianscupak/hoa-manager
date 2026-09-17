@@ -24,6 +24,9 @@ export class InviteStatusResponseDto {
 
   @ApiProperty({ nullable: true, type: Date, required: false })
   expiresAt?: Date;
+
+  @ApiProperty({ nullable: true, type: Boolean, required: false })
+  accountExists?: boolean;
 }
 
 export const acceptInviteSchema = z.object({

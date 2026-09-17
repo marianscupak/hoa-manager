@@ -3,7 +3,12 @@ import { HandleGoogleCallbackCommand } from '@/modules/core/auth/application/com
 import { HandleGoogleCallbackHandler } from './handle-google-callback.handler';
 
 const NOW = new Date('2026-09-17T10:00:00Z');
-const ACCOUNT = { id: 'u1', email: 'marian@example.com', isActive: true };
+const ACCOUNT = {
+  id: 'u1',
+  email: 'marian@example.com',
+  isActive: true,
+  isEmailVerified: true,
+};
 
 function buildHandler(overrides?: {
   purpose?: 'LOGIN' | 'LINK';

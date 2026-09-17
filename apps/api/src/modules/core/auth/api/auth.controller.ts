@@ -12,6 +12,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
@@ -28,6 +29,11 @@ import {
   IdentityResponseDto,
 } from '@/modules/core/auth/api/dto/identity.dto';
 import { LoginDto } from '@/modules/core/auth/api/dto/login.dto';
+import {
+  RegisterDto,
+  ResendVerificationDto,
+  VerifyEmailDto,
+} from '@/modules/core/auth/api/dto/register.dto';
 import { SwitchTenantDto } from '@/modules/core/auth/api/dto/switch-tenant.dto';
 import { ExchangeGoogleCodeCommand } from '@/modules/core/auth/application/commands/exchange-google-code.command';
 import { HandleGoogleCallbackCommand } from '@/modules/core/auth/application/commands/handle-google-callback.command';
@@ -40,12 +46,18 @@ import {
   RefreshTokenCommand,
   type RefreshTokenResult,
 } from '@/modules/core/auth/application/commands/refresh-token.command';
+import { RegisterAccountCommand } from '@/modules/core/auth/application/commands/register-account.command';
+import { ResendVerificationCodeCommand } from '@/modules/core/auth/application/commands/resend-verification-code.command';
 import { StartGoogleLoginCommand } from '@/modules/core/auth/application/commands/start-google-login.command';
 import {
   SwitchTenantCommand,
   type SwitchTenantResult,
 } from '@/modules/core/auth/application/commands/switch-tenant.command';
 import { UnlinkIdentityCommand } from '@/modules/core/auth/application/commands/unlink-identity.command';
+import {
+  VerifyEmailCommand,
+  type VerifyEmailResult,
+} from '@/modules/core/auth/application/commands/verify-email.command';
 import { type ExchangeGoogleCodeResult } from '@/modules/core/auth/application/handlers/exchange-google-code.handler';
 import { type HandleGoogleCallbackResult } from '@/modules/core/auth/application/handlers/handle-google-callback.handler';
 import { type StartGoogleLoginResult } from '@/modules/core/auth/application/handlers/start-google-login.handler';
@@ -59,6 +71,7 @@ import {
 } from '@/shared/api/utils/refresh-cookie';
 import { UnauthorizedException } from '@/shared/application/exceptions/auth.exceptions';
 import type { AuthPrincipal } from '@/shared/domain/auth-principal';
+import { DomainException } from '@/shared/errors/domain.exception';
 
 @ApiTags('Auth')
 @ApiErrorResponses()
@@ -67,6 +80,7 @@ export class AuthController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
+    private readonly configService: ConfigService,
   ) {}
 
   @Post('login')
@@ -84,6 +98,47 @@ export class AuthController {
     setRefreshTokenCookie(res, result.refreshToken);
 
     return { accessToken: result.accessToken };
+  }
+
+  @Post('register')
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description:
+      'Starts registration. The answer is the same whether or not the address already has an account.',
+  })
+  async register(@Body() body: RegisterDto): Promise<void> {
+    await this.commandBus.execute(
+      new RegisterAccountCommand(body.email, body.fullName, body.password),
+    );
+  }
+
+  @Post('verify-email')
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: AuthResponseDto })
+  async verifyEmail(
+    @Body() body: VerifyEmailDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<AuthResponseDto> {
+    const result = await this.commandBus.execute<
+      VerifyEmailCommand,
+      VerifyEmailResult
+    >(new VerifyEmailCommand(body.email, body.code));
+
+    setRefreshTokenCookie(res, result.refreshToken);
+
+    return { accessToken: result.accessToken };
+  }
+
+  @Post('verify-email/resend')
+  @Throttle({ default: { limit: 3, ttl: 3_600_000 } })
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ description: 'Always succeeds, whatever the address is.' })
+  async resendVerification(@Body() body: ResendVerificationDto): Promise<void> {
+    await this.commandBus.execute(
+      new ResendVerificationCodeCommand(body.email),
+    );
   }
 
   @Get('google/start')
@@ -141,19 +196,34 @@ export class AuthController {
     );
   }
 
+  /**
+   * Google parks the browser here, so a thrown exception would be rendered by
+   * DomainExceptionFilter as JSON in the address bar. Failures go back to the
+   * portal, which knows how to say them.
+   */
   @Get('google/callback')
   async handleGoogleCallback(
     @Query() query: GoogleCallbackQueryDto,
     @Res() res: Response,
   ) {
-    const result = await this.commandBus.execute<
-      HandleGoogleCallbackCommand,
-      HandleGoogleCallbackResult
-    >(new HandleGoogleCallbackCommand(query));
+    const frontendUrl = this.configService.get<string>('FRONTEND_URL');
 
-    setRefreshTokenCookie(res, result.refreshToken);
+    try {
+      const result = await this.commandBus.execute<
+        HandleGoogleCallbackCommand,
+        HandleGoogleCallbackResult
+      >(new HandleGoogleCallbackCommand(query));
 
-    return res.redirect(result.redirectUrl);
+      setRefreshTokenCookie(res, result.refreshToken);
+
+      return res.redirect(result.redirectUrl);
+    } catch (error) {
+      const code =
+        error instanceof DomainException ? error.code : 'UNAUTHORIZED';
+      return res.redirect(
+        `${frontendUrl}/auth/google/callback?error=${encodeURIComponent(code)}`,
+      );
+    }
   }
 
   @Post('google/exchange')

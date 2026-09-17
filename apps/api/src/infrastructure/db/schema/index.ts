@@ -5,6 +5,7 @@ export * from '@/infrastructure/db/schema/core/auth-identities';
 export * from '@/infrastructure/db/schema/core/auth-sessions';
 export * from '@/infrastructure/db/schema/core/oidc-login-attempts';
 export * from '@/infrastructure/db/schema/core/auth-exchange-codes';
+export * from '@/infrastructure/db/schema/core/email-verification-codes';
 export * from '@/infrastructure/db/schema/core/units';
 export * from '@/infrastructure/db/schema/core/owners';
 export * from '@/infrastructure/db/schema/core/owner-invites';

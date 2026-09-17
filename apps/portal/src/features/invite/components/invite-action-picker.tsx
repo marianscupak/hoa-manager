@@ -8,11 +8,14 @@ import { StorageService } from "@/storage/storage";
 
 interface InviteActionPickerProps {
     token: string;
+    /** An account already answers to the invited address. */
+    accountExists: boolean;
     onCreateAccount: () => void;
 }
 
 export function InviteActionPicker({
     token,
+    accountExists,
     onCreateAccount,
 }: InviteActionPickerProps) {
     const { t } = useTranslation(["invite"]);
@@ -20,17 +23,25 @@ export function InviteActionPicker({
 
     return (
         <div className="space-y-3">
-            <div className="rounded-lg border p-4">
-                <h3 className="text-foreground font-medium">
-                    {t("actions.createAccount")}
-                </h3>
-                <p className="text-muted-foreground mt-1 text-sm">
-                    {t("actions.createAccountDescription")}
+            {accountExists ? (
+                // Registering would only hit ACCOUNT_EXISTS. Signing in below
+                // returns here authenticated, where the invite can be accepted.
+                <p className="text-muted-foreground text-sm">
+                    {t("actions.accountExists")}
                 </p>
-                <Button onClick={onCreateAccount} className="mt-3 w-full">
-                    {t("actions.createAccount")}
-                </Button>
-            </div>
+            ) : (
+                <div className="rounded-lg border p-4">
+                    <h3 className="text-foreground font-medium">
+                        {t("actions.createAccount")}
+                    </h3>
+                    <p className="text-muted-foreground mt-1 text-sm">
+                        {t("actions.createAccountDescription")}
+                    </p>
+                    <Button onClick={onCreateAccount} className="mt-3 w-full">
+                        {t("actions.createAccount")}
+                    </Button>
+                </div>
+            )}
 
             <div className="rounded-lg border p-4">
                 <h3 className="text-foreground font-medium">

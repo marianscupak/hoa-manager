@@ -26,19 +26,21 @@ import {
   type GoogleOidcService,
 } from '@/modules/core/auth/application/ports/google-oidc.service.port';
 import { resolveAutoScope } from '@/modules/core/auth/application/resolve-auto-scope';
+import { decideIdentityLink } from '@/modules/core/auth/domain/link-identity';
 import { CreateUserCommand } from '@/modules/core/identity/application/commands/create-user.command';
-import { MarkEmailVerifiedCommand } from '@/modules/core/identity/application/commands/mark-email-verified.command';
 import { GetUserByEmailQuery } from '@/modules/core/identity/application/queries/get-user-by-email.query';
 import { GetUserByIdQuery } from '@/modules/core/identity/application/queries/get-user-by-id.query';
 import { GetMembershipsByUserIdQuery } from '@/modules/core/tenancy/application/queries/get-memberships-by-user-id.query';
 import { type TenantMembership } from '@/modules/core/tenancy/domain/tenant.entity';
-import { decideIdentityLink } from '@/modules/core/auth/domain/link-identity';
 import {
   IdentityAlreadyLinkedException,
   IdentityEmailMismatchException,
   UnauthorizedException,
 } from '@/shared/application/exceptions/auth.exceptions';
-import { AccountExistsException } from '@/shared/application/exceptions/invite.exceptions';
+import {
+  AccountExistsException,
+  EmailNotVerifiedException,
+} from '@/shared/application/exceptions/invite.exceptions';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 import {
   UNIT_OF_WORK,
@@ -121,14 +123,39 @@ export class HandleGoogleCallbackHandler
         : null;
 
       if (!identity) {
-        // Refuse to silently link Google to an existing email-based
-        // account. The user must sign in via their existing provider
-        // and explicitly link Google from settings.
         const existingByEmail = await this.queryBus.execute(
           new GetUserByEmailQuery(idToken.email!.toLowerCase()),
         );
+
         if (existingByEmail) {
-          throw new AccountExistsException();
+          const decision = decideIdentityLink({
+            account: {
+              id: existingByEmail.id,
+              email: existingByEmail.email,
+              isEmailVerified: existingByEmail.isEmailVerified,
+            },
+            googleEmail: idToken.email!,
+            emailVerified: !!idToken.email_verified,
+            identityOwnerId: null,
+          });
+
+          if (decision.outcome !== 'LINK') {
+            // An account whose address was never proven. Whoever really holds
+            // the mailbox gets it back by registering over it.
+            throw new AccountExistsException();
+          }
+
+          // Both sides have now proven the same address: Google by
+          // email_verified, checked above, and the account by its own
+          // verification. Attaching them is the same act the profile's link
+          // button performs, just reached from the other direction.
+          identity = await this.authIdentityRepository.create({
+            userId: existingByEmail.id,
+            provider: 'OIDC_GOOGLE',
+            providerSubject: idToken.sub,
+            passwordHash: null,
+          });
+          user = existingByEmail;
         }
       }
 
@@ -158,11 +185,6 @@ export class HandleGoogleCallbackHandler
       if (!user.isActive) {
         throw new UnauthorizedException();
       }
-
-      // Accounts created before the flag was carried across still sit at
-      // false, which blocks them from accepting an owner invite. Setting it
-      // on every login repairs them; the command is a no-op once it is true.
-      await this.commandBus.execute(new MarkEmailVerifiedCommand(user.id));
 
       await this.authIdentityRepository.updateLastUsed(identity!.id);
 
@@ -244,7 +266,11 @@ export class HandleGoogleCallbackHandler
     );
 
     const decision = decideIdentityLink({
-      account: { id: account.id, email: account.email },
+      account: {
+        id: account.id,
+        email: account.email,
+        isEmailVerified: account.isEmailVerified,
+      },
       googleEmail: idToken.email ?? '',
       emailVerified: !!idToken.email_verified,
       identityOwnerId: existing?.userId ?? null,
@@ -258,6 +284,8 @@ export class HandleGoogleCallbackHandler
           throw new IdentityAlreadyLinkedException();
         case 'EMAIL_NOT_VERIFIED':
           throw new UnauthorizedException();
+        case 'ACCOUNT_EMAIL_NOT_VERIFIED':
+          throw new EmailNotVerifiedException();
       }
     }
 

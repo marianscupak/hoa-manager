@@ -12,6 +12,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
@@ -70,6 +71,7 @@ import {
 } from '@/shared/api/utils/refresh-cookie';
 import { UnauthorizedException } from '@/shared/application/exceptions/auth.exceptions';
 import type { AuthPrincipal } from '@/shared/domain/auth-principal';
+import { DomainException } from '@/shared/errors/domain.exception';
 
 @ApiTags('Auth')
 @ApiErrorResponses()
@@ -78,6 +80,7 @@ export class AuthController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
+    private readonly configService: ConfigService,
   ) {}
 
   @Post('login')
@@ -193,19 +196,34 @@ export class AuthController {
     );
   }
 
+  /**
+   * Google parks the browser here, so a thrown exception would be rendered by
+   * DomainExceptionFilter as JSON in the address bar. Failures go back to the
+   * portal, which knows how to say them.
+   */
   @Get('google/callback')
   async handleGoogleCallback(
     @Query() query: GoogleCallbackQueryDto,
     @Res() res: Response,
   ) {
-    const result = await this.commandBus.execute<
-      HandleGoogleCallbackCommand,
-      HandleGoogleCallbackResult
-    >(new HandleGoogleCallbackCommand(query));
+    const frontendUrl = this.configService.get<string>('FRONTEND_URL');
 
-    setRefreshTokenCookie(res, result.refreshToken);
+    try {
+      const result = await this.commandBus.execute<
+        HandleGoogleCallbackCommand,
+        HandleGoogleCallbackResult
+      >(new HandleGoogleCallbackCommand(query));
 
-    return res.redirect(result.redirectUrl);
+      setRefreshTokenCookie(res, result.refreshToken);
+
+      return res.redirect(result.redirectUrl);
+    } catch (error) {
+      const code =
+        error instanceof DomainException ? error.code : 'UNAUTHORIZED';
+      return res.redirect(
+        `${frontendUrl}/auth/google/callback?error=${encodeURIComponent(code)}`,
+      );
+    }
   }
 
   @Post('google/exchange')

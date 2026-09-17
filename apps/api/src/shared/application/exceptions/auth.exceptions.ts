@@ -57,3 +57,9 @@ export class LastIdentityException extends DomainException {
     super(ErrorCode.LAST_IDENTITY);
   }
 }
+
+export class InvalidVerificationCodeException extends DomainException {
+  constructor() {
+    super(ErrorCode.INVALID_VERIFICATION_CODE);
+  }
+}

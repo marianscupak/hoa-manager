@@ -1,11 +1,8 @@
-import { format, startOfDay } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
 import * as React from "react";
 import { useFormContext } from "react-hook-form";
 
 import { cn } from "../../lib/utils";
-import { Button } from "../button";
-import { Calendar } from "../calendar";
+import { DatePicker } from "../date-picker";
 import {
     FormControl,
     FormField,
@@ -13,7 +10,6 @@ import {
     FormLabel,
     FormMessage,
 } from "../form";
-import { Popover, PopoverContent, PopoverTrigger } from "../popover";
 
 export interface FormDatePickerProps {
     name: string;
@@ -26,13 +22,14 @@ export interface FormDatePickerProps {
     min?: Date;
     /** Latest selectable day, inclusive (compared by calendar day). */
     max?: Date;
+    disabled?: boolean;
     className?: string;
 }
 
 /**
  * Date-only picker for react-hook-form. The field value is a `Date` at local
- * midnight (or `null`); the trigger shows it as `d. M. yyyy`. Sibling of
- * `FormDatetimePicker` without the time input.
+ * midnight (or `null`). The control itself is `DatePicker`, so a date chosen
+ * inside a form and one chosen outside look and behave the same.
  */
 export const FormDatePicker = React.forwardRef<
     HTMLDivElement,
@@ -47,93 +44,43 @@ export const FormDatePicker = React.forwardRef<
             placeholder,
             min,
             max,
+            disabled,
             className,
         },
         ref,
     ) => {
         const { control } = useFormContext();
-        const [open, setOpen] = React.useState(false);
 
         return (
             <FormField
                 control={control}
                 name={name}
-                render={({ field }) => {
-                    const value: Date | undefined =
-                        field.value instanceof Date &&
-                        !isNaN(field.value.getTime())
-                            ? field.value
-                            : undefined;
-                    const disabled = [
-                        ...(min ? [{ before: startOfDay(min) }] : []),
-                        ...(max ? [{ after: startOfDay(max) }] : []),
-                    ];
-
-                    return (
-                        <FormItem
-                            className={cn("flex flex-col", className)}
-                            ref={ref}
-                        >
-                            {label && (
-                                <FormLabel optional={optional}>
-                                    {label}
-                                </FormLabel>
-                            )}
-                            <Popover open={open} onOpenChange={setOpen}>
-                                <PopoverTrigger asChild>
-                                    <FormControl>
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            className={cn(
-                                                // `Button` is pill-shaped; a field trigger has to carry
-                                                // the same 9px corner as `Input`, `FormCombobox`
-                                                // and `FractionInput` or it reads as a button.
-                                                "w-full cursor-pointer rounded-[9px] pl-3 text-left font-normal",
-                                                !value &&
-                                                    "text-muted-foreground",
-                                            )}
-                                        >
-                                            {value ? (
-                                                format(value, "d. M. yyyy")
-                                            ) : (
-                                                <span>
-                                                    {placeholder ?? " "}
-                                                </span>
-                                            )}
-                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                        </Button>
-                                    </FormControl>
-                                </PopoverTrigger>
-                                <PopoverContent
-                                    className="w-auto rounded-xl p-0"
-                                    align="start"
-                                >
-                                    <Calendar
-                                        mode="single"
-                                        selected={value}
-                                        defaultMonth={value}
-                                        disabled={disabled}
-                                        onSelect={(day) => {
-                                            field.onChange(
-                                                day ? startOfDay(day) : null,
-                                            );
-                                            if (day) setOpen(false);
-                                        }}
-                                        initialFocus
-                                        className="pointer-events-auto p-3"
-                                    />
-                                </PopoverContent>
-                            </Popover>
-                            {description && (
-                                <p className="text-muted-foreground text-detail">
-                                    {description}
-                                </p>
-                            )}
-                            <FormMessage />
-                        </FormItem>
-                    );
-                }}
+                render={({ field }) => (
+                    <FormItem
+                        className={cn("flex flex-col", className)}
+                        ref={ref}
+                    >
+                        {label && (
+                            <FormLabel optional={optional}>{label}</FormLabel>
+                        )}
+                        <FormControl>
+                            <DatePicker
+                                value={field.value ?? null}
+                                onChange={field.onChange}
+                                placeholder={placeholder}
+                                min={min}
+                                max={max}
+                                disabled={disabled}
+                            />
+                        </FormControl>
+                        {description && (
+                            <p className="text-muted-foreground text-detail">
+                                {description}
+                            </p>
+                        )}
+                        <FormMessage />
+                    </FormItem>
+                )}
             />
         );
     },

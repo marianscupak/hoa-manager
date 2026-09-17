@@ -18,6 +18,7 @@ export * from "./avatar";
 export * from "./background-orbs";
 export * from "./skeleton";
 export * from "./calendar";
+export * from "./date-picker";
 export * from "./popover";
 export * from "./checkbox";
 export * from "./tabs";

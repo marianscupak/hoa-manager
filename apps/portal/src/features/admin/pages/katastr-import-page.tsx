@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 import { useAtomValue } from "jotai";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -8,6 +8,7 @@ import { Link } from "react-router";
 
 import {
     Button,
+    DatePicker,
     ErrorState,
     FileDropzone,
     StatusChip,
@@ -43,6 +44,9 @@ import {
 } from "../components/katastr-import/messages";
 
 type PreviewOwner = KatastrImportPreviewResponseDto["owners"][number];
+
+/** The trigger is a button, so the caption points at it by id rather than wrapping it. */
+const EFFECTIVE_AT_LABEL_ID = "katastr-effective-at-label";
 
 export function KatastrImportPage() {
     const { t } = useTranslation("katastr");
@@ -236,12 +240,26 @@ export function KatastrImportPage() {
                 <>
                     <DocumentSummary preview={preview} />
 
-                    <label className="flex flex-col gap-1 text-sm">
-                        <span>{t("effectiveAt.label")}</span>
-                        <input
-                            type="date"
-                            className="w-44 rounded-md border px-2 py-1 disabled:opacity-60"
-                            value={effectiveAt ?? ""}
+                    <div className="flex flex-col gap-1 text-sm">
+                        <span id={EFFECTIVE_AT_LABEL_ID}>
+                            {t("effectiveAt.label")}
+                        </span>
+                        <DatePicker
+                            className="w-44"
+                            aria-labelledby={EFFECTIVE_AT_LABEL_ID}
+                            // The state is the API's `YYYY-MM-DD` calendar
+                            // day; `parse` reads it in local time, where
+                            // `new Date(string)` would read it as UTC
+                            // midnight and can land on the day before.
+                            value={
+                                effectiveAt
+                                    ? parse(
+                                          effectiveAt,
+                                          "yyyy-MM-dd",
+                                          new Date(),
+                                      )
+                                    : null
+                            }
                             // The admin cannot pick a second date while the
                             // first one's preview is still in flight, nor
                             // while an apply is in flight — the latter
@@ -253,10 +271,12 @@ export function KatastrImportPage() {
                                 previewMutation.isPending ||
                                 applyMutation.isPending
                             }
-                            onChange={(e) => {
-                                const value = e.target.value;
-                                setEffectiveAt(value || null);
-                                // Clearing the field leaves no date to
+                            onChange={(day) => {
+                                const value = day
+                                    ? format(day, "yyyy-MM-dd")
+                                    : null;
+                                setEffectiveAt(value);
+                                // Clearing the day leaves nothing to
                                 // preview for. Re-preview with none rather
                                 // than leaving the old preview on screen
                                 // for a date that is no longer selected —
@@ -264,13 +284,13 @@ export function KatastrImportPage() {
                                 // (ct:platnost), which then repopulates
                                 // this field once the response lands
                                 // (Finding 4).
-                                runPreview(value || null);
+                                runPreview(value);
                             }}
                         />
                         <span className="text-muted-foreground">
                             {t("effectiveAt.hint")}
                         </span>
-                    </label>
+                    </div>
 
                     <Counts preview={preview} />
                     <ImportDiffTable preview={preview} />

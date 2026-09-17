@@ -32,7 +32,12 @@ import { GetUserByEmailQuery } from '@/modules/core/identity/application/queries
 import { GetUserByIdQuery } from '@/modules/core/identity/application/queries/get-user-by-id.query';
 import { GetMembershipsByUserIdQuery } from '@/modules/core/tenancy/application/queries/get-memberships-by-user-id.query';
 import { type TenantMembership } from '@/modules/core/tenancy/domain/tenant.entity';
-import { UnauthorizedException } from '@/shared/application/exceptions/auth.exceptions';
+import { decideIdentityLink } from '@/modules/core/auth/domain/link-identity';
+import {
+  IdentityAlreadyLinkedException,
+  IdentityEmailMismatchException,
+  UnauthorizedException,
+} from '@/shared/application/exceptions/auth.exceptions';
 import { AccountExistsException } from '@/shared/application/exceptions/invite.exceptions';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 import {
@@ -100,6 +105,10 @@ export class HandleGoogleCallbackHandler
 
     if (!idToken.email || !idToken.email_verified) {
       throw new UnauthorizedException();
+    }
+
+    if (attempt.purpose === 'LINK') {
+      return this.linkToAccount(attempt.userId, idToken);
     }
 
     return this.uow.execute(async () => {
@@ -206,5 +215,64 @@ export class HandleGoogleCallbackHandler
         redirectUrl,
       };
     });
+  }
+
+  /**
+   * Attaches Google to an account that is already signed in. It never creates
+   * a user, never issues a session and never reads the account out of the
+   * token — the account comes from the attempt, which only an authenticated
+   * caller could have started.
+   */
+  private async linkToAccount(
+    userId: string | null,
+    idToken: { sub: string; email?: string; email_verified?: boolean },
+  ): Promise<HandleGoogleCallbackResult> {
+    if (!userId) {
+      // `purpose` and `userId` are written together, so this can only mean
+      // the row was tampered with.
+      throw new UnauthorizedException();
+    }
+
+    const account = await this.queryBus.execute(new GetUserByIdQuery(userId));
+    if (!account || !account.isActive) {
+      throw new UnauthorizedException();
+    }
+
+    const existing = await this.authIdentityRepository.findByProvider(
+      'OIDC_GOOGLE',
+      idToken.sub,
+    );
+
+    const decision = decideIdentityLink({
+      account: { id: account.id, email: account.email },
+      googleEmail: idToken.email ?? '',
+      emailVerified: !!idToken.email_verified,
+      identityOwnerId: existing?.userId ?? null,
+    });
+
+    if (decision.outcome === 'REFUSE') {
+      switch (decision.reason) {
+        case 'EMAIL_MISMATCH':
+          throw new IdentityEmailMismatchException();
+        case 'IDENTITY_ALREADY_LINKED':
+          throw new IdentityAlreadyLinkedException();
+        case 'EMAIL_NOT_VERIFIED':
+          throw new UnauthorizedException();
+      }
+    }
+
+    if (decision.outcome === 'LINK') {
+      await this.authIdentityRepository.create({
+        userId: account.id,
+        provider: 'OIDC_GOOGLE',
+        providerSubject: idToken.sub,
+        passwordHash: null,
+      });
+    }
+
+    return {
+      refreshToken: '',
+      redirectUrl: `${this.configService.get<string>('FRONTEND_URL')}/profile?linked=google`,
+    };
   }
 }

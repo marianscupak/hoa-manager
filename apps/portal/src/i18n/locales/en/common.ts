@@ -39,6 +39,22 @@ export default {
         closeMenu: "Close menu",
     },
     menu: "Menu",
+    signIn: {
+        title: "Sign-in methods",
+        password: "Email and password",
+        passwordSet: "Set",
+        passwordNotSet: "Not set",
+        google: "Google",
+        googleLinked: "Signing in with Google is linked to this account.",
+        googleHint:
+            "Link it to sign in with Google as well. It has to be the same email address as the account's.",
+        linked: "Linked",
+        link: "Link",
+        unlink: "Unlink",
+        unlinked: "Google was unlinked from the account",
+        lastMethod: "The last sign-in method cannot be removed.",
+        linkSuccess: "Google was linked to the account",
+    },
     buildingUnits: {
         title: "Units",
         description: "Every unit in the building. Yours are marked.",

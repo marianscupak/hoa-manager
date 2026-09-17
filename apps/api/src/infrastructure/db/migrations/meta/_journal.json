@@ -183,6 +183,13 @@
       "when": 1789556833207,
       "tag": "0025_silly_selene",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1789677941841,
+      "tag": "0026_parched_karnak",
+      "breakpoints": true
     }
   ]
 }

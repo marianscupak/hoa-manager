@@ -49,6 +49,26 @@ export class DrizzleAuthIdentityRepository implements AuthIdentityRepository {
     return row ?? null;
   }
 
+  async listByUser(userId: string): Promise<AuthIdentity[]> {
+    return await this.db.query.authIdentities.findMany({
+      where: eq(authIdentities.userId, userId),
+    });
+  }
+
+  async deleteByUserAndProvider(
+    userId: string,
+    provider: 'LOCAL' | 'OIDC_GOOGLE',
+  ): Promise<void> {
+    await this.db
+      .delete(authIdentities)
+      .where(
+        and(
+          eq(authIdentities.userId, userId),
+          eq(authIdentities.provider, provider),
+        ),
+      );
+  }
+
   async create(
     identity: Omit<AuthIdentity, 'id' | 'createdAt' | 'lastUsedAt'>,
   ): Promise<AuthIdentity> {

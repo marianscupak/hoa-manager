@@ -39,6 +39,22 @@ export default {
         closeMenu: "Zavřít menu",
     },
     menu: "Menu",
+    signIn: {
+        title: "Způsoby přihlášení",
+        password: "E-mail a heslo",
+        passwordSet: "Nastaveno",
+        passwordNotSet: "Nenastaveno",
+        google: "Google",
+        googleLinked: "Přihlášení Googlem je připojeno k tomuto účtu.",
+        googleHint:
+            "Připojte, chcete-li se přihlašovat i Googlem. Musí jít o stejnou e-mailovou adresu jako u účtu.",
+        linked: "Připojeno",
+        link: "Připojit",
+        unlink: "Odpojit",
+        unlinked: "Google byl od účtu odpojen",
+        lastMethod: "Poslední způsob přihlášení odpojit nelze.",
+        linkSuccess: "Google byl připojen k účtu",
+    },
     buildingUnits: {
         title: "Jednotky",
         description: "Všechny jednotky v domě. Vaše jsou označené.",

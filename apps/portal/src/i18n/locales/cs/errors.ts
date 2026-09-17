@@ -16,7 +16,7 @@ export default {
     EMAIL_MISMATCH: "Váš e-mail neodpovídá e-mailu na pozvánce.",
     EMAIL_NOT_VERIFIED: "Před přijetím pozvánky prosím ověřte svůj e-mail.",
     ACCOUNT_EXISTS:
-        "Účet s tímto e-mailem již existuje, ale není propojen s touto pozvánkou. Přihlaste se prosím ke svému stávajícímu účtu.",
+        "Tento e-mail už účet má. Přihlaste se e-mailem a heslem a Google si pak připojte v profilu.",
     USER_INACTIVE:
         "Váš účet je momentálně neaktivní nebo pozastavený. Kontaktujte prosím podporu.",
     INTERNAL_SERVER_ERROR:

@@ -2,7 +2,9 @@ import {
   Controller,
   Post,
   Get,
+  Delete,
   Body,
+  Param,
   Query,
   Res,
   Req,
@@ -10,8 +12,8 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import type { Response, Request } from 'express';
 
@@ -21,6 +23,10 @@ import {
 } from '@/modules/core/auth/api/dto/auth-response.dto';
 import { ExchangeCodeDto } from '@/modules/core/auth/api/dto/exchange-code.dto';
 import { GoogleCallbackQueryDto } from '@/modules/core/auth/api/dto/google-callback-query.dto';
+import {
+  GoogleLinkStartResponseDto,
+  IdentityResponseDto,
+} from '@/modules/core/auth/api/dto/identity.dto';
 import { LoginDto } from '@/modules/core/auth/api/dto/login.dto';
 import { SwitchTenantDto } from '@/modules/core/auth/api/dto/switch-tenant.dto';
 import { ExchangeGoogleCodeCommand } from '@/modules/core/auth/application/commands/exchange-google-code.command';
@@ -39,9 +45,12 @@ import {
   SwitchTenantCommand,
   type SwitchTenantResult,
 } from '@/modules/core/auth/application/commands/switch-tenant.command';
+import { UnlinkIdentityCommand } from '@/modules/core/auth/application/commands/unlink-identity.command';
 import { type ExchangeGoogleCodeResult } from '@/modules/core/auth/application/handlers/exchange-google-code.handler';
 import { type HandleGoogleCallbackResult } from '@/modules/core/auth/application/handlers/handle-google-callback.handler';
 import { type StartGoogleLoginResult } from '@/modules/core/auth/application/handlers/start-google-login.handler';
+import { ListIdentitiesQuery } from '@/modules/core/auth/application/queries/list-identities.query';
+import { CurrentAuthUser } from '@/shared/api/decorators/auth.decorators';
 import { ApiErrorResponses } from '@/shared/api/decorators/error.decorators';
 import { AccessTokenAuthGuard } from '@/shared/api/guards/access-token-auth.guard';
 import {
@@ -49,12 +58,16 @@ import {
   setRefreshTokenCookie,
 } from '@/shared/api/utils/refresh-cookie';
 import { UnauthorizedException } from '@/shared/application/exceptions/auth.exceptions';
+import type { AuthPrincipal } from '@/shared/domain/auth-principal';
 
 @ApiTags('Auth')
 @ApiErrorResponses()
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly commandBus: CommandBus) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
+  ) {}
 
   @Post('login')
   @Throttle({ default: { limit: 5, ttl: 60_000 } })
@@ -80,6 +93,52 @@ export class AuthController {
       StartGoogleLoginResult
     >(new StartGoogleLoginCommand());
     return res.redirect(result.redirectUrl);
+  }
+
+  /**
+   * Hands back the URL instead of redirecting to it: the guard reads a bearer
+   * token, and a browser following a redirect sends no Authorization header.
+   * The caller navigates once it has the answer.
+   */
+  @Post('google/link/start')
+  @UseGuards(AccessTokenAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: GoogleLinkStartResponseDto })
+  async startGoogleLink(
+    @CurrentAuthUser() principal: AuthPrincipal,
+  ): Promise<GoogleLinkStartResponseDto> {
+    const result = await this.commandBus.execute<
+      StartGoogleLoginCommand,
+      StartGoogleLoginResult
+    >(new StartGoogleLoginCommand(principal.userId));
+    return { redirectUrl: result.redirectUrl };
+  }
+
+  @Get('identities')
+  @UseGuards(AccessTokenAuthGuard)
+  @ApiOkResponse({ type: IdentityResponseDto, isArray: true })
+  async listIdentities(
+    @CurrentAuthUser() principal: AuthPrincipal,
+  ): Promise<IdentityResponseDto[]> {
+    return await this.queryBus.execute(
+      new ListIdentitiesQuery(principal.userId),
+    );
+  }
+
+  @Delete('identities/:provider')
+  @UseGuards(AccessTokenAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({ description: 'Sign-in method removed' })
+  async unlinkIdentity(
+    @CurrentAuthUser() principal: AuthPrincipal,
+    @Param('provider') provider: string,
+  ): Promise<void> {
+    await this.commandBus.execute(
+      new UnlinkIdentityCommand(
+        principal.userId,
+        provider as 'LOCAL' | 'OIDC_GOOGLE',
+      ),
+    );
   }
 
   @Get('google/callback')

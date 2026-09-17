@@ -32,7 +32,7 @@ export class StartGoogleLoginHandler
   ) {}
 
   async execute(
-    _command: StartGoogleLoginCommand,
+    command: StartGoogleLoginCommand,
   ): Promise<StartGoogleLoginResult> {
     const rawState = randomBytes(32).toString('hex');
     const rawNonce = randomBytes(32).toString('hex');
@@ -43,6 +43,8 @@ export class StartGoogleLoginHandler
 
     await this.attemptRepository.create({
       provider: 'OIDC_GOOGLE',
+      purpose: command.linkToUserId ? 'LINK' : 'LOGIN',
+      userId: command.linkToUserId,
       stateHash,
       nonce: rawNonce,
       expiresAt,

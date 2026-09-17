@@ -8,10 +8,13 @@ export interface AuthIdentityRepository {
     provider: string,
     subject: string,
   ): Promise<AuthIdentity | null>;
+  /** Every way the account can sign in, for the profile and the last-one guard. */
+  listByUser(userId: string): Promise<AuthIdentity[]>;
   create(
     identity: Omit<AuthIdentity, 'id' | 'createdAt' | 'lastUsedAt'>,
   ): Promise<AuthIdentity>;
   updateLastUsed(id: string): Promise<void>;
+  deleteByUserAndProvider(userId: string, provider: string): Promise<void>;
 }
 
 export const AUTH_IDENTITY_REPOSITORY = Symbol('AUTH_IDENTITY_REPOSITORY');
@@ -32,6 +35,14 @@ export const AUTH_SESSION_REPOSITORY = Symbol('AUTH_SESSION_REPOSITORY');
 export interface OidcLoginAttempt {
   id: string;
   provider: 'LOCAL' | 'OIDC_GOOGLE';
+  /**
+   * `LOGIN` signs in or registers; `LINK` attaches the provider to the
+   * account in `userId` and may do nothing else. Kept apart so a link
+   * round trip cannot be replayed into the sign-in branch.
+   */
+  purpose: 'LOGIN' | 'LINK';
+  /** The account a `LINK` attempt belongs to; null for `LOGIN`. */
+  userId: string | null;
   stateHash: string;
   nonce: string;
   expiresAt: Date;

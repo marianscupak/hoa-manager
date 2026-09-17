@@ -12,6 +12,7 @@ import {
 
 import { useTenancyControllerGetUserTenants } from "@/api/generated/tenants/tenants";
 import { tenantContextAtom, userAtom } from "@/auth/atoms";
+import { SignInMethodsCard } from "@/features/profile/components/sign-in-methods-card";
 
 const localeNames: Record<string, string> = {
     en: "English",
@@ -89,6 +90,8 @@ export function ProfilePage() {
                     </dl>
                 </CardContent>
             </Card>
+
+            <SignInMethodsCard />
         </div>
     );
 }

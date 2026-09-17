@@ -13,7 +13,7 @@ export default {
     EMAIL_MISMATCH: "Your email does not match the one on the invitation.",
     EMAIL_NOT_VERIFIED: "Please verify your email before accepting.",
     ACCOUNT_EXISTS:
-        "An account with this email already exists but is not linked to this association invitation. Please log in with your existing account.",
+        "This email already has an account. Sign in with your email and password, then link Google from your profile.",
     USER_INACTIVE:
         "Your account is currently inactive or suspended. Please contact support.",
     INTERNAL_SERVER_ERROR:

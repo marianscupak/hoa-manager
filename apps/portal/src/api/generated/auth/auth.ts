@@ -26,6 +26,8 @@ import type {
     AuthResponseDto,
     ErrorResponseDto,
     ExchangeCodeDto,
+    GoogleLinkStartResponseDto,
+    IdentityResponseDto,
     LoginDto,
     SuccessResponseDto,
     SwitchTenantDto,
@@ -270,6 +272,313 @@ export function useAuthControllerStartGoogleLogin<
     return { ...query, queryKey: queryOptions.queryKey };
 }
 
+export const authControllerStartGoogleLink = (
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<GoogleLinkStartResponseDto>(
+        { url: `/api/auth/google/link/start`, method: "POST", signal },
+        options,
+    );
+};
+
+export const getAuthControllerStartGoogleLinkMutationOptions = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof authControllerStartGoogleLink>>,
+        TError,
+        void,
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof authControllerStartGoogleLink>>,
+    TError,
+    void,
+    TContext
+> => {
+    const mutationKey = ["authControllerStartGoogleLink"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof authControllerStartGoogleLink>>,
+        void
+    > = () => {
+        return authControllerStartGoogleLink(requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type AuthControllerStartGoogleLinkMutationResult = NonNullable<
+    Awaited<ReturnType<typeof authControllerStartGoogleLink>>
+>;
+
+export type AuthControllerStartGoogleLinkMutationError =
+    ErrorType<ErrorResponseDto>;
+
+export const useAuthControllerStartGoogleLink = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof authControllerStartGoogleLink>>,
+            TError,
+            void,
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof authControllerStartGoogleLink>>,
+    TError,
+    void,
+    TContext
+> => {
+    return useMutation(
+        getAuthControllerStartGoogleLinkMutationOptions(options),
+        queryClient,
+    );
+};
+export const authControllerListIdentities = (
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<IdentityResponseDto[]>(
+        { url: `/api/auth/identities`, method: "GET", signal },
+        options,
+    );
+};
+
+export const getAuthControllerListIdentitiesQueryKey = () => {
+    return [`/api/auth/identities`] as const;
+};
+
+export const getAuthControllerListIdentitiesQueryOptions = <
+    TData = Awaited<ReturnType<typeof authControllerListIdentities>>,
+    TError = ErrorType<ErrorResponseDto>,
+>(options?: {
+    query?: Partial<
+        UseQueryOptions<
+            Awaited<ReturnType<typeof authControllerListIdentities>>,
+            TError,
+            TData
+        >
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ?? getAuthControllerListIdentitiesQueryKey();
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof authControllerListIdentities>>
+    > = ({ signal }) => authControllerListIdentities(requestOptions, signal);
+
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof authControllerListIdentities>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type AuthControllerListIdentitiesQueryResult = NonNullable<
+    Awaited<ReturnType<typeof authControllerListIdentities>>
+>;
+export type AuthControllerListIdentitiesQueryError =
+    ErrorType<ErrorResponseDto>;
+
+export function useAuthControllerListIdentities<
+    TData = Awaited<ReturnType<typeof authControllerListIdentities>>,
+    TError = ErrorType<ErrorResponseDto>,
+>(
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof authControllerListIdentities>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof authControllerListIdentities>>,
+                    TError,
+                    Awaited<ReturnType<typeof authControllerListIdentities>>
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useAuthControllerListIdentities<
+    TData = Awaited<ReturnType<typeof authControllerListIdentities>>,
+    TError = ErrorType<ErrorResponseDto>,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof authControllerListIdentities>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof authControllerListIdentities>>,
+                    TError,
+                    Awaited<ReturnType<typeof authControllerListIdentities>>
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useAuthControllerListIdentities<
+    TData = Awaited<ReturnType<typeof authControllerListIdentities>>,
+    TError = ErrorType<ErrorResponseDto>,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof authControllerListIdentities>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useAuthControllerListIdentities<
+    TData = Awaited<ReturnType<typeof authControllerListIdentities>>,
+    TError = ErrorType<ErrorResponseDto>,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof authControllerListIdentities>>,
+                TError,
+                TData
+            >
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
+    const queryOptions = getAuthControllerListIdentitiesQueryOptions(options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+        TData,
+        TError
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+    return { ...query, queryKey: queryOptions.queryKey };
+}
+
+export const authControllerUnlinkIdentity = (
+    provider: string,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<void>(
+        { url: `/api/auth/identities/${provider}`, method: "DELETE", signal },
+        options,
+    );
+};
+
+export const getAuthControllerUnlinkIdentityMutationOptions = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof authControllerUnlinkIdentity>>,
+        TError,
+        { provider: string },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof authControllerUnlinkIdentity>>,
+    TError,
+    { provider: string },
+    TContext
+> => {
+    const mutationKey = ["authControllerUnlinkIdentity"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof authControllerUnlinkIdentity>>,
+        { provider: string }
+    > = (props) => {
+        const { provider } = props ?? {};
+
+        return authControllerUnlinkIdentity(provider, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type AuthControllerUnlinkIdentityMutationResult = NonNullable<
+    Awaited<ReturnType<typeof authControllerUnlinkIdentity>>
+>;
+
+export type AuthControllerUnlinkIdentityMutationError =
+    ErrorType<ErrorResponseDto>;
+
+export const useAuthControllerUnlinkIdentity = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof authControllerUnlinkIdentity>>,
+            TError,
+            { provider: string },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof authControllerUnlinkIdentity>>,
+    TError,
+    { provider: string },
+    TContext
+> => {
+    return useMutation(
+        getAuthControllerUnlinkIdentityMutationOptions(options),
+        queryClient,
+    );
+};
 export const authControllerHandleGoogleCallback = (
     params?: AuthControllerHandleGoogleCallbackParams,
     options?: SecondParameter<typeof customInstance>,

@@ -8,11 +8,13 @@ import { CreateAuthIdentityHandler } from '@/modules/core/auth/application/handl
 import { CreateSessionHandler } from '@/modules/core/auth/application/handlers/create-session.handler';
 import { ExchangeGoogleCodeHandler } from '@/modules/core/auth/application/handlers/exchange-google-code.handler';
 import { HandleGoogleCallbackHandler } from '@/modules/core/auth/application/handlers/handle-google-callback.handler';
+import { ListIdentitiesHandler } from '@/modules/core/auth/application/handlers/list-identities.handler';
 import { LoginHandler } from '@/modules/core/auth/application/handlers/login.handler';
 import { LogoutHandler } from '@/modules/core/auth/application/handlers/logout.handler';
 import { RefreshTokenHandler } from '@/modules/core/auth/application/handlers/refresh-token.handler';
 import { StartGoogleLoginHandler } from '@/modules/core/auth/application/handlers/start-google-login.handler';
 import { SwitchTenantHandler } from '@/modules/core/auth/application/handlers/switch-tenant.handler';
+import { UnlinkIdentityHandler } from '@/modules/core/auth/application/handlers/unlink-identity.handler';
 import {
   AUTH_IDENTITY_REPOSITORY,
   AUTH_SESSION_REPOSITORY,
@@ -87,6 +89,8 @@ import { TenancyModule } from '@/modules/core/tenancy/tenancy.module';
     RefreshTokenHandler,
     SwitchTenantHandler,
     StartGoogleLoginHandler,
+    UnlinkIdentityHandler,
+    ListIdentitiesHandler,
     HandleGoogleCallbackHandler,
     ExchangeGoogleCodeHandler,
     CreateAuthIdentityHandler,

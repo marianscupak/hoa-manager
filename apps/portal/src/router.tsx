@@ -8,8 +8,6 @@ import { AdminGuard } from "@/components/shell/admin-guard";
 import { AppShell } from "@/components/shell/app-shell";
 import { AuthGuard } from "@/components/shell/auth-guard";
 import { KatastrImportPage } from "@/features/admin/pages/katastr-import-page";
-import { UnitDetailPage } from "@/features/admin/pages/unit-detail-page";
-import { UnitsPage } from "@/features/admin/pages/units-page";
 import { GoogleCallbackPage } from "@/features/auth/pages/google-callback-page";
 import { LoginPage } from "@/features/auth/pages/login-page";
 import { SelectTenantPage } from "@/features/auth/pages/select-tenant-page";
@@ -18,8 +16,8 @@ import { OwnerInvitePage } from "@/features/invite/pages/owner-invite-page";
 import { PeoplePage } from "@/features/people/pages/people-page";
 import { ProfilePage } from "@/features/profile/pages/profile-page";
 import { CreateTenantPage } from "@/features/tenants/pages/create-tenant-page";
-import { BuildingUnitsPage } from "@/features/units/pages/building-units-page";
-import { MyUnitDetailPage } from "@/features/units/pages/my-unit-detail-page";
+import { UnitDetailRoute } from "@/features/units/pages/unit-detail-route";
+import { UnitsPage } from "@/features/units/pages/units-page";
 import { VotingAdminGuard } from "@/features/voting/guards/voting-admin-guard";
 import { AssemblyRecordPage } from "@/features/voting/pages/assembly-record-page";
 import { AssemblyRecordReviewPage } from "@/features/voting/pages/assembly-record-review-page";
@@ -55,18 +53,31 @@ export const router = createBrowserRouter([
                         element: <ProfilePage />,
                     },
                     {
-                        // The building's register, readable by every member.
-                        // The admin views of the same units, with the actions,
-                        // live under /admin/units.
+                        // One register for the whole association. The list
+                        // and the detail grow with the reader's role rather
+                        // than living at a second address for the board.
                         path: "units",
                         children: [
                             {
                                 index: true,
-                                element: <BuildingUnitsPage />,
+                                element: <UnitsPage />,
+                            },
+                            {
+                                // A bulk write that is hard to unwind, so it
+                                // keeps the guard the rest of the module no
+                                // longer needs.
+                                path: "import",
+                                element: <AdminGuard />,
+                                children: [
+                                    {
+                                        index: true,
+                                        element: <KatastrImportPage />,
+                                    },
+                                ],
                             },
                             {
                                 path: ":id",
-                                element: <MyUnitDetailPage />,
+                                element: <UnitDetailRoute />,
                             },
                         ],
                     },
@@ -117,25 +128,13 @@ export const router = createBrowserRouter([
                         children: [
                             {
                                 index: true,
-                                element: <Navigate to="units" replace />,
-                            },
-                            {
-                                path: "units",
-                                element: <UnitsPage />,
-                            },
-                            {
-                                path: "units/import",
-                                element: <KatastrImportPage />,
+                                element: <Navigate to="/people" replace />,
                             },
                             // The owner register and the member list became
                             // one module; the old paths may be bookmarked.
                             {
                                 path: "owners",
                                 element: <Navigate to="/people" replace />,
-                            },
-                            {
-                                path: "units/:id",
-                                element: <UnitDetailPage />,
                             },
                             {
                                 path: "users",

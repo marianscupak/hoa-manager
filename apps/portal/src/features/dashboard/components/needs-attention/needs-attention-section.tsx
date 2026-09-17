@@ -18,10 +18,11 @@ export function NeedsAttentionSection() {
         query: { staleTime: 0, refetchOnMount: "always" },
     });
 
-    // Rows link into /admin/units and /admin/owners, which AdminGuard
-    // restricts to ADMIN|BOARD_MEMBER. Hide the section for AUDITOR rather
-    // than showing dead-end links that bounce back to "/" — same guard the
-    // Building card's "Manage" link uses.
+    // What the section lists — units without an owner, shares that no longer
+    // add up — is the board's work to do, not an auditor's. The links
+    // themselves lead to pages everyone may read now that the register is one
+    // module, so the gate is about whose task it is rather than what they may
+    // see.
     if (!isAdminOrBoard(tenantCtx?.roles)) return null;
 
     if (!overviewQuery.data) return null;

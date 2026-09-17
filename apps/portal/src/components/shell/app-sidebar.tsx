@@ -17,14 +17,13 @@ import { cn } from "@hoa-mngr/ui/lib/utils";
 import type { TenantResponseDto } from "@/api/generated/model";
 import { useTenancyControllerGetUserTenants } from "@/api/generated/tenants/tenants";
 import { tenantContextAtom, userAtom } from "@/auth/atoms";
-import { isAdminOrBoard } from "@/auth/role-checks";
 import { Role } from "@/auth/roles";
 import { useTenantSwitcher } from "@/auth/use-tenant-switcher";
 import { getInitials, UserMenu } from "@/components/user-menu";
 
 import { BrandMark } from "./brand-mark";
 import {
-    ADMIN_NAV,
+    MANAGEMENT_NAV,
     MAIN_NAV,
     PLANNED_NAV,
     type SidebarNavItem,
@@ -127,7 +126,6 @@ export function AppSidebar({ className }: { className?: string }) {
 
     const tenantName =
         tenants?.find((x) => x.id === tenantCtx?.tenantId)?.name ?? "";
-    const adminOrBoard = isAdminOrBoard(tenantCtx?.roles);
     const highestRole = ROLE_PRIORITY.find((role) =>
         tenantCtx?.roles.includes(role),
     );
@@ -147,16 +145,12 @@ export function AppSidebar({ className }: { className?: string }) {
                 {MAIN_NAV.map((item) => (
                     <SidebarNavLink key={item.to} item={item} />
                 ))}
-                {adminOrBoard && (
-                    <>
-                        <p className="text-faint text-2xs mt-4 mb-1 px-3.5 font-bold tracking-wider uppercase">
-                            {t("common:shell.administrationGroup")}
-                        </p>
-                        {ADMIN_NAV.map((item) => (
-                            <SidebarNavLink key={item.to} item={item} />
-                        ))}
-                    </>
-                )}
+                <p className="text-faint text-2xs mt-4 mb-1 px-3.5 font-bold tracking-wider uppercase">
+                    {t("common:shell.administrationGroup")}
+                </p>
+                {MANAGEMENT_NAV.map((item) => (
+                    <SidebarNavLink key={item.to} item={item} />
+                ))}
                 <p className="text-faint text-2xs mt-4 mb-1 px-3.5 font-bold tracking-wider uppercase">
                     {t("common:shell.plannedGroup")}
                 </p>

@@ -27,7 +27,6 @@ export default {
         units: "Jednotky",
         voting: "Hlasování",
         people: "Lidé",
-        unitsRegister: "Evidence jednotek",
         finances: "Finance",
         documents: "Dokumenty",
         maintenance: "Údržba",

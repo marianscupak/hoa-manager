@@ -352,7 +352,7 @@ function ImportDone({ result }: { result: KatastrImportResultResponseDto }) {
                 })}
             </p>
             <Button className="w-fit cursor-pointer" asChild>
-                <Link to="/admin/units">{t("done.backToUnits")}</Link>
+                <Link to="/units">{t("done.backToUnits")}</Link>
             </Button>
         </div>
     );

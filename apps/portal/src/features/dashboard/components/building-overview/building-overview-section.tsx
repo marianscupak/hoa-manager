@@ -76,7 +76,7 @@ export function BuildingOverviewSection() {
                 </CardTitle>
                 {canManage && (
                     <Link
-                        to="/admin/units"
+                        to="/units"
                         className="text-detail font-medium hover:underline"
                     >
                         {t("buildingOverview.manage")}

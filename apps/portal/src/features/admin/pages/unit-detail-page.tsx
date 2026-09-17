@@ -66,7 +66,7 @@ export function UnitDetailPage() {
     return (
         <div className="space-y-8">
             <Link
-                to="/admin/units"
+                to="/units"
                 className="text-muted-foreground hover:text-foreground inline-flex w-fit items-center gap-1.5 text-sm font-medium transition-colors"
             >
                 <ArrowLeftIcon className="h-3.5 w-3.5" />

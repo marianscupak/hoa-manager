@@ -27,7 +27,6 @@ export default {
         units: "Units",
         voting: "Voting",
         people: "People",
-        unitsRegister: "Unit register",
         finances: "Finances",
         documents: "Documents",
         maintenance: "Maintenance",

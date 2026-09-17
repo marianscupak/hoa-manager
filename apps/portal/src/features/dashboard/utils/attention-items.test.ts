@@ -53,7 +53,7 @@ describe("deriveAttentionItems", () => {
         const invitesItem = items.find((item) => item.key === "pendingInvites");
 
         expect(unitsItem?.count).toBe(3);
-        expect(unitsItem?.to).toBe("/admin/units");
+        expect(unitsItem?.to).toBe("/units");
         expect(invitesItem?.count).toBe(2);
         expect(invitesItem?.to).toBe("/people");
     });

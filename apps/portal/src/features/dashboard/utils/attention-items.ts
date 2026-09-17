@@ -20,7 +20,7 @@ export function deriveAttentionItems(
         items.push({
             key: "shareDrift",
             tone: "warning",
-            to: "/admin/units",
+            to: "/units",
             labelKey: "dashboard:attention.shareDrift",
             labelParams: {
                 sum: formatPercentValue(overview.units.buildingShareSum),
@@ -32,7 +32,7 @@ export function deriveAttentionItems(
         items.push({
             key: "unitsWithoutOwner",
             tone: "warning",
-            to: "/admin/units",
+            to: "/units",
             labelKey: "dashboard:attention.unitsWithoutOwner",
             labelParams: { count: overview.units.withoutOwnersCount },
             count: overview.units.withoutOwnersCount,

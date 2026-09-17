@@ -139,6 +139,34 @@ describe("FormCombobox", () => {
         expect(screen.queryByText("No owner found")).toBeNull();
     });
 
+    it("keeps the create row out of the scrolling area", async () => {
+        // Pinned inside the list with `position: sticky`, the create row
+        // covered whatever was scrolled underneath it, so the last owner
+        // could be neither read nor clicked.
+        const user = userEvent.setup();
+        render(<Harness onCreate={vi.fn()} />);
+        await user.click(trigger());
+
+        const listbox = screen.getByRole("listbox");
+        const createRow = screen
+            .getByText("Create someone new")
+            .closest('[role="option"]');
+        const lastOption = screen
+            .getAllByRole("option")
+            .find((row) => row.textContent?.includes("Bytové družstvo"));
+
+        expect(createRow).toBeTruthy();
+        expect(lastOption).toBeTruthy();
+        expect(listbox.contains(createRow!)).toBe(true);
+
+        // The owners scroll; the create row sits outside whatever scrolls,
+        // so nothing can end up beneath it.
+        const scroller = lastOption!.parentElement!;
+        expect(scroller.className).toContain("overflow-y-auto");
+        expect(scroller.contains(createRow!)).toBe(false);
+        expect(createRow!.className).not.toContain("sticky");
+    });
+
     it("says so when nothing matches and there is nothing to create", async () => {
         const user = await openList();
 

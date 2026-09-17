@@ -150,11 +150,17 @@ export const FormCombobox = ({
                 return (
                     <FormItem>
                         {label && (
-                        <FormLabel optional={optional}>
-                            {label}
-                        </FormLabel>
-                    )}
+                            <FormLabel optional={optional}>{label}</FormLabel>
+                        )}
+                        {/* `modal` matters inside a dialog: Radix's dialog
+                            locks scrolling through react-remove-scroll, and a
+                            portalled popover sits outside the locked subtree,
+                            so the wheel does nothing over the option list and
+                            only the scrollbar can be dragged. A modal popover
+                            owns the innermost lock and permits its own
+                            content. */}
                         <Popover
+                            modal
                             open={open}
                             onOpenChange={(next) => {
                                 setOpen(next);
@@ -224,80 +230,92 @@ export const FormCombobox = ({
                                     />
                                 </div>
 
-                                <ul
+                                {/* The create row is a sibling of the scroll
+                                    area, not a sticky row inside it: pinned
+                                    within the list it covered whatever was
+                                    scrolled underneath, so the last owner
+                                    could never be read or clicked. The
+                                    wrappers are `role="none"` so the listbox
+                                    still owns its options directly. */}
+                                <div
                                     id={listId}
                                     role="listbox"
-                                    className={cn(
-                                        "max-h-60 overflow-y-auto p-1",
-                                        // No bottom padding under a pinned
-                                        // create row, or options scroll
-                                        // through the gap beneath it.
-                                        canCreate && "pb-0",
-                                    )}
+                                    className="flex max-h-72 flex-col"
                                 >
-                                    {filtered.map((option, index) => (
-                                        <li
-                                            key={option.value}
-                                            id={`${listId}-row-${index}`}
-                                            role="option"
-                                            aria-selected={
-                                                option.value === field.value
-                                            }
-                                            onClick={() => choose(option.value)}
-                                            onMouseEnter={() =>
-                                                setActiveIndex(index)
-                                            }
-                                            className={cn(
-                                                "flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm",
-                                                index === activeIndex &&
-                                                    "bg-accent text-accent-foreground",
-                                            )}
-                                        >
-                                            <Check
-                                                className={cn(
-                                                    "h-4 w-4 shrink-0",
+                                    <div
+                                        role="none"
+                                        className="min-h-0 flex-1 overflow-y-auto p-1"
+                                    >
+                                        {filtered.map((option, index) => (
+                                            <div
+                                                key={option.value}
+                                                id={`${listId}-row-${index}`}
+                                                role="option"
+                                                aria-selected={
                                                     option.value === field.value
-                                                        ? "opacity-100"
-                                                        : "opacity-0",
+                                                }
+                                                onClick={() =>
+                                                    choose(option.value)
+                                                }
+                                                onMouseEnter={() =>
+                                                    setActiveIndex(index)
+                                                }
+                                                className={cn(
+                                                    "flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm",
+                                                    index === activeIndex &&
+                                                        "bg-accent text-accent-foreground",
                                                 )}
-                                            />
-                                            <span className="truncate">
-                                                {option.label}
-                                            </span>
-                                        </li>
-                                    ))}
+                                            >
+                                                <Check
+                                                    className={cn(
+                                                        "h-4 w-4 shrink-0",
+                                                        option.value ===
+                                                            field.value
+                                                            ? "opacity-100"
+                                                            : "opacity-0",
+                                                    )}
+                                                />
+                                                <span className="truncate">
+                                                    {option.label}
+                                                </span>
+                                            </div>
+                                        ))}
 
-                                    {rowCount === 0 && (
-                                        <li className="text-muted-foreground px-2 py-3 text-center text-sm">
-                                            {emptyMessage}
-                                        </li>
-                                    )}
+                                        {rowCount === 0 && (
+                                            <div className="text-muted-foreground px-2 py-3 text-center text-sm">
+                                                {emptyMessage}
+                                            </div>
+                                        )}
+                                    </div>
 
                                     {canCreate && (
-                                        <li
-                                            id={`${listId}-row-${createIndex}`}
-                                            role="option"
-                                            aria-selected={false}
-                                            onClick={create}
-                                            onMouseEnter={() =>
-                                                setActiveIndex(createIndex)
-                                            }
-                                            // Pinned to the bottom of the
-                                            // scroll area so a long owner list
-                                            // never hides it.
-                                            className={cn(
-                                                "text-primary border-border bg-popover sticky bottom-0 mt-1 flex cursor-pointer items-center gap-2 rounded-sm border-t px-2 py-2 text-sm font-medium",
-                                                activeIndex === createIndex &&
-                                                    "bg-accent",
-                                            )}
+                                        <div
+                                            role="none"
+                                            className="shrink-0 p-1 pt-0"
                                         >
-                                            <Plus className="h-4 w-4 shrink-0" />
-                                            <span className="truncate">
-                                                {createLabel(query.trim())}
-                                            </span>
-                                        </li>
+                                            <div
+                                                id={`${listId}-row-${createIndex}`}
+                                                role="option"
+                                                aria-selected={false}
+                                                onClick={create}
+                                                onMouseEnter={() =>
+                                                    setActiveIndex(createIndex)
+                                                }
+                                                className={cn(
+                                                    "text-primary border-border bg-popover flex cursor-pointer items-center gap-2 rounded-sm border-t px-2 py-2 text-sm font-medium",
+                                                    activeIndex ===
+                                                        createIndex &&
+                                                        "bg-accent",
+                                                )}
+                                            >
+                                                <Plus className="h-4 w-4 shrink-0" />
+                                                <span className="truncate">
+                                                    {createLabel(query.trim())}
+                                                </span>
+                                            </div>
+                                        </div>
                                     )}
-                                </ul>
+                                </div>
                             </PopoverContent>
                         </Popover>
                         {description && (

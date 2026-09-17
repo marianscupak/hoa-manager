@@ -46,19 +46,19 @@ export const voting = {
             PER_ROLLAM: {
                 title: "Hlasování per rollam",
                 description:
-                    "Písemné hlasování mimo zasedání. Rozhoduje většina hlasů **všech** vlastníků; lhůta min. 15 dnů.",
+                    "Písemné hlasování mimo zasedání. Bez kvóra, rozhoduje většina hlasů všech vlastníků. Lhůta je nejméně 15 dnů.",
             },
             ASSEMBLY_RECORD: {
                 title: "Záznam shromáždění",
                 description:
-                    "Zápis výsledků prezenčního shromáždění. Kvórum nadpoloviční většiny všech hlasů; rozhoduje většina přítomných.",
+                    "Zápis výsledků prezenčního shromáždění. Kvórum nadpoloviční většina všech hlasů, rozhoduje většina odevzdaných hlasů.",
             },
         },
         steps: {
             mode: {
                 title: "Typ hlasování",
                 description:
-                    "Vyberte, zda se jedná o hlasování per rollam, nebo o záznam shromáždění. Po vytvoření hlasování už typ nelze změnit.",
+                    "Vyberte, zda se jedná o hlasování per rollam, nebo o záznam shromáždění. Po vytvoření hlasování už typ nelze změnit. Uvedená pravidla jsou výchozí, v dalších krocích je lze upravit.",
             },
             basicInfo: {
                 title: "Základní údaje",

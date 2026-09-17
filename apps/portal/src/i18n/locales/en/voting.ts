@@ -45,19 +45,19 @@ export const voting = {
             PER_ROLLAM: {
                 title: "Per-rollam vote",
                 description:
-                    "A written vote held outside a meeting. Decided by a majority of **all** owners' votes; window must be at least 15 days.",
+                    "A written vote held outside a meeting. No quorum; decided by a majority of all owners' votes. The window is at least 15 days.",
             },
             ASSEMBLY_RECORD: {
                 title: "Assembly record",
                 description:
-                    "Records the results of an in-person assembly. Quorum is a simple majority of all votes; decided by a majority of those present.",
+                    "Records the results of an in-person assembly. Quorum is a majority of all votes; decided by a majority of the votes cast.",
             },
         },
         steps: {
             mode: {
                 title: "Vote type",
                 description:
-                    "Choose whether this is a per-rollam vote or an assembly record. The type can't be changed once the vote is created.",
+                    "Choose whether this is a per-rollam vote or an assembly record. The type can't be changed once the vote is created. The rules shown are the defaults; later steps can change them.",
             },
             basicInfo: {
                 title: "Details",

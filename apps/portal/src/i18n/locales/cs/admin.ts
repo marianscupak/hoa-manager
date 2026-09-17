@@ -179,7 +179,7 @@ export default {
             createOwnerBlank: "Vytvořit nového vlastníka",
             spouseOne: "První manžel/manželka",
             spouseTwo: "Druhý manžel/manželka",
-            shareLabel: "Podíl",
+            shareLabel: "Podíl na jednotce",
             totalShare: "Celkový podíl",
             save: "Uložit změny",
             saving: "Ukládání...",

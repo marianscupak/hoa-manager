@@ -232,7 +232,7 @@ export function FractionInput({
                 // field has a natural size. Stretching it across a dialog
                 // would only open a gap between the numbers and the pill;
                 // `className` can still widen it where that is wanted.
-                "border-input bg-card ring-offset-background flex h-10 w-full max-w-[192px] items-center gap-1 rounded-[9px] border px-3 transition-colors",
+                "border-input bg-card ring-offset-background flex h-10 w-full min-w-[192px] items-center gap-1 rounded-[9px] border px-3 transition-colors",
                 "focus-within:ring-ring focus-within:ring-2 focus-within:ring-offset-2 focus-within:outline-none",
                 fieldInvalid &&
                     "border-destructive focus-within:ring-destructive",
@@ -252,7 +252,7 @@ export function FractionInput({
                         autoComplete="off"
                         aria-label={label("common:fractionInput.numerator")}
                         aria-invalid={fieldInvalid || undefined}
-                        className={cn(innerInput, "max-w-[44px] text-right")}
+                        className={cn(innerInput, "text-right")}
                         onChange={(e) => {
                             setNumText(e.target.value);
                             setInvalid(false);
@@ -292,7 +292,7 @@ export function FractionInput({
                         autoComplete="off"
                         aria-label={label("common:fractionInput.denominator")}
                         aria-invalid={fieldInvalid || undefined}
-                        className={cn(innerInput, "max-w-[44px] text-left")}
+                        className={cn(innerInput, "text-left")}
                         onChange={(e) => {
                             setDenText(e.target.value);
                             setInvalid(false);
@@ -312,7 +312,7 @@ export function FractionInput({
                         autoComplete="off"
                         aria-label={label("common:fractionInput.percent")}
                         aria-invalid={fieldInvalid || undefined}
-                        className={cn(innerInput, "max-w-[60px] text-right")}
+                        className={cn(innerInput, "text-right")}
                         onChange={(e) => {
                             setPercentText(e.target.value);
                             percentSource.current = null;

@@ -176,7 +176,7 @@ export default {
             createOwnerBlank: "Create a new owner",
             spouseOne: "Spouse One",
             spouseTwo: "Spouse Two",
-            shareLabel: "Share",
+            shareLabel: "Share of the unit",
             totalShare: "Total Share",
             save: "Save Changes",
             saving: "Saving...",

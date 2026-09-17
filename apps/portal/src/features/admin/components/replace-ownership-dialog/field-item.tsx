@@ -98,7 +98,7 @@ export function ReplaceOwnershipFieldItem({
     return (
         <div className="border-border bg-muted/60 hover:border-primary/30 space-y-4 rounded-xl border p-4 transition-colors">
             <div className="flex items-start gap-4">
-                <div className="w-44">
+                <div className="min-w-0 flex-1">
                     <FormSelect
                         name={`ownerships.${index}.partyType`}
                         label={t("units.ownershipEditor.partyType.label")}
@@ -118,9 +118,11 @@ export function ReplaceOwnershipFieldItem({
                     />
                 </div>
 
-                {/* The field's own full width — enough for both numbers, the
-                    slash and the mode pill without crowding. */}
-                <div className="w-[192px] shrink-0">
+                {/* Half the row each, so neither the ownership type nor the
+                    share is truncated. `FractionInput` keeps its own minimum
+                    width, so the pair never collapses below what the numbers,
+                    the slash and the mode pill need. */}
+                <div className="min-w-0 flex-1">
                     <FormField
                         control={control}
                         name={`ownerships.${index}.share`}

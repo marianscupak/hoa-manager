@@ -28,6 +28,7 @@ import {
   UnauthorizedException,
   InvalidCredentialsException,
 } from '@/shared/application/exceptions/auth.exceptions';
+import { EmailNotVerifiedException } from '@/shared/application/exceptions/invite.exceptions';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 import {
   UNIT_OF_WORK,
@@ -90,6 +91,13 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
         if (!isValid) {
           throw new InvalidCredentialsException();
         }
+      }
+
+      // After the password, never before it: in front of the comparison this
+      // is a free oracle for which addresses exist and which are unverified,
+      // which is what the compareDummy calls above exist to prevent.
+      if (!user.isEmailVerified) {
+        throw new EmailNotVerifiedException();
       }
 
       await this.authIdentityRepository.updateLastUsed(identity.id);

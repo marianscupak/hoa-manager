@@ -23,6 +23,7 @@ import { ListOwnersHandler } from '@/modules/core/property/application/handlers/
 import { ListUnitsHandler } from '@/modules/core/property/application/handlers/list-units.handler';
 import { PreviewKatastrImportHandler } from '@/modules/core/property/application/handlers/preview-katastr-import.handler';
 import { ReplaceUnitOwnershipHandler } from '@/modules/core/property/application/handlers/replace-unit-ownership.handler';
+import { RenameOwnerHandler } from '@/modules/core/property/application/handlers/rename-owner.handler';
 import { SetOwnerEmailHandler } from '@/modules/core/property/application/handlers/set-owner-email.handler';
 import { SetOwnerUserIdHandler } from '@/modules/core/property/application/handlers/set-owner-user-id.handler';
 import { LinkOwnerToAccountHandler } from '@/modules/core/property/application/handlers/link-owner-to-account.handler';
@@ -54,6 +55,7 @@ const CommandHandlers = [
   CreateUnitHandler,
   ReplaceUnitOwnershipHandler,
   CancelScheduledOwnershipTransferHandler,
+  RenameOwnerHandler,
   SetOwnerEmailHandler,
   SetOwnerUserIdHandler,
   LinkOwnerToAccountHandler,

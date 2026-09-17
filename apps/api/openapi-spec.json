@@ -1377,6 +1377,79 @@
         ]
       }
     },
+    "/api/owners/{ownerId}/name": {
+      "patch": {
+        "operationId": "OwnerController_renameOwner",
+        "parameters": [
+          {
+            "name": "ownerId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenameOwnerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Owner's display name changed everywhere they appear"
+          },
+          "400": {
+            "description": "Bad Request - Validation or Domain logic error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Property Owners"
+        ]
+      }
+    },
     "/api/owners/{ownerId}/invite": {
       "post": {
         "operationId": "OwnerController_sendInvite",
@@ -4489,6 +4562,20 @@
         },
         "required": [
           "email"
+        ]
+      },
+      "RenameOwnerDto": {
+        "type": "object",
+        "properties": {
+          "displayName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "description": "New display name for the owner"
+          }
+        },
+        "required": [
+          "displayName"
         ]
       },
       "LinkOwnerAccountDto": {

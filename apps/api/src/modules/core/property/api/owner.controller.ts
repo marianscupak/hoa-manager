@@ -26,11 +26,13 @@ import {
   CreateOwnerResponseDto,
   OwnerResponseDto,
   LinkOwnerAccountDto,
+  RenameOwnerDto,
   SetOwnerEmailDto,
 } from '@/modules/core/property/api/dto/owner.dto';
 import { CreateOwnerCommand } from '@/modules/core/property/application/commands/create-owner.command';
 import { DeleteOwnerCommand } from '@/modules/core/property/application/commands/delete-owner.command';
 import { LinkOwnerToAccountCommand } from '@/modules/core/property/application/commands/link-owner-to-account.command';
+import { RenameOwnerCommand } from '@/modules/core/property/application/commands/rename-owner.command';
 import { SetOwnerEmailCommand } from '@/modules/core/property/application/commands/set-owner-email.command';
 import { UnlinkOwnerFromAccountCommand } from '@/modules/core/property/application/commands/unlink-owner-from-account.command';
 import { ListOwnersQuery } from '@/modules/core/property/application/queries/list-owners.query';
@@ -110,6 +112,22 @@ export class OwnerController {
   ): Promise<void> {
     await this.commandBus.execute(
       new SetOwnerEmailCommand(tenantCtx.tenantId, ownerId, dto.email),
+    );
+  }
+
+  @Patch(':ownerId/name')
+  @Roles(TenantMembershipRole.ADMIN, TenantMembershipRole.BOARD_MEMBER)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({
+    description: "Owner's display name changed everywhere they appear",
+  })
+  async renameOwner(
+    @Tenant() tenantCtx: TenantContext,
+    @Param('ownerId') ownerId: string,
+    @Body() dto: RenameOwnerDto,
+  ): Promise<void> {
+    await this.commandBus.execute(
+      new RenameOwnerCommand(tenantCtx.tenantId, ownerId, dto.displayName),
     );
   }
 

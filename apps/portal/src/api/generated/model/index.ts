@@ -120,6 +120,7 @@ export * from "./recordPaperBallotDto";
 export * from "./recordPaperBallotDtoAnswersItem";
 export * from "./registerFromInviteDto";
 export * from "./registerFromInviteResponseDto";
+export * from "./renameOwnerDto";
 export * from "./replaceOwnershipsDto";
 export * from "./replaceOwnershipsDtoOwnershipsItem";
 export * from "./replaceOwnershipsDtoOwnershipsItemPartyType";

@@ -27,6 +27,8 @@ export const STRINGS: Record<
       `${v.actor} cancelled the ownership change of unit ${v.unit} scheduled for ${v.effectiveFrom}.`,
     'owner.email.added.privileged': (v) =>
       `${v.actor} added an email address for owner ${v.owner}.`,
+    'owner.renamed.privileged': (v) =>
+      `${v.actor} renamed owner ${v.previousOwner} to ${v.owner}.`,
     'owner.user.linked.privileged': (v) =>
       `${v.actor} linked owner ${v.owner} to user ${v.user}.`,
     'owner.user.unlinked.privileged': (v) =>
@@ -65,6 +67,8 @@ export const STRINGS: Record<
       `${v.actor} zrušil/a naplánovanou změnu vlastnictví jednotky ${v.unit} k ${v.effectiveFrom}.`,
     'owner.email.added.privileged': (v) =>
       `${v.actor} přidal/a e-mail vlastníkovi ${v.owner}.`,
+    'owner.renamed.privileged': (v) =>
+      `${v.actor} přejmenoval/a vlastníka ${v.previousOwner} na ${v.owner}.`,
     'owner.user.linked.privileged': (v) =>
       `${v.actor} propojil/a vlastníka ${v.owner} s uživatelem ${v.user}.`,
     'owner.user.unlinked.privileged': (v) =>

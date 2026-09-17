@@ -43,6 +43,17 @@ export default {
             emailLabel: "E-mailová adresa",
             emailPlaceholder: "Např. jan@priklad.cz",
         },
+        rename: {
+            action: "Upravit jméno",
+            title: "Upravit jméno vlastníka",
+            description:
+                "Jméno se změní všude, kde vlastník vystupuje, včetně historie vlastnictví. Použijte, když se jméno opravdu změnilo — třeba sňatkem — nebo když je v něm překlep.",
+            nameLabel: "Jméno vlastníka",
+            required: "Zadejte jméno",
+            submit: "Uložit jméno",
+            submitting: "Ukládání...",
+            success: "Jméno vlastníka bylo změněno",
+        },
         addEmail: {
             action: "Přidat e-mail",
             title: "Přidat e-mailovou adresu",

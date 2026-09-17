@@ -210,6 +210,23 @@ export class CoreAuditFormatter implements AuditEventFormatter, OnModuleInit {
           }),
         };
       }
+      case CoreEventType.OWNER_RENAMED: {
+        const p = event.payload as {
+          labels: {
+            previousName: string;
+            ownerName: string;
+            renamedBy: string;
+          };
+        };
+        return {
+          ...base,
+          message: t(lang, 'owner.renamed.privileged', {
+            actor: p.labels.renamedBy,
+            previousOwner: p.labels.previousName,
+            owner: p.labels.ownerName,
+          }),
+        };
+      }
       case CoreEventType.OWNER_USER_LINKED: {
         const p = event.payload as {
           labels: { ownerName: string; userName: string; linkedBy: string };

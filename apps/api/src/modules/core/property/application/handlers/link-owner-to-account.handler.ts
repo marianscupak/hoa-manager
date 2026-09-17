@@ -36,7 +36,9 @@ import { LinkOwnerToAccountCommand } from '../commands/link-owner-to-account.com
  * for granted things an admin clicking a button cannot.
  */
 @CommandHandler(LinkOwnerToAccountCommand)
-export class LinkOwnerToAccountHandler implements ICommandHandler<LinkOwnerToAccountCommand> {
+export class LinkOwnerToAccountHandler
+  implements ICommandHandler<LinkOwnerToAccountCommand>
+{
   constructor(
     @Inject(UNIT_OF_WORK) private readonly uow: UnitOfWork,
     @Inject(OWNER_REPOSITORY) private readonly ownerRepo: OwnerRepository,

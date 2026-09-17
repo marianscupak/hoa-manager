@@ -52,6 +52,12 @@ export class UserAlreadyLinkedToOwnerException extends DomainException {
   }
 }
 
+export class OwnerNameRequiredException extends DomainException {
+  constructor() {
+    super(ErrorCode.OWNER_NAME_REQUIRED);
+  }
+}
+
 export class OwnerEmailAlreadySetException extends DomainException {
   constructor() {
     super(ErrorCode.OWNER_EMAIL_ALREADY_SET);

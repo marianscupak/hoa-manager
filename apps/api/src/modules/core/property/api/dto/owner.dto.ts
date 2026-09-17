@@ -28,6 +28,16 @@ export const setOwnerEmailSchema = z.object({
 
 export class SetOwnerEmailDto extends createZodDto(setOwnerEmailSchema) {}
 
+export const renameOwnerSchema = z.object({
+  displayName: z
+    .string()
+    .min(1, 'Display name is required')
+    .max(255)
+    .describe('New display name for the owner'),
+});
+
+export class RenameOwnerDto extends createZodDto(renameOwnerSchema) {}
+
 export const linkOwnerAccountSchema = z.object({
   membershipId: z.uuid(),
 });

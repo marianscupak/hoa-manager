@@ -201,6 +201,17 @@ export class DrizzleOwnerRepository implements OwnerRepository {
       .where(and(eq(owners.tenantId, tenantId), eq(owners.id, ownerId)));
   }
 
+  async setDisplayName(
+    tenantId: string,
+    ownerId: string,
+    displayName: string,
+  ): Promise<void> {
+    await this.db
+      .update(owners)
+      .set({ displayName })
+      .where(and(eq(owners.tenantId, tenantId), eq(owners.id, ownerId)));
+  }
+
   async setKatastrPersonId(
     tenantId: string,
     ownerId: string,

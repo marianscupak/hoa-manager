@@ -27,6 +27,7 @@ import type {
     ErrorResponseDto,
     LinkOwnerAccountDto,
     OwnerResponseDto,
+    RenameOwnerDto,
     SetOwnerEmailDto,
 } from ".././model";
 
@@ -355,6 +356,94 @@ export const useOwnerControllerSetOwnerEmail = <
 > => {
     return useMutation(
         getOwnerControllerSetOwnerEmailMutationOptions(options),
+        queryClient,
+    );
+};
+export const ownerControllerRenameOwner = (
+    ownerId: string,
+    renameOwnerDto: BodyType<RenameOwnerDto>,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<void>(
+        {
+            url: `/api/owners/${ownerId}/name`,
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            data: renameOwnerDto,
+            signal,
+        },
+        options,
+    );
+};
+
+export const getOwnerControllerRenameOwnerMutationOptions = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof ownerControllerRenameOwner>>,
+        TError,
+        { ownerId: string; data: BodyType<RenameOwnerDto> },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof ownerControllerRenameOwner>>,
+    TError,
+    { ownerId: string; data: BodyType<RenameOwnerDto> },
+    TContext
+> => {
+    const mutationKey = ["ownerControllerRenameOwner"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof ownerControllerRenameOwner>>,
+        { ownerId: string; data: BodyType<RenameOwnerDto> }
+    > = (props) => {
+        const { ownerId, data } = props ?? {};
+
+        return ownerControllerRenameOwner(ownerId, data, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type OwnerControllerRenameOwnerMutationResult = NonNullable<
+    Awaited<ReturnType<typeof ownerControllerRenameOwner>>
+>;
+export type OwnerControllerRenameOwnerMutationBody = BodyType<RenameOwnerDto>;
+export type OwnerControllerRenameOwnerMutationError =
+    ErrorType<ErrorResponseDto>;
+
+export const useOwnerControllerRenameOwner = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof ownerControllerRenameOwner>>,
+            TError,
+            { ownerId: string; data: BodyType<RenameOwnerDto> },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof ownerControllerRenameOwner>>,
+    TError,
+    { ownerId: string; data: BodyType<RenameOwnerDto> },
+    TContext
+> => {
+    return useMutation(
+        getOwnerControllerRenameOwnerMutationOptions(options),
         queryClient,
     );
 };

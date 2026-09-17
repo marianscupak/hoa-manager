@@ -11,6 +11,7 @@ import { usePeopleControllerGetPeople } from "@/api/generated/people/people";
 import { tenantContextAtom } from "@/auth/atoms";
 import { isAdminOrBoard } from "@/auth/role-checks";
 import { AddOwnerEmailDialog } from "@/features/admin/components/add-owner-email-dialog";
+import { RenameOwnerDialog } from "@/features/admin/components/rename-owner-dialog";
 import { CreateOwnerDialog } from "@/features/admin/components/create-owner-dialog";
 import { DeleteOwnerDialog } from "@/features/admin/components/delete-owner-dialog";
 import { Role } from "@/auth/roles";
@@ -57,6 +58,7 @@ export function PeoplePage() {
     const [linking, setLinking] = useState<PersonRow | null>(null);
     const [deleting, setDeleting] = useState<PersonRow | null>(null);
     const [addingEmail, setAddingEmail] = useState<PersonRow | null>(null);
+    const [renaming, setRenaming] = useState<PersonRow | null>(null);
 
     const { data: people, isLoading, refetch } = usePeopleControllerGetPeople();
 
@@ -83,6 +85,7 @@ export function PeoplePage() {
                         isAdmin={isAdmin}
                         onDelete={setDeleting}
                         onAddEmail={setAddingEmail}
+                        onRename={setRenaming}
                         onLink={setLinking}
                     />
                 ),
@@ -179,6 +182,12 @@ export function PeoplePage() {
                         }
                         open={addingEmail !== null}
                         onOpenChange={(open) => !open && setAddingEmail(null)}
+                        onSuccess={refetch}
+                    />
+                    <RenameOwnerDialog
+                        owner={toOwnerRef(renaming) as OwnerResponseDto | null}
+                        open={renaming !== null}
+                        onOpenChange={(open) => !open && setRenaming(null)}
                         onSuccess={refetch}
                     />
                     <DeleteOwnerDialog

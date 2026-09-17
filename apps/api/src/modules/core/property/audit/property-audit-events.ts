@@ -2,6 +2,7 @@ import { KatastrDataImportedAuditEvent } from './events/katastr-data-imported.ev
 import { OwnerCreatedAuditEvent } from './events/owner-created.event';
 import { OwnerDeletedAuditEvent } from './events/owner-deleted.event';
 import { OwnerEmailAddedAuditEvent } from './events/owner-email-added.event';
+import { OwnerRenamedAuditEvent } from './events/owner-renamed.event';
 import { OwnerUserLinkedAuditEvent } from './events/owner-user-linked.event';
 import { OwnerUserUnlinkedAuditEvent } from './events/owner-user-unlinked.event';
 import { UnitCreatedAuditEvent } from './events/unit-created.event';
@@ -21,5 +22,6 @@ export const PROPERTY_AUDIT_EVENTS = [
   OwnerUserLinkedAuditEvent,
   OwnerUserUnlinkedAuditEvent,
   OwnerEmailAddedAuditEvent,
+  OwnerRenamedAuditEvent,
   KatastrDataImportedAuditEvent,
 ];

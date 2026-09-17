@@ -119,6 +119,13 @@ const PAYLOADS: Record<CoreEventType, Record<string, unknown>> = {
       owners: ['Bob Owner'],
     },
   },
+  [CoreEventType.OWNER_RENAMED]: {
+    labels: {
+      previousName: 'Jana Dvořáková',
+      ownerName: 'Jana Nováková',
+      renamedBy: 'Alice Admin',
+    },
+  },
   [CoreEventType.OWNER_USER_LINKED]: {
     userId: '11111111-1111-1111-1111-111111111111',
     source: 'INVITE_ACCEPT',

@@ -42,6 +42,17 @@ export default {
             emailLabel: "Email Address",
             emailPlaceholder: "E.g. john@example.com",
         },
+        rename: {
+            action: "Edit name",
+            title: "Edit the owner's name",
+            description:
+                "The name changes everywhere the owner appears, ownership history included. Use it when the name really changed — a marriage, say — or when it holds a typo.",
+            nameLabel: "Owner's name",
+            required: "Enter a name",
+            submit: "Save the name",
+            submitting: "Saving...",
+            success: "The owner's name was changed",
+        },
         addEmail: {
             action: "Add Email",
             title: "Add Email Address",

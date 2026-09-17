@@ -27,6 +27,7 @@ interface PersonRowActionsProps {
     isAdmin: boolean;
     onDelete: (person: PersonRow) => void;
     onAddEmail: (person: PersonRow) => void;
+    onRename: (person: PersonRow) => void;
     onLink: (person: PersonRow) => void;
 }
 
@@ -41,6 +42,7 @@ export function PersonRowActions({
     isAdmin,
     onDelete,
     onAddEmail,
+    onRename,
     onLink,
 }: PersonRowActionsProps) {
     const { t } = useTranslation(["admin"]);
@@ -84,6 +86,14 @@ export function PersonRowActions({
 
     return (
         <div className="flex items-center justify-end gap-1.5">
+            <Button
+                variant="tableAction"
+                size="tableText"
+                onClick={() => onRename(person)}
+            >
+                {t("owners.rename.action")}
+            </Button>
+
             {!person.membershipId && !person.email && (
                 <Button
                     variant="tableAction"

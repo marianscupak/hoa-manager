@@ -65,6 +65,11 @@ export interface OwnerRepository {
   setUserId(tenantId: string, ownerId: string, userId: string): Promise<void>;
   clearUserId(tenantId: string, ownerId: string): Promise<void>;
   setEmail(tenantId: string, ownerId: string, email: string): Promise<void>;
+  setDisplayName(
+    tenantId: string,
+    ownerId: string,
+    displayName: string,
+  ): Promise<void>;
   setKatastrPersonId(
     tenantId: string,
     ownerId: string,

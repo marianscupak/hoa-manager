@@ -110,17 +110,17 @@ export const FormDatetimePicker = React.forwardRef<
                             ref={ref}
                         >
                             {label && (
-                        <FormLabel optional={optional}>
-                            {label}
-                        </FormLabel>
-                    )}
+                                <FormLabel optional={optional}>
+                                    {label}
+                                </FormLabel>
+                            )}
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <FormControl>
                                         <Button
                                             variant={"outline"}
                                             className={cn(
-                                                "w-full pl-3 text-left font-normal",
+                                                "w-full cursor-pointer rounded-[9px] pl-3 text-left font-normal",
                                                 !field.value &&
                                                     "text-muted-foreground",
                                             )}

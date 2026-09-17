@@ -37,87 +37,105 @@ export interface FormDatePickerProps {
 export const FormDatePicker = React.forwardRef<
     HTMLDivElement,
     FormDatePickerProps
->((
-    { name, label, optional, description, placeholder, min, max, className },
-    ref,
-) => {
-    const { control } = useFormContext();
-    const [open, setOpen] = React.useState(false);
+>(
+    (
+        {
+            name,
+            label,
+            optional,
+            description,
+            placeholder,
+            min,
+            max,
+            className,
+        },
+        ref,
+    ) => {
+        const { control } = useFormContext();
+        const [open, setOpen] = React.useState(false);
 
-    return (
-        <FormField
-            control={control}
-            name={name}
-            render={({ field }) => {
-                const value: Date | undefined =
-                    field.value instanceof Date && !isNaN(field.value.getTime())
-                        ? field.value
-                        : undefined;
-                const disabled = [
-                    ...(min ? [{ before: startOfDay(min) }] : []),
-                    ...(max ? [{ after: startOfDay(max) }] : []),
-                ];
+        return (
+            <FormField
+                control={control}
+                name={name}
+                render={({ field }) => {
+                    const value: Date | undefined =
+                        field.value instanceof Date &&
+                        !isNaN(field.value.getTime())
+                            ? field.value
+                            : undefined;
+                    const disabled = [
+                        ...(min ? [{ before: startOfDay(min) }] : []),
+                        ...(max ? [{ after: startOfDay(max) }] : []),
+                    ];
 
-                return (
-                    <FormItem
-                        className={cn("flex flex-col", className)}
-                        ref={ref}
-                    >
-                        {label && (
-                        <FormLabel optional={optional}>
-                            {label}
-                        </FormLabel>
-                    )}
-                        <Popover open={open} onOpenChange={setOpen}>
-                            <PopoverTrigger asChild>
-                                <FormControl>
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        className={cn(
-                                            "w-full cursor-pointer pl-3 text-left font-normal",
-                                            !value && "text-muted-foreground",
-                                        )}
-                                    >
-                                        {value ? (
-                                            format(value, "d. M. yyyy")
-                                        ) : (
-                                            <span>{placeholder ?? " "}</span>
-                                        )}
-                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                    </Button>
-                                </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent
-                                className="w-auto rounded-xl p-0"
-                                align="start"
-                            >
-                                <Calendar
-                                    mode="single"
-                                    selected={value}
-                                    defaultMonth={value}
-                                    disabled={disabled}
-                                    onSelect={(day) => {
-                                        field.onChange(
-                                            day ? startOfDay(day) : null,
-                                        );
-                                        if (day) setOpen(false);
-                                    }}
-                                    initialFocus
-                                    className="pointer-events-auto p-3"
-                                />
-                            </PopoverContent>
-                        </Popover>
-                        {description && (
-                            <p className="text-muted-foreground text-detail">
-                                {description}
-                            </p>
-                        )}
-                        <FormMessage />
-                    </FormItem>
-                );
-            }}
-        />
-    );
-});
+                    return (
+                        <FormItem
+                            className={cn("flex flex-col", className)}
+                            ref={ref}
+                        >
+                            {label && (
+                                <FormLabel optional={optional}>
+                                    {label}
+                                </FormLabel>
+                            )}
+                            <Popover open={open} onOpenChange={setOpen}>
+                                <PopoverTrigger asChild>
+                                    <FormControl>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            className={cn(
+                                                // `Button` is pill-shaped; a field trigger has to carry
+                                                // the same 9px corner as `Input`, `FormCombobox`
+                                                // and `FractionInput` or it reads as a button.
+                                                "w-full cursor-pointer rounded-[9px] pl-3 text-left font-normal",
+                                                !value &&
+                                                    "text-muted-foreground",
+                                            )}
+                                        >
+                                            {value ? (
+                                                format(value, "d. M. yyyy")
+                                            ) : (
+                                                <span>
+                                                    {placeholder ?? " "}
+                                                </span>
+                                            )}
+                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                        </Button>
+                                    </FormControl>
+                                </PopoverTrigger>
+                                <PopoverContent
+                                    className="w-auto rounded-xl p-0"
+                                    align="start"
+                                >
+                                    <Calendar
+                                        mode="single"
+                                        selected={value}
+                                        defaultMonth={value}
+                                        disabled={disabled}
+                                        onSelect={(day) => {
+                                            field.onChange(
+                                                day ? startOfDay(day) : null,
+                                            );
+                                            if (day) setOpen(false);
+                                        }}
+                                        initialFocus
+                                        className="pointer-events-auto p-3"
+                                    />
+                                </PopoverContent>
+                            </Popover>
+                            {description && (
+                                <p className="text-muted-foreground text-detail">
+                                    {description}
+                                </p>
+                            )}
+                            <FormMessage />
+                        </FormItem>
+                    );
+                }}
+            />
+        );
+    },
+);
 FormDatePicker.displayName = "FormDatePicker";

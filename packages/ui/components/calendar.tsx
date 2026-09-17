@@ -1,22 +1,36 @@
 "use client";
 
+import { cs, enUS } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import * as React from "react";
 import { DayPicker } from "react-day-picker";
+import { useTranslation } from "react-i18next";
 
 import { buttonVariants } from "./button";
 import { cn } from "../lib/utils";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
+/**
+ * Month and weekday names, and which day a week starts on, come from the
+ * date-fns locale. Without one react-day-picker falls back to en-US, which
+ * renders a Czech screen as "September 2026" with weeks starting on Sunday.
+ */
+const localeFor = (language: string | undefined) =>
+    language?.toLowerCase().startsWith("cs") ? cs : enUS;
+
 function Calendar({
     className,
     classNames,
     showOutsideDays = true,
+    locale,
     ...props
 }: CalendarProps) {
+    const { i18n } = useTranslation();
+
     return (
         <DayPicker
+            locale={locale ?? localeFor(i18n.language)}
             showOutsideDays={showOutsideDays}
             className={cn("p-3", className)}
             classNames={{

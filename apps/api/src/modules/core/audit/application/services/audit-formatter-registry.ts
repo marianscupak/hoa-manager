@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
 
-import type { AuditEventReadRecord } from '../ports/audit-event-read.repository.port';
-
 import type {
   AuditEventFormatter,
   TimelineEntry,
   ViewerContext,
 } from './audit-event-formatter';
+import type { AuditEventReadRecord } from '../ports/audit-event-read.repository.port';
 
 @Injectable()
 export class AuditFormatterRegistry {

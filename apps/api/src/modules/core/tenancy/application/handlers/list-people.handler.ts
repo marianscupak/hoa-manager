@@ -8,8 +8,8 @@ import {
   PEOPLE_HOLDINGS_REPOSITORY,
   type PeopleHoldingsRepository,
 } from '@/modules/core/tenancy/application/ports/people-holdings.repository.port';
-import { ListTenantMembersQuery } from '@/modules/core/tenancy/application/queries/list-tenant-members.query';
 import { type TenantMembershipWithUser } from '@/modules/core/tenancy/application/ports/tenant.repository.port';
+import { ListTenantMembersQuery } from '@/modules/core/tenancy/application/queries/list-tenant-members.query';
 import { unionPeople } from '@/modules/core/tenancy/domain/people-union';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 import { Rational } from '@/shared/domain/rational';

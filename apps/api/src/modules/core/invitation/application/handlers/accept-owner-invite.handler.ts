@@ -82,7 +82,6 @@ export class AcceptOwnerInviteHandler
         throw new InviteExpiredException();
       }
 
-      // Validate the user
       const user = await this.queryBus.execute(
         new GetUserByIdQuery(command.userId),
       );
@@ -98,7 +97,6 @@ export class AcceptOwnerInviteHandler
         throw new EmailMismatchException();
       }
 
-      // Load owner and link
       const owner = await this.queryBus.execute(
         new GetOwnerByIdQuery(invite.tenantId, invite.ownerId),
       );
@@ -121,7 +119,6 @@ export class AcceptOwnerInviteHandler
         );
       }
 
-      // Ensure membership exists
       const existing = await this.queryBus.execute(
         new GetMembershipByTenantAndUserQuery(invite.tenantId, user.id),
       );
@@ -143,7 +140,6 @@ export class AcceptOwnerInviteHandler
         );
       }
 
-      // Mark invite as accepted
       await this.inviteRepo.markAccepted(invite.id, now);
 
       const actor = this.auditContext.requireActor();

@@ -81,7 +81,6 @@ export function CastVotePage() {
     const totalQuestions = questions.length;
     const currentQuestion = questions[currentQuestionIndex];
 
-    // Calculate completion percentage based on answered questions
     const completedQuestions = useMemo(() => {
         if (votableUnits.length === 0 || totalQuestions === 0) return 0;
         let count = 0;
@@ -370,7 +369,6 @@ export function CastVotePage() {
     // ── Question Step ────────────────────────────────────
     if (!currentQuestion) return null;
 
-    // Check if all units have answered current question
     const allCurrentAnswered = votableUnits.every(
         (u) => answers[u.id]?.[currentQuestion.id] !== undefined,
     );

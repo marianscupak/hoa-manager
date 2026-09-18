@@ -18,17 +18,11 @@ export interface VoteConsentWriteRepository {
    */
   save(data: SaveVoteUnitConsentInput): Promise<string>;
 
-  /**
-   * Finds a consent record by its exact ID and Tenant ID.
-   */
   findById(
     tenantId: string,
     consentId: string,
   ): Promise<typeof voteUnitConsents.$inferSelect | null>;
 
-  /**
-   * Updates the status of an existing consent.
-   */
   updateStatus(
     tenantId: string,
     consentId: string,

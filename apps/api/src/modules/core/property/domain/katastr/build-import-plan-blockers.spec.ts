@@ -2,11 +2,11 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { buildImportPlan } from '@/modules/core/property/domain/katastr/build-import-plan';
-import type { KatastrDocument } from '@/modules/core/property/domain/katastr/katastr-document';
 import type {
   RegisterSnapshot,
   RegisterUnit,
 } from '@/modules/core/property/domain/katastr/import-plan';
+import type { KatastrDocument } from '@/modules/core/property/domain/katastr/katastr-document';
 import { parseKatastrDocument } from '@/modules/core/property/domain/katastr/parse-katastr-document';
 import {
   OwnerKind,

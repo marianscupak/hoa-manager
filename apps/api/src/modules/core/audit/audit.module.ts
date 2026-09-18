@@ -2,7 +2,6 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
 import { AuthModule } from '../auth/auth.module';
-
 import { AuditController } from './api/audit.controller';
 import { AUDIT_EVENT_READ_REPOSITORY } from './application/ports/audit-event-read.repository.port';
 import { AUDIT_EVENT_WRITE_REPOSITORY } from './application/ports/audit-event-write.repository.port';

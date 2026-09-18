@@ -14,18 +14,18 @@ import { GetMembershipByTenantAndUserHandler } from '@/modules/core/tenancy/appl
 import { GetMembershipsByUserIdHandler } from '@/modules/core/tenancy/application/handlers/get-memberships-by-user-id.handler';
 import { GetTenantByIdHandler } from '@/modules/core/tenancy/application/handlers/get-tenant-by-id.handler';
 import { GetUserTenantsHandler } from '@/modules/core/tenancy/application/handlers/get-user-tenants.handler';
-import { ListTenantContactsHandler } from '@/modules/core/tenancy/application/handlers/list-tenant-contacts.handler';
 import { ListPeopleHandler } from '@/modules/core/tenancy/application/handlers/list-people.handler';
+import { ListTenantContactsHandler } from '@/modules/core/tenancy/application/handlers/list-tenant-contacts.handler';
 import { ListTenantMembersHandler } from '@/modules/core/tenancy/application/handlers/list-tenant-members.handler';
-import { PEOPLE_HOLDINGS_REPOSITORY } from '@/modules/core/tenancy/application/ports/people-holdings.repository.port';
-import { DrizzlePeopleHoldingsRepository } from '@/modules/core/tenancy/infrastructure/persistence/drizzle-people-holdings.repository';
 import { UpdateMemberRoleHandler } from '@/modules/core/tenancy/application/handlers/update-member-role.handler';
 import { UpdateMembershipStatusHandler } from '@/modules/core/tenancy/application/handlers/update-membership-status.handler';
+import { PEOPLE_HOLDINGS_REPOSITORY } from '@/modules/core/tenancy/application/ports/people-holdings.repository.port';
 import {
   MEMBERSHIP_REPOSITORY,
   TENANT_REPOSITORY,
 } from '@/modules/core/tenancy/application/ports/tenant.repository.port';
 import { TenancyAuditRegistration } from '@/modules/core/tenancy/audit/tenancy-audit.registration';
+import { DrizzlePeopleHoldingsRepository } from '@/modules/core/tenancy/infrastructure/persistence/drizzle-people-holdings.repository';
 import {
   DrizzleMembershipRepository,
   DrizzleTenantRepository,

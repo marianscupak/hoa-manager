@@ -1,7 +1,3 @@
-/**
- * Custom hook for submitting ballots.
- * This will be replaced by the generated Orval hook after running `pnpm generate`.
- */
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import {

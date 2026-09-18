@@ -74,7 +74,6 @@ export const FormDatetimePicker = React.forwardRef<
                             return;
                         }
 
-                        // Preserve existing time if available
                         if (dateValue) {
                             selectedDate.setHours(dateValue.getHours());
                             selectedDate.setMinutes(dateValue.getMinutes());

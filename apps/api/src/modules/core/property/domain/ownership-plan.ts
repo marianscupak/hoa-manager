@@ -48,12 +48,10 @@ export function validateOwnershipPlan(
   let hasAssociationParty = false;
 
   parties.forEach((party, index) => {
-    // Check fraction validity
     if (!isValidFraction(party.shareNumerator, party.shareDenominator)) {
       errors.push({ code: 'INVALID_SHARE', index });
     }
 
-    // Map owner IDs to refs, tracking unknown owners
     const members = party.memberOwnerIds
       .map((id) => owners.get(id) ?? null)
       .map((ref, i) => {
@@ -95,7 +93,6 @@ export function validateOwnershipPlan(
       seenOwners.add(id);
     }
 
-    // Track if any party has an association
     if (members.some((m) => m.kind === OwnerKind.ASSOCIATION)) {
       hasAssociationParty = true;
     }

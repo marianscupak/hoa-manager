@@ -1,5 +1,3 @@
-import type { AuditEventReadRecord } from '../ports/audit-event-read.repository.port';
-import { Visibility } from '../../domain/visibility';
 import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
 
 import {
@@ -8,6 +6,8 @@ import {
   type ViewerContext,
 } from './audit-event-formatter';
 import { AuditFormatterRegistry } from './audit-formatter-registry';
+import { Visibility } from '../../domain/visibility';
+import type { AuditEventReadRecord } from '../ports/audit-event-read.repository.port';
 
 const VIEWER: ViewerContext = {
   viewerUserId: 'u-1',

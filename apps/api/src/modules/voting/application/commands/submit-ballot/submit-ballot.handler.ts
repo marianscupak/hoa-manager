@@ -54,7 +54,6 @@ export class SubmitBallotHandler
     const { tenantId, voteId, membershipId, ballots: ballotInputs } = command;
 
     return this.uow.execute(async () => {
-      // 1. Load vote detail and verify it's OPEN
       const vote = await this.voteReadRepository.findDetailById(
         tenantId,
         voteId,
@@ -68,7 +67,6 @@ export class SubmitBallotHandler
 
       const unitIds = ballotInputs.map((b) => b.unitId);
 
-      // 2. Verify all units are in the electorate with this membership as representative
       const electorateUnits =
         await this.voteWriteRepository.findElectorateUnitsForMembership(
           tenantId,
@@ -84,7 +82,7 @@ export class SubmitBallotHandler
         }
       }
 
-      // 3. One ballot per unit — the unit's representative casts it (DOM-004)
+      // One ballot per unit — the unit's representative casts it (DOM-004)
       const existingBallotUnitIds =
         await this.voteWriteRepository.hasExistingBallots(
           tenantId,
@@ -96,12 +94,10 @@ export class SubmitBallotHandler
         throw new BallotAlreadyCastException();
       }
 
-      // 4. Validate answers match vote questions and options
       for (const ballot of ballotInputs) {
         assertAnswersMatchQuestions(vote.questions, ballot.answers);
       }
 
-      // 5. Persist all ballots atomically
       const occurredAt = this.clock.now();
       const inserted = await this.voteWriteRepository.saveBallots(
         tenantId,
@@ -114,7 +110,6 @@ export class SubmitBallotHandler
         })),
       );
 
-      // 6. Emit audit event per ballot
       const actor = this.auditContext.requireActor();
       const castByLabel = await this.labelResolver.resolveActorLabel(actor);
 

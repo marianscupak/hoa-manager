@@ -171,7 +171,6 @@ export class HandleGoogleCallbackHandler
         );
         const userId = (userResult as { id: string }).id;
 
-        // Fetch the newly created user to match original logic (which used the created object)
         user = await this.queryBus.execute(new GetUserByIdQuery(userId));
 
         identity = await this.authIdentityRepository.create({

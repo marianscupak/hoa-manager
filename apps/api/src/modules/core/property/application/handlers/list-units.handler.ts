@@ -1,6 +1,7 @@
 import { Inject } from '@nestjs/common';
 import { IQueryHandler, QueryBus, QueryHandler } from '@nestjs/cqrs';
 
+import { type OwnedUnitResponseDto } from '@/modules/core/property/api/dto/owned-unit-response.dto';
 import {
   OWNER_REPOSITORY,
   UNIT_OWNERSHIP_REPOSITORY,
@@ -9,7 +10,6 @@ import {
   type UnitOwnershipRepository,
   type UnitRepository,
 } from '@/modules/core/property/application/ports/property.repository.port';
-import { type OwnedUnitResponseDto } from '@/modules/core/property/api/dto/owned-unit-response.dto';
 import { GetOwnedUnitsQuery } from '@/modules/core/property/application/queries/get-owned-units/get-owned-units.query';
 import { ListUnitsQuery } from '@/modules/core/property/application/queries/list-units.query';
 import {

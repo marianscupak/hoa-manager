@@ -42,7 +42,6 @@ export class GetVotesHandler
 
     const votes = await this.voteReadRepository.findVotes(tenantId, statuses);
 
-    // Compute voter summaries for scheduled and open votes
     const voteIdsForSummary = votes
       .filter(
         (v) =>

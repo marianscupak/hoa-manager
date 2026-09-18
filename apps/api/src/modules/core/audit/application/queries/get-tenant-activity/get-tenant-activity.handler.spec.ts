@@ -1,12 +1,14 @@
-import type { AuditEventReadRecord } from '../../ports/audit-event-read.repository.port';
-import type { AuditEventReadRepository } from '../../ports/audit-event-read.repository.port';
-import { AuditFormatterRegistry } from '../../services/audit-formatter-registry';
-import { VisibilityPolicyService } from '../../services/visibility-policy.service';
-import { Visibility } from '../../../domain/visibility';
 import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
 
 import { GetTenantActivityHandler } from './get-tenant-activity.handler';
 import { GetTenantActivityQuery } from './get-tenant-activity.query';
+import { Visibility } from '../../../domain/visibility';
+import type {
+  AuditEventReadRecord,
+  AuditEventReadRepository,
+} from '../../ports/audit-event-read.repository.port';
+import { AuditFormatterRegistry } from '../../services/audit-formatter-registry';
+import { VisibilityPolicyService } from '../../services/visibility-policy.service';
 
 function event(
   partial: Partial<AuditEventReadRecord> = {},

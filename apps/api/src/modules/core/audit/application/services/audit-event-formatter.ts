@@ -1,6 +1,6 @@
-import type { AuditEventReadRecord } from '../ports/audit-event-read.repository.port';
-
 import type { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
+
+import type { AuditEventReadRecord } from '../ports/audit-event-read.repository.port';
 
 export interface ViewerContext {
   viewerUserId: string;

@@ -48,7 +48,6 @@
         "@testing-library/react": "^16.3.3",
         "@testing-library/user-event": "^14.6.7",
         "@types/react": "19.2.14",
-        "@types/react-datepicker": "7.0.0",
         "eslint": "^10.0.2",
         "eslint-plugin-react": "7.37.5",
         "jsdom": "^30.0.1",

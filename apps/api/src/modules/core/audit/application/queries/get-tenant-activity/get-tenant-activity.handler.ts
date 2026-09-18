@@ -1,15 +1,14 @@
 import { Inject } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
+import { GetTenantActivityQuery } from './get-tenant-activity.query';
+import type { TenantActivityResponseDto } from '../../../api/dto/tenant-activity-response.dto';
 import {
   AUDIT_EVENT_READ_REPOSITORY,
   type AuditEventReadRepository,
 } from '../../ports/audit-event-read.repository.port';
 import { AuditFormatterRegistry } from '../../services/audit-formatter-registry';
 import { VisibilityPolicyService } from '../../services/visibility-policy.service';
-
-import { GetTenantActivityQuery } from './get-tenant-activity.query';
-import type { TenantActivityResponseDto } from '../../../api/dto/tenant-activity-response.dto';
 
 @QueryHandler(GetTenantActivityQuery)
 export class GetTenantActivityHandler

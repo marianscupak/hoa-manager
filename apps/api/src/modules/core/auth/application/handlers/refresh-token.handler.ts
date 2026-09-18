@@ -91,7 +91,6 @@ export class RefreshTokenHandler
       userId,
     );
 
-    // Add user identity to claims
     scopedClaims.email = user.email;
     scopedClaims.fullName = user.fullName;
     scopedClaims.preferredLanguage = user.preferredLanguage;

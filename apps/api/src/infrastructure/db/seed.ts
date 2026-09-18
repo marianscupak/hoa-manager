@@ -26,7 +26,6 @@ async function seed() {
     const adminEmail = 'admin@hoa.local';
     const adminPassword = 'AdminPassword123!';
 
-    // 1. Ensure User exists
     const [user] = await db
       .insert(schema.users)
       .values({
@@ -42,7 +41,6 @@ async function seed() {
       .returning();
     console.log('✅ User ensured:', user.email);
 
-    // 2. Ensure Local AuthIdentity exists
     const passwordHash = await bcrypt.hash(adminPassword, 10);
     await db
       .insert(schema.authIdentities)
@@ -61,7 +59,6 @@ async function seed() {
       });
     console.log('✅ AuthIdentity (LOCAL) ensured.');
 
-    // 3. Ensure a Tenant exists
     const tenantName = 'Default Community';
     const [tenant] = await db
       .insert(schema.tenants)
@@ -69,7 +66,6 @@ async function seed() {
       .returning();
     console.log('✅ Tenant created/inserted:', tenant.name);
 
-    // 4. Ensure TenantMembership exists
     const [membership] = await db
       .insert(schema.tenantMemberships)
       .values({
@@ -91,7 +87,6 @@ async function seed() {
       `✅ TenantMembership ensured for ${user.email} in ${tenant.name}.`,
     );
 
-    // 5. Ensure Unit Owner User exists
     const ownerEmail = 'owner@hoa.local';
     const ownerPassword = 'OwnerPassword123!';
 
@@ -110,7 +105,6 @@ async function seed() {
       .returning();
     console.log('✅ User ensured:', ownerUser.email);
 
-    // 6. Ensure Local AuthIdentity exists for Unit Owner
     const ownerPasswordHash = await bcrypt.hash(ownerPassword, 10);
     await db
       .insert(schema.authIdentities)
@@ -129,7 +123,6 @@ async function seed() {
       });
     console.log('✅ AuthIdentity (LOCAL) ensured for owner.');
 
-    // 7. Ensure Tenants for Unit Owner
     const [hoa1] = await db
       .insert(schema.tenants)
       .values({ name: 'Sunset Valley HOA' })
@@ -142,7 +135,6 @@ async function seed() {
 
     console.log('✅ Additional HOAs created:', hoa1.name, 'and', hoa2.name);
 
-    // 8. Ensure Memberships for Unit Owner
     const ownerMemberships = [
       {
         tenantId: hoa1.id,
@@ -174,7 +166,7 @@ async function seed() {
 
     console.log('🏢 Creating SVJ Slunečná 12 building structure...');
 
-    // 5. Owners — SVJ Slunečná 12
+    // Owners — SVJ Slunečná 12
     const insertOwner = async (
       displayName: string,
       kind: 'PERSON' | 'LEGAL_ENTITY' | 'ASSOCIATION',
@@ -252,7 +244,7 @@ async function seed() {
       '✅ Created QA user accounts for Jana and Alena (UNIT_OWNER role)',
     );
 
-    // 6. Units — building shares over /10000, summing to exactly 1/1
+    // Units — building shares over /10000, summing to exactly 1/1
     const unitShares: [string, number][] = [
       ['1', 1712],
       ['2', 1650],
@@ -280,7 +272,7 @@ async function seed() {
       '✅ Created 8 units with building shares summing to exactly 10000/10000',
     );
 
-    // 7. Ownership parties
+    // Ownership parties
     const insertParty = async (
       unitId: string,
       partyType: 'SOLE' | 'SJM',
@@ -321,7 +313,7 @@ async function seed() {
       '✅ Created 9 ownership parties: 1 SJM, 2 co-ownership (2/3 + 1/3), 1 legal entity, 1 association, 4 sole owners',
     );
 
-    // 8. Votes — one per mode, both SCHEDULED (open/close them through the app)
+    // Votes — one per mode, both SCHEDULED (open/close them through the app)
     const day = 86_400_000;
     const now = Date.now();
     const insertVote = async (

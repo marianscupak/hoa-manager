@@ -1,10 +1,4 @@
 import type {
-  Fraction,
-  KatastrDocument,
-  KatastrParty,
-  KatastrUnit,
-} from '@/modules/core/property/domain/katastr/katastr-document';
-import type {
   ImportBlocker,
   ImportPlan,
   ImportWarning,
@@ -16,6 +10,12 @@ import type {
   RegisterSnapshot,
   RegisterUnit,
 } from '@/modules/core/property/domain/katastr/import-plan';
+import type {
+  Fraction,
+  KatastrDocument,
+  KatastrParty,
+  KatastrUnit,
+} from '@/modules/core/property/domain/katastr/katastr-document';
 import { periodStatus } from '@/modules/core/property/domain/ownership-periods';
 import {
   OwnerKind,

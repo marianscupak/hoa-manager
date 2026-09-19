@@ -1,6 +1,16 @@
 export default {
     title: "Import z katastru nemovitostí",
     intro: "Nahrajte výpis z katastru nemovitostí ve formátu XML za celou budovu. Údaje o jednotkách, podílech a vlastnících se z něj přenesou do evidence. E-mailové adresy katastr neobsahuje, ty doplníte potom.",
+    previewIntro:
+        "Zkontrolujte, co výpis s evidencí udělá. Dokud import nepotvrdíte, nic se nezapíše.",
+    /** The "← Units" link back to the register; `done.backToUnits` is the
+     *  button on the finished screen. */
+    backLink: "Jednotky",
+    steps: {
+        file: "Soubor",
+        preview: "Náhled",
+        done: "Hotovo",
+    },
     pickFile: "Vybrat soubor",
     dropzone: {
         label: "Přetáhněte sem výpis nebo vyberte soubor",
@@ -16,6 +26,8 @@ export default {
     adminOnly: "Import z katastru nemovitostí může spustit jen administrátor.",
     document: {
         heading: "Soubor",
+        fileMeta: "{{size}} · jen se přečte, neukládá se",
+        replaceFile: "Vyměnit soubor",
         lv: "List vlastnictví",
         municipality: "Obec",
         area: "Katastrální území",
@@ -24,29 +36,43 @@ export default {
     },
     effectiveAt: {
         label: "Změny vlastnictví nabudou účinnosti",
-        hint: "Předvyplněno datem, ke kterému jsou data v katastru platná.",
+        hint: "Předvyplněno datem, ke kterému jsou data v katastru platná. Změna data znovu spustí náhled.",
     },
     counts: {
-        unitsCreated: "{{count}} jednotek k založení",
-        unitsUpdated: "{{count}} jednotek ke změně",
-        unitsUnchanged: "{{count}} jednotek bez změny",
-        ownersCreated: "{{count}} nových vlastníků",
-        ownersMatched: "{{count}} spárovaných vlastníků",
+        // Captions under a figure, so they stay in the genitive plural and
+        // read as "<number> of units to create" whatever the number is.
+        unitsCreated: "jednotek k založení",
+        unitsUpdated: "jednotek ke změně",
+        unitsUnchanged: "jednotek bez změny",
+        ownersCreated: "nových vlastníků",
+        ownersMatched: "spárovaných vlastníků",
         nothingToDo: "Soubor neobsahuje nic, co by se mělo změnit.",
     },
     table: {
+        heading: "Jednotky",
         unit: "Jednotka",
         change: "Změna",
+        detail: "Detail",
         create: "Založit",
         update: "Změnit",
         unchanged: "Bez změny",
         notInFile: "Není v souboru",
         notInFileHint: "Zůstane v evidenci, import nic nemaže.",
-        shareChange: "Podíl {{from}} → {{to}}",
-        unitNoChange: "Označení {{from}} → {{to}}",
-        usageChange: "Využití {{from}} → {{to}}",
-        ownershipChange: "Vlastnictví: {{from}} → {{to}}",
-        newOwnership: "Vlastnictví: {{to}}",
+        noChange: "V souboru beze změny.",
+        searchPlaceholder: "Hledat jednotky",
+        noMatch: "Hledání neodpovídá žádná jednotka.",
+        showUnchanged: "Zobrazit beze změny ({{count}})",
+        hideUnchanged: "Skrýt beze změny ({{count}})",
+        // Field labels for the per-change lines in the Detail cell; the
+        // old value, the arrow and the new value are rendered around them.
+        field: {
+            share: "Podíl",
+            unitNo: "Označení",
+            usage: "Využití",
+            ownership: "Vlastnictví",
+        },
+        /** Joins the two names of a marital community property (SJM). */
+        memberJoin: " a ",
         count_one: "{{count}} řádek",
         count_few: "{{count}} řádky",
         count_other: "{{count}} řádků",
@@ -58,9 +84,39 @@ export default {
         byName: "Spárováno podle jména",
         create: "Nový vlastník",
         noEmail: "bez e-mailu",
-        hasAccount: "má účet",
-        checkNameMatches:
-            "Párování podle jména zkontrolujte. Nesouhlasí-li, import zrušte a jména v evidenci upravte.",
+        noEmailInFile: "v souboru bez e-mailu",
+        hasAccount: "Má účet",
+        // Three shapes, because a sub-line reading "a 0 podle jména" is
+        // noise and the caution only applies when a name match exists.
+        needALook:
+            "Zkontrolujte {{created}} nových a {{matchedByName}} podle jména spárovaných vlastníků. U párování podle jména ověřte, že sedí.",
+        needALookCreated_one:
+            "Jeden vlastník je nový, ostatní se spárovali přesně.",
+        needALookCreated_few:
+            "{{count}} vlastníci jsou noví, ostatní se spárovali přesně.",
+        needALookCreated_other:
+            "{{count}} vlastníků je nových, ostatní se spárovali přesně.",
+        needALookMatched_one:
+            "Jeden vlastník se spároval podle jména. Před potvrzením ověřte, že sedí.",
+        needALookMatched_few:
+            "{{count}} vlastníci se spárovali podle jména. Před potvrzením ověřte, že sedí.",
+        needALookMatched_other:
+            "{{count}} vlastníků se spárovalo podle jména. Před potvrzením ověřte, že sedí.",
+        allShown: "Všech {{count}} vlastníků z výpisu.",
+        showAll: "Zobrazit všech {{count}} vlastníků",
+        showNeedALook: "Zobrazit jen ty ke kontrole",
+        noEmailsNote:
+            "Výpis neobsahuje e-mailové adresy. Doplňte je po importu na stránce Lidé.",
+    },
+    actionBar: {
+        summary:
+            "Potvrzením se do evidence zapíše {{unitsCreated}} nových jednotek, {{unitsUpdated}} změn a {{ownersCreated}} nových vlastníků.",
+        blocked_one:
+            "Import blokuje jeden problém. Opravte ho v evidenci a spusťte náhled znovu.",
+        blocked_few:
+            "Import blokují {{count}} problémy. Opravte je v evidenci a spusťte náhled znovu.",
+        blocked_other:
+            "Import blokuje {{count}} problémů. Opravte je v evidenci a spusťte náhled znovu.",
     },
     warnings: {
         heading: "Upozornění",

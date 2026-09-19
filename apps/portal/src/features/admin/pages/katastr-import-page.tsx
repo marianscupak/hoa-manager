@@ -2,16 +2,17 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { format, parse } from "date-fns";
 import { useAtomValue } from "jotai";
+import { ChevronLeftIcon } from "lucide-react";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
 import {
     Button,
+    Card,
     DatePicker,
     ErrorState,
     FileDropzone,
-    StatusChip,
     type FileRejection,
 } from "@hoa-mngr/ui";
 
@@ -23,11 +24,13 @@ import { applyKatastrImport, previewKatastrImport } from "@/api/katastr-import";
 import { tenantContextAtom } from "@/auth/atoms";
 import { Role } from "@/auth/roles";
 
+import { ActionBar } from "../components/katastr-import/action-bar";
 import { Blockers } from "../components/katastr-import/blockers";
 import {
     KATASTR_IMPORT_ACCEPTED_CONTENT_TYPES,
     KATASTR_IMPORT_MAX_SIZE_BYTES,
 } from "../components/katastr-import/constants";
+import { CountStrip } from "../components/katastr-import/count-strip";
 import {
     DROPZONE_REJECTION_KEY,
     isDropzoneRejectionError,
@@ -36,16 +39,18 @@ import {
     type KatastrErrorBody,
     type Translate,
 } from "../components/katastr-import/errors";
-import { ImportDiffTable } from "../components/katastr-import/import-diff-table";
+import { FileCard } from "../components/katastr-import/file-card";
+import { ImportUnitsTable } from "../components/katastr-import/import-units-table";
 import { invalidateKatastrImportQueries } from "../components/katastr-import/invalidate-import-queries";
+import { OwnerList } from "../components/katastr-import/owner-list";
 import {
-    hasNothingToDo,
-    messageKeyFor,
-} from "../components/katastr-import/messages";
+    StepPills,
+    type KatastrImportStep,
+} from "../components/katastr-import/step-pills";
+import { Warnings } from "../components/katastr-import/warnings";
 
-type PreviewOwner = KatastrImportPreviewResponseDto["owners"][number];
-
-/** The trigger is a button, so the caption points at it by id rather than wrapping it. */
+/** The trigger is a button, so the caption points at it by id rather than
+ *  wrapping it. */
 const EFFECTIVE_AT_LABEL_ID = "katastr-effective-at-label";
 
 export function KatastrImportPage() {
@@ -185,176 +190,192 @@ export function KatastrImportPage() {
         return <ImportDone result={result} />;
     }
 
-    return (
-        <div className="flex flex-col gap-6">
-            <div>
-                <h1 className="text-xl font-semibold">{t("title")}</h1>
-                <p className="text-muted-foreground mt-2 max-w-2xl text-sm">
-                    {t("intro")}
-                </p>
-            </div>
+    // Any request in flight freezes every input on the page. For the file
+    // and the date that keeps `latestRequestRef` from moving behind an
+    // in-flight apply's back — which is what lets its 409 path apply a
+    // fresh plan unconditionally (see `applyMutation` above).
+    const isLocked = previewMutation.isPending || applyMutation.isPending;
 
-            <div className="flex flex-col gap-3">
-                <FileDropzone
-                    accept={KATASTR_IMPORT_ACCEPTED_CONTENT_TYPES}
-                    maxSizeBytes={KATASTR_IMPORT_MAX_SIZE_BYTES}
-                    // Locked for the same reason the date input below is:
-                    // while an apply is in flight, nothing may advance
-                    // `latestRequestRef`, or its 409 path's unconditional
-                    // `setPreview` could silently overwrite whatever the
-                    // admin has moved on to in the meantime.
-                    disabled={
-                        previewMutation.isPending || applyMutation.isPending
-                    }
-                    onFiles={([selected]) => {
-                        setPreview(null);
-                        setPreviewError(null);
-                        setApplyError(null);
-                        setFile(selected);
-                    }}
-                    onReject={({ reason }: FileRejection) =>
-                        setPreviewError({ dropzoneRejection: reason })
-                    }
-                    label={t("dropzone.label")}
-                    hint={t("dropzone.hint")}
-                />
-                {file !== null && (
-                    <p className="text-muted-foreground text-sm">{file.name}</p>
-                )}
-                <Button
-                    className="w-fit cursor-pointer"
-                    disabled={
-                        file === null ||
-                        previewMutation.isPending ||
-                        applyMutation.isPending
-                    }
-                    onClick={() => runPreview(null)}
-                >
-                    {t("analyze")}
-                </Button>
-            </div>
+    const returnToDropzone = () => {
+        setPreview(null);
+        setFile(null);
+        setApplyError(null);
+    };
+
+    return (
+        <div className="flex flex-col gap-4">
+            <ImportHeader
+                step={preview === null ? "file" : "preview"}
+                intro={preview === null ? t("intro") : t("previewIntro")}
+            />
 
             {previewError !== null && <ImportErrors error={previewError} />}
 
-            {preview !== null && (
+            {preview === null ? (
+                <div className="flex flex-col gap-3">
+                    <FileDropzone
+                        accept={KATASTR_IMPORT_ACCEPTED_CONTENT_TYPES}
+                        maxSizeBytes={KATASTR_IMPORT_MAX_SIZE_BYTES}
+                        disabled={isLocked}
+                        onFiles={([selected]) => {
+                            setPreview(null);
+                            setPreviewError(null);
+                            setApplyError(null);
+                            setFile(selected);
+                        }}
+                        onReject={({ reason }: FileRejection) =>
+                            setPreviewError({ dropzoneRejection: reason })
+                        }
+                        label={t("dropzone.label")}
+                        hint={t("dropzone.hint")}
+                    />
+                    {file !== null && (
+                        <p className="text-muted-foreground text-sm">
+                            {file.name}
+                        </p>
+                    )}
+                    <Button
+                        className="w-fit"
+                        disabled={file === null || isLocked}
+                        onClick={() => runPreview(null)}
+                    >
+                        {t("analyze")}
+                    </Button>
+                </div>
+            ) : (
                 <>
-                    <DocumentSummary preview={preview} />
-
-                    <div className="flex flex-col gap-1 text-sm">
-                        <span id={EFFECTIVE_AT_LABEL_ID}>
-                            {t("effectiveAt.label")}
-                        </span>
-                        <DatePicker
-                            className="w-44"
-                            aria-labelledby={EFFECTIVE_AT_LABEL_ID}
-                            // The state is the API's `YYYY-MM-DD` calendar
-                            // day; `parse` reads it in local time, where
-                            // `new Date(string)` would read it as UTC
-                            // midnight and can land on the day before.
-                            value={
-                                effectiveAt
-                                    ? parse(
-                                          effectiveAt,
-                                          "yyyy-MM-dd",
-                                          new Date(),
-                                      )
-                                    : null
-                            }
-                            // The admin cannot pick a second date while the
-                            // first one's preview is still in flight, nor
-                            // while an apply is in flight — the latter
-                            // keeps `latestRequestRef` from moving behind
-                            // an in-flight apply's back, which is what
-                            // lets its 409 path apply a fresh plan
-                            // unconditionally (see `applyMutation` above).
-                            disabled={
-                                previewMutation.isPending ||
-                                applyMutation.isPending
-                            }
-                            onChange={(day) => {
-                                const value = day
-                                    ? format(day, "yyyy-MM-dd")
-                                    : null;
-                                setEffectiveAt(value);
-                                // Clearing the day leaves nothing to
-                                // preview for. Re-preview with none rather
-                                // than leaving the old preview on screen
-                                // for a date that is no longer selected —
-                                // the API falls back to its own default
-                                // (ct:platnost), which then repopulates
-                                // this field once the response lands
-                                // (Finding 4).
-                                runPreview(value);
-                            }}
-                        />
-                        <span className="text-muted-foreground">
-                            {t("effectiveAt.hint")}
-                        </span>
-                    </div>
-
-                    <Counts preview={preview} />
-                    <ImportDiffTable preview={preview} />
-                    <OwnerMatches preview={preview} />
-                    <Warnings preview={preview} />
-                    <Blockers blockers={preview.blockers} />
-                    <ApplyErrorNotice error={applyError} />
-
-                    <div className="flex items-center gap-3">
-                        <Button
-                            variant="outline"
-                            className="cursor-pointer"
-                            // Completes the same lock the file/date inputs
-                            // and "Show preview" have: without it, Cancel
-                            // could clear `preview`/`file` while an apply
-                            // is still in flight, without touching either
-                            // ref — so a 409 landing afterward would still
-                            // apply unconditionally and resurrect the
-                            // panel Cancel just dismissed.
-                            disabled={
-                                previewMutation.isPending ||
-                                applyMutation.isPending
-                            }
-                            onClick={() => {
-                                setPreview(null);
-                                setFile(null);
-                                setApplyError(null);
-                            }}
-                        >
-                            {t("cancel")}
-                        </Button>
-                        <Button
-                            className="cursor-pointer"
-                            disabled={
-                                preview.blockers.length > 0 ||
-                                file === null ||
-                                effectiveAt === null ||
-                                // The plan on screen must still describe
-                                // the current file/date. A pending
-                                // re-preview fails this (as before), but so
-                                // does one that just *failed* — its error
-                                // never updates `previewRequestRef`, so a
-                                // naive "not pending" check would have
-                                // re-enabled Confirm for a plan that no
-                                // longer matches the visible `effectiveAt`.
-                                !previewIsCurrent ||
-                                applyMutation.isPending
-                            }
-                            onClick={() => {
-                                if (file === null || effectiveAt === null) {
-                                    return;
+                    <div className="grid grid-cols-[repeat(auto-fit,minmax(290px,1fr))] items-start gap-4">
+                        {file !== null && (
+                            <FileCard
+                                file={file}
+                                document={preview.document}
+                                onReplace={returnToDropzone}
+                                replaceDisabled={isLocked}
+                            />
+                        )}
+                        <Card className="px-[18px] py-4">
+                            <h2
+                                id={EFFECTIVE_AT_LABEL_ID}
+                                className="text-md font-bold tracking-[-0.1px]"
+                            >
+                                {t("effectiveAt.label")}
+                            </h2>
+                            <DatePicker
+                                className="mt-3"
+                                aria-labelledby={EFFECTIVE_AT_LABEL_ID}
+                                // The state is the API's `YYYY-MM-DD`
+                                // calendar day; `parse` reads it in local
+                                // time, where `new Date(string)` would read
+                                // it as UTC midnight and can land on the
+                                // day before.
+                                value={
+                                    effectiveAt
+                                        ? parse(
+                                              effectiveAt,
+                                              "yyyy-MM-dd",
+                                              new Date(),
+                                          )
+                                        : null
                                 }
-                                applyMutation.mutate({
-                                    file,
-                                    effectiveAt,
-                                    planHash: preview.planHash,
-                                });
-                            }}
-                        >
-                            {t("confirm")}
-                        </Button>
+                                disabled={isLocked}
+                                onChange={(day) => {
+                                    const value = day
+                                        ? format(day, "yyyy-MM-dd")
+                                        : null;
+                                    setEffectiveAt(value);
+                                    // Clearing the day leaves nothing to
+                                    // preview for. Re-preview with none
+                                    // rather than leaving the old preview
+                                    // on screen for a date that is no
+                                    // longer selected — the API falls back
+                                    // to its own default (ct:platnost),
+                                    // which then repopulates this field
+                                    // once the response lands (Finding 4).
+                                    runPreview(value);
+                                }}
+                            />
+                            <p className="text-muted-foreground mt-2.5 text-[12.5px] leading-[18px]">
+                                {t("effectiveAt.hint")}
+                            </p>
+                        </Card>
                     </div>
+
+                    <CountStrip counts={preview.counts} />
+                    <Blockers blockers={preview.blockers} />
+                    <Warnings warnings={preview.warnings} />
+                    <ImportUnitsTable preview={preview} />
+                    <OwnerList owners={preview.owners} />
+
+                    <ActionBar
+                        counts={preview.counts}
+                        blockerCount={preview.blockers.length}
+                        notice={
+                            applyError !== null ? (
+                                <ApplyErrorNotice error={applyError} />
+                            ) : undefined
+                        }
+                        cancelDisabled={isLocked}
+                        confirmDisabled={
+                            preview.blockers.length > 0 ||
+                            file === null ||
+                            effectiveAt === null ||
+                            // The plan on screen must still describe the
+                            // current file/date. A pending re-preview fails
+                            // this (as before), but so does one that just
+                            // *failed* — its error never updates
+                            // `previewRequestRef`, so a naive "not pending"
+                            // check would have re-enabled Confirm for a
+                            // plan that no longer matches the visible
+                            // `effectiveAt`.
+                            !previewIsCurrent ||
+                            applyMutation.isPending
+                        }
+                        onCancel={returnToDropzone}
+                        onConfirm={() => {
+                            if (file === null || effectiveAt === null) return;
+                            applyMutation.mutate({
+                                file,
+                                effectiveAt,
+                                planHash: preview.planHash,
+                            });
+                        }}
+                    />
                 </>
             )}
+        </div>
+    );
+}
+
+/** Title, one line of orientation, and where the admin is in the flow. */
+function ImportHeader({
+    step,
+    intro,
+}: {
+    step: KatastrImportStep;
+    intro: string;
+}) {
+    const { t } = useTranslation("katastr");
+
+    return (
+        <div className="flex flex-col gap-3">
+            <Link
+                to="/units"
+                className="text-muted-foreground hover:text-foreground inline-flex w-fit items-center gap-1.5 text-[13px] font-semibold transition-colors"
+            >
+                <ChevronLeftIcon aria-hidden className="h-[13px] w-[13px]" />
+                {t("backLink")}
+            </Link>
+            <div className="flex flex-wrap items-end justify-between gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold tracking-tight">
+                        {t("title")}
+                    </h1>
+                    <p className="text-muted-foreground mt-2 max-w-[560px] text-sm">
+                        {intro}
+                    </p>
+                </div>
+                <StepPills current={step} />
+            </div>
         </div>
     );
 }
@@ -364,16 +385,23 @@ function ImportDone({ result }: { result: KatastrImportResultResponseDto }) {
 
     return (
         <div className="flex flex-col gap-4">
-            <h1 className="text-xl font-semibold">{t("done.heading")}</h1>
-            <p className="text-muted-foreground max-w-2xl text-sm">
-                {t("done.summary", {
-                    created: result.counts.unitsCreated,
-                    updated: result.counts.unitsUpdated,
-                })}
-            </p>
-            <Button className="w-fit cursor-pointer" asChild>
-                <Link to="/units">{t("done.backToUnits")}</Link>
-            </Button>
+            <ImportHeader step="done" intro={t("previewIntro")} />
+            <Card className="flex flex-col items-start gap-4 px-[18px] py-5">
+                <div>
+                    <h2 className="font-display text-title font-extrabold tracking-tight">
+                        {t("done.heading")}
+                    </h2>
+                    <p className="text-muted-foreground mt-2 max-w-2xl text-sm">
+                        {t("done.summary", {
+                            created: result.counts.unitsCreated,
+                            updated: result.counts.unitsUpdated,
+                        })}
+                    </p>
+                </div>
+                <Button asChild>
+                    <Link to="/units">{t("done.backToUnits")}</Link>
+                </Button>
+            </Card>
         </div>
     );
 }
@@ -402,168 +430,6 @@ function ApplyErrorNotice({ error }: { error: unknown }) {
         return <Blockers blockers={body.blockers} />;
     }
     return <ImportErrors error={error} />;
-}
-
-function DocumentSummary({
-    preview,
-}: {
-    preview: KatastrImportPreviewResponseDto;
-}) {
-    const { t } = useTranslation("katastr");
-    const { document } = preview;
-    const formatDate = (iso: string) => format(new Date(iso), "d. M. yyyy");
-
-    const fields: { label: string; value: string }[] = [
-        { label: t("document.lv"), value: document.lvNumber },
-        { label: t("document.municipality"), value: document.municipality },
-        { label: t("document.area"), value: document.cadastralArea },
-        { label: t("document.validAt"), value: formatDate(document.validAt) },
-        {
-            label: t("document.issuedAt"),
-            value: formatDate(document.issuedAt),
-        },
-    ];
-
-    return (
-        <div className="rounded-panel border-border bg-card border p-4">
-            <h2 className="text-sm font-semibold">{t("document.heading")}</h2>
-            <dl className="mt-2 grid grid-cols-2 gap-x-6 gap-y-2 text-sm sm:grid-cols-3">
-                {fields.map((field) => (
-                    <div key={field.label}>
-                        <dt className="text-muted-foreground">{field.label}</dt>
-                        <dd className="font-medium">{field.value}</dd>
-                    </div>
-                ))}
-            </dl>
-        </div>
-    );
-}
-
-function Counts({ preview }: { preview: KatastrImportPreviewResponseDto }) {
-    const { t } = useTranslation("katastr");
-    const { counts } = preview;
-
-    if (hasNothingToDo(counts)) {
-        return (
-            <p className="text-muted-foreground text-sm">
-                {t("counts.nothingToDo")}
-            </p>
-        );
-    }
-
-    const items = [
-        counts.unitsCreated > 0 &&
-            t("counts.unitsCreated", { count: counts.unitsCreated }),
-        counts.unitsUpdated > 0 &&
-            t("counts.unitsUpdated", { count: counts.unitsUpdated }),
-        counts.unitsUnchanged > 0 &&
-            t("counts.unitsUnchanged", { count: counts.unitsUnchanged }),
-        counts.ownersCreated > 0 &&
-            t("counts.ownersCreated", { count: counts.ownersCreated }),
-        counts.ownersMatched > 0 &&
-            t("counts.ownersMatched", { count: counts.ownersMatched }),
-    ].filter((item) => item !== false) as string[];
-
-    return (
-        <ul className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
-            {items.map((item) => (
-                <li key={item}>{item}</li>
-            ))}
-        </ul>
-    );
-}
-
-const OWNER_MATCH_LABEL_KEY = {
-    CREATE: "owners.create",
-    MATCHED_BY_KATASTR_ID: "owners.byKatastrId",
-    MATCHED_BY_ICO: "owners.byIco",
-    MATCHED_BY_NAME: "owners.byName",
-} as const satisfies Record<PreviewOwner["action"], string>;
-
-function OwnerMatches({
-    preview,
-}: {
-    preview: KatastrImportPreviewResponseDto;
-}) {
-    const { t } = useTranslation("katastr");
-    const { owners } = preview;
-    const hasNameMatch = owners.some(
-        (owner) => owner.action === "MATCHED_BY_NAME",
-    );
-
-    return (
-        <div className="flex flex-col gap-2">
-            <h2 className="text-sm font-semibold">{t("owners.heading")}</h2>
-            {hasNameMatch && (
-                <p className="text-warning-deep text-sm">
-                    {t("owners.checkNameMatches")}
-                </p>
-            )}
-            <ul className="flex flex-col gap-1.5 text-sm">
-                {owners.map((owner, index) => (
-                    <li
-                        key={`${owner.displayName}-${index}`}
-                        className="flex flex-wrap items-center gap-2"
-                    >
-                        <span className="font-medium">{owner.displayName}</span>
-                        <StatusChip
-                            variant={
-                                owner.action === "CREATE"
-                                    ? "success"
-                                    : "neutral"
-                            }
-                            dot={false}
-                        >
-                            {t(OWNER_MATCH_LABEL_KEY[owner.action])}
-                        </StatusChip>
-                        {owner.action !== "CREATE" && (
-                            <>
-                                {owner.existingDisplayName && (
-                                    <span className="text-muted-foreground">
-                                        → {owner.existingDisplayName}
-                                    </span>
-                                )}
-                                <span className="text-muted-foreground">
-                                    {owner.existingEmail ?? t("owners.noEmail")}
-                                </span>
-                                {owner.existingHasAccount && (
-                                    <StatusChip variant="primary" dot={false}>
-                                        {t("owners.hasAccount")}
-                                    </StatusChip>
-                                )}
-                            </>
-                        )}
-                    </li>
-                ))}
-            </ul>
-        </div>
-    );
-}
-
-function Warnings({ preview }: { preview: KatastrImportPreviewResponseDto }) {
-    const { t } = useTranslation("katastr");
-    if (preview.warnings.length === 0) return null;
-
-    return (
-        <div className="border-warning-tint-border bg-warning-muted rounded-panel border p-4">
-            <h2 className="text-warning-deep text-sm font-semibold">
-                {t("warnings.heading")}
-            </h2>
-            <ul className="text-warning-deep mt-2 flex flex-col gap-1 text-sm">
-                {preview.warnings.map((warning, index) => (
-                    <li key={index}>
-                        {
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            t(
-                                messageKeyFor("warnings", warning.code) as any,
-                                warning,
-                            )
-                        }
-                    </li>
-                ))}
-            </ul>
-        </div>
-    );
 }
 
 /**
@@ -606,15 +472,24 @@ function ErrorBox({ messages }: { messages: string[] }) {
     const { t } = useTranslation("katastr");
 
     return (
-        <div className="border-destructive/30 bg-destructive-muted rounded-panel border p-4">
-            <h2 className="text-destructive text-sm font-semibold">
+        <section className="border-destructive/30 bg-destructive-faint rounded-card shadow-clay-card-destructive border px-[18px] py-4">
+            <h2 className="text-destructive-muted-foreground text-[14.5px] font-bold">
                 {t("errors.heading")}
             </h2>
-            <ul className="text-destructive mt-2 flex flex-col gap-1 text-sm">
+            <ul className="mt-2.5 flex flex-col gap-2">
                 {messages.map((message, index) => (
-                    <li key={index}>{message}</li>
+                    <li
+                        key={index}
+                        className="text-destructive-deep text-detail flex gap-2.5 leading-[19px]"
+                    >
+                        <span
+                            aria-hidden
+                            className="bg-destructive mt-[7px] h-[5px] w-[5px] shrink-0 rounded-full"
+                        />
+                        <span>{message}</span>
+                    </li>
                 ))}
             </ul>
-        </div>
+        </section>
     );
 }

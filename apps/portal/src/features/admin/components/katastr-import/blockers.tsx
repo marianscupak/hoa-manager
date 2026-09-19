@@ -1,3 +1,4 @@
+import { CircleXIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { formatPeriodDate } from "@/components/ownership-history/rows";
@@ -44,19 +45,29 @@ export function Blockers({ blockers }: { blockers: KatastrCoded[] }) {
     const translate = t as unknown as Translate;
 
     return (
-        <section className="border-destructive/40 bg-destructive/5 rounded-md border p-4">
-            <h2 className="text-destructive font-medium">
+        <section className="border-destructive/30 bg-destructive-faint rounded-card shadow-clay-card-destructive border px-[18px] py-4">
+            <h2 className="text-destructive-muted-foreground flex items-center gap-2 text-[14.5px] font-bold">
+                <CircleXIcon aria-hidden className="h-[15px] w-[15px]" />
                 {t("blockers.heading")}
             </h2>
-            <ul className="mt-2 flex list-disc flex-col gap-2 pl-5 text-sm">
+            <ul className="mt-2.5 flex flex-col gap-2">
                 {blockers.map((blocker, i) => (
-                    <li key={`${blocker.code}-${i}`}>
-                        {translateCoded(
-                            translate,
-                            "blockers",
-                            blocker.code,
-                            displayVars(blocker),
-                        )}
+                    <li
+                        key={`${blocker.code}-${i}`}
+                        className="text-destructive-deep text-detail flex gap-2.5 leading-[19px]"
+                    >
+                        <span
+                            aria-hidden
+                            className="bg-destructive mt-[7px] h-[5px] w-[5px] shrink-0 rounded-full"
+                        />
+                        <span>
+                            {translateCoded(
+                                translate,
+                                "blockers",
+                                blocker.code,
+                                displayVars(blocker),
+                            )}
+                        </span>
                     </li>
                 ))}
             </ul>

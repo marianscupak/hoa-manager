@@ -1,6 +1,16 @@
 export default {
     title: "Cadastre import",
     intro: "Upload an XML extract from the Land Registry (katastr nemovitostí) for the whole building. Unit, share and owner data will be transferred into the register from it. The extract does not contain email addresses — add those afterwards.",
+    previewIntro:
+        "Check what the extract will do to the register. Nothing is written until you confirm.",
+    /** The "← Units" link back to the register; `done.backToUnits` is the
+     *  button on the finished screen. */
+    backLink: "Units",
+    steps: {
+        file: "File",
+        preview: "Preview",
+        done: "Done",
+    },
     pickFile: "Choose file",
     dropzone: {
         label: "Drop the extract here or browse",
@@ -16,6 +26,8 @@ export default {
     adminOnly: "Only an administrator can import from the cadastre.",
     document: {
         heading: "File",
+        fileMeta: "{{size}} · read, not stored",
+        replaceFile: "Replace file",
         lv: "Certificate of ownership (LV)",
         municipality: "Municipality",
         area: "Cadastral area",
@@ -24,29 +36,41 @@ export default {
     },
     effectiveAt: {
         label: "Ownership changes take effect",
-        hint: "Pre-filled with the date the cadastre data is valid as of.",
+        hint: "Pre-filled with the date the cadastre data is valid as of. Changing it re-runs the preview.",
     },
     counts: {
-        unitsCreated: "{{count}} units to create",
-        unitsUpdated: "{{count}} units to update",
-        unitsUnchanged: "{{count}} units unchanged",
-        ownersCreated: "{{count}} new owners",
-        ownersMatched: "{{count}} matched owners",
+        unitsCreated: "units to create",
+        unitsUpdated: "units to update",
+        unitsUnchanged: "units unchanged",
+        ownersCreated: "new owners",
+        ownersMatched: "owners matched",
         nothingToDo: "The file contains nothing that needs to change.",
     },
     table: {
+        heading: "Units",
         unit: "Unit",
         change: "Change",
+        detail: "Detail",
         create: "Create",
         update: "Update",
         unchanged: "Unchanged",
         notInFile: "Not in file",
         notInFileHint: "Stays in the register — import deletes nothing.",
-        shareChange: "Share {{from}} → {{to}}",
-        unitNoChange: "Label {{from}} → {{to}}",
-        usageChange: "Usage {{from}} → {{to}}",
-        ownershipChange: "Ownership: {{from}} → {{to}}",
-        newOwnership: "Ownership: {{to}}",
+        noChange: "No change in the file.",
+        searchPlaceholder: "Search units",
+        noMatch: "No units match your search.",
+        showUnchanged: "Show unchanged ({{count}})",
+        hideUnchanged: "Hide unchanged ({{count}})",
+        // Field labels for the per-change lines in the Detail cell; the
+        // old value, the arrow and the new value are rendered around them.
+        field: {
+            share: "Share",
+            unitNo: "Label",
+            usage: "Usage",
+            ownership: "Ownership",
+        },
+        /** Joins the two names of a marital community property (SJM). */
+        memberJoin: " and ",
         count_one: "{{count}} row",
         count_other: "{{count}} rows",
     },
@@ -57,9 +81,32 @@ export default {
         byName: "Matched by name",
         create: "New owner",
         noEmail: "no email",
-        hasAccount: "has an account",
-        checkNameMatches:
-            "Check the name-based matches. If any is wrong, cancel the import and fix the names in the register.",
+        noEmailInFile: "no email in file",
+        hasAccount: "Has an account",
+        // Three shapes, because a sub-line reading "and 0 name-matched"
+        // is noise and the caution only applies when a name match exists.
+        needALook:
+            "{{created}} new and {{matchedByName}} name-matched owners need a look. Check the name matches before confirming.",
+        needALookCreated_one: "One owner is new; the rest matched exactly.",
+        needALookCreated_other:
+            "{{count}} owners are new; the rest matched exactly.",
+        needALookMatched_one:
+            "One owner was matched by name. Check the match before confirming.",
+        needALookMatched_other:
+            "{{count}} owners were matched by name. Check the matches before confirming.",
+        allShown: "All {{count}} owners in the extract.",
+        showAll: "Show all {{count}} owners",
+        showNeedALook: "Show only those needing a look",
+        noEmailsNote:
+            "The extract contains no email addresses. Add them on the People page after the import.",
+    },
+    actionBar: {
+        summary:
+            "Confirming writes {{unitsCreated}} new units, {{unitsUpdated}} updates and {{ownersCreated}} new owners into the register.",
+        blocked_one:
+            "One problem blocks this import. Fix it in the register, then run the preview again.",
+        blocked_other:
+            "{{count}} problems block this import. Fix them in the register, then run the preview again.",
     },
     warnings: {
         heading: "Warnings",

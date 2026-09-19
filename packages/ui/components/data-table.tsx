@@ -52,6 +52,8 @@ export interface DataTableProps<TData extends { id: string }> {
     emptyMessage: string;
     /** Shown when a search query matches nothing; falls back to emptyMessage. */
     emptySearchMessage?: string;
+    /** Heading shown at the start of the toolbar, before the search field. */
+    title?: string;
     /** Omit to hide the search field. */
     searchPlaceholder?: string;
     /** Extra toolbar content, right-aligned (e.g. a filter select). */
@@ -105,6 +107,7 @@ export function DataTable<TData extends { id: string }>({
     loadingMessage,
     emptyMessage,
     emptySearchMessage,
+    title,
     searchPlaceholder,
     toolbarEnd,
     minWidth,
@@ -175,26 +178,33 @@ export function DataTable<TData extends { id: string }>({
             role="table"
             className="bg-card rounded-card shadow-clay-card overflow-hidden border"
         >
-            {(searchPlaceholder || toolbarEnd) && (
-                <div className="border-hairline flex items-center justify-between gap-3 border-b px-4 py-3">
-                    {searchPlaceholder ? (
-                        <div className="bg-background border-border relative h-[34px] w-full max-w-[300px] rounded-full border">
-                            <SearchIcon className="text-faint pointer-events-none absolute top-1/2 left-[13px] h-3.5 w-3.5 -translate-y-1/2" />
-                            <input
-                                type="search"
-                                value={globalFilter}
-                                onChange={(e) =>
-                                    setGlobalFilter(e.target.value)
-                                }
-                                placeholder={searchPlaceholder}
-                                aria-label={searchPlaceholder}
-                                className="placeholder:text-faint focus-visible:ring-ring text-detail h-full w-full rounded-full bg-transparent pr-[13px] pl-9 focus-visible:ring-2 focus-visible:outline-none"
-                            />
-                        </div>
-                    ) : (
-                        <div />
+            {(title || searchPlaceholder || toolbarEnd) && (
+                <div className="border-hairline flex flex-wrap items-center gap-3 border-b px-4 py-3">
+                    {title && (
+                        <h2 className="text-md font-bold tracking-[-0.1px]">
+                            {title}
+                        </h2>
                     )}
-                    {toolbarEnd}
+                    <div className="flex flex-1 flex-wrap items-center justify-between gap-3">
+                        {searchPlaceholder ? (
+                            <div className="bg-background border-border relative h-[34px] w-full max-w-[300px] rounded-full border">
+                                <SearchIcon className="text-faint pointer-events-none absolute top-1/2 left-[13px] h-3.5 w-3.5 -translate-y-1/2" />
+                                <input
+                                    type="search"
+                                    value={globalFilter}
+                                    onChange={(e) =>
+                                        setGlobalFilter(e.target.value)
+                                    }
+                                    placeholder={searchPlaceholder}
+                                    aria-label={searchPlaceholder}
+                                    className="placeholder:text-faint focus-visible:ring-ring text-detail h-full w-full rounded-full bg-transparent pr-[13px] pl-9 focus-visible:ring-2 focus-visible:outline-none"
+                                />
+                            </div>
+                        ) : (
+                            <div />
+                        )}
+                        {toolbarEnd}
+                    </div>
                 </div>
             )}
 

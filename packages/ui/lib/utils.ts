@@ -9,6 +9,7 @@ const twMerge = extendTailwindMerge({
             shadow: [
                 "clay-card",
                 "clay-card-amber",
+                "clay-card-destructive",
                 "clay-hero",
                 "clay-btn",
                 "clay-btn-sm",

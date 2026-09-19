@@ -46,11 +46,13 @@
     --color-destructive-foreground: #ffffff;
     --color-destructive-muted: #fee2e2;
     --color-destructive-muted-foreground: #b91c1c;
+    --color-destructive-deep: #991b1b;
     --color-destructive-bar: #f43f5e;
     --color-destructive-faint: #fef2f2;
     --color-border: #e2e8f0;
     --color-hairline: #f1f5f9;
     --color-surface-zebra: #fafbfe;
+    --color-strike: #cbd5e1; /* rule over a value being replaced */
     --color-input: #e2e8f0;
     --color-ring: #7c3aed;
 
@@ -81,6 +83,7 @@
     /* Clay shadows */
     --shadow-clay-card: 0 3px 0 rgba(124, 58, 237, 0.06);
     --shadow-clay-card-amber: 0 3px 0 rgba(245, 158, 11, 0.12);
+    --shadow-clay-card-destructive: 0 3px 0 rgba(220, 38, 38, 0.1);
     --shadow-clay-hero: 0 4px 0 rgba(124, 58, 237, 0.1),
         0 16px 40px rgba(124, 58, 237, 0.12);
     --shadow-clay-btn: 0 4px 0 #5b21b6, 0 12px 26px rgba(124, 58, 237, 0.25);

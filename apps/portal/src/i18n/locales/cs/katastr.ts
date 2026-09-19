@@ -111,6 +111,14 @@ export default {
     actionBar: {
         summary:
             "Potvrzením se do evidence zapíše {{unitsCreated}} nových jednotek, {{unitsUpdated}} změn a {{ownersCreated}} nových vlastníků.",
+        // No unit changes at all, so the three-count sentence would read as
+        // "0 jednotek, 0 změn a…" beside a strip already saying so.
+        summaryOwnersOnly_one:
+            "Potvrzením se do evidence přidá jeden nový vlastník. Jednotky se nemění.",
+        summaryOwnersOnly_few:
+            "Potvrzením se do evidence přidají {{count}} noví vlastníci. Jednotky se nemění.",
+        summaryOwnersOnly_other:
+            "Potvrzením se do evidence přidá {{count}} nových vlastníků. Jednotky se nemění.",
         blocked_one:
             "Import blokuje jeden problém. Opravte ho v evidenci a spusťte náhled znovu.",
         blocked_few:

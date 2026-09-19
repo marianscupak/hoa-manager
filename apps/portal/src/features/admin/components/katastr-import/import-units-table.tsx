@@ -119,7 +119,10 @@ export function ImportUnitsTable({
         () => buildImportRows(preview, memberJoin),
         [preview, memberJoin],
     );
-    const visible = visibleImportRows(rows, showUnchanged);
+    const visible = useMemo(
+        () => visibleImportRows(rows, showUnchanged),
+        [rows, showUnchanged],
+    );
     const unchangedCount = rows.filter(
         (row) => row.action === "UNCHANGED",
     ).length;

@@ -103,6 +103,12 @@ export default {
     actionBar: {
         summary:
             "Confirming writes {{unitsCreated}} new units, {{unitsUpdated}} updates and {{ownersCreated}} new owners into the register.",
+        // No unit changes at all, so the three-count sentence would read as
+        // "0 new units, 0 updates and…" beside a strip already saying so.
+        summaryOwnersOnly_one:
+            "Confirming adds one new owner to the register. No unit changes.",
+        summaryOwnersOnly_other:
+            "Confirming adds {{count}} new owners to the register. No unit changes.",
         blocked_one:
             "One problem blocks this import. Fix it in the register, then run the preview again.",
         blocked_other:

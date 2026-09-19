@@ -352,7 +352,9 @@ function ImportHeader({
     intro,
 }: {
     step: KatastrImportStep;
-    intro: string;
+    /** Omitted on the done screen, where the card below says everything and
+     *  a line promising nothing is written yet would be untrue. */
+    intro?: string;
 }) {
     const { t } = useTranslation("katastr");
 
@@ -370,9 +372,11 @@ function ImportHeader({
                     <h1 className="text-2xl font-bold tracking-tight">
                         {t("title")}
                     </h1>
-                    <p className="text-muted-foreground mt-2 max-w-[560px] text-sm">
-                        {intro}
-                    </p>
+                    {intro && (
+                        <p className="text-muted-foreground mt-2 max-w-[560px] text-sm">
+                            {intro}
+                        </p>
+                    )}
                 </div>
                 <StepPills current={step} />
             </div>
@@ -385,7 +389,7 @@ function ImportDone({ result }: { result: KatastrImportResultResponseDto }) {
 
     return (
         <div className="flex flex-col gap-4">
-            <ImportHeader step="done" intro={t("previewIntro")} />
+            <ImportHeader step="done" />
             <Card className="flex flex-col items-start gap-4 px-[18px] py-5">
                 <div>
                     <h2 className="font-display text-title font-extrabold tracking-tight">
@@ -427,7 +431,7 @@ function ApplyErrorNotice({ error }: { error: unknown }) {
         return <p className="text-warning-deep text-sm">{t("errors.STALE")}</p>;
     }
     if (body?.blockers) {
-        return <Blockers blockers={body.blockers} />;
+        return <Blockers blockers={body.blockers} inline />;
     }
     return <ImportErrors error={error} />;
 }

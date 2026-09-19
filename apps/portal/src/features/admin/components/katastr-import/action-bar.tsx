@@ -6,6 +6,8 @@ import { cn } from "@hoa-mngr/ui/lib/utils";
 
 import type { KatastrImportPreviewResponseDto } from "@/api/generated/model";
 
+import { hasNothingToDo } from "./messages";
+
 /**
  * Cancel and Confirm, pinned to the bottom of the viewport. The preview
  * runs to several screens on a real building, and the whole point of the
@@ -35,6 +37,20 @@ export function ActionBar({
 }) {
     const { t } = useTranslation("katastr");
     const isBlocked = blockerCount > 0;
+    // `hasNothingToDo` counts units only, so an extract that changes no
+    // unit can still bring new owners with it. Say which of the two it is
+    // rather than reciting three counts, two of them zero.
+    const unitsUntouched = hasNothingToDo(counts);
+
+    const summary = unitsUntouched
+        ? counts.ownersCreated > 0
+            ? t("actionBar.summaryOwnersOnly", { count: counts.ownersCreated })
+            : t("counts.nothingToDo")
+        : t("actionBar.summary", {
+              unitsCreated: counts.unitsCreated,
+              unitsUpdated: counts.unitsUpdated,
+              ownersCreated: counts.ownersCreated,
+          });
 
     return (
         <div className="border-border bg-card/92 sticky bottom-0 z-10 -mx-4 border-t px-4 py-3.5 backdrop-blur-md md:-mx-8 md:px-8">
@@ -50,11 +66,7 @@ export function ActionBar({
                 >
                     {isBlocked
                         ? t("actionBar.blocked", { count: blockerCount })
-                        : t("actionBar.summary", {
-                              unitsCreated: counts.unitsCreated,
-                              unitsUpdated: counts.unitsUpdated,
-                              ownersCreated: counts.ownersCreated,
-                          })}
+                        : summary}
                 </p>
                 <div className="flex items-center gap-2.5">
                     <Button

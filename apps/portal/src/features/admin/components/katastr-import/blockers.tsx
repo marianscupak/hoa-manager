@@ -1,6 +1,8 @@
 import { CircleXIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { cn } from "@hoa-mngr/ui/lib/utils";
+
 import { formatPeriodDate } from "@/components/ownership-history/rows";
 
 import { blockerVars } from "./blocker-vars";
@@ -30,7 +32,19 @@ function displayVars(blocker: KatastrCoded): Record<string, string> {
         : vars;
 }
 
-export function Blockers({ blockers }: { blockers: KatastrCoded[] }) {
+/**
+ * `inline` drops the card chrome for the one place a blocker list appears
+ * inside another surface — the sticky action bar, where an apply-time 422
+ * explains why Confirm just failed and a second bordered card inside a
+ * 14px strip would read as a mistake.
+ */
+export function Blockers({
+    blockers,
+    inline = false,
+}: {
+    blockers: KatastrCoded[];
+    inline?: boolean;
+}) {
     const { t } = useTranslation("katastr");
     if (blockers.length === 0) return null;
 
@@ -45,12 +59,17 @@ export function Blockers({ blockers }: { blockers: KatastrCoded[] }) {
     const translate = t as unknown as Translate;
 
     return (
-        <section className="border-destructive/30 bg-destructive-faint rounded-card shadow-clay-card-destructive border px-[18px] py-4">
+        <section
+            className={cn(
+                !inline &&
+                    "border-destructive/30 bg-destructive-faint rounded-card shadow-clay-card-destructive border px-[18px] py-4",
+            )}
+        >
             <h2 className="text-destructive-muted-foreground flex items-center gap-2 text-[14.5px] font-bold">
                 <CircleXIcon aria-hidden className="h-[15px] w-[15px]" />
                 {t("blockers.heading")}
             </h2>
-            <ul className="mt-2.5 flex flex-col gap-2">
+            <ul className="mt-2 flex flex-col gap-1.5">
                 {blockers.map((blocker, i) => (
                     <li
                         key={`${blocker.code}-${i}`}

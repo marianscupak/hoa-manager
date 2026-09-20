@@ -4,6 +4,8 @@ import {
     CalendarClock,
     CheckSquare,
     Circle,
+    ClipboardCheck,
+    FileCheck,
     FilePlus,
     HelpCircle,
     Home,
@@ -80,6 +82,14 @@ const META: Record<string, EventTypeMeta> = {
         icon: Trash2,
         dotColor: "bg-destructive-bar",
     },
+    "VOTING.ASSEMBLY_ATTENDANCE_RECORDED": {
+        icon: ClipboardCheck,
+        dotColor: "bg-primary",
+    },
+    "VOTING.ASSEMBLY_RECORD_PUBLISHED": {
+        icon: FileCheck,
+        dotColor: "bg-success",
+    },
     "CORE.TENANT_CREATED": { icon: Building2, dotColor: "bg-success" },
     "CORE.MEMBERSHIP_CREATED": { icon: UserPlus, dotColor: "bg-faint" },
     "CORE.MEMBERSHIP_ROLE_UPDATED": {
@@ -103,6 +113,11 @@ const META: Record<string, EventTypeMeta> = {
         icon: Undo2,
         dotColor: "bg-faint",
     },
+    "CORE.OWNER_RENAMED": { icon: PencilLine, dotColor: "bg-faint" },
+    "CORE.OWNERSHIP_PERIOD_UPDATED": {
+        icon: CalendarClock,
+        dotColor: "bg-faint",
+    },
     "CORE.OWNER_EMAIL_ADDED": { icon: MailPlus, dotColor: "bg-faint" },
     "CORE.OWNER_USER_LINKED": { icon: Link2, dotColor: "bg-faint" },
     "CORE.OWNER_USER_UNLINKED": { icon: Unlink, dotColor: "bg-faint" },
@@ -119,6 +134,11 @@ const META: Record<string, EventTypeMeta> = {
 };
 
 const FALLBACK: EventTypeMeta = { icon: Circle, dotColor: "bg-border" };
+
+/** Every event type this map knows how to draw. `event-type-meta.test.ts`
+ *  asserts it against the API's own event-type unions, so an event added
+ *  there can never reach the timeline as a grey dot labelled "Event". */
+export const KNOWN_EVENT_TYPES = Object.keys(META);
 
 export function getEventTypeMeta(eventType: string): EventTypeMeta {
     return META[eventType] ?? FALLBACK;

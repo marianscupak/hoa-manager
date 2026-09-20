@@ -36,6 +36,8 @@ export const audit = {
         UNIT_OWNERSHIP_REPLACED: "Vlastnictví jednotky změněno",
         UNIT_OWNERSHIP_TRANSFER_CANCELLED:
             "Naplánovaná změna vlastnictví zrušena",
+        OWNER_RENAMED: "Vlastník přejmenován",
+        OWNERSHIP_PERIOD_UPDATED: "Platnost vlastnictví změněna",
         OWNER_EMAIL_ADDED: "Vlastníkovi přidán e-mail",
         OWNER_USER_LINKED: "Vlastník propojen s uživatelem",
         OWNER_USER_UNLINKED: "Propojení vlastníka s účtem zrušeno",

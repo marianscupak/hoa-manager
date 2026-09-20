@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -6,33 +6,13 @@ import { describe, expect, it } from "vitest";
 
 import cs from "@/i18n/locales/cs/katastr";
 import en from "@/i18n/locales/en/katastr";
+import { findRepoRoot } from "@/test-support/repo-root";
 
 import {
     KATASTR_BLOCKER_CODES,
     KATASTR_ERROR_CODES,
     KATASTR_WARNING_CODES,
 } from "./messages";
-
-/**
- * Walks up from this file to the monorepo root (marked by
- * pnpm-workspace.yaml), so the descent into the API's katastr domain folder
- * below is the only path that can ever go stale, not this traversal.
- */
-function findRepoRoot(dir: string): string {
-    let current = dir;
-    while (!existsSync(join(current, "pnpm-workspace.yaml"))) {
-        const parent = dirname(current);
-        if (parent === current) {
-            throw new Error(
-                "could not find the repo root (no pnpm-workspace.yaml above " +
-                    dir +
-                    ")",
-            );
-        }
-        current = parent;
-    }
-    return current;
-}
 
 /**
  * The single list both this test and the API's `katastr-error-codes.spec.ts`

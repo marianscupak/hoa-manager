@@ -35,6 +35,8 @@ export const audit = {
         UNIT_OWNERSHIP_REPLACED: "Unit ownership changed",
         UNIT_OWNERSHIP_TRANSFER_CANCELLED:
             "Scheduled ownership change cancelled",
+        OWNER_RENAMED: "Owner renamed",
+        OWNERSHIP_PERIOD_UPDATED: "Ownership period changed",
         OWNER_EMAIL_ADDED: "Owner email added",
         OWNER_USER_LINKED: "Owner linked to user",
         OWNER_USER_UNLINKED: "Owner unlinked from user",

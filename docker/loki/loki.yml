@@ -33,5 +33,18 @@ schema_config:
               prefix: index_
               period: 24h
 
+# Without this, Loki keeps every line forever. Matched to Prometheus's
+# --storage.tsdb.retention.time=30d so the two halves of the dashboard cover
+# the same window, and so a mistakenly logged secret ages out rather than
+# sitting on the disk for the life of the server.
+limits_config:
+    retention_period: 30d
+
+compactor:
+    working_directory: /loki/compactor
+    retention_enabled: true
+    retention_delete_delay: 2h
+    delete_request_store: filesystem
+
 ruler:
     alertmanager_url: http://localhost:9093

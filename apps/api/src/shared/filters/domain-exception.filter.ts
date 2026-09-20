@@ -10,6 +10,10 @@ import type { Request, Response } from 'express';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import type { Logger as WinstonLogger } from 'winston';
 
+import {
+  requestDurationMs,
+  sanitizeUrl,
+} from '@/shared/api/logging/request-logging';
 import { AuthClaims } from '@/shared/domain/auth-claims';
 import { TenantContext } from '@/shared/domain/tenant-context';
 import { DomainException } from '@/shared/errors/domain.exception';
@@ -28,11 +32,16 @@ export class DomainExceptionFilter implements ExceptionFilter {
       Request & { authClaims?: AuthClaims; tenant?: TenantContext }
     >();
 
+    // This is the only line a failed request gets, so it carries the duration
+    // the interceptor measured as well as the error's own identity. The path
+    // is stripped of its query string: an invite token or an OAuth code must
+    // not reach the log store.
     const requestContext = {
       method: request.method,
-      url: request.originalUrl,
+      path: sanitizeUrl(request.originalUrl),
       userId: request.authClaims?.sub,
       tenantId: request.tenant?.tenantId,
+      durationMs: requestDurationMs(request),
     };
 
     // Multer rejects an oversized or unexpectedly-shaped upload with a plain
@@ -86,18 +95,18 @@ export class DomainExceptionFilter implements ExceptionFilter {
       this.logger.warn('HttpException', {
         ...requestContext,
         statusCode,
-        message: err.message,
+        error: err.message,
       });
 
       return response.status(statusCode).json(err.getResponse());
     }
 
     const stack = err instanceof Error ? err.stack : undefined;
-    const message = err instanceof Error ? err.message : String(err);
+    const error = err instanceof Error ? err.message : String(err);
 
     this.logger.error('UnhandledError', {
       ...requestContext,
-      message,
+      error,
       stack,
     });
 

@@ -14,6 +14,7 @@
             "id": 1,
             "type": "logs",
             "title": "API",
+            "description": "The API logs JSON, so `| json` turns every field into one you can filter on — expand a line to see them all. `correlationId` is the join key: the same value is on `audit_events.correlation_id` for anything the request recorded.",
             "datasource": { "type": "loki", "uid": "loki" },
             "gridPos": { "h": 10, "w": 24, "x": 0, "y": 0 },
             "options": {
@@ -25,7 +26,7 @@
             "targets": [
                 {
                     "refId": "A",
-                    "expr": "{service=\"api\"}",
+                    "expr": "{service=\"api\"} | json | line_format `{{.level}} {{.message}}{{if .method}} {{.method}} {{.path}} {{.statusCode}}{{end}}{{if .durationMs}} {{.durationMs}}ms{{end}}{{if .correlationId}} cid={{.correlationId}}{{end}}`",
                     "queryType": "range",
                     "datasource": { "type": "loki", "uid": "loki" }
                 }

@@ -113,4 +113,34 @@ export default {
     DOCUMENT_STORAGE_NOT_CONFIGURED: "Úložiště dokumentů není nakonfigurováno.",
     CONSENT_ALREADY_RECORDED:
         "Zastoupení od tohoto vlastníka už je pro toto hlasování zaevidováno. Nejprve ho zrušte.",
+    // Ownership periods — the register's own date arithmetic.
+    OWNERSHIP_PERIOD_NOT_FOUND:
+        "Toto vlastnické období už v evidenci není. Načtěte jednotku znovu a zkuste to zase.",
+    OWNERSHIP_PERIOD_OVERLAPS:
+        "Zadaná data se překrývají s jiným vlastnickým obdobím této jednotky. Upravte je tak, aby na sebe období navazovala.",
+    OWNERSHIP_PERIOD_END_BEFORE_START:
+        "Konec období nemůže být dřív než jeho začátek.",
+    OWNER_NAME_REQUIRED: "Zadejte jméno vlastníka.",
+    // Signing in with Google alongside a password.
+    IDENTITY_EMAIL_MISMATCH:
+        "Tento účet Google má jinou e-mailovou adresu než tento účet.",
+    IDENTITY_ALREADY_LINKED: "Tento účet Google už je propojený s někým jiným.",
+    IDENTITY_NOT_LINKED: "K tomuto účtu není propojený žádný účet Google.",
+    LAST_IDENTITY:
+        "Tohle je poslední způsob, jak se do účtu přihlásit, takže ho nelze odebrat.",
+    // Recording a vote taken at a physical meeting.
+    ASSEMBLY_RECORD_NOT_SCHEDULABLE:
+        "Zápis ze shromáždění, které už proběhlo, nelze naplánovat.",
+    VOTE_HAS_BALLOTS:
+        "Hlasy už jsou zaznamenané, otázky a možnosti proto už nelze měnit.",
+    NOT_AN_ASSEMBLY_RECORD:
+        "Tohle se týká jen hlasování zaznamenaného ze shromáždění.",
+    UNIT_NOT_ELIGIBLE_FOR_ATTENDANCE:
+        "Tuto jednotku nelze na tomto shromáždění označit jako přítomnou.",
+    UNIT_NOT_PRESENT:
+        "Než zadáte hlas jednotky, označte ji na shromáždění jako přítomnou.",
+    ASSEMBLY_VOTER_NOT_RECORDED:
+        "Než zadáte hlas jednotky, zaznamenejte, kdo za ni hlasoval.",
+    ASSEMBLY_RECORD_INCOMPLETE:
+        "U některých přítomných jednotek chybí hlas. Doplňte je, nebo je označte jako nepřítomné.",
 } as const;

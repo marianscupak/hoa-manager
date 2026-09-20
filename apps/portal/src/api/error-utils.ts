@@ -56,22 +56,24 @@ export function formatErrorParam(
  * Show a translated toast for an API error.
  * Looks up `errors:<CODE>` in the i18n resources.
  * Falls back to `errors:UNKNOWN` for unrecognised codes.
+ *
+ * The fallback is i18next's own `defaultValue` rather than a comparison
+ * against the key afterwards. The comparison this replaces tested
+ * `message === "errors:" + code`, but i18next returns an unresolved key
+ * with the namespace already stripped — just `"OWNERSHIP_PERIOD_OVERLAPS"`
+ * — so it never matched and every code with no catalogue entry was toasted
+ * at the user as itself.
  */
 export function showApiError(err: unknown): void {
     const code = getApiErrorCode(err) ?? "UNKNOWN";
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const message = i18n.t(`errors:${code}` as any, {
         param: formatErrorParam(getApiErrorParam(err)),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        defaultValue: i18n.t("errors:UNKNOWN" as any) as string,
     }) as string;
 
     // Longer than the global default: an API error usually names something the
     // user has to go and change, so it has to survive being read twice.
-    const options = { duration: 10_000 };
-
-    if (message === `errors:${code}`) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        toast.error(i18n.t("errors:UNKNOWN" as any) as string, options);
-    } else {
-        toast.error(message, options);
-    }
+    toast.error(message, { duration: 10_000 });
 }

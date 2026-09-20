@@ -111,4 +111,35 @@ export default {
     DOCUMENT_STORAGE_NOT_CONFIGURED: "Document storage is not configured.",
     CONSENT_ALREADY_RECORDED:
         "A representation from this owner is already recorded for this vote. Revoke it first.",
+    // Ownership periods — the register's own date arithmetic.
+    OWNERSHIP_PERIOD_NOT_FOUND:
+        "That ownership period is no longer on the register. Reload the unit and try again.",
+    OWNERSHIP_PERIOD_OVERLAPS:
+        "These dates overlap another ownership period on this unit. Adjust them so the periods follow one another.",
+    OWNERSHIP_PERIOD_END_BEFORE_START:
+        "The end of the period cannot fall before its start.",
+    OWNER_NAME_REQUIRED: "Enter the owner's name.",
+    // Signing in with Google alongside a password.
+    IDENTITY_EMAIL_MISMATCH:
+        "That Google account uses a different e-mail address than this account.",
+    IDENTITY_ALREADY_LINKED:
+        "That Google account is already linked to somebody else here.",
+    IDENTITY_NOT_LINKED: "This account has no Google account linked.",
+    LAST_IDENTITY:
+        "This is the only way left to sign in to the account, so it cannot be removed.",
+    // Recording a vote taken at a physical meeting.
+    ASSEMBLY_RECORD_NOT_SCHEDULABLE:
+        "A record of a meeting that already took place cannot be scheduled.",
+    VOTE_HAS_BALLOTS:
+        "Votes have already been recorded, so the questions and options can no longer change.",
+    NOT_AN_ASSEMBLY_RECORD:
+        "This only applies to a vote recorded from a physical meeting.",
+    UNIT_NOT_ELIGIBLE_FOR_ATTENDANCE:
+        "This unit cannot be marked as present at this meeting.",
+    UNIT_NOT_PRESENT:
+        "Mark the unit as present at the meeting before entering its ballot.",
+    ASSEMBLY_VOTER_NOT_RECORDED:
+        "Record who voted for this unit before entering its ballot.",
+    ASSEMBLY_RECORD_INCOMPLETE:
+        "Some units marked present have no ballot entered yet. Enter them, or mark those units absent.",
 } as const;

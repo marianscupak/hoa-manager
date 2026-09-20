@@ -1,9 +1,22 @@
 {$DOMAIN} {
     # Structured access logs → docker stdout → Promtail → Loki (traffic
     # panels in Grafana are built from these).
+    #
+    # The query string is stripped before the line is written. Two endpoints
+    # carry a live credential there — /api/invites/owner/status?token=… and
+    # /api/auth/google/callback?code=… — and Caddy sees both before the API
+    # does, so sanitising only the API side would leave the same secrets in
+    # the same Loki. Everything goes rather than a list of named parameters,
+    # matching sanitizeUrl() in the API: an allowlist only protects the
+    # parameters somebody remembered to name.
     log {
         output stdout
-        format json
+        format filter {
+            wrap json
+            fields {
+                request>uri regexp "\?.*$" ""
+            }
+        }
     }
 
     # Metrics are for the internal Prometheus scraper only.

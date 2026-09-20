@@ -111,14 +111,26 @@ export function PeoplePage() {
             <DataTable
                 columns={columns}
                 data={rows}
+                // E-mail is the longest text on the row, so it takes the
+                // largest share; a name wraps where it has to, and the unit
+                // count never needs more than ~80px. Access is fixed at the
+                // width of its widest control, the role select.
                 gridTemplate={
-                    canSeeAccounts ? "1.6fr 1.5fr 0.9fr 190px 230px" : "2fr 1fr"
+                    canSeeAccounts ? "1.3fr 1.9fr 0.8fr 170px 400px" : "2fr 1fr"
                 }
                 // The admin view carries five columns, two of which hold
                 // controls rather than text; below this they stop fitting and
                 // scrolling beats squeezing. The owner's two columns always
                 // fit, so they get no floor.
-                minWidth={canSeeAccounts ? "980px" : undefined}
+                //
+                // A row can offer four actions at once (rename, add e-mail,
+                // link an account, delete), which in Czech runs to ~390px —
+                // the old 230px track let those buttons spill left over the
+                // access column, and the old 980px floor was below the point
+                // where the text columns start colliding. Both are sized to
+                // the widest real row now, so the table scrolls rather than
+                // overlapping itself.
+                minWidth={canSeeAccounts ? "1220px" : undefined}
                 isLoading={isLoading}
                 loadingMessage={tCommon("loading")}
                 emptyMessage={t("people.empty")}

@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import { format, startOfDay } from "date-fns";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -23,6 +24,7 @@ import { showApiError } from "@/api/error-utils";
 import { useUnitControllerUpdateOwnershipPeriod } from "@/api/generated/property-units/property-units";
 
 import { affectedVotesFrom, type AffectedVote } from "./affected-votes";
+import { invalidateUnitOwnershipQueries } from "./invalidate-ownership-queries";
 
 const schema = z
     .object({
@@ -63,6 +65,7 @@ export function UpdatePeriodDialog({
     onSuccess,
 }: UpdatePeriodDialogProps) {
     const { t } = useTranslation(["admin"]);
+    const queryClient = useQueryClient();
     const [affected, setAffected] = useState<AffectedVote[] | null>(null);
 
     const form = useForm<UpdatePeriodValues>({
@@ -85,6 +88,7 @@ export function UpdatePeriodDialog({
         mutation: {
             onSuccess: () => {
                 toast.success(t("units.details.ownership.editPeriod.success"));
+                invalidateUnitOwnershipQueries(queryClient, unitId);
                 onOpenChange(false);
                 onSuccess?.();
             },

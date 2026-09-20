@@ -27,12 +27,8 @@ import {
 import { showApiError } from "@/api/error-utils";
 import type { UnitOwnershipResponseDto } from "@/api/generated/model";
 import { useOwnerControllerGetOwners } from "@/api/generated/property-owners/property-owners";
-import {
-    getUnitControllerGetOwnershipHistoryQueryKey,
-    getUnitControllerGetUnitDetailQueryKey,
-    getUnitControllerGetUnitsQueryKey,
-    useUnitControllerReplaceUnitOwnership,
-} from "@/api/generated/property-units/property-units";
+import { useUnitControllerReplaceUnitOwnership } from "@/api/generated/property-units/property-units";
+import { invalidateUnitOwnershipQueries } from "@/features/admin/components/ownership-history/invalidate-ownership-queries";
 
 import { ReplaceOwnershipFieldItem } from "./field-item";
 import { emptyRow, initialRows } from "./rows";
@@ -104,19 +100,7 @@ export function ReplaceOwnershipDialog({
             {
                 onSuccess: () => {
                     toast.success(t("units.ownershipEditor.success"));
-                    queryClient.invalidateQueries({
-                        queryKey:
-                            getUnitControllerGetUnitDetailQueryKey(unitId),
-                    });
-                    queryClient.invalidateQueries({
-                        queryKey: getUnitControllerGetUnitsQueryKey(),
-                    });
-                    queryClient.invalidateQueries({
-                        queryKey:
-                            getUnitControllerGetOwnershipHistoryQueryKey(
-                                unitId,
-                            ),
-                    });
+                    invalidateUnitOwnershipQueries(queryClient, unitId);
                     onOpenChange(false);
                     onSuccess?.();
                 },

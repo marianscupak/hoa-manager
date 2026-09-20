@@ -4,14 +4,11 @@ import { useTranslation } from "react-i18next";
 import { ConfirmDialog, toast } from "@hoa-mngr/ui";
 
 import { showApiError } from "@/api/error-utils";
-import {
-    getUnitControllerGetOwnershipHistoryQueryKey,
-    getUnitControllerGetUnitDetailQueryKey,
-    getUnitControllerGetUnitsQueryKey,
-    useUnitControllerCancelScheduledOwnershipTransfer,
-} from "@/api/generated/property-units/property-units";
+import { useUnitControllerCancelScheduledOwnershipTransfer } from "@/api/generated/property-units/property-units";
 
 import { formatPeriodDate } from "@/components/ownership-history/rows";
+
+import { invalidateUnitOwnershipQueries } from "./invalidate-ownership-queries";
 
 interface CancelScheduledTransferDialogProps {
     unitId: string;
@@ -38,16 +35,7 @@ export function CancelScheduledTransferDialog({
                 toast.success(
                     t("units.details.ownership.cancelDialog.success"),
                 );
-                queryClient.invalidateQueries({
-                    queryKey:
-                        getUnitControllerGetOwnershipHistoryQueryKey(unitId),
-                });
-                queryClient.invalidateQueries({
-                    queryKey: getUnitControllerGetUnitDetailQueryKey(unitId),
-                });
-                queryClient.invalidateQueries({
-                    queryKey: getUnitControllerGetUnitsQueryKey(),
-                });
+                invalidateUnitOwnershipQueries(queryClient, unitId);
                 onOpenChange(false);
                 onSuccess?.();
             },

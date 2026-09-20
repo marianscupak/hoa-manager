@@ -57,3 +57,22 @@ describe('configSchema Brevo email group', () => {
     expect(result.success).toBe(true);
   });
 });
+
+describe('configSchema LOG_LEVEL', () => {
+  it('defaults to info when unset', () => {
+    const result = configSchema.safeParse(BASE_ENV);
+    expect(result.success && result.data.LOG_LEVEL).toBe('info');
+  });
+
+  it('accepts a winston level', () => {
+    const result = configSchema.safeParse({ ...BASE_ENV, LOG_LEVEL: 'debug' });
+    expect(result.success && result.data.LOG_LEVEL).toBe('debug');
+  });
+
+  it('rejects a level winston does not know', () => {
+    // 'fatal' is the tempting one: nest-winston's adapter emits it, but it is
+    // not an npm level, so asking for it here would silence everything.
+    const result = configSchema.safeParse({ ...BASE_ENV, LOG_LEVEL: 'fatal' });
+    expect(result.success).toBe(false);
+  });
+});

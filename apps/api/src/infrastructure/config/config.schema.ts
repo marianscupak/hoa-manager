@@ -30,9 +30,25 @@ const optionalEmail = z.preprocess(
   z.email().optional(),
 );
 
+/**
+ * Winston's npm levels, most severe first. Nothing set a level before, so the
+ * library default of `info` applied everywhere and the `debug` calls in the
+ * schedulers never emitted in any environment.
+ */
+const LOG_LEVELS = [
+  'error',
+  'warn',
+  'info',
+  'http',
+  'verbose',
+  'debug',
+  'silly',
+] as const;
+
 export const configSchema = z
   .object({
     DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
+    LOG_LEVEL: z.enum(LOG_LEVELS).default('info'),
     CORS_ORIGINS: corsOriginsSchema,
     JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
     FRONTEND_URL: z.url('FRONTEND_URL must be a valid URL'),

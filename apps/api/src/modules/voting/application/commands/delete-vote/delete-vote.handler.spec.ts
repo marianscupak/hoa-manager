@@ -76,6 +76,8 @@ describe('DeleteVoteHandler', () => {
     } as unknown as VotingAuditLabelResolver;
     const clock: Clock = { now: () => new Date('2026-08-22T12:00:00Z') };
 
+    const logger = { info: jest.fn(), warn: jest.fn() } as never;
+
     handler = new DeleteVoteHandler(
       voteWriteRepository,
       unitOfWork,
@@ -85,6 +87,7 @@ describe('DeleteVoteHandler', () => {
       labelResolver,
       documentRepository,
       storage,
+      logger,
     );
   });
 

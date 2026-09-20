@@ -1,5 +1,7 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import type { Logger as WinstonLogger } from 'winston';
 
 import { type Clock, CLOCK } from '@/shared/application/ports/clock.port';
 
@@ -16,8 +18,6 @@ const PENDING_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 
 @Injectable()
 export class VoteDocumentCleanupService {
-  private readonly logger = new Logger(VoteDocumentCleanupService.name);
-
   constructor(
     @Inject(VOTE_DOCUMENT_REPOSITORY)
     private readonly documentRepository: VoteDocumentRepository,
@@ -25,6 +25,7 @@ export class VoteDocumentCleanupService {
     private readonly storage: DocumentStoragePort,
     @Inject(CLOCK)
     private readonly clock: Clock,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: WinstonLogger,
   ) {}
 
   @Cron(CronExpression.EVERY_HOUR)
@@ -35,18 +36,19 @@ export class VoteDocumentCleanupService {
       return;
     }
 
-    this.logger.log(`Cleaning up ${stale.length} stale pending document(s).`);
+    this.logger.info('StalePendingDocumentsFound', { count: stale.length });
 
     for (const document of stale) {
       if (this.storage.isConfigured()) {
         try {
           await this.storage.delete(document.objectKey);
         } catch (error: unknown) {
-          const message =
-            error instanceof Error ? error.message : String(error);
-          this.logger.warn(
-            `Failed to delete R2 object ${document.objectKey}: ${message}`,
-          );
+          this.logger.warn('R2ObjectDeleteFailed', {
+            operation: 'vote-document-cleanup',
+            objectKey: document.objectKey,
+            tenantId: document.tenantId,
+            error: error instanceof Error ? error.message : String(error),
+          });
         }
       }
       await this.documentRepository.deleteById(document.tenantId, document.id);

@@ -7,8 +7,6 @@ import {
   OutgoingEmail,
 } from '@/infrastructure/email/email-sender.port';
 
-const RULE = '═══════════════════════════════════════════';
-
 /** Used when BREVO_API_KEY is unset: prints the message instead of sending it. */
 @Injectable()
 export class ConsoleEmailSender implements EmailSender {
@@ -17,13 +15,15 @@ export class ConsoleEmailSender implements EmailSender {
   ) {}
 
   async send(message: OutgoingEmail): Promise<void> {
-    this.logger.info(RULE);
-    this.logger.info('📧  EMAIL (console sender)');
-    this.logger.info(RULE);
-    this.logger.info(`To:      ${message.to}`);
-    this.logger.info(`Subject: ${message.subject}`);
-    this.logger.info('');
-    this.logger.info(message.text);
-    this.logger.info(RULE);
+    // One line, not the eight-line banner this used to print: the transport
+    // emits JSON, so every rule and blank line was its own object. The body
+    // stays a field, which keeps the confirmation codes and invite links
+    // readable in the terminal during development.
+    this.logger.info('EmailNotSent', {
+      reason: 'console sender (BREVO_API_KEY unset)',
+      to: message.to,
+      subject: message.subject,
+      text: message.text,
+    });
   }
 }

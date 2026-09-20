@@ -32,10 +32,12 @@ describe('VoteDocumentCleanupService', () => {
       delete: jest.fn(),
     } as unknown as jest.Mocked<DocumentStoragePort>;
     const clock: Clock = { now: () => NOW };
+    const logger = { info: jest.fn(), warn: jest.fn() } as never;
     service = new VoteDocumentCleanupService(
       documentRepository,
       storage,
       clock,
+      logger,
     );
   });
 

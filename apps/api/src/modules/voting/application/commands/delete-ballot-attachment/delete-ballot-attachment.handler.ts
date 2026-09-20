@@ -1,5 +1,7 @@
-import { Inject, Logger } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import type { Logger as WinstonLogger } from 'winston';
 
 import { VoteDocumentNotFoundException } from '@/shared/application/exceptions/vote.exceptions';
 
@@ -17,13 +19,12 @@ import {
 export class DeleteBallotAttachmentHandler
   implements ICommandHandler<DeleteBallotAttachmentCommand>
 {
-  private readonly logger = new Logger(DeleteBallotAttachmentHandler.name);
-
   constructor(
     @Inject(VOTE_DOCUMENT_REPOSITORY)
     private readonly documentRepository: VoteDocumentRepository,
     @Inject(DOCUMENT_STORAGE)
     private readonly storage: DocumentStoragePort,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: WinstonLogger,
   ) {}
 
   async execute(command: DeleteBallotAttachmentCommand): Promise<void> {
@@ -63,10 +64,12 @@ export class DeleteBallotAttachmentHandler
     try {
       await this.storage.delete(document.objectKey);
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      this.logger.warn(
-        `Failed to delete R2 object ${document.objectKey}: ${message}`,
-      );
+      this.logger.warn('R2ObjectDeleteFailed', {
+        operation: 'delete-ballot-attachment',
+        objectKey: document.objectKey,
+        tenantId,
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
   }
 }

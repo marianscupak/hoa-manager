@@ -1,6 +1,8 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import type { Logger as WinstonLogger } from 'winston';
 
 import { SystemActorRunner } from '@/modules/core/audit/infrastructure/cls/system-actor.runner';
 import { type Clock, CLOCK } from '@/shared/application/ports/clock.port';
@@ -14,8 +16,6 @@ import {
 
 @Injectable()
 export class VoteSchedulerService {
-  private readonly logger = new Logger(VoteSchedulerService.name);
-
   constructor(
     @Inject(VOTE_WRITE_REPOSITORY)
     private readonly voteRepository: VoteWriteRepository,
@@ -23,6 +23,7 @@ export class VoteSchedulerService {
     @Inject(CLOCK)
     private readonly clock: Clock,
     private readonly systemActorRunner: SystemActorRunner,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: WinstonLogger,
   ) {}
 
   @Cron(CronExpression.EVERY_MINUTE)
@@ -30,11 +31,11 @@ export class VoteSchedulerService {
     const now = this.clock.now();
 
     // ── Open votes ──────────────────────────────────────────────────
-    this.logger.debug('Checking for votes to open...');
+    this.logger.debug('CheckingVotesToOpen');
     const votesToOpen = await this.voteRepository.findScheduledToOpen(now);
 
     if (votesToOpen.length > 0) {
-      this.logger.log(`Found ${votesToOpen.length} votes to open.`);
+      this.logger.info('VotesDueToOpen', { count: votesToOpen.length });
     }
 
     for (const vote of votesToOpen) {
@@ -42,24 +43,26 @@ export class VoteSchedulerService {
         await this.systemActorRunner.run('vote-scheduler:auto-open', () =>
           this.commandBus.execute(new OpenVoteCommand(vote.tenantId, vote.id)),
         );
-        this.logger.log(`Vote ${vote.id} opened successfully.`);
+        this.logger.info('VoteOpened', {
+          voteId: vote.id,
+          tenantId: vote.tenantId,
+        });
       } catch (error: unknown) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
-        const errorStack = error instanceof Error ? error.stack : undefined;
-        this.logger.error(
-          `Failed to open vote ${vote.id}: ${errorMessage}`,
-          errorStack,
-        );
+        this.logger.error('VoteOpenFailed', {
+          voteId: vote.id,
+          tenantId: vote.tenantId,
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+        });
       }
     }
 
     // ── Close votes ─────────────────────────────────────────────────
-    this.logger.debug('Checking for votes to close...');
+    this.logger.debug('CheckingVotesToClose');
     const votesToClose = await this.voteRepository.findScheduledToClose(now);
 
     if (votesToClose.length > 0) {
-      this.logger.log(`Found ${votesToClose.length} votes to close.`);
+      this.logger.info('VotesDueToClose', { count: votesToClose.length });
     }
 
     for (const vote of votesToClose) {
@@ -67,15 +70,17 @@ export class VoteSchedulerService {
         await this.systemActorRunner.run('vote-scheduler:auto-close', () =>
           this.commandBus.execute(new CloseVoteCommand(vote.tenantId, vote.id)),
         );
-        this.logger.log(`Vote ${vote.id} closed successfully.`);
+        this.logger.info('VoteClosed', {
+          voteId: vote.id,
+          tenantId: vote.tenantId,
+        });
       } catch (error: unknown) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
-        const errorStack = error instanceof Error ? error.stack : undefined;
-        this.logger.error(
-          `Failed to close vote ${vote.id}: ${errorMessage}`,
-          errorStack,
-        );
+        this.logger.error('VoteCloseFailed', {
+          voteId: vote.id,
+          tenantId: vote.tenantId,
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+        });
       }
     }
   }

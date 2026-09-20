@@ -1,5 +1,7 @@
-import { Inject, Logger } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import type { Logger as WinstonLogger } from 'winston';
 
 import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
 import { AuditService } from '@/modules/core/audit/application/services/audit.service';
@@ -36,8 +38,6 @@ import {
 export class ConfirmDocumentUploadHandler
   implements ICommandHandler<ConfirmDocumentUploadCommand>
 {
-  private readonly logger = new Logger(ConfirmDocumentUploadHandler.name);
-
   constructor(
     @Inject(VOTE_WRITE_REPOSITORY)
     private readonly voteWriteRepository: VoteWriteRepository,
@@ -52,6 +52,7 @@ export class ConfirmDocumentUploadHandler
     private readonly auditService: AuditService,
     private readonly auditContext: AuditContextService,
     private readonly labelResolver: VotingAuditLabelResolver,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: WinstonLogger,
   ) {}
 
   async execute(command: ConfirmDocumentUploadCommand): Promise<void> {
@@ -92,11 +93,12 @@ export class ConfirmDocumentUploadHandler
         try {
           await this.storage.delete(document.objectKey);
         } catch (error: unknown) {
-          const message =
-            error instanceof Error ? error.message : String(error);
-          this.logger.warn(
-            `Failed to delete R2 object ${document.objectKey}: ${message}`,
-          );
+          this.logger.warn('R2ObjectDeleteFailed', {
+            operation: 'confirm-document-upload',
+            objectKey: document.objectKey,
+            tenantId,
+            error: error instanceof Error ? error.message : String(error),
+          });
         }
       }
       await this.documentRepository.deleteById(tenantId, documentId);

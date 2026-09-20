@@ -39,7 +39,7 @@ export class SessionCleanupService {
       // A failed sweep must not take the scheduler down with it; the next
       // run picks up whatever this one left behind.
       this.logger.error('ExpiredSessionsRemovalFailed', {
-        message: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? error.message : String(error),
       });
     }
   }

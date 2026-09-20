@@ -37,7 +37,12 @@ describe('DeleteBallotAttachmentHandler', () => {
     storage = {
       delete: jest.fn(),
     } as unknown as jest.Mocked<DocumentStoragePort>;
-    handler = new DeleteBallotAttachmentHandler(documentRepository, storage);
+    const logger = { info: jest.fn(), warn: jest.fn() } as never;
+    handler = new DeleteBallotAttachmentHandler(
+      documentRepository,
+      storage,
+      logger,
+    );
   });
 
   const command = new DeleteBallotAttachmentCommand(

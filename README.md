@@ -81,6 +81,8 @@ JWT_SECRET=<at least 32 characters>
 
 Google sign-in, file uploads and outgoing email are optional and configured as all-or-nothing groups (`GOOGLE_*`, `R2_UPLOADS_*`, `BREVO_API_KEY` + `EMAIL_FROM`) — the config schema rejects a half-filled group at boot rather than failing later.
 
+`LOG_LEVEL` is optional and defaults to `info`. It takes any winston level (`error`, `warn`, `info`, `http`, `verbose`, `debug`, `silly`); `debug` adds the scheduler's per-minute checks. The API logs one JSON line per request to stdout, without the query string, and every line carries a `correlationId` that also lands on `audit_events.correlation_id`.
+
 Create `apps/portal/.env.local`:
 
 ```ini

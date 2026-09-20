@@ -157,6 +157,7 @@ export default {
                         "Změna posune, od kdy a do kdy toto vlastnictví platí. Ponecháte-li konec prázdný, vlastnictví zůstává otevřené; vyplněním konce jednotka od toho dne zůstane bez vlastníka.",
                     fromLabel: "Platné od",
                     toLabel: "Platné do",
+                    clearTo: "Vymazat datum konce",
                     toHint: "Nechte prázdné, pokud vlastnictví pokračuje.",
                     endBeforeStart: "Konec musí být až po začátku",
                     affectedTitle_one: "Změna se dotkne {{count}} hlasování",

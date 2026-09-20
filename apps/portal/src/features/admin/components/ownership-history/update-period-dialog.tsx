@@ -149,6 +149,9 @@ export function UpdatePeriodDialog({
                             <FormDatePicker
                                 name="validTo"
                                 optional
+                                clearLabel={t(
+                                    "units.details.ownership.editPeriod.clearTo",
+                                )}
                                 label={t(
                                     "units.details.ownership.editPeriod.toLabel",
                                 )}

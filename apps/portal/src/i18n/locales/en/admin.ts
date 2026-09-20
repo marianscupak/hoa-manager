@@ -155,6 +155,7 @@ export default {
                         "Moves the dates this ownership holds between. Leave the end empty to keep it open; fill it in and the unit has no owner from that day.",
                     fromLabel: "Valid from",
                     toLabel: "Valid until",
+                    clearTo: "Clear the end date",
                     toHint: "Leave empty if the ownership continues.",
                     endBeforeStart: "The end has to come after the start",
                     affectedTitle_one: "The change reaches {{count}} vote",

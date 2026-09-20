@@ -68,3 +68,40 @@ describe("DatePicker", () => {
         expect(screen.queryByRole("grid")).toBeNull();
     });
 });
+
+describe("DatePicker clear button", () => {
+    it("is absent unless the field is clearable", () => {
+        setup();
+        expect(screen.queryByRole("button", { name: "Clear date" })).toBeNull();
+    });
+
+    it("is absent while there is no date to clear", () => {
+        setup({ clearable: true, value: null });
+        expect(screen.queryByRole("button", { name: "Clear date" })).toBeNull();
+    });
+
+    it("hands back null so an optional field can be emptied again", async () => {
+        const { onChange, user } = setup({ clearable: true });
+        await user.click(screen.getByRole("button", { name: "Clear date" }));
+        expect(onChange).toHaveBeenCalledWith(null);
+    });
+
+    it("does not open the calendar when clearing", async () => {
+        const { user } = setup({ clearable: true });
+        await user.click(screen.getByRole("button", { name: "Clear date" }));
+        expect(screen.queryByRole("dialog")).toBeNull();
+        expect(screen.queryByRole("grid")).toBeNull();
+    });
+
+    it("takes its accessible name from the caller, for a localized app", () => {
+        setup({ clearable: true, clearLabel: "Vymazat datum konce" });
+        expect(
+            screen.getByRole("button", { name: "Vymazat datum konce" }),
+        ).toBeTruthy();
+    });
+
+    it("stays out of the way while the field is disabled", () => {
+        setup({ clearable: true, disabled: true });
+        expect(screen.queryByRole("button", { name: "Clear date" })).toBeNull();
+    });
+});

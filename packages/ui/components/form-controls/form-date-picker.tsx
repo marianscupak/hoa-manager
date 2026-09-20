@@ -14,8 +14,12 @@ import {
 export interface FormDatePickerProps {
     name: string;
     label?: string;
-    /** Renders a muted "optional" marker next to the label. */
+    /** Renders a muted "optional" marker next to the label — and, because
+     *  the two must not drift apart, puts a clear button on the control so
+     *  the field can actually be emptied again. */
     optional?: boolean;
+    /** Accessible name for that clear button. */
+    clearLabel?: string;
     description?: string;
     placeholder?: string;
     /** Earliest selectable day, inclusive (compared by calendar day). */
@@ -40,6 +44,7 @@ export const FormDatePicker = React.forwardRef<
             name,
             label,
             optional,
+            clearLabel,
             description,
             placeholder,
             min,
@@ -70,6 +75,8 @@ export const FormDatePicker = React.forwardRef<
                                 placeholder={placeholder}
                                 min={min}
                                 max={max}
+                                clearable={optional}
+                                clearLabel={clearLabel}
                                 disabled={disabled}
                             />
                         </FormControl>

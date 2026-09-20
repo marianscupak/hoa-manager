@@ -1,5 +1,5 @@
 import { format, startOfDay } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, XIcon } from "lucide-react";
 import * as React from "react";
 
 import { cn } from "../lib/utils";
@@ -27,6 +27,12 @@ export interface DatePickerProps extends TriggerProps {
     min?: Date;
     /** Latest selectable day, inclusive (compared by calendar day). */
     max?: Date;
+    /** Shows a clear button once a day is chosen. A field the form calls
+     *  optional needs one: without it the only way back to "no date" is to
+     *  close the dialog and start again. */
+    clearable?: boolean;
+    /** Accessible name for that button. */
+    clearLabel?: string;
 }
 
 /**
@@ -42,6 +48,8 @@ export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
             placeholder,
             min,
             max,
+            clearable = false,
+            clearLabel,
             disabled,
             className,
             ...rest
@@ -60,32 +68,50 @@ export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
             ...(max ? [{ after: startOfDay(max) }] : []),
         ];
 
+        const showClear = clearable && selected !== undefined && !disabled;
+
         return (
             <Popover open={open} onOpenChange={setOpen}>
-                <PopoverTrigger asChild>
-                    <Button
-                        ref={ref}
-                        type="button"
-                        variant="outline"
-                        disabled={disabled}
-                        {...rest}
-                        className={cn(
-                            // `Button` is pill-shaped; a field trigger has to carry
-                            // the same 9px corner as `Input`, `FormCombobox`
-                            // and `FractionInput` or it reads as a button.
-                            "w-full cursor-pointer rounded-[9px] pl-3 text-left font-normal",
-                            !selected && "text-muted-foreground",
-                            className,
-                        )}
-                    >
-                        {selected ? (
-                            format(selected, "d. M. yyyy")
-                        ) : (
-                            <span>{placeholder ?? " "}</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
-                </PopoverTrigger>
+                {/* The clear button is a sibling of the trigger, not a child
+                    of it: the trigger is itself a <button>, and a button
+                    inside a button is invalid and unreachable by keyboard. */}
+                <div className="relative w-full">
+                    <PopoverTrigger asChild>
+                        <Button
+                            ref={ref}
+                            type="button"
+                            variant="outline"
+                            disabled={disabled}
+                            {...rest}
+                            className={cn(
+                                // `Button` is pill-shaped; a field trigger has to carry
+                                // the same 9px corner as `Input`, `FormCombobox`
+                                // and `FractionInput` or it reads as a button.
+                                "w-full cursor-pointer rounded-[9px] pl-3 text-left font-normal",
+                                !selected && "text-muted-foreground",
+                                showClear && "pr-10",
+                                className,
+                            )}
+                        >
+                            {selected ? (
+                                format(selected, "d. M. yyyy")
+                            ) : (
+                                <span>{placeholder ?? " "}</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                    </PopoverTrigger>
+                    {showClear && (
+                        <button
+                            type="button"
+                            aria-label={clearLabel ?? "Clear date"}
+                            onClick={() => onChange(null)}
+                            className="text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring absolute top-1/2 right-2 flex h-6 w-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full transition-colors focus-visible:ring-2 focus-visible:outline-none"
+                        >
+                            <XIcon className="h-3.5 w-3.5" />
+                        </button>
+                    )}
+                </div>
                 <PopoverContent className="w-auto rounded-xl p-0" align="start">
                     <Calendar
                         mode="single"

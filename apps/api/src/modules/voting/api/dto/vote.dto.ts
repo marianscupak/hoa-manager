@@ -981,6 +981,9 @@ export class VoteParticipationUnitDto {
   @ApiProperty({ required: false })
   recordedBy?: string;
 
+  /** Why the snapshot left the unit out of the app booth. Also present on a
+   *  NOT_VOTED unit with no common representative: the board can still
+   *  record its paper ballot, but nobody can cast for it in the app. */
   @ApiProperty({
     required: false,
     enum: ['NO_REPRESENTATIVE', 'MISSING_OWNERSHIP', 'ASSOCIATION_OWNED'],

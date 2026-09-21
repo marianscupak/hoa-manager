@@ -73,6 +73,7 @@ describe('RecordPaperBallotHandler', () => {
       unitId: 'unit-1',
       representativeMembershipId: 'mem-owner',
       eligibilityStatus: 'ELIGIBLE',
+      ineligibleReason: null,
     });
     writeRepo.hasExistingBallots.mockResolvedValue(new Set());
     writeRepo.saveBallots.mockResolvedValue([
@@ -157,15 +158,30 @@ describe('RecordPaperBallotHandler', () => {
     );
   });
 
-  it('rejects a unit the snapshot froze as ineligible', async () => {
+  it('records a ballot for a unit with no common representative: the signer needs no app account', async () => {
     writeRepo.findElectorateUnit.mockResolvedValue({
       unitId: 'unit-1',
       representativeMembershipId: null,
       eligibilityStatus: 'INELIGIBLE',
+      ineligibleReason: 'NO_REPRESENTATIVE',
+    });
+
+    await handler.execute(command());
+
+    expect(writeRepo.saveBallots).toHaveBeenCalledTimes(1);
+  });
+
+  it('rejects a unit the snapshot froze as ineligible for a reason paper cannot cure', async () => {
+    writeRepo.findElectorateUnit.mockResolvedValue({
+      unitId: 'unit-1',
+      representativeMembershipId: null,
+      eligibilityStatus: 'INELIGIBLE',
+      ineligibleReason: 'MISSING_OWNERSHIP',
     });
     await expect(handler.execute(command())).rejects.toThrow(
       UnitNotEligibleException,
     );
+    expect(writeRepo.saveBallots).not.toHaveBeenCalled();
   });
 
   it('rejects a unit that is not in the electorate at all', async () => {

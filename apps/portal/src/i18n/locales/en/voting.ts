@@ -871,6 +871,7 @@ export const voting = {
                 voted: "Voted",
                 notVoted: "Not voted",
                 ineligible: "Not eligible",
+                appUnavailable: "Can't vote in the app",
             },
             ineligibleReason: {
                 NO_REPRESENTATIVE: "No common representative",
@@ -994,8 +995,8 @@ export const voting = {
         status: {
             voted: "Voted",
             notVoted: "Not voted",
-            needsDelegation: "No common representative",
             ineligible: "Not eligible",
+            appUnavailable: "Can't vote in the app",
             inApp: "In app · {{date}}",
             onPaper: "Paper ballot · {{date}}",
             onPaperRecordedBy: "Paper ballot · {{date}} · recorded by {{name}}",

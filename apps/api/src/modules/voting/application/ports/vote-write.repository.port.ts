@@ -1,6 +1,9 @@
 import { VoteResultSnapshot } from '@/modules/voting/domain/vote/vote-result.types';
 import { VoteAggregate } from '@/modules/voting/domain/vote/vote.aggregate';
-import { ElectorateUnit } from '@/modules/voting/domain/vote/vote.types';
+import {
+  ElectorateIneligibleReason,
+  ElectorateUnit,
+} from '@/modules/voting/domain/vote/vote.types';
 
 export interface BallotInput {
   unitId: string;
@@ -61,6 +64,7 @@ export interface VoteWriteRepository {
     unitId: string;
     representativeMembershipId: string | null;
     eligibilityStatus: string;
+    ineligibleReason: ElectorateIneligibleReason | null;
   } | null>;
   findScheduledToClose(now: Date): Promise<VoteAggregate[]>;
   saveResults(

@@ -886,6 +886,7 @@ export const voting = {
                 voted: "Hlasováno",
                 notVoted: "Nehlasováno",
                 ineligible: "Nemá hlas",
+                appUnavailable: "V aplikaci hlasovat nemůže",
             },
             ineligibleReason: {
                 NO_REPRESENTATIVE: "Není zvolen společný zástupce",
@@ -1012,8 +1013,8 @@ export const voting = {
         status: {
             voted: "Hlasovalo",
             notVoted: "Nehlasovalo",
-            needsDelegation: "Chybí společný zástupce",
             ineligible: "Nemůže hlasovat",
+            appUnavailable: "V aplikaci hlasovat nemůže",
             inApp: "V aplikaci · {{date}}",
             onPaper: "Listinně · {{date}}",
             onPaperRecordedBy: "Listinně · {{date}} · zapsal(a) {{name}}",

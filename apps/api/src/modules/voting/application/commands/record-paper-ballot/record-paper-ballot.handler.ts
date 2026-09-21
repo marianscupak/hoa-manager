@@ -7,6 +7,7 @@ import { type SubmitBallotResponseDto } from '@/modules/voting/api/dto/vote.dto'
 import { BallotCastProxyAuditEvent } from '@/modules/voting/audit/events/ballot-cast-proxy.event';
 import { VotingAuditLabelResolver } from '@/modules/voting/audit/label-resolver.service';
 import { assertAnswersMatchQuestions } from '@/modules/voting/domain/vote/ballot-answers';
+import { isRecordableOnPaper } from '@/modules/voting/domain/vote/paper-ballot-eligibility';
 import { VoteStatus } from '@/modules/voting/domain/vote/vote.types';
 import {
   BallotAlreadyCastException,
@@ -91,14 +92,18 @@ export class RecordPaperBallotHandler
       if (!vote) throw new VoteNotFoundException();
       if (vote.status !== VoteStatus.OPEN) throw new VoteNotOpenException();
 
-      // The electorate is frozen at open time. A unit the snapshot marked
-      // ineligible has no vote for anyone to cast, on paper or in the app.
+      // The electorate is frozen at open time. What the snapshot decided is
+      // who may cast in the app; a signed paper ballot only needs an owner,
+      // so a unit with no common representative is still recordable here.
       const electorateUnit = await this.voteWriteRepository.findElectorateUnit(
         tenantId,
         voteId,
         unitId,
       );
-      if (!electorateUnit || electorateUnit.eligibilityStatus !== 'ELIGIBLE') {
+      if (
+        !electorateUnit ||
+        !isRecordableOnPaper(electorateUnit.ineligibleReason)
+      ) {
         throw new UnitNotEligibleException();
       }
 

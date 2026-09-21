@@ -33,6 +33,7 @@ import {
   type VoteMode,
   type VoteQuestion,
   type VoteOption,
+  ElectorateIneligibleReason,
   ElectorateUnit,
 } from '../../domain/vote/vote.types';
 
@@ -631,6 +632,7 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
     unitId: string;
     representativeMembershipId: string | null;
     eligibilityStatus: string;
+    ineligibleReason: ElectorateIneligibleReason | null;
   } | null> {
     const rows = await this.db
       .select({
@@ -638,6 +640,7 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
         representativeMembershipId:
           voteElectorateUnits.representativeMembershipId,
         eligibilityStatus: voteElectorateUnits.eligibilityStatus,
+        ineligibleReason: voteElectorateUnits.ineligibleReason,
       })
       .from(voteElectorateUnits)
       .where(
@@ -649,7 +652,13 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
       )
       .limit(1);
 
-    return rows[0] ?? null;
+    const row = rows[0];
+    if (!row) return null;
+    return {
+      ...row,
+      ineligibleReason:
+        row.ineligibleReason as ElectorateIneligibleReason | null,
+    };
   }
 
   async hasExistingBallots(

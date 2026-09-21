@@ -118,24 +118,11 @@ export function getLiveResultsColumns({
                 }
 
                 if (unit.status === "INELIGIBLE") {
-                    // A missing common representative is the one reason an
-                    // owner can still act on, so it reads as a prompt rather
-                    // than as a closed door. The server already collapses
-                    // this reason out of the owner payload, so `isBoardView`
-                    // here is defence in depth, not the only guard — but it
-                    // is the one place a server-side regression would
-                    // otherwise become a visible leak rather than a missing
-                    // field, on both the chip and the detail line below.
-                    if (
-                        isBoardView &&
-                        unit.ineligibleReason === "NO_REPRESENTATIVE"
-                    ) {
-                        return (
-                            <StatusChip variant="warning">
-                                {t("liveResults.status.needsDelegation")}
-                            </StatusChip>
-                        );
-                    }
+                    // Only a unit nobody could vote for lands here: the
+                    // server reports a unit that merely lacks a common
+                    // representative as not voted, since the board can still
+                    // record its paper ballot. `isBoardView` is defence in
+                    // depth: the owner payload carries no reason at all.
                     return (
                         <div className="min-w-0">
                             <StatusChip variant="neutral">
@@ -153,9 +140,16 @@ export function getLiveResultsColumns({
                 }
 
                 return (
-                    <StatusChip variant="neutral" dot={false}>
-                        {t("liveResults.status.notVoted")}
-                    </StatusChip>
+                    <div className="min-w-0">
+                        <StatusChip variant="neutral" dot={false}>
+                            {t("liveResults.status.notVoted")}
+                        </StatusChip>
+                        {isBoardView && unit.ineligibleReason && (
+                            <div className="text-faint text-2xs mt-0.5 truncate">
+                                {t("liveResults.status.appUnavailable")}
+                            </div>
+                        )}
+                    </div>
                 );
             },
         },

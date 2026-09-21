@@ -92,9 +92,18 @@ export function getParticipationColumns(
                     );
                 }
                 return (
-                    <StatusChip variant="neutral" dot={false}>
-                        {t("paperBallot.chooseUnit.status.notVoted")}
-                    </StatusChip>
+                    <div className="min-w-0">
+                        <StatusChip variant="neutral" dot={false}>
+                            {t("paperBallot.chooseUnit.status.notVoted")}
+                        </StatusChip>
+                        {unit.ineligibleReason && (
+                            <div className="text-faint text-2xs mt-0.5 truncate">
+                                {t(
+                                    "paperBallot.chooseUnit.status.appUnavailable",
+                                )}
+                            </div>
+                        )}
+                    </div>
                 );
             },
         },

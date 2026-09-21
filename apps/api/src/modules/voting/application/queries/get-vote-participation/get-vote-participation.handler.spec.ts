@@ -81,6 +81,25 @@ describe('GetVoteParticipationHandler', () => {
 
       expect(result.units[0]).toEqual(votedRow);
     });
+
+    it('offers a unit with no common representative for paper recording, keeping the reason', async () => {
+      readRepo.findParticipation.mockResolvedValue([noRepresentativeRow]);
+
+      const result = await handler.execute(query([role]));
+
+      expect(result.units[0]).toEqual({
+        ...noRepresentativeRow,
+        status: 'NOT_VOTED',
+      });
+    });
+
+    it('keeps a unit with no owner on record ineligible', async () => {
+      readRepo.findParticipation.mockResolvedValue([missingOwnershipRow]);
+
+      const result = await handler.execute(query([role]));
+
+      expect(result.units[0].status).toBe('INELIGIBLE');
+    });
   });
 
   describe('for a UNIT_OWNER', () => {

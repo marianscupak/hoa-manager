@@ -64,7 +64,7 @@ describe('RecordPaperBallotHandler', () => {
         {
           id: 'q1',
           title: 'Replace windows?',
-          options: [{ id: 'o1', label: 'Yes' }],
+          options: [{ id: 'o1', label: 'YES', optionKey: 'YES' }],
         },
       ],
     });
@@ -135,6 +135,15 @@ describe('RecordPaperBallotHandler', () => {
             signerLabel: 'Jana Nováková',
             attachmentFileName: 'ballot_A1.pdf',
             castBy: 'Board Member',
+            // The key travels with the label so the portal can translate a
+            // standard answer instead of showing the stored "YES".
+            answers: [
+              {
+                questionText: 'Replace windows?',
+                optionText: 'YES',
+                optionKey: 'YES',
+              },
+            ],
           }),
         }),
       }),

@@ -195,6 +195,7 @@ export class RecordPaperBallotHandler
         return {
           questionText: question.title,
           optionText: option.label,
+          optionKey: option.optionKey,
         };
       });
 

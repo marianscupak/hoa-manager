@@ -14,8 +14,8 @@ import { cn } from "@hoa-mngr/ui/lib/utils";
 import type { AssemblyRecordResponseDto } from "@/api/generated/model";
 import { sharePercent } from "@/features/units/utils/shares";
 
-import { getOptionLabel } from "../shared/question-options";
 import type { AssemblyUnit } from "./roster";
+import { getOptionLabel } from "../../utils/option-label";
 
 type Question = AssemblyRecordResponseDto["questions"][number];
 

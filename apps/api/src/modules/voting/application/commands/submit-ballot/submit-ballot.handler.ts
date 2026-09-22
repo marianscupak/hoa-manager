@@ -133,7 +133,11 @@ export class SubmitBallotHandler
               'Internal: ballot answer references missing question/option',
             );
           }
-          return { questionText: question.title, optionText: option.label };
+          return {
+            questionText: question.title,
+            optionText: option.label,
+            optionKey: option.optionKey,
+          };
         });
 
         await this.auditService.append(

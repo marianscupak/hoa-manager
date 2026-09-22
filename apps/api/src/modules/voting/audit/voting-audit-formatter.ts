@@ -124,7 +124,11 @@ export class VotingAuditFormatter implements AuditEventFormatter, OnModuleInit {
             voteTitle: string;
             unitLabel: string;
             castBy: string;
-            answers: { questionText: string; optionText: string }[];
+            answers: {
+              questionText: string;
+              optionText: string;
+              optionKey?: string;
+            }[];
           };
         };
         const isOwnBallot =
@@ -153,7 +157,11 @@ export class VotingAuditFormatter implements AuditEventFormatter, OnModuleInit {
             unitLabel: string;
             castBy: string;
             signerLabel: string;
-            answers: { questionText: string; optionText: string }[];
+            answers: {
+              questionText: string;
+              optionText: string;
+              optionKey?: string;
+            }[];
           };
         };
         return {

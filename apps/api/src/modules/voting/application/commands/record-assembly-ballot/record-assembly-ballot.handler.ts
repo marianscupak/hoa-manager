@@ -122,6 +122,7 @@ export class RecordAssemblyBallotHandler
         return {
           questionText: question?.title ?? '',
           optionText: option?.label ?? '',
+          optionKey: option?.optionKey,
         };
       });
 

@@ -1,10 +1,11 @@
-import type { TFunction } from "i18next";
 import { Check, Minus, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { cn } from "@hoa-mngr/ui/lib/utils";
 
 import type { VoteOptionResponseDto } from "@/api/generated/model";
+
+import { getOptionLabel } from "../../utils/option-label";
 
 // ── Option Icon ────────────────────────────────────────────
 export function OptionIcon({
@@ -21,17 +22,6 @@ export function OptionIcon({
     if (optionKey === "ABSTAIN")
         return <Minus className={cn("text-faint h-6 w-6", className)} />;
     return null;
-}
-
-export function getOptionLabel(
-    optionKey: string,
-    label: string,
-    t: TFunction<"voting">,
-) {
-    if (optionKey === "YES") return t("castVote.options.yes");
-    if (optionKey === "NO") return t("castVote.options.no");
-    if (optionKey === "ABSTAIN") return t("castVote.options.abstain");
-    return label;
 }
 
 export function QuestionOptionGrid({

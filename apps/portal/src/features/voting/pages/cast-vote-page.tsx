@@ -27,13 +27,13 @@ import {
 
 import {
     OptionIcon,
-    getOptionLabel,
     QuestionOptionGrid,
 } from "../components/shared/question-options";
 import {
     useSubmitBallot,
     type SubmitBallotBody,
 } from "../hooks/use-submit-ballot";
+import { getOptionLabel } from "../utils/option-label";
 
 // ── Types ───────────────────────────────────────────────────
 interface BallotAnswers {

@@ -16,7 +16,7 @@ import type {
 } from "@/api/generated/model";
 import { sharePercent } from "@/features/units/utils/shares";
 
-import { getOptionLabel } from "../shared/question-options";
+import { getOptionLabel } from "../../utils/option-label";
 
 const ZERO = { num: "0", den: "1" };
 

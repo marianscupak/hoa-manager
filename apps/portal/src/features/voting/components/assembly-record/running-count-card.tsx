@@ -4,8 +4,8 @@ import { cn } from "@hoa-mngr/ui/lib/utils";
 
 import type { AssemblyRecordResponseDto } from "@/api/generated/model";
 
-import { getOptionLabel } from "../shared/question-options";
 import { runningCountFigure } from "./running-count";
+import { getOptionLabel } from "../../utils/option-label";
 
 /** Dot tones follow the option's meaning, matching the results page. */
 const DOT: Record<string, string> = {

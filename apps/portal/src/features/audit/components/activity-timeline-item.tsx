@@ -5,6 +5,11 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
+import {
+    getOptionLabel,
+    resolveAnswerOptionKey,
+} from "@/features/voting/utils/option-label";
+
 import { type ActivityTimelineEntry } from "./activity-timeline";
 import { getEventTypeMeta } from "./event-type-meta";
 
@@ -16,6 +21,9 @@ interface ActivityTimelineItemProps {
 interface BallotAnswer {
     questionText: string;
     optionText: string;
+    /** Recorded since the option key travels with the label; older entries
+     *  lack it and fall back to the stored label (see resolveAnswerOptionKey). */
+    optionKey?: string;
 }
 
 function getBallotAnswers(
@@ -117,7 +125,13 @@ export function ActivityTimelineItem({
                                     {" "}
                                     —{" "}
                                 </span>
-                                <span>{a.optionText}</span>
+                                <span>
+                                    {getOptionLabel(
+                                        resolveAnswerOptionKey(a),
+                                        a.optionText,
+                                        t,
+                                    )}
+                                </span>
                             </li>
                         ))}
                     </ul>

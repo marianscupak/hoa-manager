@@ -3,14 +3,6 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import {
-    VoteOptionResponseDtoOptionKey,
-    VoteQuestionResponseDtoType,
-    type SetVoteRulesetResponseDto,
-    type VoteOptionResponseDto,
-    type VoteOptionResultDto,
-    type VoteResultsResponseDto,
-} from "@/api/generated/model";
-import {
     Card,
     formatFraction,
     formatPercent,
@@ -21,14 +13,24 @@ import {
 } from "@hoa-mngr/ui";
 
 import {
-    mapQuestionVerdict,
-    type QuestionVerdict,
-} from "../../utils/question-verdict";
-import { buildMajorityFragment } from "../../utils/rule-sentence";
+    VoteOptionResponseDtoOptionKey,
+    VoteQuestionResponseDtoType,
+    type SetVoteRulesetResponseDto,
+    type VoteOptionResponseDto,
+    type VoteOptionResultDto,
+    type VoteResultsResponseDto,
+} from "@/api/generated/model";
+
 import {
     computeParticipationStats,
     deriveQuorumThresholdPercentLabel,
 } from "./participation-banner";
+import { getOptionLabel } from "../../utils/option-label";
+import {
+    mapQuestionVerdict,
+    type QuestionVerdict,
+} from "../../utils/question-verdict";
+import { buildMajorityFragment } from "../../utils/rule-sentence";
 
 type EnrichedQuestion = VoteResultsResponseDto["questionResults"][number] & {
     title: string;
@@ -78,7 +80,15 @@ function verdictLabel(
         case "rejected":
             return t("outcomes.REJECTED");
         case "winner":
-            return t("outcomes.winner", { option: winningOption?.label ?? "" });
+            return t("outcomes.winner", {
+                option: winningOption
+                    ? getOptionLabel(
+                          winningOption.optionKey,
+                          winningOption.label,
+                          t,
+                      )
+                    : "",
+            });
         case "notDecided":
         default:
             return t("outcomes.NOT_DECIDED");
@@ -215,7 +225,13 @@ function buildReason(args: {
             : undefined;
         const pct = Number(winnerResult?.percent ?? "0");
         return t("resultsV2.reasonWinner", {
-            option: winningOption?.label ?? "",
+            option: winningOption
+                ? getOptionLabel(
+                      winningOption.optionKey,
+                      winningOption.label,
+                      t,
+                  )
+                : "",
             pct: formatPercentValue(pct, 1),
         });
     }

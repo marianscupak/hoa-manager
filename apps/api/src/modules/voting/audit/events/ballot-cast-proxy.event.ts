@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { defineAuditEvent } from '@/modules/core/audit/application/registry/define-audit-event';
 import type { AuditActor } from '@/modules/core/audit/domain/actor';
 import { Visibility } from '@/modules/core/audit/domain/visibility';
+import { type VoteOptionSemantic } from '@/modules/voting/domain/vote/vote.types';
 
 import {
   BallotAnswerSchema,
@@ -49,7 +50,11 @@ export const BallotCastProxyAuditEvent = defineAuditEvent({
     actor: AuditActor;
     castByLabel: string;
     answers: { questionId: string; optionId: string }[];
-    labeledAnswers: { questionText: string; optionText: string }[];
+    labeledAnswers: {
+      questionText: string;
+      optionText: string;
+      optionKey?: VoteOptionSemantic;
+    }[];
     occurredAt: Date;
   }) {
     return {

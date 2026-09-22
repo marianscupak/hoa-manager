@@ -1,9 +1,11 @@
 import { useTranslation } from "react-i18next";
 
-import { type VoteDetailResponseDto } from "@/api/generated/model";
 import { cn } from "@hoa-mngr/ui/lib/utils";
 
+import { type VoteDetailResponseDto } from "@/api/generated/model";
+
 import type { LiveResultsRow } from "../../utils/live-results-filter";
+import { getOptionLabel } from "../../utils/option-label";
 
 const ANSWER_CLASS: Record<string, string> = {
     YES: "text-success-tint-foreground",
@@ -47,8 +49,13 @@ export function UnitAnswersPanel({ unit, questions }: UnitAnswersPanelProps) {
                                     : "text-faint",
                             )}
                         >
-                            {answer?.optionLabel ??
-                                t("liveResults.answers.none")}
+                            {answer
+                                ? getOptionLabel(
+                                      answer.optionKey,
+                                      answer.optionLabel,
+                                      t,
+                                  )
+                                : t("liveResults.answers.none")}
                         </dd>
                     </div>
                 );

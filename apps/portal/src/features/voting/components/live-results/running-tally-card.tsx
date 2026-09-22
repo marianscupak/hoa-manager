@@ -1,11 +1,13 @@
 import { useTranslation } from "react-i18next";
 
+import { Card, StatusChip, type StatusChipVariant } from "@hoa-mngr/ui";
+
 import {
     type VoteDetailResponseDto,
     type VoteTallyResponseDto,
 } from "@/api/generated/model";
-import { Card, StatusChip, type StatusChipVariant } from "@hoa-mngr/ui";
 
+import { getOptionLabel } from "../../utils/option-label";
 import { formatTallyOption } from "../../utils/tally-display";
 
 const OPTION_VARIANT: Record<string, StatusChipVariant> = {
@@ -93,7 +95,13 @@ export function RunningTallyCard({
                                                         detail does not list
                                                         degrades to a dash —
                                                         never a raw id. */}
-                                                    {meta?.label ?? "—"}
+                                                    {meta
+                                                        ? getOptionLabel(
+                                                              meta.optionKey,
+                                                              meta.label,
+                                                              t,
+                                                          )
+                                                        : "—"}
                                                     <span className="font-bold tabular-nums">
                                                         {display.primary}
                                                     </span>

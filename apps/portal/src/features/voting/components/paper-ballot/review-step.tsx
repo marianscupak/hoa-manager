@@ -10,7 +10,8 @@ import type {
 } from "@/api/generated/model";
 
 import type { BallotAttachment } from "../../hooks/use-ballot-attachment";
-import { getOptionLabel, OptionIcon } from "../shared/question-options";
+import { getOptionLabel } from "../../utils/option-label";
+import { OptionIcon } from "../shared/question-options";
 
 export interface ReviewStepProps {
     unit: VoteParticipationUnitDto;

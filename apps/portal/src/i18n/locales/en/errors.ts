@@ -71,6 +71,7 @@ export default {
         "A representative can only be named while the vote is scheduled.",
     NOT_A_UNIT_OWNER: "You are not an owner of this unit.",
     UNIT_NOT_ELIGIBLE: "This unit has no vote to cast in this ballot.",
+    CONSENT_TARGET_INVALID: "This person can't be named as the representative.",
     MEMBERSHIP_HAS_NO_ASSOCIATED_OWNER:
         "Your membership is not correctly linked to an owner profile.",
     LAST_ADMIN_CANNOT_BE_REMOVED:

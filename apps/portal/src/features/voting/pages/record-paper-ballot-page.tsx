@@ -34,6 +34,7 @@ import { RecordedState } from "../components/paper-ballot/recorded-state";
 import { ReviewStep } from "../components/paper-ballot/review-step";
 import { useBallotAttachment } from "../hooks/use-ballot-attachment";
 import { invalidateVoteResultQueries } from "../utils/invalidate-vote-result-queries";
+import { defaultSignerOwnerId, signerOptions } from "../utils/signer-options";
 
 export type PaperBallotStepId = "unit" | "ballot" | "answers" | "review";
 
@@ -85,10 +86,19 @@ export function RecordPaperBallotPage() {
         setStep("unit");
     }, [remove]);
 
-    const handleRecord = useCallback((selected: string) => {
-        setUnitId(selected);
-        setStep("ballot");
-    }, []);
+    const handleRecord = useCallback(
+        (selected: string) => {
+            const unit = participationQuery.data?.units.find(
+                (u) => u.unitId === selected,
+            );
+            setUnitId(selected);
+            setSignerOwnerId(
+                unit ? defaultSignerOwnerId(signerOptions(unit)) : null,
+            );
+            setStep("ballot");
+        },
+        [participationQuery.data],
+    );
 
     // Rail jumps. Going back to step 1 means picking a different unit, so the
     // whole transcription is discarded — carrying one unit's answers onto
@@ -174,9 +184,10 @@ export function RecordPaperBallotPage() {
         (u) => u.unitId === unitId,
     );
     const currentQuestion = vote.questions[qIndex];
-    const signerName =
-        selectedUnit?.owners?.find((o) => o.ownerId === signerOwnerId)
-            ?.displayName ?? "";
+    const signerName = selectedUnit
+        ? signerOptions(selectedUnit).find((o) => o.ownerId === signerOwnerId)
+              ?.displayName ?? ""
+        : "";
     const actorName = user?.fullName ?? user?.email ?? "";
 
     return (

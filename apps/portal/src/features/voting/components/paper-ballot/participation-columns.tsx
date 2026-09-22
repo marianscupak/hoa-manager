@@ -96,11 +96,16 @@ export function getParticipationColumns(
                         <StatusChip variant="neutral" dot={false}>
                             {t("paperBallot.chooseUnit.status.notVoted")}
                         </StatusChip>
-                        {unit.ineligibleReason && (
+                        {unit.canVoteInApp === false && (
                             <div className="text-faint text-2xs mt-0.5 truncate">
-                                {t(
-                                    "paperBallot.chooseUnit.status.appUnavailable",
-                                )}
+                                {t("paperBallot.chooseUnit.status.paperOnly")}
+                                {" · "}
+                                <Link
+                                    to="/people"
+                                    className="cursor-pointer underline"
+                                >
+                                    {t("paperBallot.chooseUnit.status.invite")}
+                                </Link>
                             </div>
                         )}
                     </div>

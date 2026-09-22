@@ -8,5 +8,6 @@
 
 export type VotesControllerGetDelegationCandidatesParams = {
     unitId: string;
+    fromOwnerId?: string;
     forMembershipId?: string;
 };

@@ -20,6 +20,7 @@ interface ConfirmDelegationModalProps {
     onConfirm: () => void;
     unitName: string;
     delegateName: string;
+    delegateHasAccount: boolean;
     risk: ConsentRisk | null;
     voteTitle: string;
     scheduledFrom?: string | Date | null;
@@ -32,6 +33,7 @@ export const ConfirmDelegationModal = ({
     onConfirm,
     unitName,
     delegateName,
+    delegateHasAccount,
     risk,
     voteTitle,
     scheduledFrom,
@@ -67,7 +69,9 @@ export const ConfirmDelegationModal = ({
                                     {delegateName}
                                 </p>
                                 <p className="text-faint text-2xs">
-                                    {t("delegate.modal.delegateSubtext")}
+                                    {delegateHasAccount
+                                        ? t("delegate.modal.delegateSubtext")
+                                        : t("delegate.modal.delegateNoAccount")}
                                 </p>
                             </div>
                         </div>

@@ -18,8 +18,12 @@ export interface VoteConsentResponseDto {
     unitName: string;
     fromOwnerId: string;
     fromOwnerName: string;
-    toMembershipId: string;
+    /** @nullable */
+    toOwnerId: string | null;
+    /** @nullable */
+    toMembershipId: string | null;
     toDelegateName: string;
+    toDelegateHasAccount: boolean;
     recordedByMembershipId: VoteConsentResponseDtoRecordedByMembershipId;
     createdAt: string;
 }

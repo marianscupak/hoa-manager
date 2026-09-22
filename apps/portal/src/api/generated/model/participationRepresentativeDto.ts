@@ -6,14 +6,11 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface DelegationCandidateDto {
+export interface ParticipationRepresentativeDto {
     /** @nullable */
     ownerId: string | null;
     /** @nullable */
     membershipId: string | null;
     name: string;
-    hasAccount: boolean;
-    hasDelegatedToRequester: boolean;
-    isEligible: boolean;
     isUnitOwner: boolean;
 }

@@ -38,7 +38,10 @@ import {
     useVotesControllerGetVotes,
     getVotesControllerGetVoterStatusQueryKey,
 } from "@/api/generated/votes/votes";
-
+import {
+    candidateKey,
+    consentTargetFromKey,
+} from "@/features/voting/utils/candidate-key";
 import { votesOpenForDelegation } from "@/features/voting/utils/delegation-eligibility";
 
 import {
@@ -57,7 +60,7 @@ export function AdminRecordDelegation() {
             voteId: "",
             unitId: "",
             fromOwnerId: "",
-            delegateMembershipId: "",
+            delegateKey: "",
         },
     });
 
@@ -97,17 +100,23 @@ export function AdminRecordDelegation() {
         return [...byOwnerId.values()];
     }, [unitDetail]);
 
-    // The representative may be any active member of the association —
-    // who represents the unit is not itself a co-ownership matter — so it
-    // keeps using every tenant membership.
+    // Candidates are people, not accounts — an SJM spouse without a login is
+    // offered here so the admin can record "wife designates husband" from
+    // the paper consent.
     const { data: delegateCandidates } =
         useVotesControllerGetDelegationCandidates(
             selectedVoteId,
             {
                 unitId: selectedUnitId,
+                fromOwnerId: selectedFromOwnerId || undefined,
             },
             {
-                query: { enabled: !!selectedVoteId && !!selectedUnitId },
+                query: {
+                    enabled:
+                        !!selectedVoteId &&
+                        !!selectedUnitId &&
+                        !!selectedFromOwnerId,
+                },
             },
         );
 
@@ -121,7 +130,7 @@ export function AdminRecordDelegation() {
                 data: {
                     unitId: data.unitId,
                     fromOwnerId: data.fromOwnerId,
-                    delegateMembershipId: data.delegateMembershipId,
+                    ...consentTargetFromKey(data.delegateKey),
                 },
             },
             {
@@ -131,7 +140,7 @@ export function AdminRecordDelegation() {
                         voteId: data.voteId, // Keep vote to add multiple
                         unitId: "",
                         fromOwnerId: "",
-                        delegateMembershipId: "",
+                        delegateKey: "",
                     });
                     queryClient.invalidateQueries({
                         queryKey: getVotesControllerGetVoterStatusQueryKey(
@@ -187,7 +196,7 @@ export function AdminRecordDelegation() {
                                                     "",
                                                 );
                                                 form.setValue(
-                                                    "delegateMembershipId",
+                                                    "delegateKey",
                                                     "",
                                                 );
                                             }}
@@ -237,7 +246,7 @@ export function AdminRecordDelegation() {
                                                     "",
                                                 );
                                                 form.setValue(
-                                                    "delegateMembershipId",
+                                                    "delegateKey",
                                                     "",
                                                 );
                                             }}
@@ -286,7 +295,7 @@ export function AdminRecordDelegation() {
                                             onValueChange={(val) => {
                                                 field.onChange(val);
                                                 form.setValue(
-                                                    "delegateMembershipId",
+                                                    "delegateKey",
                                                     "",
                                                 );
                                             }}
@@ -320,7 +329,7 @@ export function AdminRecordDelegation() {
 
                             <FormField
                                 control={form.control}
-                                name="delegateMembershipId"
+                                name="delegateKey"
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel className="flex items-center gap-2 text-sm font-medium text-slate-700">
@@ -344,18 +353,23 @@ export function AdminRecordDelegation() {
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                {(delegateCandidates ?? []).map(
-                                                    (c) => (
+                                                {(delegateCandidates ?? [])
+                                                    .filter((c) => c.isEligible)
+                                                    .map((c) => (
                                                         <SelectItem
-                                                            key={c.membershipId}
-                                                            value={
-                                                                c.membershipId
-                                                            }
+                                                            key={candidateKey(
+                                                                c,
+                                                            )}
+                                                            value={candidateKey(
+                                                                c,
+                                                            )}
                                                         >
                                                             {c.name}
+                                                            {c.hasAccount
+                                                                ? ""
+                                                                : ` · ${t("voting:delegation.noAccount")}`}
                                                         </SelectItem>
-                                                    ),
-                                                )}
+                                                    ))}
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />

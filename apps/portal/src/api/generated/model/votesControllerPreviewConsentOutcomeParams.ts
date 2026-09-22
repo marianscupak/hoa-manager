@@ -8,5 +8,6 @@
 
 export type VotesControllerPreviewConsentOutcomeParams = {
     unitId: string;
-    delegateMembershipId: string;
+    toMembershipId?: string;
+    toOwnerId?: string;
 };

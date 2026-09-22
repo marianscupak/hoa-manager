@@ -118,11 +118,11 @@ export function getLiveResultsColumns({
                 }
 
                 if (unit.status === "INELIGIBLE") {
-                    // Only a unit nobody could vote for lands here: the
-                    // server reports a unit that merely lacks a common
-                    // representative as not voted, since the board can still
-                    // record its paper ballot. `isBoardView` is defence in
-                    // depth: the owner payload carries no reason at all.
+                    // The board sees every ineligible unit with its reason, including one
+                    // whose co-owners never chose a representative — per rollam that cannot
+                    // be cured by a paper ballot. Owners see such a unit as simply not voted
+                    // (the server narrows it and strips the reason), so `isBoardView` here
+                    // is defence in depth.
                     return (
                         <div className="min-w-0">
                             <StatusChip variant="neutral">
@@ -144,9 +144,9 @@ export function getLiveResultsColumns({
                         <StatusChip variant="neutral" dot={false}>
                             {t("liveResults.status.notVoted")}
                         </StatusChip>
-                        {isBoardView && unit.ineligibleReason && (
+                        {isBoardView && unit.canVoteInApp === false && (
                             <div className="text-faint text-2xs mt-0.5 truncate">
-                                {t("liveResults.status.appUnavailable")}
+                                {t("liveResults.status.paperOnly")}
                             </div>
                         )}
                     </div>

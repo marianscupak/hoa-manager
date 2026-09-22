@@ -8,8 +8,8 @@ import {
     OwningUnitStatusDto,
 } from "@/api/generated/model";
 
-import type { ConsentRisk } from "../../utils/delegation-eligibility";
 import { ConsentRiskNotice } from "./consent-risk-notice";
+import type { ConsentRisk } from "../../utils/delegation-eligibility";
 
 interface DelegationSummaryProps {
     selectedUnit: OwningUnitStatusDto | null | undefined;
@@ -72,15 +72,23 @@ export const DelegationSummary = ({
                         <span className="text-muted-foreground">
                             {t("delegate.summary.delegate")}
                         </span>
-                        <span
-                            className={cn(
-                                "font-medium",
-                                !selectedDelegate &&
-                                    "text-muted-foreground text-sm italic",
-                            )}
-                        >
-                            {selectedDelegate?.name ||
-                                t("delegate.summary.notSelected")}
+                        <span className="text-right">
+                            <span
+                                className={cn(
+                                    "block font-medium",
+                                    !selectedDelegate &&
+                                        "text-muted-foreground text-sm italic",
+                                )}
+                            >
+                                {selectedDelegate?.name ||
+                                    t("delegate.summary.notSelected")}
+                            </span>
+                            {selectedDelegate &&
+                                !selectedDelegate.hasAccount && (
+                                    <span className="text-muted-foreground text-2xs block">
+                                        {t("delegation.noAccount")}
+                                    </span>
+                                )}
                         </span>
                     </div>
                 </div>

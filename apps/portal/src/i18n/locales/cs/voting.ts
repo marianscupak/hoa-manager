@@ -729,6 +729,7 @@ export const voting = {
             },
             delegateLabel: "ZÁSTUPCE",
             delegateSubtext: "Oprávněná osoba",
+            delegateNoAccount: "Zatím nemá účet — do té doby hlasuje listinně",
             unitLabel: "JEDNOTKA",
             unitSubtext: "Nemovitost",
             eventLabel: "HLASOVÁNÍ",
@@ -742,6 +743,7 @@ export const voting = {
     },
     delegation: {
         coOwner: "Spoluvlastník",
+        noAccount: "Bez účtu",
     },
     delegations: {
         tabs: {
@@ -886,10 +888,11 @@ export const voting = {
                 voted: "Hlasováno",
                 notVoted: "Nehlasováno",
                 ineligible: "Nemá hlas",
-                appUnavailable: "V aplikaci hlasovat nemůže",
+                paperOnly: "Zástupce nemá účet · jen listinně",
+                invite: "Pozvat v Lidech",
             },
             ineligibleReason: {
-                NO_REPRESENTATIVE: "Není zvolen společný zástupce",
+                NO_REPRESENTATIVE: "Spoluvlastníci si nezvolili zástupce",
                 MISSING_OWNERSHIP: "Není evidován vlastník",
                 ASSOCIATION_OWNED: "Ve vlastnictví společenství",
             },
@@ -914,6 +917,7 @@ export const voting = {
             signerLabel: "Kdo lístek podepsal?",
             ownerRole: "Vlastník · podíl {{share}}",
             representative: "Společný zástupce",
+            representativeOnly: "Zástupce · jednotku nevlastní",
             coOwnedHint:
                 "Jednotka má více spoluvlastníků — lístek by měl podepsat společný zástupce.",
             noOwners:
@@ -1014,14 +1018,14 @@ export const voting = {
             voted: "Hlasovalo",
             notVoted: "Nehlasovalo",
             ineligible: "Nemůže hlasovat",
-            appUnavailable: "V aplikaci hlasovat nemůže",
+            paperOnly: "Zástupce nemá účet · jen listinně",
             inApp: "V aplikaci · {{date}}",
             onPaper: "Listinně · {{date}}",
             onPaperRecordedBy: "Listinně · {{date}} · zapsal(a) {{name}}",
             ineligibleReason: {
                 MISSING_OWNERSHIP: "Bez evidovaného vlastníka",
                 ASSOCIATION_OWNED: "Ve vlastnictví společenství",
-                NO_REPRESENTATIVE: "Bez společného zástupce",
+                NO_REPRESENTATIVE: "Spoluvlastníci si nezvolili zástupce",
             },
         },
         pill: { yours: "Vaše", proxy: "V zastoupení" },

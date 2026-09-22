@@ -13,7 +13,7 @@ describe("adminRecordDelegationSchema", () => {
             voteId: "v1",
             unitId: "u1",
             fromOwnerId: "owner-accountless-1",
-            delegateMembershipId: "m1",
+            delegateKey: "owner:o1",
         });
 
         expect(result.success).toBe(true);
@@ -24,7 +24,7 @@ describe("adminRecordDelegationSchema", () => {
             voteId: "v1",
             unitId: "u1",
             fromOwnerId: "",
-            delegateMembershipId: "m1",
+            delegateKey: "owner:o1",
         });
 
         expect(result.success).toBe(false);
@@ -35,11 +35,11 @@ describe("adminRecordDelegationSchema", () => {
         ).toBe(true);
     });
 
-    it("no longer accepts the legacy ownerMembershipId field name", () => {
+    it("no longer accepts the legacy delegateMembershipId field name", () => {
         const result = adminRecordDelegationSchema(t).safeParse({
             voteId: "v1",
             unitId: "u1",
-            ownerMembershipId: "m-legacy-1",
+            fromOwnerId: "owner-accountless-1",
             delegateMembershipId: "m1",
         });
 

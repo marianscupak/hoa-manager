@@ -7,12 +7,13 @@ import { cn } from "@hoa-mngr/ui/lib/utils";
 
 import type { VoteParticipationUnitDto } from "@/api/generated/model";
 
-import { formatFileSize } from "../../utils/format-file-size";
 import {
     BALLOT_SCAN_ACCEPTED_TYPES,
     BALLOT_SCAN_MAX_SIZE_BYTES,
     type BallotAttachment,
 } from "../../hooks/use-ballot-attachment";
+import { formatFileSize } from "../../utils/format-file-size";
+import { signerOptions } from "../../utils/signer-options";
 
 export interface BallotSignerStepProps {
     unit: VoteParticipationUnitDto;
@@ -37,7 +38,8 @@ export function BallotSignerStep({
 }: BallotSignerStepProps) {
     const { t } = useTranslation("voting");
     const [localError, setLocalError] = useState<string | null>(null);
-    const unitOwners = unit.owners ?? [];
+    const unitOwners = signerOptions(unit);
+    const realOwnerCount = unitOwners.filter((o) => o.isUnitOwner).length;
 
     return (
         <div className="space-y-6">
@@ -150,9 +152,14 @@ export function BallotSignerStep({
                                         {owner.displayName}
                                     </span>
                                     <span className="text-muted-foreground block text-xs">
-                                        {t("paperBallot.ballot.ownerRole", {
-                                            share: owner.share,
-                                        })}
+                                        {owner.isUnitOwner
+                                            ? t(
+                                                  "paperBallot.ballot.ownerRole",
+                                                  { share: owner.share },
+                                              )
+                                            : t(
+                                                  "paperBallot.ballot.representativeOnly",
+                                              )}
                                     </span>
                                 </span>
                                 {owner.isRepresentative && (
@@ -179,7 +186,7 @@ export function BallotSignerStep({
                         );
                     })}
                 </div>
-                {unitOwners.length > 1 && (
+                {realOwnerCount > 1 && (
                     <p className="text-muted-foreground mt-2 text-xs">
                         {t("paperBallot.ballot.coOwnedHint")}
                     </p>

@@ -24,6 +24,7 @@ import { DelegationHeader } from "../components/delegation/delegation-header";
 import { DelegationNotice } from "../components/delegation/delegation-notice";
 import { DelegationSummary } from "../components/delegation/delegation-summary";
 import { UnitSelection } from "../components/delegation/unit-selection";
+import { candidateKey, consentTargetFromKey } from "../utils/candidate-key";
 import { consentRisk, isDelegableUnit } from "../utils/delegation-eligibility";
 
 export const DelegateVotePage = () => {
@@ -63,7 +64,9 @@ export const DelegateVotePage = () => {
             id,
             {
                 unitId: selectedUnitId || "",
-                delegateMembershipId: selectedDelegateId || "",
+                ...(selectedDelegateId
+                    ? consentTargetFromKey(selectedDelegateId)
+                    : {}),
             },
             {
                 query: { enabled: !!selectedUnitId && !!selectedDelegateId },
@@ -76,7 +79,7 @@ export const DelegateVotePage = () => {
         (u) => u.id === selectedUnitId,
     );
     const selectedDelegate = candidates?.find(
-        (c) => c.membershipId === selectedDelegateId,
+        (c) => candidateKey(c) === selectedDelegateId,
     );
 
     const handleConfirm = () => {
@@ -87,7 +90,7 @@ export const DelegateVotePage = () => {
                 id,
                 data: {
                     unitId: selectedUnitId,
-                    delegateMembershipId: selectedDelegateId,
+                    ...consentTargetFromKey(selectedDelegateId),
                 },
             },
             {
@@ -171,6 +174,7 @@ export const DelegateVotePage = () => {
                 onConfirm={handleConfirm}
                 unitName={selectedUnit?.name || ""}
                 delegateName={selectedDelegate?.name || ""}
+                delegateHasAccount={selectedDelegate?.hasAccount ?? true}
                 risk={risk}
                 voteTitle={vote.title}
                 scheduledFrom={vote.scheduledFrom}

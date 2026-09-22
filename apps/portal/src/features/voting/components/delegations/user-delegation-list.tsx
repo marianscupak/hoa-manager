@@ -12,6 +12,7 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
+    StatusChip,
     type ColumnDef,
     toast,
 } from "@hoa-mngr/ui";
@@ -117,8 +118,15 @@ export function UserDelegationList() {
             enableSorting: false,
             enableGlobalFilter: true,
             cell: ({ row }) => (
-                <span className="text-secondary-foreground block truncate text-sm">
-                    {row.original.toDelegateName}
+                <span className="text-secondary-foreground flex min-w-0 items-center gap-2 text-sm">
+                    <span className="truncate">
+                        {row.original.toDelegateName}
+                    </span>
+                    {!row.original.toDelegateHasAccount && (
+                        <StatusChip variant="neutral" dot={false}>
+                            {t("voting:delegation.noAccount")}
+                        </StatusChip>
+                    )}
                 </span>
             ),
         },

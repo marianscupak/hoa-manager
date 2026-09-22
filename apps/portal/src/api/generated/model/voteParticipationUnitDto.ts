@@ -7,6 +7,7 @@
  */
 import type { ParticipationAnswerDto } from "./participationAnswerDto";
 import type { ParticipationOwnerDto } from "./participationOwnerDto";
+import type { ParticipationRepresentativeDto } from "./participationRepresentativeDto";
 import type { VoteParticipationUnitDtoCastMethod } from "./voteParticipationUnitDtoCastMethod";
 import type { VoteParticipationUnitDtoIneligibleReason } from "./voteParticipationUnitDtoIneligibleReason";
 import type { VoteParticipationUnitDtoStatus } from "./voteParticipationUnitDtoStatus";
@@ -25,6 +26,8 @@ export interface VoteParticipationUnitDto {
     recordedBy?: string;
     ineligibleReason?: VoteParticipationUnitDtoIneligibleReason;
     isOwnUnit?: boolean;
+    canVoteInApp?: boolean;
+    representative?: ParticipationRepresentativeDto | null;
     owners?: ParticipationOwnerDto[];
     answers?: ParticipationAnswerDto[];
 }

@@ -7,6 +7,8 @@ import { cn } from "@hoa-mngr/ui/lib/utils";
 
 import { DelegationCandidateDto } from "@/api/generated/model";
 
+import { candidateKey } from "../../utils/candidate-key";
+
 interface DelegateSelectionProps {
     candidates: DelegationCandidateDto[];
     selectedDelegateId: string | null;
@@ -68,58 +70,69 @@ export const DelegateSelection = ({
             </div>
 
             <div className="space-y-2">
-                {candidates.map((candidate) => (
-                    <Card
-                        key={candidate.membershipId}
-                        onClick={() =>
-                            candidate.isEligible &&
-                            onSelect(candidate.membershipId)
-                        }
-                        className={cn(
-                            "cursor-pointer border p-3 transition-all",
-                            !candidate.isEligible &&
-                                "bg-muted/20 cursor-not-allowed opacity-60",
-                            selectedDelegateId === candidate.membershipId
-                                ? "bg-primary/5 border-primary"
-                                : "bg-card hover:border-primary/50",
-                        )}
-                    >
-                        <div className="flex items-center gap-3">
-                            <Avatar className="h-10 w-10 border">
-                                <AvatarFallback className="bg-primary/5 text-primary text-xs font-bold">
-                                    {candidate.name
-                                        .split(" ")
-                                        .map((n) => n[0])
-                                        .join("")}
-                                </AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1">
-                                <p className="font-medium">{candidate.name}</p>
-                                <div className="mt-1 flex flex-wrap gap-2">
-                                    {candidate.isUnitOwner && (
-                                        <span className="bg-primary-tint text-primary-tint-foreground text-2xs rounded px-1.5 py-0.5 font-bold tracking-wider uppercase">
-                                            {t("delegation.coOwner")}
-                                        </span>
-                                    )}
-                                    {candidate.hasDelegatedToRequester && (
-                                        <span className="text-2xs rounded bg-emerald-100 px-1.5 py-0.5 font-bold tracking-wider text-emerald-700 uppercase">
-                                            {t("delegate.assignedToYou")}
-                                        </span>
-                                    )}
-                                    {!candidate.isEligible &&
-                                        !candidate.hasDelegatedToRequester && (
-                                            <span className="text-2xs rounded bg-slate-100 px-1.5 py-0.5 font-bold tracking-wider text-slate-600 uppercase">
-                                                {t("delegate.alreadyDelegated")}
+                {candidates.map((candidate) => {
+                    const key = candidateKey(candidate);
+                    return (
+                        <Card
+                            key={key}
+                            onClick={() =>
+                                candidate.isEligible && onSelect(key)
+                            }
+                            className={cn(
+                                "cursor-pointer border p-3 transition-all",
+                                !candidate.isEligible &&
+                                    "bg-muted/20 cursor-not-allowed opacity-60",
+                                selectedDelegateId === key
+                                    ? "bg-primary/5 border-primary"
+                                    : "bg-card hover:border-primary/50",
+                            )}
+                        >
+                            <div className="flex items-center gap-3">
+                                <Avatar className="h-10 w-10 border">
+                                    <AvatarFallback className="bg-primary/5 text-primary text-xs font-bold">
+                                        {candidate.name
+                                            .split(" ")
+                                            .map((n) => n[0])
+                                            .join("")}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <div className="flex-1">
+                                    <p className="font-medium">
+                                        {candidate.name}
+                                    </p>
+                                    <div className="mt-1 flex flex-wrap gap-2">
+                                        {candidate.isUnitOwner && (
+                                            <span className="bg-primary-tint text-primary-tint-foreground text-2xs rounded px-1.5 py-0.5 font-bold tracking-wider uppercase">
+                                                {t("delegation.coOwner")}
                                             </span>
                                         )}
+                                        {!candidate.hasAccount && (
+                                            <span className="bg-muted text-muted-foreground text-2xs rounded px-1.5 py-0.5 font-bold tracking-wider uppercase">
+                                                {t("delegation.noAccount")}
+                                            </span>
+                                        )}
+                                        {candidate.hasDelegatedToRequester && (
+                                            <span className="text-2xs rounded bg-emerald-100 px-1.5 py-0.5 font-bold tracking-wider text-emerald-700 uppercase">
+                                                {t("delegate.assignedToYou")}
+                                            </span>
+                                        )}
+                                        {!candidate.isEligible &&
+                                            !candidate.hasDelegatedToRequester && (
+                                                <span className="text-2xs rounded bg-slate-100 px-1.5 py-0.5 font-bold tracking-wider text-slate-600 uppercase">
+                                                    {t(
+                                                        "delegate.alreadyDelegated",
+                                                    )}
+                                                </span>
+                                            )}
+                                    </div>
                                 </div>
+                                {selectedDelegateId === key && (
+                                    <CheckCircle2 className="text-primary h-5 w-5" />
+                                )}
                             </div>
-                            {selectedDelegateId === candidate.membershipId && (
-                                <CheckCircle2 className="text-primary h-5 w-5" />
-                            )}
-                        </div>
-                    </Card>
-                ))}
+                        </Card>
+                    );
+                })}
 
                 {isEnabled && candidates.length === 0 && (
                     <EmptyState message={t("delegate.noCandidatesFound")} />

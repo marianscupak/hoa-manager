@@ -3676,6 +3676,14 @@
             }
           },
           {
+            "name": "fromOwnerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "forMembershipId",
             "required": false,
             "in": "query",
@@ -3686,7 +3694,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Returns a list of memberships eligible for delegation for this unit",
+            "description": "Returns the people this unit may be represented by: owners of the tenant (with or without an account) and members who own nothing here",
             "content": {
               "application/json": {
                 "schema": {
@@ -3725,8 +3733,16 @@
             }
           },
           {
-            "name": "delegateMembershipId",
-            "required": true,
+            "name": "toMembershipId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "toOwnerId",
+            "required": false,
             "in": "query",
             "schema": {
               "type": "string"
@@ -6351,11 +6367,19 @@
           "fromOwnerName": {
             "type": "string"
           },
+          "toOwnerId": {
+            "type": "string",
+            "nullable": true
+          },
           "toMembershipId": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "toDelegateName": {
             "type": "string"
+          },
+          "toDelegateHasAccount": {
+            "type": "boolean"
           },
           "recordedByMembershipId": {
             "type": "object"
@@ -6374,8 +6398,10 @@
           "unitName",
           "fromOwnerId",
           "fromOwnerName",
+          "toOwnerId",
           "toMembershipId",
           "toDelegateName",
+          "toDelegateHasAccount",
           "recordedByMembershipId",
           "createdAt"
         ]
@@ -7270,11 +7296,19 @@
       "DelegationCandidateDto": {
         "type": "object",
         "properties": {
+          "ownerId": {
+            "type": "string",
+            "nullable": true
+          },
           "membershipId": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "name": {
             "type": "string"
+          },
+          "hasAccount": {
+            "type": "boolean"
           },
           "hasDelegatedToRequester": {
             "type": "boolean"
@@ -7287,8 +7321,10 @@
           }
         },
         "required": [
+          "ownerId",
           "membershipId",
           "name",
+          "hasAccount",
           "hasDelegatedToRequester",
           "isEligible",
           "isUnitOwner"
@@ -7314,7 +7350,12 @@
             "format": "uuid",
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
           },
-          "delegateMembershipId": {
+          "toOwnerId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "toMembershipId": {
             "type": "string",
             "format": "uuid",
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
@@ -7326,8 +7367,7 @@
           }
         },
         "required": [
-          "unitId",
-          "delegateMembershipId"
+          "unitId"
         ]
       },
       "SubmitBallotDto": {
@@ -7807,6 +7847,31 @@
           "answers"
         ]
       },
+      "ParticipationRepresentativeDto": {
+        "type": "object",
+        "properties": {
+          "ownerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "membershipId": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "isUnitOwner": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ownerId",
+          "membershipId",
+          "name",
+          "isUnitOwner"
+        ]
+      },
       "ParticipationOwnerDto": {
         "type": "object",
         "properties": {
@@ -7917,6 +7982,17 @@
           },
           "isOwnUnit": {
             "type": "boolean"
+          },
+          "canVoteInApp": {
+            "type": "boolean"
+          },
+          "representative": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ParticipationRepresentativeDto"
+              }
+            ]
           },
           "owners": {
             "type": "array",

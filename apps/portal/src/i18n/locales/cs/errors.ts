@@ -72,6 +72,7 @@ export default {
         "Zastoupení lze určit pouze v naplánovaném hlasování.",
     NOT_A_UNIT_OWNER: "Nejste vlastníkem této jednotky.",
     UNIT_NOT_ELIGIBLE: "Tato jednotka v tomto hlasování nemá hlas.",
+    CONSENT_TARGET_INVALID: "Tuto osobu nelze určit jako zástupce.",
     MEMBERSHIP_HAS_NO_ASSOCIATED_OWNER:
         "Vaše členství není správně propojeno s profilem vlastníka.",
     LAST_ADMIN_CANNOT_BE_REMOVED:

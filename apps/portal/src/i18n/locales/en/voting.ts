@@ -717,6 +717,8 @@ export const voting = {
             },
             delegateLabel: "REPRESENTATIVE",
             delegateSubtext: "Person voting for you",
+            delegateNoAccount:
+                "Has no account yet — will vote on paper until they do",
             unitLabel: "UNIT",
             unitSubtext: "Property Asset",
             eventLabel: "VOTING EVENT",
@@ -730,6 +732,7 @@ export const voting = {
     },
     delegation: {
         coOwner: "Co-owner",
+        noAccount: "No account",
     },
     delegations: {
         tabs: {
@@ -871,10 +874,11 @@ export const voting = {
                 voted: "Voted",
                 notVoted: "Not voted",
                 ineligible: "Not eligible",
-                appUnavailable: "Can't vote in the app",
+                paperOnly: "Representative has no account · paper only",
+                invite: "Invite in People",
             },
             ineligibleReason: {
-                NO_REPRESENTATIVE: "No common representative",
+                NO_REPRESENTATIVE: "Co-owners have not chosen a representative",
                 MISSING_OWNERSHIP: "No registered owner",
                 ASSOCIATION_OWNED: "Owned by the association",
             },
@@ -899,6 +903,7 @@ export const voting = {
             signerLabel: "Who signed the ballot?",
             ownerRole: "Owner · owns {{share}}",
             representative: "Common representative",
+            representativeOnly: "Representative · does not own this unit",
             coOwnedHint:
                 "This unit is co-owned — the ballot should be signed by the common representative.",
             noOwners:
@@ -996,14 +1001,14 @@ export const voting = {
             voted: "Voted",
             notVoted: "Not voted",
             ineligible: "Not eligible",
-            appUnavailable: "Can't vote in the app",
+            paperOnly: "Representative has no account · paper only",
             inApp: "In app · {{date}}",
             onPaper: "Paper ballot · {{date}}",
             onPaperRecordedBy: "Paper ballot · {{date}} · recorded by {{name}}",
             ineligibleReason: {
                 MISSING_OWNERSHIP: "No owner on record",
                 ASSOCIATION_OWNED: "Owned by the association",
-                NO_REPRESENTATIVE: "No common representative",
+                NO_REPRESENTATIVE: "Co-owners have not chosen a representative",
             },
         },
         pill: { yours: "Yours", proxy: "By representative" },

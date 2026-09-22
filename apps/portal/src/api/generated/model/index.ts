@@ -107,6 +107,7 @@ export * from "./owningUnitStatusDtoStatus";
 export * from "./participationAnswerDto";
 export * from "./participationAnswerDtoOptionKey";
 export * from "./participationOwnerDto";
+export * from "./participationRepresentativeDto";
 export * from "./personResponseDto";
 export * from "./personResponseDtoKind";
 export * from "./personResponseDtoSource";

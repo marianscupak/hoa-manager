@@ -4,7 +4,7 @@
   "description": "",
   "author": "",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "build": "nest build",
     "generate": "dotenv -e .env.local -- ts-node -r tsconfig-paths/register src/generate-openapi.ts",

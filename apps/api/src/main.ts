@@ -39,7 +39,9 @@ async function bootstrap() {
     return document;
   };
 
-  SwaggerModule.setup('docs', app, documentFactory);
+  // Mounted under the /api prefix so it lands on /api/docs: in production Caddy
+  // only proxies /api/* to the API and serves everything else from the portal.
+  SwaggerModule.setup('docs', app, documentFactory, { useGlobalPrefix: true });
 
   await app.listen(process.env.PORT ?? 3000);
 }

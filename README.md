@@ -101,7 +101,7 @@ pnpm dev
 | ---------- | ---------------------------------------------------------------- |
 | Portal     | http://localhost:5173 (proxies `/api` to the API)                |
 | API        | http://localhost:3000/api                                        |
-| Swagger UI | http://localhost:3000/docs                                       |
+| Swagger UI | http://localhost:3000/api/docs                                   |
 | Grafana    | http://localhost:3100 (with `docker compose up -d` for the rest) |
 
 The seed creates a demo association with units, owners and votes, and an admin login: `admin@hoa.local` / `AdminPassword123!`.

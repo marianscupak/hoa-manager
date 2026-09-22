@@ -6,6 +6,10 @@ import type {
   ElectorateConsentInput,
   ElectoratePartyInput,
 } from '@/modules/voting/domain/vote/electorate-resolution';
+import {
+  memberRef,
+  ownerRef,
+} from '@/modules/voting/domain/vote/representative-ref';
 import { VoteWeightBasis } from '@/modules/voting/domain/vote/vote.types';
 import {
   MembershipHasNoAssociatedOwnerException,
@@ -88,7 +92,7 @@ const run = (
       TENANT,
       VOTE,
       UNIT,
-      delegateMembershipId,
+      { toMembershipId: delegateMembershipId },
       'caller-membership',
     ),
   );
@@ -100,7 +104,7 @@ describe('PreviewConsentOutcomeHandler', () => {
         {
           unitId: UNIT,
           fromOwnerId: 'husband',
-          toMembershipId: WIFE_MEMBERSHIP,
+          to: ownerRef('wife'),
         },
       ],
     });
@@ -124,7 +128,7 @@ describe('PreviewConsentOutcomeHandler', () => {
         {
           unitId: UNIT,
           fromOwnerId: 'husband',
-          toMembershipId: BOARD_MEMBERSHIP,
+          to: memberRef(BOARD_MEMBERSHIP),
         },
       ],
     });
@@ -167,5 +171,37 @@ describe('PreviewConsentOutcomeHandler', () => {
     await expect(run(handler)).rejects.toThrow(
       MembershipHasNoAssociatedOwnerException,
     );
+  });
+
+  it('previews a consent that names the other spouse as an owner without an account', async () => {
+    const { handler } = buildHandler({
+      parties: [
+        { ...SJM, members: [member('wife', null), member('husband', null)] },
+      ],
+      consents: [],
+      ownerIdByMembership: 'wife',
+    });
+    // The caller here is an admin previewing for the wife; the handler still
+    // resolves the grantor from the caller's membership, so the spec keeps
+    // the wife as the caller's owner.
+    const result = await handler.execute(
+      new PreviewConsentOutcomeQuery(
+        TENANT,
+        VOTE,
+        UNIT,
+        { toOwnerId: 'husband' },
+        WIFE_MEMBERSHIP,
+      ),
+    );
+    expect(result.wouldLeaveUnitWithoutRepresentative).toBe(false);
+  });
+
+  it('rejects a preview that names both or neither target', async () => {
+    const { handler } = buildHandler();
+    await expect(
+      handler.execute(
+        new PreviewConsentOutcomeQuery(TENANT, VOTE, UNIT, {}, WIFE_MEMBERSHIP),
+      ),
+    ).rejects.toMatchObject({ code: 'CONSENT_TARGET_INVALID' });
   });
 });

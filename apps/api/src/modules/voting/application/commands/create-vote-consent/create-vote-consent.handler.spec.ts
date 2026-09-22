@@ -20,6 +20,8 @@ function buildHandler(overrides?: {
   saveImpl?: () => Promise<string>;
   mode?: VoteMode;
   status?: VoteStatus;
+  isDelegableOwner?: boolean;
+  isActiveMembership?: boolean;
 }) {
   const voteWriteRepo = {
     findById: jest.fn().mockResolvedValue({
@@ -49,6 +51,12 @@ function buildHandler(overrides?: {
     isActiveUnitOwner: jest
       .fn()
       .mockResolvedValue(overrides?.isActiveUnitOwner ?? true),
+    isDelegableOwner: jest
+      .fn()
+      .mockResolvedValue(overrides?.isDelegableOwner ?? true),
+    isActiveMembership: jest
+      .fn()
+      .mockResolvedValue(overrides?.isActiveMembership ?? true),
   };
   const unitOfWork = { execute: jest.fn((fn: () => Promise<void>) => fn()) };
   const clock = { now: () => new Date('2026-08-31T10:00:00Z') };
@@ -97,7 +105,7 @@ describe('CreateVoteConsentHandler', () => {
         VOTE,
         UNIT,
         RECORDER_MEMBERSHIP,
-        DELEGATE_MEMBERSHIP,
+        { toMembershipId: DELEGATE_MEMBERSHIP },
         ['ADMIN'],
         'owner-accountless-1',
       ),
@@ -119,6 +127,7 @@ describe('CreateVoteConsentHandler', () => {
         voteId: VOTE,
         unitId: UNIT,
         fromOwnerId: 'owner-accountless-1',
+        toOwnerId: null,
         toMembershipId: DELEGATE_MEMBERSHIP,
         recordedByMembershipId: RECORDER_MEMBERSHIP,
         status: VoteUnitConsentStatus.VALID,
@@ -139,7 +148,7 @@ describe('CreateVoteConsentHandler', () => {
           VOTE,
           UNIT,
           RECORDER_MEMBERSHIP,
-          DELEGATE_MEMBERSHIP,
+          { toMembershipId: DELEGATE_MEMBERSHIP },
           ['BOARD_MEMBER'],
           'owner-not-active-1',
         ),
@@ -157,7 +166,7 @@ describe('CreateVoteConsentHandler', () => {
           VOTE,
           UNIT,
           RECORDER_MEMBERSHIP,
-          DELEGATE_MEMBERSHIP,
+          { toMembershipId: DELEGATE_MEMBERSHIP },
           ['UNIT_OWNER'],
           'owner-accountless-1',
         ),
@@ -177,7 +186,7 @@ describe('CreateVoteConsentHandler', () => {
         VOTE,
         UNIT,
         RECORDER_MEMBERSHIP,
-        DELEGATE_MEMBERSHIP,
+        { toMembershipId: DELEGATE_MEMBERSHIP },
         ['UNIT_OWNER'],
       ),
     );
@@ -216,7 +225,7 @@ describe('CreateVoteConsentHandler', () => {
           VOTE,
           UNIT,
           RECORDER_MEMBERSHIP,
-          DELEGATE_MEMBERSHIP,
+          { toMembershipId: DELEGATE_MEMBERSHIP },
           ['UNIT_OWNER'],
         ),
       ),
@@ -238,7 +247,7 @@ describe('CreateVoteConsentHandler', () => {
           VOTE,
           UNIT,
           RECORDER_MEMBERSHIP,
-          DELEGATE_MEMBERSHIP,
+          { toMembershipId: DELEGATE_MEMBERSHIP },
           ['ADMIN'],
           'owner-accountless-1',
         ),
@@ -262,7 +271,7 @@ describe('CreateVoteConsentHandler', () => {
         VOTE,
         UNIT,
         RECORDER_MEMBERSHIP,
-        DELEGATE_MEMBERSHIP,
+        { toMembershipId: DELEGATE_MEMBERSHIP },
         ['ADMIN'],
         'owner-accountless-1',
       ),
@@ -285,7 +294,7 @@ describe('CreateVoteConsentHandler', () => {
           VOTE,
           UNIT,
           RECORDER_MEMBERSHIP,
-          DELEGATE_MEMBERSHIP,
+          { toMembershipId: DELEGATE_MEMBERSHIP },
           ['ADMIN'],
           'owner-accountless-1',
         ),
@@ -307,11 +316,128 @@ describe('CreateVoteConsentHandler', () => {
           VOTE,
           UNIT,
           RECORDER_MEMBERSHIP,
-          DELEGATE_MEMBERSHIP,
+          { toMembershipId: DELEGATE_MEMBERSHIP },
           ['ADMIN'],
           'owner-accountless-1',
         ),
       ),
     ).rejects.toMatchObject({ code: 'INVALID_VOTE_STATUS_FOR_DELEGATION' });
+  });
+
+  it('records a consent to a co-owner as an owner, who may have no account at all', async () => {
+    const { handler, consentWriteRepo, auditService } = buildHandler();
+
+    await handler.execute(
+      new CreateVoteConsentCommand(
+        TENANT,
+        VOTE,
+        UNIT,
+        RECORDER_MEMBERSHIP,
+        { toOwnerId: 'husband' },
+        ['ADMIN'],
+        'wife',
+      ),
+    );
+
+    expect(consentWriteRepo.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        fromOwnerId: 'wife',
+        toOwnerId: 'husband',
+        toMembershipId: null,
+      }),
+    );
+    expect(auditService.append).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({
+          delegateOwnerId: 'husband',
+          delegateMembershipId: null,
+        }),
+      }),
+    );
+  });
+
+  it('rejects a consent that names both a member and an owner', async () => {
+    const { handler } = buildHandler();
+    await expect(
+      handler.execute(
+        new CreateVoteConsentCommand(
+          TENANT,
+          VOTE,
+          UNIT,
+          RECORDER_MEMBERSHIP,
+          { toOwnerId: 'husband', toMembershipId: DELEGATE_MEMBERSHIP },
+          ['ADMIN'],
+          'wife',
+        ),
+      ),
+    ).rejects.toMatchObject({ code: 'CONSENT_TARGET_INVALID' });
+  });
+
+  it('rejects a consent that names nobody', async () => {
+    const { handler } = buildHandler();
+    await expect(
+      handler.execute(
+        new CreateVoteConsentCommand(
+          TENANT,
+          VOTE,
+          UNIT,
+          RECORDER_MEMBERSHIP,
+          {},
+          ['ADMIN'],
+          'wife',
+        ),
+      ),
+    ).rejects.toMatchObject({ code: 'CONSENT_TARGET_INVALID' });
+  });
+
+  it('rejects an owner consenting to themselves', async () => {
+    const { handler } = buildHandler();
+    await expect(
+      handler.execute(
+        new CreateVoteConsentCommand(
+          TENANT,
+          VOTE,
+          UNIT,
+          RECORDER_MEMBERSHIP,
+          { toOwnerId: 'wife' },
+          ['ADMIN'],
+          'wife',
+        ),
+      ),
+    ).rejects.toMatchObject({ code: 'CONSENT_TARGET_INVALID' });
+  });
+
+  it('rejects the association or an unknown owner as the target', async () => {
+    const { handler } = buildHandler({ isDelegableOwner: false });
+    await expect(
+      handler.execute(
+        new CreateVoteConsentCommand(
+          TENANT,
+          VOTE,
+          UNIT,
+          RECORDER_MEMBERSHIP,
+          { toOwnerId: 'svj' },
+          ['ADMIN'],
+          'wife',
+        ),
+      ),
+    ).rejects.toMatchObject({ code: 'CONSENT_TARGET_INVALID' });
+  });
+
+  it('rejects a membership that is not active', async () => {
+    const { handler } = buildHandler({ isActiveMembership: false });
+    await expect(
+      handler.execute(
+        new CreateVoteConsentCommand(
+          TENANT,
+          VOTE,
+          UNIT,
+          RECORDER_MEMBERSHIP,
+          { toMembershipId: 'm-suspended' },
+          ['ADMIN'],
+          'wife',
+        ),
+      ),
+    ).rejects.toMatchObject({ code: 'CONSENT_TARGET_INVALID' });
   });
 });

@@ -50,7 +50,7 @@ export interface VoteWriteRepository {
     voteId: string,
     membershipId: string,
     unitIds: string[],
-  ): Promise<{ unitId: string; representativeMembershipId: string | null }[]>;
+  ): Promise<{ unitId: string; channelMembershipId: string | null }[]>;
   hasExistingBallots(
     tenantId: string,
     voteId: string,
@@ -62,6 +62,7 @@ export interface VoteWriteRepository {
     unitId: string,
   ): Promise<{
     unitId: string;
+    representativeOwnerId: string | null;
     representativeMembershipId: string | null;
     eligibilityStatus: string;
     ineligibleReason: ElectorateIneligibleReason | null;

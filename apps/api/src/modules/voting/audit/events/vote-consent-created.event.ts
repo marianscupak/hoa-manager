@@ -13,7 +13,10 @@ const PayloadSchema = z.object({
   // recording a POA for an account-less owner) — there is no membership to
   // point to in that case.
   ownerMembershipId: z.uuid().nullable(),
-  delegateMembershipId: z.uuid(),
+  // Exactly one is set — the representative is a person, stored as the
+  // owner when they own in the tenant, else as the membership.
+  delegateOwnerId: z.uuid().nullable(),
+  delegateMembershipId: z.uuid().nullable(),
   recordedByMembershipId: z.uuid(),
   labels: z.object({
     voteTitle: z.string(),
@@ -41,7 +44,8 @@ export const VoteConsentCreatedAuditEvent = defineAuditEvent({
     unitLabel: string;
     ownerMembershipId: string | null;
     ownerLabel: string;
-    delegateMembershipId: string;
+    delegateOwnerId: string | null;
+    delegateMembershipId: string | null;
     delegateLabel: string;
     recordedByMembershipId: string;
     actor: AuditActor;
@@ -58,6 +62,7 @@ export const VoteConsentCreatedAuditEvent = defineAuditEvent({
         consentId: input.consentId,
         unitId: input.unitId,
         ownerMembershipId: input.ownerMembershipId,
+        delegateOwnerId: input.delegateOwnerId,
         delegateMembershipId: input.delegateMembershipId,
         recordedByMembershipId: input.recordedByMembershipId,
         labels: {

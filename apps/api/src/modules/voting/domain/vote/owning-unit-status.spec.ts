@@ -3,11 +3,14 @@ import {
   OwnershipPartyType,
 } from '@/modules/core/property/domain/ownership-plan';
 
+import { channelMembershipIdFromParties } from './electorate-channel';
 import {
   resolveElectorateUnits,
+  type ElectorateConsentInput,
   type ElectoratePartyInput,
 } from './electorate-resolution';
 import { deriveOwningUnitStatus } from './owning-unit-status';
+import { memberRef, ownerRef } from './representative-ref';
 import {
   ElectorateEligibilityStatus,
   ElectorateIneligibleReason,
@@ -42,7 +45,7 @@ describe('deriveOwningUnitStatus', () => {
 
   const preview = (
     parties: ElectoratePartyInput[],
-    consents: { unitId: string; fromOwnerId: string; toMembershipId: string }[],
+    consents: ElectorateConsentInput[],
     membershipId: string,
     isOwner = true,
   ) => {
@@ -56,6 +59,7 @@ describe('deriveOwningUnitStatus', () => {
       resolved,
       status: deriveOwningUnitStatus({
         resolved,
+        channelMembershipId: channelMembershipIdFromParties(resolved, parties),
         membershipId,
         isOwner,
         hasVoted: false,
@@ -73,7 +77,7 @@ describe('deriveOwningUnitStatus', () => {
     it('previews READY for the share-majority holder', () => {
       const { resolved, status } = preview(parties, [], 'm-a');
 
-      expect(resolved.representativeMembershipId).toBe('m-a');
+      expect(resolved.representativeOwnerId).toBe('own-a');
       expect(status).toBe(OwningUnitStatus.READY);
     });
 
@@ -89,7 +93,7 @@ describe('deriveOwningUnitStatus', () => {
 
     const { resolved, status } = preview(parties, [], 'm-a');
 
-    expect(resolved.representativeMembershipId).toBeNull();
+    expect(resolved.representativeOwnerId).toBeNull();
     expect(resolved.ineligibleReason).toBe(
       ElectorateIneligibleReason.NO_REPRESENTATIVE,
     );
@@ -99,7 +103,7 @@ describe('deriveOwningUnitStatus', () => {
   it('previews READY once the 1/2 deadlock is broken by a consent', () => {
     const parties = [party('own-a', 'm-a', 1, 2), party('own-b', 'm-b', 1, 2)];
     const consents = [
-      { unitId: 'u1', fromOwnerId: 'own-b', toMembershipId: 'm-a' },
+      { unitId: 'u1', fromOwnerId: 'own-b', to: ownerRef('own-a') },
     ];
 
     expect(preview(parties, consents, 'm-a').status).toBe(
@@ -116,9 +120,24 @@ describe('deriveOwningUnitStatus', () => {
     );
   });
 
+  it('previews DELEGATED for a co-owner with an account whose unit is represented by an account-less co-owner', () => {
+    const parties = [
+      party('own-a', 'm-a', 2, 5),
+      {
+        ...party('own-b', 'm-b', 3, 5),
+        members: [
+          { ownerId: 'own-b', ownerKind: OwnerKind.PERSON, membershipId: null },
+        ],
+      },
+    ];
+    const { resolved, status } = preview(parties, [], 'm-a');
+    expect(resolved.representativeOwnerId).toBe('own-b');
+    expect(status).toBe(OwningUnitStatus.DELEGATED);
+  });
+
   it('previews DELEGATED for a sole owner who delegated the unit', () => {
     const consents = [
-      { unitId: 'u1', fromOwnerId: 'own-a', toMembershipId: 'm-x' },
+      { unitId: 'u1', fromOwnerId: 'own-a', to: memberRef('m-x') },
     ];
 
     const { resolved, status } = preview(
@@ -140,7 +159,7 @@ describe('deriveOwningUnitStatus', () => {
   describe('a member who represents a unit they do not own', () => {
     const parties = [party('own-a', 'm-a', 1, 1)];
     const consents = [
-      { unitId: 'u1', fromOwnerId: 'own-a', toMembershipId: 'm-x' },
+      { unitId: 'u1', fromOwnerId: 'own-a', to: memberRef('m-x') },
     ];
 
     it('previews PROXY, so the unit reaches the delegate at all', () => {
@@ -160,6 +179,10 @@ describe('deriveOwningUnitStatus', () => {
       expect(
         deriveOwningUnitStatus({
           resolved,
+          channelMembershipId: channelMembershipIdFromParties(
+            resolved,
+            parties,
+          ),
           membershipId: 'm-x',
           isOwner: false,
           hasVoted: true,
@@ -172,10 +195,10 @@ describe('deriveOwningUnitStatus', () => {
       expect(
         deriveOwningUnitStatus({
           resolved: {
-            representativeMembershipId: 'm-x',
             eligibilityStatus: ElectorateEligibilityStatus.ELIGIBLE,
             ineligibleReason: null,
           },
+          channelMembershipId: 'm-x',
           membershipId: 'm-x',
           isOwner: false,
           hasVoted: false,
@@ -190,7 +213,7 @@ describe('deriveOwningUnitStatus', () => {
     // the unit, so it is theirs to vote — not a proxy for someone else.
     const parties = [party('own-a', 'm-a', 1, 2), party('own-b', 'm-b', 1, 2)];
     const consents = [
-      { unitId: 'u1', fromOwnerId: 'own-b', toMembershipId: 'm-a' },
+      { unitId: 'u1', fromOwnerId: 'own-b', to: ownerRef('own-a') },
     ];
 
     expect(preview(parties, consents, 'm-a').status).toBe(
@@ -208,9 +231,10 @@ describe('deriveOwningUnitStatus', () => {
   });
 
   it('reports VOTED ahead of READY once a ballot exists', () => {
+    const parties = [party('own-a', 'm-a', 1, 1)];
     const [resolved] = resolveElectorateUnits(
       [UNIT],
-      [party('own-a', 'm-a', 1, 1)],
+      parties,
       [],
       VoteWeightBasis.UNIT_SHARE,
     );
@@ -218,6 +242,7 @@ describe('deriveOwningUnitStatus', () => {
     expect(
       deriveOwningUnitStatus({
         resolved,
+        channelMembershipId: channelMembershipIdFromParties(resolved, parties),
         membershipId: 'm-a',
         isOwner: true,
         hasVoted: true,
@@ -228,7 +253,6 @@ describe('deriveOwningUnitStatus', () => {
 
   describe('SNAPSHOT phase', () => {
     const frozen = {
-      representativeMembershipId: null,
       eligibilityStatus: ElectorateEligibilityStatus.INELIGIBLE,
       ineligibleReason: ElectorateIneligibleReason.NO_REPRESENTATIVE,
     };
@@ -237,6 +261,7 @@ describe('deriveOwningUnitStatus', () => {
       expect(
         deriveOwningUnitStatus({
           resolved: frozen,
+          channelMembershipId: null,
           membershipId: 'm-a',
           isOwner: true,
           hasVoted: false,

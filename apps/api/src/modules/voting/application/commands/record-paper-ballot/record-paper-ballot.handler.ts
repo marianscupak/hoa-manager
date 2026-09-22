@@ -92,18 +92,15 @@ export class RecordPaperBallotHandler
       if (!vote) throw new VoteNotFoundException();
       if (vote.status !== VoteStatus.OPEN) throw new VoteNotOpenException();
 
-      // The electorate is frozen at open time. What the snapshot decided is
-      // who may cast in the app; a signed paper ballot only needs an owner,
-      // so a unit with no common representative is still recordable here.
+      // The electorate is frozen at open time. Per rollam a unit votes only
+      // through its designated representative — who need not have an account;
+      // a signed paper ballot is exactly how such an owner votes.
       const electorateUnit = await this.voteWriteRepository.findElectorateUnit(
         tenantId,
         voteId,
         unitId,
       );
-      if (
-        !electorateUnit ||
-        !isRecordableOnPaper(electorateUnit.ineligibleReason)
-      ) {
+      if (!electorateUnit || !isRecordableOnPaper(electorateUnit)) {
         throw new UnitNotEligibleException();
       }
 
@@ -114,13 +111,21 @@ export class RecordPaperBallotHandler
       );
       if (existing.size > 0) throw new BallotAlreadyCastException();
 
+      // The signer is an owner of the unit, or the designated representative
+      // even when they own no share of it (an outsider holding a power of
+      // attorney).
       const signerOwnsUnit = await this.voteReadRepository.isActiveUnitOwner(
         tenantId,
         unitId,
         signerOwnerId,
         occurredAt,
       );
-      if (!signerOwnsUnit) throw new NotAUnitOwnerException();
+      if (
+        !signerOwnsUnit &&
+        signerOwnerId !== electorateUnit.representativeOwnerId
+      ) {
+        throw new NotAUnitOwnerException();
+      }
 
       const attachment = await this.documentRepository.findById(
         tenantId,

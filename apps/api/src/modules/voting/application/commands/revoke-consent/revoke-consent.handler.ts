@@ -78,6 +78,7 @@ export class RevokeConsentHandler
       command.tenantId,
       consent.fromOwnerId,
     );
+    const delegateOwnerId = consent.toOwnerId;
     const delegateMembershipId = consent.toMembershipId;
 
     await this.unitOfWork.execute(async () => {
@@ -93,7 +94,11 @@ export class RevokeConsentHandler
           this.labelResolver.resolveVoteTitle(consent.voteId),
           this.labelResolver.resolveUnitLabel(consent.unitId),
           this.labelResolver.resolveOwnerLabel(consent.fromOwnerId),
-          this.labelResolver.resolveMembershipLabel(delegateMembershipId),
+          delegateOwnerId
+            ? this.labelResolver.resolveOwnerLabel(delegateOwnerId)
+            : this.labelResolver.resolveMembershipLabel(
+                delegateMembershipId as string,
+              ),
           this.labelResolver.resolveActorLabel(actor),
         ]);
 
@@ -107,6 +112,7 @@ export class RevokeConsentHandler
           unitLabel,
           ownerMembershipId,
           ownerLabel,
+          delegateOwnerId,
           delegateMembershipId,
           delegateLabel,
           revokedByMembershipId: command.membershipId,

@@ -1,0 +1,7 @@
+ALTER TABLE "vote_unit_consents" ALTER COLUMN "to_membership_id" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "vote_unit_consents" ADD COLUMN "to_owner_id" uuid;--> statement-breakpoint
+ALTER TABLE "vote_electorate_units" ADD COLUMN "representative_owner_id" uuid;--> statement-breakpoint
+ALTER TABLE "vote_unit_consents" ADD CONSTRAINT "vote_unit_consents_to_owner_id_owners_id_fk" FOREIGN KEY ("to_owner_id") REFERENCES "public"."owners"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "vote_electorate_units" ADD CONSTRAINT "vote_electorate_units_representative_owner_id_owners_id_fk" FOREIGN KEY ("representative_owner_id") REFERENCES "public"."owners"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "vote_unit_consents" ADD CONSTRAINT "chk_vote_unit_consents_one_target" CHECK (("vote_unit_consents"."to_owner_id" IS NULL) <> ("vote_unit_consents"."to_membership_id" IS NULL));--> statement-breakpoint
+ALTER TABLE "vote_electorate_units" ADD CONSTRAINT "chk_vote_electorate_units_one_representative" CHECK ("vote_electorate_units"."representative_owner_id" IS NULL OR "vote_electorate_units"."representative_membership_id" IS NULL);

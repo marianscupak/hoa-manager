@@ -116,6 +116,13 @@ export enum ElectorateIneligibleReason {
 
 export interface ElectorateUnit {
   unitId: string;
+  /** The owner who represents the unit — a sole or majority owner, or a
+   *  co-owner the others designated. Null when a member with no owner record
+   *  in the tenant represents it, or when nobody does. */
+  representativeOwnerId: string | null;
+  /** Only set for a representative who owns nothing in the tenant (a delegate
+   *  by consent). For an owner-representative the account is looked up live
+   *  from the owner's user link — see the "channel" helpers. */
   representativeMembershipId: string | null;
   eligibilityStatus: ElectorateEligibilityStatus;
   ineligibleReason: ElectorateIneligibleReason | null;

@@ -2,8 +2,6 @@ import { Inject } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
-import { isRecordableOnPaper } from '@/modules/voting/domain/vote/paper-ballot-eligibility';
-import { type ElectorateIneligibleReason } from '@/modules/voting/domain/vote/vote.types';
 import { VoteNotFoundException } from '@/shared/application/exceptions/vote.exceptions';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 
@@ -24,40 +22,26 @@ const BOARD_VIEW_ROLES: readonly TenantMembershipRole[] = [
 ];
 
 /**
- * The snapshot says who may cast in the app; this screen is where the board
- * records paper ballots, which only need a signing owner. A unit the snapshot
- * marked ineligible for want of a common representative therefore reads as
- * simply "not voted" — still awaiting its paper ballot — while the reason is
- * kept so the board view can say the unit cannot vote in the app.
- */
-function withPaperRecordability(
-  unit: VoteParticipationUnitDto,
-): VoteParticipationUnitDto {
-  if (
-    unit.status === 'INELIGIBLE' &&
-    isRecordableOnPaper(
-      (unit.ineligibleReason as ElectorateIneligibleReason | undefined) ?? null,
-    )
-  ) {
-    return { ...unit, status: 'NOT_VOTED' };
-  }
-  return unit;
-}
-
-/**
  * What a unit owner may see: that a unit exists, its weight, and whether it
  * has voted. Built by construction rather than by deleting keys, so a field
  * added to the repository row is excluded by default instead of leaking
- * until someone remembers to redact it. `ineligibleReason` stays out: the
- * remaining INELIGIBLE units are genuinely outside the electorate, and an
- * owner does not need to know why.
+ * until someone remembers to redact it.
+ *
+ * `status` is narrowed too: a unit whose co-owners never settled on a
+ * representative reads as simply "not voted" — to a neighbour the question is
+ * whose ballot is missing, not why — while a unit with no owner on record
+ * stays INELIGIBLE because it is genuinely outside the electorate.
  */
 function toOwnerView(unit: VoteParticipationUnitDto): VoteParticipationUnitDto {
   return {
     unitId: unit.unitId,
     unitNo: unit.unitNo,
     share: unit.share,
-    status: unit.status,
+    status:
+      unit.status === 'INELIGIBLE' &&
+      unit.ineligibleReason === 'NO_REPRESENTATIVE'
+        ? 'NOT_VOTED'
+        : unit.status,
     ownsUnit: unit.ownsUnit,
     isProxy: unit.isProxy,
   };
@@ -95,7 +79,6 @@ export class GetVoteParticipationHandler
       BOARD_VIEW_ROLES.includes(role),
     );
 
-    const recordable = units.map(withPaperRecordability);
-    return { units: isBoardView ? recordable : recordable.map(toOwnerView) };
+    return { units: isBoardView ? units : units.map(toOwnerView) };
   }
 }

@@ -12,7 +12,10 @@ const PayloadSchema = z.object({
   // `null` when the consent's grantor has no user account (and therefore no
   // membership) — e.g. a POA recorded for an SJM spouse without a login.
   ownerMembershipId: z.uuid().nullable(),
-  delegateMembershipId: z.uuid(),
+  // Exactly one is set — the representative is a person, stored as the
+  // owner when they own in the tenant, else as the membership.
+  delegateOwnerId: z.uuid().nullable(),
+  delegateMembershipId: z.uuid().nullable(),
   revokedByMembershipId: z.uuid(),
   labels: z.object({
     voteTitle: z.string(),
@@ -40,7 +43,8 @@ export const VoteConsentRevokedAuditEvent = defineAuditEvent({
     unitLabel: string;
     ownerMembershipId: string | null;
     ownerLabel: string;
-    delegateMembershipId: string;
+    delegateOwnerId: string | null;
+    delegateMembershipId: string | null;
     delegateLabel: string;
     revokedByMembershipId: string;
     actor: AuditActor;
@@ -57,6 +61,7 @@ export const VoteConsentRevokedAuditEvent = defineAuditEvent({
         consentId: input.consentId,
         unitId: input.unitId,
         ownerMembershipId: input.ownerMembershipId,
+        delegateOwnerId: input.delegateOwnerId,
         delegateMembershipId: input.delegateMembershipId,
         revokedByMembershipId: input.revokedByMembershipId,
         labels: {

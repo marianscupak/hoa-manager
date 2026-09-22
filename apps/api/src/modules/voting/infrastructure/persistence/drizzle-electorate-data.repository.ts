@@ -16,6 +16,7 @@ import {
   type OwnershipPartyType,
 } from '@/modules/core/property/domain/ownership-plan';
 
+import { findOwnerIdsByMembershipIds } from './owner-lookup';
 import {
   ElectorateConsentData,
   ElectorateDataRepository,
@@ -83,6 +84,7 @@ export class DrizzleElectorateDataRepository
         and(
           eq(owners.userId, tenantMemberships.userId),
           eq(owners.tenantId, tenantMemberships.tenantId),
+          eq(tenantMemberships.status, 'ACTIVE'),
         ),
       )
       .where(
@@ -124,6 +126,7 @@ export class DrizzleElectorateDataRepository
       .select({
         unitId: voteUnitConsents.unitId,
         fromOwnerId: voteUnitConsents.fromOwnerId,
+        toOwnerId: voteUnitConsents.toOwnerId,
         toMembershipId: voteUnitConsents.toMembershipId,
       })
       .from(voteUnitConsents)
@@ -134,5 +137,16 @@ export class DrizzleElectorateDataRepository
           eq(voteUnitConsents.status, 'VALID'),
         ),
       );
+  }
+
+  findOwnerIdsByMembershipIds(
+    tenantId: string,
+    membershipIds: string[],
+  ): Promise<Map<string, string>> {
+    return findOwnerIdsByMembershipIds(
+      this.drizzle.db,
+      tenantId,
+      membershipIds,
+    );
   }
 }

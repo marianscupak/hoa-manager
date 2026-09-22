@@ -2,6 +2,7 @@ import { Inject } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 import { ConsentPreviewResponseDto } from '@/modules/voting/api/dto/vote.dto';
+import { toRepresentativeRef } from '@/modules/voting/application/commands/create-vote-consent/consent-target-input';
 import {
   VOTE_READ_REPOSITORY,
   type VoteReadRepository,
@@ -47,6 +48,7 @@ export class PreviewConsentOutcomeHandler
     query: PreviewConsentOutcomeQuery,
   ): Promise<ConsentPreviewResponseDto> {
     const now = this.clock.now();
+    const to = toRepresentativeRef(query.target);
 
     const ownerId = await this.voteReadRepository.getOwnerIdByMembership(
       query.tenantId,
@@ -79,7 +81,7 @@ export class PreviewConsentOutcomeHandler
       applyHypotheticalConsent(inputs.consents, {
         unitId: query.unitId,
         fromOwnerId: ownerId,
-        toMembershipId: query.delegateMembershipId,
+        to,
       }),
       inputs.weightBasis,
     );

@@ -28,7 +28,7 @@ export class GetDelegationCandidatesHandler
       query.tenantId,
       query.voteId,
       query.unitId,
-      query.forMembershipId,
+      { membershipId: query.forMembershipId, ownerId: query.fromOwnerId },
       query.requesterMembershipId,
       this.clock.now(),
     );

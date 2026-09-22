@@ -1,29 +1,16 @@
-import { ElectorateIneligibleReason } from './vote.types';
-
 /**
- * Ineligibilities a signed paper ballot cannot cure.
+ * Whether the board may record a paper ballot for this unit in a per-rollam
+ * vote: only a unit with a designated representative. The representative
+ * need not have an account — that is exactly who paper ballots are for — but
+ * co-owners who never agreed on one cannot be cured by a signature; per
+ * rollam the designation happens before the vote opens (see
+ * `CreateVoteConsentHandler`).
  *
- * A unit the association owns casts no vote at all, and a unit with no
- * ownership on record has nobody who could have signed the ballot.
- *
- * NO_REPRESENTATIVE is deliberately absent. The common representative is
- * what tells the app booth which account may cast for the unit, and
- * `resolveElectorateUnits` only considers memberships as candidates — so a
- * sole owner who simply has no user account lands here too. Paper ballots
- * exist for exactly those owners: the signer is an owner, checked against
- * the ownership register, not a membership. Mirrors `isRecordableAtAssembly`.
- *
- * The tally agrees: a ballot from such a unit counts, because `tally.ts`
- * weights every countable unit and only reports `eligibleWeight` separately.
+ * Contrast `isRecordableAtAssembly`, which tolerates NO_REPRESENTATIVE
+ * because a meeting settles it in the room.
  */
-const UNCURABLE_ON_PAPER: (ElectorateIneligibleReason | null)[] = [
-  ElectorateIneligibleReason.ASSOCIATION_OWNED,
-  ElectorateIneligibleReason.MISSING_OWNERSHIP,
-];
-
-/** Whether the board may record a paper ballot for this unit. */
-export function isRecordableOnPaper(
-  ineligibleReason: ElectorateIneligibleReason | null,
-): boolean {
-  return !UNCURABLE_ON_PAPER.includes(ineligibleReason);
+export function isRecordableOnPaper(row: {
+  eligibilityStatus: string;
+}): boolean {
+  return row.eligibilityStatus === 'ELIGIBLE';
 }

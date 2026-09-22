@@ -22,6 +22,7 @@ import {
   VoteStatus,
   VoteWeightBasis,
 } from '@/modules/voting/domain/vote/vote.types';
+import { channelMembershipIdSql } from '@/modules/voting/infrastructure/persistence/electorate-channel.sql';
 import {
   VoteNotOpenException,
   VoteNotScheduledException,
@@ -364,8 +365,7 @@ export async function openPhaseTwoVote(
 
   const [electorateRow] = await deps.db
     .select({
-      representativeMembershipId:
-        schema.voteElectorateUnits.representativeMembershipId,
+      channelMembershipId: channelMembershipIdSql(),
     })
     .from(schema.voteElectorateUnits)
     .where(
@@ -375,7 +375,7 @@ export async function openPhaseTwoVote(
       ),
     )
     .limit(1);
-  if (!electorateRow || electorateRow.representativeMembershipId === null) {
+  if (!electorateRow || electorateRow.channelMembershipId === null) {
     console.warn(
       `⚠️  WARNING: the participant's unit has no representative in the electorate for "${vote.title}" — task O3 will fail until this is fixed.`,
     );

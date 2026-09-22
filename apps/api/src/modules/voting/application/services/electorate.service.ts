@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 
+import { canonicalizeConsentTargets } from '@/modules/voting/domain/vote/consent-target';
 import { resolveElectorateUnits } from '@/modules/voting/domain/vote/electorate-resolution';
 import { VoteAggregate } from '@/modules/voting/domain/vote/vote.aggregate';
 import {
@@ -28,11 +29,26 @@ export class ElectorateDomainService implements ElectorateService {
     vote: VoteAggregate,
     now: Date,
   ): Promise<ElectorateUnit[]> {
-    const [units, parties, consents] = await Promise.all([
+    const [units, parties, storedConsents] = await Promise.all([
       this.electorateDataRepository.findAllUnits(vote.tenantId),
       this.electorateDataRepository.findOwnershipParties(vote.tenantId, now),
       this.electorateDataRepository.findValidConsents(vote.tenantId, vote.id),
     ]);
+
+    const membershipTargets = [
+      ...new Set(
+        storedConsents.flatMap((c) =>
+          c.toMembershipId ? [c.toMembershipId] : [],
+        ),
+      ),
+    ];
+    const ownerIdByMembership =
+      membershipTargets.length === 0
+        ? new Map<string, string>()
+        : await this.electorateDataRepository.findOwnerIdsByMembershipIds(
+            vote.tenantId,
+            membershipTargets,
+          );
 
     const weightBasis = vote.ruleset?.weightBasis ?? VoteWeightBasis.UNIT_SHARE;
 
@@ -45,7 +61,7 @@ export class ElectorateDomainService implements ElectorateService {
         shareDenominator: p.shareDenominator,
         members: p.members,
       })),
-      consents,
+      canonicalizeConsentTargets(storedConsents, ownerIdByMembership),
       weightBasis,
     );
   }

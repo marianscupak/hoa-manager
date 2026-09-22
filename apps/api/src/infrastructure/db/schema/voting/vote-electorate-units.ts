@@ -1,5 +1,14 @@
-import { pgTable, timestamp, uuid, integer, unique } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
+import {
+  pgTable,
+  timestamp,
+  uuid,
+  integer,
+  unique,
+  check,
+} from 'drizzle-orm/pg-core';
 
+import { owners } from '@/infrastructure/db/schema/core/owners';
 import { tenantMemberships } from '@/infrastructure/db/schema/core/tenant-memberships';
 import { tenants } from '@/infrastructure/db/schema/core/tenants';
 import { units } from '@/infrastructure/db/schema/core/units';
@@ -26,6 +35,10 @@ export const voteElectorateUnits = pgTable(
       () => tenantMemberships.id,
       { onDelete: 'cascade' },
     ),
+    representativeOwnerId: uuid('representative_owner_id').references(
+      () => owners.id,
+      { onDelete: 'set null' },
+    ),
     eligibilityStatus:
       electorateEligibilityStatusEnum('eligibility_status').notNull(),
     ineligibleReason: electorateIneligibleReasonEnum('ineligible_reason'),
@@ -40,5 +53,9 @@ export const voteElectorateUnits = pgTable(
     unqVoteElectorateUnitsVoteIdUnitId: unique(
       'unq_vote_electorate_units_vote_id_unit_id',
     ).on(table.voteId, table.unitId),
+    chkOneRepresentative: check(
+      'chk_vote_electorate_units_one_representative',
+      sql`${table.representativeOwnerId} IS NULL OR ${table.representativeMembershipId} IS NULL`,
+    ),
   }),
 );

@@ -25,7 +25,8 @@ export interface ElectorateOwnershipPartyData {
 export interface ElectorateConsentData {
   unitId: string;
   fromOwnerId: string;
-  toMembershipId: string;
+  toOwnerId: string | null;
+  toMembershipId: string | null;
 }
 
 export interface ElectorateDataRepository {
@@ -43,6 +44,12 @@ export interface ElectorateDataRepository {
    *  none. An assembly held before this cannot be read literally — see
    *  `assemblyElectorateAsOf`. */
   findOwnershipRegisterStart(tenantId: string): Promise<Date | null>;
+  /** Owner id per membership id, for the memberships that are owners in the
+   *  tenant. Missing key = a member who owns nothing. */
+  findOwnerIdsByMembershipIds(
+    tenantId: string,
+    membershipIds: string[],
+  ): Promise<Map<string, string>>;
 }
 
 export const ELECTORATE_DATA_REPOSITORY = Symbol('ELECTORATE_DATA_REPOSITORY');

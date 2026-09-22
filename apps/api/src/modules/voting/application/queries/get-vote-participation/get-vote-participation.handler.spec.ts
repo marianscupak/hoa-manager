@@ -24,6 +24,13 @@ describe('GetVoteParticipationHandler', () => {
     isOwnUnit: false,
     ownsUnit: true,
     isProxy: false,
+    canVoteInApp: true,
+    representative: {
+      ownerId: 'o1',
+      membershipId: null,
+      name: 'Jana Nováková',
+      isUnitOwner: true,
+    },
     owners: [
       {
         ownerId: 'o1',
@@ -53,6 +60,8 @@ describe('GetVoteParticipationHandler', () => {
     recordedBy: undefined,
     answers: undefined,
     ownsUnit: false,
+    canVoteInApp: false,
+    representative: null,
   };
 
   const missingOwnershipRow = {
@@ -82,15 +91,12 @@ describe('GetVoteParticipationHandler', () => {
       expect(result.units[0]).toEqual(votedRow);
     });
 
-    it('offers a unit with no common representative for paper recording, keeping the reason', async () => {
+    it('keeps a unit with no common representative ineligible for the board, with its reason', async () => {
       readRepo.findParticipation.mockResolvedValue([noRepresentativeRow]);
 
       const result = await handler.execute(query([role]));
 
-      expect(result.units[0]).toEqual({
-        ...noRepresentativeRow,
-        status: 'NOT_VOTED',
-      });
+      expect(result.units[0]).toEqual(noRepresentativeRow);
     });
 
     it('keeps a unit with no owner on record ineligible', async () => {

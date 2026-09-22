@@ -355,16 +355,20 @@ export class VotesController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
     description:
-      'Returns a list of memberships eligible for delegation for this unit',
+      'Returns the people this unit may be represented by: owners of the ' +
+      'tenant (with or without an account) and members who own nothing here',
     type: [DelegationCandidateDto],
   })
   @ApiQuery({ name: 'forMembershipId', required: false, type: String })
+  @ApiQuery({ name: 'fromOwnerId', required: false, type: String })
   @UseGuards(AccessTokenAuthGuard, TenantContextGuard)
   getDelegationCandidates(
     @Param('id', ParseUUIDPipe) id: string,
     @Query('unitId', ParseUUIDPipe) unitId: string,
     @Query('forMembershipId', new ParseUUIDPipe({ optional: true }))
     forMembershipId: string | undefined,
+    @Query('fromOwnerId', new ParseUUIDPipe({ optional: true }))
+    fromOwnerId: string | undefined,
     @Tenant() tenantCtx: TenantContext,
   ) {
     return this.queryBus.execute(
@@ -374,6 +378,7 @@ export class VotesController {
         unitId,
         tenantCtx.membershipId,
         forMembershipId,
+        fromOwnerId,
       ),
     );
   }
@@ -386,11 +391,16 @@ export class VotesController {
       'delegation flow can warn before it is saved',
     type: ConsentPreviewResponseDto,
   })
+  @ApiQuery({ name: 'toOwnerId', required: false, type: String })
+  @ApiQuery({ name: 'toMembershipId', required: false, type: String })
   @UseGuards(AccessTokenAuthGuard, TenantContextGuard)
   previewConsentOutcome(
     @Param('id', ParseUUIDPipe) id: string,
     @Query('unitId', ParseUUIDPipe) unitId: string,
-    @Query('delegateMembershipId', ParseUUIDPipe) delegateMembershipId: string,
+    @Query('toOwnerId', new ParseUUIDPipe({ optional: true }))
+    toOwnerId: string | undefined,
+    @Query('toMembershipId', new ParseUUIDPipe({ optional: true }))
+    toMembershipId: string | undefined,
     @Tenant() tenantCtx: TenantContext,
   ) {
     return this.queryBus.execute(
@@ -398,7 +408,7 @@ export class VotesController {
         tenantCtx.tenantId,
         id,
         unitId,
-        delegateMembershipId,
+        { toOwnerId, toMembershipId },
         tenantCtx.membershipId,
       ),
     );
@@ -421,7 +431,7 @@ export class VotesController {
         id,
         body.unitId,
         tenantCtx.membershipId,
-        body.delegateMembershipId,
+        { toOwnerId: body.toOwnerId, toMembershipId: body.toMembershipId },
         tenantCtx.roles,
         body.fromOwnerId,
       ),

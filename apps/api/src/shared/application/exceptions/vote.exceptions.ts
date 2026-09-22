@@ -150,6 +150,12 @@ export class DelegationNotFoundException extends DomainException {
   }
 }
 
+export class ConsentTargetInvalidException extends DomainException {
+  constructor() {
+    super(ErrorCode.CONSENT_TARGET_INVALID);
+  }
+}
+
 export class VoteNotScheduledException extends DomainException {
   constructor() {
     super(ErrorCode.VOTE_NOT_SCHEDULED);

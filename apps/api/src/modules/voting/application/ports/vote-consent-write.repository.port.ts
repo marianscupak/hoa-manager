@@ -6,7 +6,8 @@ export type SaveVoteUnitConsentInput = {
   voteId: string;
   unitId: string;
   fromOwnerId: string;
-  toMembershipId: string;
+  toOwnerId: string | null;
+  toMembershipId: string | null;
   recordedByMembershipId: string | null;
   status: VoteUnitConsentStatus;
 };

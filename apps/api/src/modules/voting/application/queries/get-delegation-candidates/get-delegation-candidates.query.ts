@@ -5,5 +5,6 @@ export class GetDelegationCandidatesQuery {
     public readonly unitId: string,
     public readonly requesterMembershipId: string,
     public readonly forMembershipId?: string,
+    public readonly fromOwnerId?: string,
   ) {}
 }

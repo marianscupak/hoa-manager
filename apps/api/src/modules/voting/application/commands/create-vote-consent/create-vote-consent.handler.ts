@@ -24,6 +24,7 @@ import {
 } from '@/modules/voting/domain/vote/vote.types';
 import { ForbiddenException } from '@/shared/application/exceptions/auth.exceptions';
 import {
+  ConsentTargetInvalidException,
   InvalidVoteStatusForDelegationException,
   MembershipHasNoAssociatedOwnerException,
   NotAUnitOwnerException,
@@ -35,6 +36,7 @@ import {
   type UnitOfWork,
 } from '@/shared/application/ports/unit-of-work.port';
 
+import { toRepresentativeRef } from './consent-target-input';
 import { CreateVoteConsentCommand } from './create-vote-consent.command';
 
 @CommandHandler(CreateVoteConsentCommand)
@@ -58,6 +60,8 @@ export class CreateVoteConsentHandler
   ) {}
 
   async execute(command: CreateVoteConsentCommand): Promise<void> {
+    const to = toRepresentativeRef(command.target);
+
     const vote = await this.voteWriteRepo.findById(
       command.tenantId,
       command.voteId,
@@ -134,13 +138,33 @@ export class CreateVoteConsentHandler
       ownerMembershipIdForAudit = command.membershipId;
     }
 
+    if (to.ownerId !== null) {
+      if (to.ownerId === ownerId) throw new ConsentTargetInvalidException();
+      if (
+        !(await this.voteReadRepo.isDelegableOwner(
+          command.tenantId,
+          to.ownerId,
+        ))
+      ) {
+        throw new ConsentTargetInvalidException();
+      }
+    } else if (
+      !(await this.voteReadRepo.isActiveMembership(
+        command.tenantId,
+        to.membershipId,
+      ))
+    ) {
+      throw new ConsentTargetInvalidException();
+    }
+
     await this.unitOfWork.execute(async () => {
       const consentId = await this.consentWriteRepo.save({
         tenantId: command.tenantId,
         voteId: command.voteId,
         unitId: command.unitId,
         fromOwnerId: ownerId,
-        toMembershipId: command.delegateMembershipId,
+        toOwnerId: to.ownerId,
+        toMembershipId: to.membershipId,
         recordedByMembershipId: command.membershipId,
         status: VoteUnitConsentStatus.VALID,
       });
@@ -151,9 +175,9 @@ export class CreateVoteConsentHandler
           this.labelResolver.resolveActorLabel(actor),
           this.labelResolver.resolveUnitLabel(command.unitId),
           this.labelResolver.resolveOwnerLabel(ownerId),
-          this.labelResolver.resolveMembershipLabel(
-            command.delegateMembershipId,
-          ),
+          to.ownerId !== null
+            ? this.labelResolver.resolveOwnerLabel(to.ownerId)
+            : this.labelResolver.resolveMembershipLabel(to.membershipId),
         ]);
 
       await this.auditService.append(
@@ -166,7 +190,8 @@ export class CreateVoteConsentHandler
           unitLabel,
           ownerMembershipId: ownerMembershipIdForAudit,
           ownerLabel,
-          delegateMembershipId: command.delegateMembershipId,
+          delegateOwnerId: to.ownerId,
+          delegateMembershipId: to.membershipId,
           delegateLabel,
           recordedByMembershipId: command.membershipId,
           actor,

@@ -49,6 +49,7 @@ describe('ElectorateDomainService', () => {
       findOwnershipParties: jest.fn(),
       findValidConsents: jest.fn(),
       findOwnershipRegisterStart: jest.fn(),
+      findOwnerIdsByMembershipIds: jest.fn().mockResolvedValue(new Map()),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -96,7 +97,8 @@ describe('ElectorateDomainService', () => {
     expect(result).toEqual([
       {
         unitId: 'u1',
-        representativeMembershipId: 'm1',
+        representativeOwnerId: 'own-1',
+        representativeMembershipId: null,
         eligibilityStatus: ElectorateEligibilityStatus.ELIGIBLE,
         ineligibleReason: null,
         weightNum: 1,
@@ -151,5 +153,61 @@ describe('ElectorateDomainService', () => {
       defaultTenantId,
       meetingDate,
     );
+  });
+
+  it('folds a consent to a co-owner’s account into that owner before resolving', async () => {
+    dataRepo.findAllUnits.mockResolvedValue([
+      { id: 'u1', buildingShareNumerator: 1, buildingShareDenominator: 1 },
+    ]);
+    dataRepo.findOwnershipParties.mockResolvedValue([
+      {
+        ownershipId: 'o1',
+        unitId: 'u1',
+        partyType: OwnershipPartyType.SOLE,
+        shareNumerator: 1,
+        shareDenominator: 2,
+        members: [
+          {
+            ownerId: 'own-a',
+            ownerKind: OwnerKind.PERSON,
+            membershipId: 'm-a',
+          },
+        ],
+      },
+      {
+        ownershipId: 'o2',
+        unitId: 'u1',
+        partyType: OwnershipPartyType.SOLE,
+        shareNumerator: 1,
+        shareDenominator: 2,
+        members: [
+          {
+            ownerId: 'own-b',
+            ownerKind: OwnerKind.PERSON,
+            membershipId: 'm-b',
+          },
+        ],
+      },
+    ]);
+    dataRepo.findValidConsents.mockResolvedValue([
+      {
+        unitId: 'u1',
+        fromOwnerId: 'own-b',
+        toOwnerId: null,
+        toMembershipId: 'm-a',
+      },
+    ]);
+    dataRepo.findOwnerIdsByMembershipIds.mockResolvedValue(
+      new Map([['m-a', 'own-a']]),
+    );
+
+    const [row] = await service.resolveElectorate(voteWith(), NOW);
+
+    expect(dataRepo.findOwnerIdsByMembershipIds).toHaveBeenCalledWith(
+      defaultTenantId,
+      ['m-a'],
+    );
+    expect(row.representativeOwnerId).toBe('own-a');
+    expect(row.eligibilityStatus).toBe(ElectorateEligibilityStatus.ELIGIBLE);
   });
 });

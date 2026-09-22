@@ -57,6 +57,10 @@ export interface VoteReadRepository {
     ownerId: string,
     now: Date,
   ): Promise<boolean>;
+  /** An owner in this tenant who can be named a representative: exists and
+   *  is not the association itself. Having an account is not required. */
+  isDelegableOwner(tenantId: string, ownerId: string): Promise<boolean>;
+  isActiveMembership(tenantId: string, membershipId: string): Promise<boolean>;
   getMembershipByOwnerId(
     tenantId: string,
     ownerId: string,
@@ -90,7 +94,7 @@ export interface VoteReadRepository {
     tenantId: string,
     voteId: string,
     unitId: string,
-    forMembershipId: string | undefined,
+    exclude: { membershipId?: string; ownerId?: string },
     requesterMembershipId: string,
     now: Date,
   ): Promise<DelegationCandidateDto[]>;

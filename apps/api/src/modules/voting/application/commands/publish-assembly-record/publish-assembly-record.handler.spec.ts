@@ -34,6 +34,7 @@ const NOW = new Date('2026-09-16T12:00:00Z');
 const UNITS: ElectorateUnit[] = [
   {
     unitId: 'u1',
+    representativeOwnerId: null,
     representativeMembershipId: 'member-9',
     eligibilityStatus: ElectorateEligibilityStatus.ELIGIBLE,
     ineligibleReason: null,
@@ -42,6 +43,7 @@ const UNITS: ElectorateUnit[] = [
   },
   {
     unitId: 'u2',
+    representativeOwnerId: null,
     representativeMembershipId: null,
     eligibilityStatus: ElectorateEligibilityStatus.INELIGIBLE,
     ineligibleReason: ElectorateIneligibleReason.ASSOCIATION_OWNED,

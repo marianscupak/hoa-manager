@@ -1,18 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { and, eq } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/pg-core';
 
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
 import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
+import { owners } from '@/infrastructure/db/schema';
 import { tenantMemberships } from '@/infrastructure/db/schema/core/tenant-memberships';
 import { units } from '@/infrastructure/db/schema/core/units';
 import { users } from '@/infrastructure/db/schema/core/users';
 import { voteElectorateUnits } from '@/infrastructure/db/schema/voting/vote-electorate-units';
 import { Rational } from '@/shared/domain/rational';
 
+const repOwners = alias(owners, 'rep_owners');
+
 export interface ElectorateUnitSnapshot {
   unitId: string;
   unitLabel: string;
   representativeMembershipId: string | null;
+  representativeOwnerId: string | null;
   representativeLabel: string | null;
   eligibilityStatus: string;
   ineligibleReason: string | null;
@@ -48,7 +53,9 @@ export class VoteElectorateSnapshotLookup {
         unitNo: units.unitNo,
         representativeMembershipId:
           voteElectorateUnits.representativeMembershipId,
+        representativeOwnerId: voteElectorateUnits.representativeOwnerId,
         representativeFullName: users.fullName,
+        representativeOwnerName: repOwners.displayName,
         eligibilityStatus: voteElectorateUnits.eligibilityStatus,
         ineligibleReason: voteElectorateUnits.ineligibleReason,
         weightNumerator: voteElectorateUnits.weightNumerator,
@@ -64,6 +71,10 @@ export class VoteElectorateSnapshotLookup {
         ),
       )
       .leftJoin(users, eq(users.id, tenantMemberships.userId))
+      .leftJoin(
+        repOwners,
+        eq(repOwners.id, voteElectorateUnits.representativeOwnerId),
+      )
       .where(
         and(
           eq(voteElectorateUnits.tenantId, tenantId),
@@ -79,7 +90,9 @@ export class VoteElectorateSnapshotLookup {
       unitId: r.unitId,
       unitLabel: r.unitNo,
       representativeMembershipId: r.representativeMembershipId,
-      representativeLabel: r.representativeFullName ?? null,
+      representativeOwnerId: r.representativeOwnerId,
+      representativeLabel:
+        r.representativeOwnerName ?? r.representativeFullName ?? null,
       eligibilityStatus: r.eligibilityStatus,
       ineligibleReason: r.ineligibleReason,
       weight: `${weights[i].num}/${weights[i].den}`,

@@ -5,6 +5,7 @@ import {
   uuid,
   text,
   uniqueIndex,
+  check,
 } from 'drizzle-orm/pg-core';
 
 import { owners } from '@/infrastructure/db/schema/core/owners';
@@ -30,9 +31,13 @@ export const voteUnitConsents = pgTable(
     fromOwnerId: uuid('from_owner_id')
       .notNull()
       .references(() => owners.id, { onDelete: 'cascade' }),
-    toMembershipId: uuid('to_membership_id')
-      .notNull()
-      .references(() => tenantMemberships.id, { onDelete: 'cascade' }),
+    toMembershipId: uuid('to_membership_id').references(
+      () => tenantMemberships.id,
+      { onDelete: 'cascade' },
+    ),
+    toOwnerId: uuid('to_owner_id').references(() => owners.id, {
+      onDelete: 'cascade',
+    }),
     recordedByMembershipId: uuid('recorded_by_membership_id').references(
       () => tenantMemberships.id,
       { onDelete: 'cascade' },
@@ -51,5 +56,9 @@ export const voteUnitConsents = pgTable(
     unqValidConsent: uniqueIndex('unq_vote_unit_consents_valid')
       .on(table.voteId, table.unitId, table.fromOwnerId)
       .where(sql`${table.status} = 'VALID'`),
+    chkOneTarget: check(
+      'chk_vote_unit_consents_one_target',
+      sql`(${table.toOwnerId} IS NULL) <> (${table.toMembershipId} IS NULL)`,
+    ),
   }),
 );

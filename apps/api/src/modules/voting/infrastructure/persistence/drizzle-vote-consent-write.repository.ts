@@ -37,6 +37,7 @@ export class DrizzleVoteConsentWriteRepository
       await this.db
         .update(voteUnitConsents)
         .set({
+          toOwnerId: data.toOwnerId,
           toMembershipId: data.toMembershipId,
           recordedByMembershipId: data.recordedByMembershipId,
           status: data.status,
@@ -54,6 +55,7 @@ export class DrizzleVoteConsentWriteRepository
           voteId: data.voteId,
           unitId: data.unitId,
           fromOwnerId: data.fromOwnerId,
+          toOwnerId: data.toOwnerId,
           toMembershipId: data.toMembershipId,
           recordedByMembershipId: data.recordedByMembershipId,
           status: data.status,

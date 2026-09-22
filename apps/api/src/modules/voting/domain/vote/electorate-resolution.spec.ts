@@ -9,6 +9,11 @@ import {
   type ElectoratePartyInput,
 } from './electorate-resolution';
 import {
+  memberRef,
+  ownerRef,
+  type RepresentativeRef,
+} from './representative-ref';
+import {
   ElectorateEligibilityStatus,
   ElectorateIneligibleReason,
   VoteWeightBasis,
@@ -41,7 +46,7 @@ const sole = (
 
 const resolve = (
   parties: ElectoratePartyInput[],
-  consents: { fromOwnerId: string; toMembershipId: string }[] = [],
+  consents: { fromOwnerId: string; to: RepresentativeRef }[] = [],
 ) =>
   resolveElectorateUnits(
     [UNIT],
@@ -61,39 +66,41 @@ describe('resolveElectorateUnits', () => {
     expect(row.weightDen).toBe(625);
   });
 
-  it('sole owner with account is auto-eligible', () => {
+  it('sole owner with account is auto-eligible as their own representative', () => {
     const row = resolve([sole('p1', 'm1', 1, 1)]);
     expect(row.eligibilityStatus).toBe(ElectorateEligibilityStatus.ELIGIBLE);
-    expect(row.representativeMembershipId).toBe('m1');
+    expect(row.representativeOwnerId).toBe('p1');
+    expect(row.representativeMembershipId).toBeNull();
   });
 
-  it('sole owner without account → NO_REPRESENTATIVE', () => {
-    expect(resolve([sole('p1', null, 1, 1)]).ineligibleReason).toBe(
-      ElectorateIneligibleReason.NO_REPRESENTATIVE,
-    );
+  it('sole owner WITHOUT account is eligible too — the account is a channel, not a right', () => {
+    const row = resolve([sole('p1', null, 1, 1)]);
+    expect(row.eligibilityStatus).toBe(ElectorateEligibilityStatus.ELIGIBLE);
+    expect(row.representativeOwnerId).toBe('p1');
+    expect(row.ineligibleReason).toBeNull();
   });
 
-  it('sole owner delegates: consent to board redirects the unit', () => {
+  it('sole owner delegates: consent to a board member redirects the unit', () => {
     const row = resolve(
       [sole('p1', 'm1', 1, 1)],
-      [{ fromOwnerId: 'p1', toMembershipId: 'board' }],
+      [{ fromOwnerId: 'p1', to: memberRef('board') }],
     );
     expect(row.eligibilityStatus).toBe(ElectorateEligibilityStatus.ELIGIBLE);
+    expect(row.representativeOwnerId).toBeNull();
     expect(row.representativeMembershipId).toBe('board');
   });
 
-  it('sole owner WITHOUT account delegates: board-recorded consent designates the delegate (§ 1185)', () => {
+  it('sole owner WITHOUT account delegates: board-recorded consent designates the delegate', () => {
     const row = resolve(
       [sole('p1', null, 1, 1)],
-      [{ fromOwnerId: 'p1', toMembershipId: 'board' }],
+      [{ fromOwnerId: 'p1', to: memberRef('board') }],
     );
-    expect(row.eligibilityStatus).toBe(ElectorateEligibilityStatus.ELIGIBLE);
     expect(row.representativeMembershipId).toBe('board');
   });
 
   it('60/40 co-owners: majority holder designates without minority consent', () => {
     const row = resolve([sole('p1', 'm1', 3, 5), sole('p2', 'm2', 2, 5)]);
-    expect(row.representativeMembershipId).toBe('m1'); // p1 alone holds > 1/2
+    expect(row.representativeOwnerId).toBe('p1');
   });
 
   it('50/50 deadlock → NO_REPRESENTATIVE', () => {
@@ -103,12 +110,12 @@ describe('resolveElectorateUnits', () => {
     ).toBe(ElectorateIneligibleReason.NO_REPRESENTATIVE);
   });
 
-  it('50/50 resolved by consent: p2 consents to m1 → m1 holds 1/1 > 1/2', () => {
+  it('50/50 resolved by consent to the co-owner as a person', () => {
     const row = resolve(
       [sole('p1', 'm1', 1, 2), sole('p2', 'm2', 1, 2)],
-      [{ fromOwnerId: 'p2', toMembershipId: 'm1' }],
+      [{ fromOwnerId: 'p2', to: ownerRef('p1') }],
     );
-    expect(row.representativeMembershipId).toBe('m1');
+    expect(row.representativeOwnerId).toBe('p1');
     expect(row.eligibilityStatus).toBe(ElectorateEligibilityStatus.ELIGIBLE);
   });
 
@@ -120,7 +127,7 @@ describe('resolveElectorateUnits', () => {
         sole('p3', 'm3', 1, 4),
         sole('p4', 'm4', 1, 4),
       ],
-      [{ fromOwnerId: 'p2', toMembershipId: 'm1' }],
+      [{ fromOwnerId: 'p2', to: ownerRef('p1') }],
     );
     expect(row.ineligibleReason).toBe(
       ElectorateIneligibleReason.NO_REPRESENTATIVE,
@@ -140,17 +147,34 @@ describe('resolveElectorateUnits', () => {
     );
     const designated = resolve(
       [sjm],
-      [{ fromOwnerId: 'husband', toMembershipId: 'mw' }],
+      [{ fromOwnerId: 'husband', to: ownerRef('wife') }],
     );
-    expect(designated.representativeMembershipId).toBe('mw');
+    expect(designated.representativeOwnerId).toBe('wife');
+  });
+
+  it('SJM without any account: a consent to the spouse as an owner designates them', () => {
+    const sjm: ElectoratePartyInput = {
+      unitId: 'u1',
+      partyType: OwnershipPartyType.SJM,
+      shareNumerator: 1,
+      shareDenominator: 1,
+      members: [member('wife', null), member('husband', null)],
+    };
+    const row = resolve(
+      [sjm],
+      [{ fromOwnerId: 'wife', to: ownerRef('husband') }],
+    );
+    expect(row.eligibilityStatus).toBe(ElectorateEligibilityStatus.ELIGIBLE);
+    expect(row.representativeOwnerId).toBe('husband');
+    expect(row.representativeMembershipId).toBeNull();
   });
 
   it('third-party representative: all owners consent to a non-owner membership', () => {
     const row = resolve(
       [sole('p1', 'm1', 1, 2), sole('p2', null, 1, 2)],
       [
-        { fromOwnerId: 'p1', toMembershipId: 'board' },
-        { fromOwnerId: 'p2', toMembershipId: 'board' },
+        { fromOwnerId: 'p1', to: memberRef('board') },
+        { fromOwnerId: 'p2', to: memberRef('board') },
       ],
     );
     expect(row.representativeMembershipId).toBe('board');
@@ -172,20 +196,20 @@ describe('resolveElectorateUnits', () => {
   it('explicit consent overrides implicit self-support (deterministic winner)', () => {
     const row = resolve(
       [sole('p1', 'mA', 3, 5), sole('p2', 'mB', 2, 5)],
-      [{ fromOwnerId: 'p1', toMembershipId: 'mB' }],
+      [{ fromOwnerId: 'p1', to: ownerRef('p2') }],
     );
-    expect(row.representativeMembershipId).toBe('mB');
+    expect(row.representativeOwnerId).toBe('p2');
   });
 
   it('mutual cross-delegation resolves to the majority-backed delegate', () => {
     const row = resolve(
       [sole('p1', 'mA', 3, 5), sole('p2', 'mB', 2, 5)],
       [
-        { fromOwnerId: 'p1', toMembershipId: 'mB' },
-        { fromOwnerId: 'p2', toMembershipId: 'mA' },
+        { fromOwnerId: 'p1', to: ownerRef('p2') },
+        { fromOwnerId: 'p2', to: ownerRef('p1') },
       ],
     );
-    expect(row.representativeMembershipId).toBe('mB');
+    expect(row.representativeOwnerId).toBe('p2');
   });
 
   it('ONE_UNIT_ONE_VOTE weights every unit 1/1', () => {
@@ -202,9 +226,9 @@ describe('resolveElectorateUnits', () => {
 
 describe('applyHypotheticalConsent', () => {
   const existing = [
-    { unitId: 'u1', fromOwnerId: 'wife', toMembershipId: 'mh' },
-    { unitId: 'u1', fromOwnerId: 'neighbour', toMembershipId: 'board' },
-    { unitId: 'u2', fromOwnerId: 'wife', toMembershipId: 'board' },
+    { unitId: 'u1', fromOwnerId: 'wife', to: ownerRef('husband') },
+    { unitId: 'u1', fromOwnerId: 'neighbour', to: memberRef('board') },
+    { unitId: 'u2', fromOwnerId: 'wife', to: memberRef('board') },
   ];
 
   it('replaces the consent the owner already recorded for that unit', () => {
@@ -212,12 +236,12 @@ describe('applyHypotheticalConsent', () => {
       applyHypotheticalConsent(existing, {
         unitId: 'u1',
         fromOwnerId: 'wife',
-        toMembershipId: 'board',
+        to: memberRef('board'),
       }),
     ).toEqual([
-      { unitId: 'u1', fromOwnerId: 'neighbour', toMembershipId: 'board' },
-      { unitId: 'u2', fromOwnerId: 'wife', toMembershipId: 'board' },
-      { unitId: 'u1', fromOwnerId: 'wife', toMembershipId: 'board' },
+      { unitId: 'u1', fromOwnerId: 'neighbour', to: memberRef('board') },
+      { unitId: 'u2', fromOwnerId: 'wife', to: memberRef('board') },
+      { unitId: 'u1', fromOwnerId: 'wife', to: memberRef('board') },
     ]);
   });
 
@@ -226,7 +250,7 @@ describe('applyHypotheticalConsent', () => {
       applyHypotheticalConsent(existing, {
         unitId: 'u1',
         fromOwnerId: 'husband',
-        toMembershipId: 'board',
+        to: memberRef('board'),
       }),
     ).toHaveLength(4);
   });
@@ -236,7 +260,7 @@ describe('applyHypotheticalConsent', () => {
     applyHypotheticalConsent(existing, {
       unitId: 'u1',
       fromOwnerId: 'wife',
-      toMembershipId: 'board',
+      to: memberRef('board'),
     });
     expect(existing).toEqual(before);
   });
@@ -256,8 +280,8 @@ describe('applyHypotheticalConsent', () => {
       [UNIT],
       [sjm],
       applyHypotheticalConsent(
-        [{ unitId: 'u1', fromOwnerId: 'husband', toMembershipId: 'mw' }],
-        { unitId: 'u1', fromOwnerId: 'wife', toMembershipId: 'board' },
+        [{ unitId: 'u1', fromOwnerId: 'husband', to: ownerRef('wife') }],
+        { unitId: 'u1', fromOwnerId: 'wife', to: memberRef('board') },
       ),
       VoteWeightBasis.UNIT_SHARE,
     )[0];

@@ -475,11 +475,19 @@ export class ConsentPreviewResponseDto {
 }
 
 export class DelegationCandidateDto {
-  @ApiProperty()
-  membershipId!: string;
+  /** Set when the person is an owner in the tenant (with or without an account). */
+  @ApiProperty({ type: 'string', nullable: true })
+  ownerId!: string | null;
+
+  /** The person's ACTIVE membership, if any. */
+  @ApiProperty({ type: 'string', nullable: true })
+  membershipId!: string | null;
 
   @ApiProperty()
   name!: string;
+
+  @ApiProperty()
+  hasAccount!: boolean;
 
   @ApiProperty()
   hasDelegatedToRequester!: boolean;
@@ -493,7 +501,11 @@ export class DelegationCandidateDto {
 
 export const createVoteConsentSchema = z.object({
   unitId: z.string().uuid(),
-  delegateMembershipId: z.string().uuid(),
+  // The representative is a person: an owner of the tenant (with or without
+  // an account) or a member who owns nothing here. Exactly one must be set;
+  // the handler enforces it so the OpenAPI shape stays a plain object.
+  toOwnerId: z.string().uuid().optional(),
+  toMembershipId: z.string().uuid().optional(),
   // Self-service callers omit this — the grantor is resolved from their own
   // membership. Admins/board members recording a paper POA send the
   // grantor's ownerId directly, since the grantor may have no user account
@@ -538,11 +550,18 @@ export class VoteConsentResponseDto {
   @ApiProperty()
   fromOwnerName!: string;
 
-  @ApiProperty()
-  toMembershipId!: string;
+  @ApiProperty({ type: 'string', nullable: true })
+  toOwnerId!: string | null;
+
+  @ApiProperty({ type: 'string', nullable: true })
+  toMembershipId!: string | null;
 
   @ApiProperty()
   toDelegateName!: string;
+
+  /** False for a representative who has no account yet — they will vote on paper. */
+  @ApiProperty()
+  toDelegateHasAccount!: boolean;
 
   @ApiProperty()
   recordedByMembershipId!: string | null;
@@ -755,9 +774,8 @@ export class ParticipationOwnerDto {
   @ApiProperty({ description: 'Share of the unit, e.g. "1/2".' })
   share!: string;
 
-  /** True when this owner's user account is the membership the electorate
-   *  snapshot recorded as the unit's representative — what the portal shows
-   *  as "Common representative". */
+  /** True when this owner is the unit's representative in the electorate
+   *  snapshot — with or without an account. */
   @ApiProperty()
   isRepresentative!: boolean;
 }
@@ -941,6 +959,22 @@ export class AssemblyRecordResponseDto {
   questions!: AssemblyRecordQuestionDto[];
 }
 
+export class ParticipationRepresentativeDto {
+  @ApiProperty({ type: 'string', nullable: true })
+  ownerId!: string | null;
+
+  @ApiProperty({ type: 'string', nullable: true })
+  membershipId!: string | null;
+
+  @ApiProperty()
+  name!: string;
+
+  /** Whether the representative owns a share of this unit. A false here is a
+   *  designated outsider — they may still sign the paper ballot. */
+  @ApiProperty()
+  isUnitOwner!: boolean;
+}
+
 export class VoteParticipationUnitDto {
   @ApiProperty()
   unitId!: string;
@@ -981,9 +1015,10 @@ export class VoteParticipationUnitDto {
   @ApiProperty({ required: false })
   recordedBy?: string;
 
-  /** Why the snapshot left the unit out of the app booth. Also present on a
-   *  NOT_VOTED unit with no common representative: the board can still
-   *  record its paper ballot, but nobody can cast for it in the app. */
+  /** Why the snapshot left the unit out of the electorate. Present only on
+   *  INELIGIBLE units; a unit with no common representative cannot be
+   *  recorded on paper either — per rollam the representative is agreed
+   *  before the vote opens. */
   @ApiProperty({
     required: false,
     enum: ['NO_REPRESENTATIVE', 'MISSING_OWNERSHIP', 'ASSOCIATION_OWNED'],
@@ -994,6 +1029,18 @@ export class VoteParticipationUnitDto {
    *  rather than record their own paper ballot. */
   @ApiProperty({ required: false })
   isOwnUnit?: boolean;
+
+  /** Whether anyone can cast for this unit in the app right now — false for a
+   *  representative without an account, whose unit votes on paper. */
+  @ApiProperty({ required: false })
+  canVoteInApp?: boolean;
+
+  @ApiProperty({
+    required: false,
+    type: ParticipationRepresentativeDto,
+    nullable: true,
+  })
+  representative?: ParticipationRepresentativeDto | null;
 
   @ApiProperty({ required: false, type: [ParticipationOwnerDto] })
   owners?: ParticipationOwnerDto[];

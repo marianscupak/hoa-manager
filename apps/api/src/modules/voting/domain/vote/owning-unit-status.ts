@@ -24,10 +24,11 @@ export type ElectoratePhase = 'PREVIEW' | 'SNAPSHOT';
  * reads differently from voting one's own unit.
  */
 export function deriveOwningUnitStatus(input: {
-  resolved: Pick<
-    ElectorateUnit,
-    'representativeMembershipId' | 'eligibilityStatus' | 'ineligibleReason'
-  >;
+  resolved: Pick<ElectorateUnit, 'eligibilityStatus' | 'ineligibleReason'>;
+  /** The account that may cast for the unit right now (see the channel
+   *  helpers); null when the representative has no account or nobody
+   *  represents the unit. */
+  channelMembershipId: string | null;
   membershipId: string;
   isOwner: boolean;
   hasVoted: boolean;
@@ -46,13 +47,10 @@ export function deriveOwningUnitStatus(input: {
   }
 
   if (input.hasVoted) return OwningUnitStatus.VOTED;
-  if (resolved.representativeMembershipId === input.membershipId) {
-    // Owning a share of the unit makes this the member's own vote to cast;
-    // otherwise the right came from a consent and is cast on the owner's
-    // behalf.
+  if (input.channelMembershipId === input.membershipId) {
     return input.isOwner ? OwningUnitStatus.READY : OwningUnitStatus.PROXY;
   }
-  // Someone else represents the unit — either because this owner delegated
-  // to them, or because they hold a share majority of the unit.
+  // Someone else represents the unit — a co-owner with the share majority, a
+  // designated person (with or without an account), or a delegate.
   return OwningUnitStatus.DELEGATED;
 }

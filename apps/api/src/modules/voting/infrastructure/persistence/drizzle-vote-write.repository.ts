@@ -18,6 +18,7 @@ import {
 import { BallotAlreadyCastException } from '@/shared/application/exceptions/vote.exceptions';
 import { isUniqueViolation } from '@/shared/errors/pg-errors';
 
+import { channelMembershipIdSql } from './electorate-channel.sql';
 import { mapRulesetColumns, mapRulesetRow } from './vote-ruleset.mapper';
 import {
   VoteWriteRepository,
@@ -518,6 +519,7 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
         voteId,
         unitId: u.unitId,
         representativeMembershipId: u.representativeMembershipId,
+        representativeOwnerId: u.representativeOwnerId,
         eligibilityStatus: u.eligibilityStatus,
         ineligibleReason: u.ineligibleReason,
         weightNumerator: u.weightNum,
@@ -604,14 +606,13 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
     voteId: string,
     membershipId: string,
     unitIds: string[],
-  ): Promise<{ unitId: string; representativeMembershipId: string | null }[]> {
+  ): Promise<{ unitId: string; channelMembershipId: string | null }[]> {
     if (unitIds.length === 0) return [];
 
     return this.db
       .select({
         unitId: voteElectorateUnits.unitId,
-        representativeMembershipId:
-          voteElectorateUnits.representativeMembershipId,
+        channelMembershipId: channelMembershipIdSql(),
       })
       .from(voteElectorateUnits)
       .where(
@@ -619,7 +620,7 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
           eq(voteElectorateUnits.tenantId, tenantId),
           eq(voteElectorateUnits.voteId, voteId),
           inArray(voteElectorateUnits.unitId, unitIds),
-          eq(voteElectorateUnits.representativeMembershipId, membershipId),
+          eq(channelMembershipIdSql(), membershipId),
         ),
       );
   }
@@ -630,6 +631,7 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
     unitId: string,
   ): Promise<{
     unitId: string;
+    representativeOwnerId: string | null;
     representativeMembershipId: string | null;
     eligibilityStatus: string;
     ineligibleReason: ElectorateIneligibleReason | null;
@@ -637,6 +639,7 @@ export class DrizzleVoteWriteRepository implements VoteWriteRepository {
     const rows = await this.db
       .select({
         unitId: voteElectorateUnits.unitId,
+        representativeOwnerId: voteElectorateUnits.representativeOwnerId,
         representativeMembershipId:
           voteElectorateUnits.representativeMembershipId,
         eligibilityStatus: voteElectorateUnits.eligibilityStatus,

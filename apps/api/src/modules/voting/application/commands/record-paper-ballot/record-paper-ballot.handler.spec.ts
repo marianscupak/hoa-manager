@@ -71,7 +71,8 @@ describe('RecordPaperBallotHandler', () => {
     readRepo.isActiveUnitOwner.mockResolvedValue(true);
     writeRepo.findElectorateUnit.mockResolvedValue({
       unitId: 'unit-1',
-      representativeMembershipId: 'mem-owner',
+      representativeOwnerId: 'owner-3',
+      representativeMembershipId: null,
       eligibilityStatus: 'ELIGIBLE',
       ineligibleReason: null,
     });
@@ -158,12 +159,42 @@ describe('RecordPaperBallotHandler', () => {
     );
   });
 
-  it('records a ballot for a unit with no common representative: the signer needs no app account', async () => {
+  it('records a ballot for an eligible unit whose representative has no account', async () => {
     writeRepo.findElectorateUnit.mockResolvedValue({
       unitId: 'unit-1',
+      representativeOwnerId: 'owner-3',
+      representativeMembershipId: null,
+      eligibilityStatus: 'ELIGIBLE',
+      ineligibleReason: null,
+    });
+
+    await handler.execute(command());
+
+    expect(writeRepo.saveBallots).toHaveBeenCalledTimes(1);
+  });
+
+  it('rejects a unit with no common representative: per rollam that is agreed before the vote opens', async () => {
+    writeRepo.findElectorateUnit.mockResolvedValue({
+      unitId: 'unit-1',
+      representativeOwnerId: null,
       representativeMembershipId: null,
       eligibilityStatus: 'INELIGIBLE',
       ineligibleReason: 'NO_REPRESENTATIVE',
+    });
+    await expect(handler.execute(command())).rejects.toThrow(
+      UnitNotEligibleException,
+    );
+    expect(writeRepo.saveBallots).not.toHaveBeenCalled();
+  });
+
+  it('accepts the representative as signer even when they own no share of the unit', async () => {
+    readRepo.isActiveUnitOwner.mockResolvedValue(false);
+    writeRepo.findElectorateUnit.mockResolvedValue({
+      unitId: 'unit-1',
+      representativeOwnerId: 'owner-3',
+      representativeMembershipId: null,
+      eligibilityStatus: 'ELIGIBLE',
+      ineligibleReason: null,
     });
 
     await handler.execute(command());
@@ -174,6 +205,7 @@ describe('RecordPaperBallotHandler', () => {
   it('rejects a unit the snapshot froze as ineligible for a reason paper cannot cure', async () => {
     writeRepo.findElectorateUnit.mockResolvedValue({
       unitId: 'unit-1',
+      representativeOwnerId: null,
       representativeMembershipId: null,
       eligibilityStatus: 'INELIGIBLE',
       ineligibleReason: 'MISSING_OWNERSHIP',
@@ -199,6 +231,13 @@ describe('RecordPaperBallotHandler', () => {
   });
 
   it('rejects a signer who does not own the unit', async () => {
+    writeRepo.findElectorateUnit.mockResolvedValue({
+      unitId: 'unit-1',
+      representativeOwnerId: 'owner-other',
+      representativeMembershipId: null,
+      eligibilityStatus: 'ELIGIBLE',
+      ineligibleReason: null,
+    });
     readRepo.isActiveUnitOwner.mockResolvedValue(false);
     await expect(handler.execute(command())).rejects.toThrow(
       NotAUnitOwnerException,

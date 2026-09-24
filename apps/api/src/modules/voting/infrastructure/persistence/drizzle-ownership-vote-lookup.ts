@@ -6,6 +6,11 @@ import { voteElectorateUnits, votes } from '@/infrastructure/db/schema';
 import type { OwnershipVoteLookup } from '@/modules/core/property/application/ports/ownership-vote-lookup.port';
 import type { VoteInRange } from '@/modules/core/property/domain/ownership-period-bounds';
 
+/**
+ * Voting's answer to the register's OwnershipVoteLookup port. It lives here so
+ * that only the voting module knows its own tables; the register depends on
+ * the port alone and receives this implementation through VotingPortsModule.
+ */
 @Injectable()
 export class DrizzleOwnershipVoteLookup implements OwnershipVoteLookup {
   constructor(private readonly drizzle: DrizzleService) {}

@@ -2,8 +2,9 @@ import type { VoteInRange } from '@/modules/core/property/domain/ownership-perio
 
 /**
  * Reads the votes a unit has taken part in, so moving an ownership period can
- * say what it reaches. A read-only view across the context boundary: the
- * register never writes to voting.
+ * say what it reaches. Declared by the register and implemented by the voting
+ * module (VotingPortsModule), so the register never touches voting's tables
+ * and core does not depend on voting.
  */
 export interface OwnershipVoteLookup {
   /**

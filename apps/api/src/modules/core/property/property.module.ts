@@ -32,7 +32,6 @@ import { UpdateOwnershipPeriodHandler } from '@/modules/core/property/applicatio
 import { UpdateUnitHandler } from '@/modules/core/property/application/handlers/update-unit.handler';
 import { KATASTR_SNAPSHOT_REPOSITORY } from '@/modules/core/property/application/ports/katastr-snapshot.repository.port';
 import { OWNER_READ_REPOSITORY } from '@/modules/core/property/application/ports/owner-read.repository.port';
-import { OWNERSHIP_VOTE_LOOKUP } from '@/modules/core/property/application/ports/ownership-vote-lookup.port';
 import {
   OWNER_REPOSITORY,
   UNIT_OWNERSHIP_REPOSITORY,
@@ -44,7 +43,6 @@ import { GetPropertyOverviewHandler } from '@/modules/core/property/application/
 import { PropertyAuditRegistration } from '@/modules/core/property/audit/property-audit.registration';
 import { DrizzleKatastrSnapshotRepository } from '@/modules/core/property/infrastructure/persistence/drizzle-katastr-snapshot.repository';
 import { DrizzleOwnerReadRepository } from '@/modules/core/property/infrastructure/persistence/drizzle-owner-read.repository';
-import { DrizzleOwnershipVoteLookup } from '@/modules/core/property/infrastructure/persistence/drizzle-ownership-vote-lookup';
 import {
   DrizzleOwnerRepository,
   DrizzleUnitOwnershipRepository,
@@ -87,10 +85,6 @@ const Repositories = [
   {
     provide: UNIT_OWNERSHIP_REPOSITORY,
     useClass: DrizzleUnitOwnershipRepository,
-  },
-  {
-    provide: OWNERSHIP_VOTE_LOOKUP,
-    useClass: DrizzleOwnershipVoteLookup,
   },
   { provide: UNIT_READ_REPOSITORY, useClass: DrizzleUnitReadRepository },
   { provide: OWNER_READ_REPOSITORY, useClass: DrizzleOwnerReadRepository },

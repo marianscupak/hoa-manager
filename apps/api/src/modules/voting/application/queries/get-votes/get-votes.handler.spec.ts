@@ -104,4 +104,64 @@ describe('GetVotesHandler', () => {
 
     expect(result[0].questionOutcomes).toBeUndefined();
   });
+
+  it('hides DRAFT votes from a unit owner by default', async () => {
+    voteReadRepository.findVotes.mockResolvedValue([]);
+
+    await handler.execute(
+      new GetVotesQuery(
+        'tenant-1',
+        [TenantMembershipRole.UNIT_OWNER],
+        'm1',
+        undefined,
+      ),
+    );
+
+    expect(voteReadRepository.findVotes).toHaveBeenCalledWith('tenant-1', [
+      'SCHEDULED',
+      'OPEN',
+      'CLOSED',
+      'CANCELLED',
+    ]);
+  });
+
+  it('does not return DRAFT votes to a unit owner who asks for them', async () => {
+    const result = await handler.execute(
+      new GetVotesQuery('tenant-1', [TenantMembershipRole.UNIT_OWNER], 'm1', [
+        'DRAFT',
+      ]),
+    );
+
+    expect(result).toEqual([]);
+    expect(voteReadRepository.findVotes).not.toHaveBeenCalled();
+  });
+
+  it('drops DRAFT from a unit owner status filter and keeps the rest', async () => {
+    voteReadRepository.findVotes.mockResolvedValue([]);
+
+    await handler.execute(
+      new GetVotesQuery('tenant-1', [TenantMembershipRole.UNIT_OWNER], 'm1', [
+        'DRAFT',
+        'OPEN',
+      ]),
+    );
+
+    expect(voteReadRepository.findVotes).toHaveBeenCalledWith('tenant-1', [
+      'OPEN',
+    ]);
+  });
+
+  it('passes a board member status filter through unchanged', async () => {
+    voteReadRepository.findVotes.mockResolvedValue([]);
+
+    await handler.execute(
+      new GetVotesQuery('tenant-1', [TenantMembershipRole.BOARD_MEMBER], 'm1', [
+        'DRAFT',
+      ]),
+    );
+
+    expect(voteReadRepository.findVotes).toHaveBeenCalledWith('tenant-1', [
+      'DRAFT',
+    ]);
+  });
 });

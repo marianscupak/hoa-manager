@@ -11,6 +11,13 @@ import { GetVotesQuery } from '@/modules/voting/application/queries/get-votes/ge
 import { VoteStatus } from '@/modules/voting/domain/vote/vote.types';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 
+const MEMBER_VISIBLE_STATUSES: readonly VoteStatus[] = [
+  VoteStatus.SCHEDULED,
+  VoteStatus.OPEN,
+  VoteStatus.CLOSED,
+  VoteStatus.CANCELLED,
+];
+
 @QueryHandler(GetVotesQuery)
 export class GetVotesHandler
   implements IQueryHandler<GetVotesQuery, VoteListItemResponseDto[]>
@@ -29,16 +36,21 @@ export class GetVotesHandler
       roles.includes(TenantMembershipRole.ADMIN) ||
       roles.includes(TenantMembershipRole.BOARD_MEMBER);
 
-    const statuses =
-      (query.statuses as VoteStatus[]) ??
-      (isAdminOrBoard
-        ? undefined
-        : [
-            VoteStatus.SCHEDULED,
-            VoteStatus.OPEN,
-            VoteStatus.CLOSED,
-            VoteStatus.CANCELLED,
-          ]);
+    // A member without the board role never sees a DRAFT, the same rule as
+    // GetVoteDetailHandler. A requested status filter narrows the visible
+    // set, it cannot widen it: `?status=DRAFT` used to return the drafts.
+    const requested = query.statuses as VoteStatus[] | undefined;
+    const statuses = isAdminOrBoard
+      ? requested
+      : (requested ?? MEMBER_VISIBLE_STATUSES).filter((s) =>
+          MEMBER_VISIBLE_STATUSES.includes(s),
+        );
+
+    // An empty filter means "no filter" to the repository, so a request for
+    // nothing but hidden statuses must stop here.
+    if (statuses?.length === 0) {
+      return [];
+    }
 
     const votes = await this.voteReadRepository.findVotes(tenantId, statuses);
 

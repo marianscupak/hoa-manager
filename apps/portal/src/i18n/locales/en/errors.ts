@@ -92,6 +92,7 @@ export default {
     VOTE_BUILDING_SHARES_INCOMPLETE:
         "Building unit shares don't add up to 1/1 — current total {{param}}. Complete the units before opening the vote.",
     MEMBERSHIP_NOT_FOUND: "User membership not found in this association.",
+    CANNOT_CHANGE_OWN_MEMBERSHIP_STATUS: "You cannot suspend your own access.",
     NOT_UNIT_REPRESENTATIVE:
         "You are not the designated representative for this unit.",
     VOTE_MISSING_QUESTIONS: "The vote must contain at least one question.",

@@ -4,12 +4,12 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
 import { AuditService } from '@/modules/core/audit/application/services/audit.service';
 import { CoreAuditLabelResolver } from '@/modules/core/audit-projections/core-audit-label-resolver.service';
-import { UpdateMemberRoleCommand } from '@/modules/core/tenancy/application/commands/update-member-role.command';
+import { ChangeMemberStatusCommand } from '@/modules/core/tenancy/application/commands/change-member-status.command';
 import {
   MEMBERSHIP_REPOSITORY,
   type MembershipRepository,
 } from '@/modules/core/tenancy/application/ports/tenant.repository.port';
-import { MembershipRoleUpdatedAuditEvent } from '@/modules/core/tenancy/audit/events/membership-role-updated.event';
+import { MembershipStatusUpdatedAuditEvent } from '@/modules/core/tenancy/audit/events/membership-status-updated.event';
 import {
   TenantMembershipRole,
   TenantMembershipStatus,
@@ -22,9 +22,18 @@ import {
 import { DomainException } from '@/shared/errors/domain.exception';
 import { ErrorCode } from '@/shared/errors/error-codes';
 
-@CommandHandler(UpdateMemberRoleCommand)
-export class UpdateMemberRoleHandler
-  implements ICommandHandler<UpdateMemberRoleCommand>
+/**
+ * Suspends a member or lets them back in. A suspended membership keeps its
+ * role and history; `TenantContextGuard` simply stops admitting it, on the
+ * very next request, because it reads the status from the database each time.
+ *
+ * Unlike `UpdateMembershipStatusHandler`, which only runs inside the invite
+ * flow, this one is reachable from the API, so it checks that the membership
+ * belongs to the caller's association.
+ */
+@CommandHandler(ChangeMemberStatusCommand)
+export class ChangeMemberStatusHandler
+  implements ICommandHandler<ChangeMemberStatusCommand>
 {
   constructor(
     @Inject(MEMBERSHIP_REPOSITORY)
@@ -38,7 +47,7 @@ export class UpdateMemberRoleHandler
     private readonly labelResolver: CoreAuditLabelResolver,
   ) {}
 
-  async execute(command: UpdateMemberRoleCommand): Promise<void> {
+  async execute(command: ChangeMemberStatusCommand): Promise<void> {
     const membership = await this.membershipRepository.findById(
       command.membershipId,
     );
@@ -47,37 +56,39 @@ export class UpdateMemberRoleHandler
       throw new DomainException(ErrorCode.MEMBERSHIP_NOT_FOUND);
     }
 
-    if (membership.role === command.role) {
+    if (membership.status === command.status) {
       return;
     }
 
+    if (membership.id === command.actorMembershipId) {
+      throw new DomainException(ErrorCode.CANNOT_CHANGE_OWN_MEMBERSHIP_STATUS);
+    }
+
     if (
-      membership.role === TenantMembershipRole.ADMIN &&
-      command.role !== TenantMembershipRole.ADMIN
+      command.status === TenantMembershipStatus.SUSPENDED &&
+      membership.role === TenantMembershipRole.ADMIN
     ) {
       const members = await this.membershipRepository.listByTenant(
         command.tenantId,
       );
-      // A suspended admin cannot administer anything, so only active ones
-      // count towards keeping the association administrable.
-      const admins = members.filter(
+      const activeAdmins = members.filter(
         (m) =>
           m.role === TenantMembershipRole.ADMIN &&
           m.status === TenantMembershipStatus.ACTIVE,
       );
 
-      if (admins.length <= 1) {
+      if (activeAdmins.length <= 1) {
         throw new DomainException(ErrorCode.LAST_ADMIN_CANNOT_BE_REMOVED);
       }
     }
 
-    const previousRole = membership.role;
+    const previousStatus = membership.status;
 
     await this.uow.execute(async () => {
-      await this.membershipRepository.updateRole(
+      await this.membershipRepository.updateStatus(
         command.tenantId,
         command.membershipId,
-        command.role,
+        command.status,
       );
 
       const actor = this.auditContext.requireActor();
@@ -87,12 +98,12 @@ export class UpdateMemberRoleHandler
       const actorLabel = await this.labelResolver.resolveActorLabel(actor);
 
       await this.auditService.append(
-        MembershipRoleUpdatedAuditEvent.build({
+        MembershipStatusUpdatedAuditEvent.build({
           tenantId: command.tenantId,
           membershipId: command.membershipId,
           userId: membership.userId,
-          previousRole,
-          newRole: command.role,
+          previousStatus,
+          newStatus: command.status,
           actor,
           memberNameLabel: memberLabel,
           changedByLabel: actorLabel,

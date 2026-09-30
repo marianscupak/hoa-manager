@@ -94,6 +94,7 @@ export default {
         "Podíly jednotek na domě nedávají dohromady 1/1 — aktuální součet {{param}}. Doplňte jednotky před otevřením hlasování.",
     MEMBERSHIP_NOT_FOUND:
         "Členství uživatele v tomto společenství nebylo nalezeno.",
+    CANNOT_CHANGE_OWN_MEMBERSHIP_STATUS: "Vlastní přístup nelze pozastavit.",
     NOT_UNIT_REPRESENTATIVE: "Nejste určeným zástupcem pro tuto jednotku.",
     VOTE_MISSING_QUESTIONS: "Hlasování musí obsahovat alespoň jednu otázku.",
     VOTE_NOT_OPEN: "Toto hlasování momentálně není otevřeno.",

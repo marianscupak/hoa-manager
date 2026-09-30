@@ -22,6 +22,7 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+    ChangeMemberStatusDto,
     ErrorResponseDto,
     MemberResponseDto,
     TenantContactResponseDto,
@@ -413,6 +414,95 @@ export const useMemberControllerUpdateMemberRole = <
 > => {
     return useMutation(
         getMemberControllerUpdateMemberRoleMutationOptions(options),
+        queryClient,
+    );
+};
+export const memberControllerChangeMemberStatus = (
+    id: string,
+    changeMemberStatusDto: BodyType<ChangeMemberStatusDto>,
+    options?: SecondParameter<typeof customInstance>,
+    signal?: AbortSignal,
+) => {
+    return customInstance<void>(
+        {
+            url: `/api/members/${id}/status`,
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            data: changeMemberStatusDto,
+            signal,
+        },
+        options,
+    );
+};
+
+export const getMemberControllerChangeMemberStatusMutationOptions = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof memberControllerChangeMemberStatus>>,
+        TError,
+        { id: string; data: BodyType<ChangeMemberStatusDto> },
+        TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof memberControllerChangeMemberStatus>>,
+    TError,
+    { id: string; data: BodyType<ChangeMemberStatusDto> },
+    TContext
+> => {
+    const mutationKey = ["memberControllerChangeMemberStatus"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation &&
+          "mutationKey" in options.mutation &&
+          options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof memberControllerChangeMemberStatus>>,
+        { id: string; data: BodyType<ChangeMemberStatusDto> }
+    > = (props) => {
+        const { id, data } = props ?? {};
+
+        return memberControllerChangeMemberStatus(id, data, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type MemberControllerChangeMemberStatusMutationResult = NonNullable<
+    Awaited<ReturnType<typeof memberControllerChangeMemberStatus>>
+>;
+export type MemberControllerChangeMemberStatusMutationBody =
+    BodyType<ChangeMemberStatusDto>;
+export type MemberControllerChangeMemberStatusMutationError =
+    ErrorType<ErrorResponseDto>;
+
+export const useMemberControllerChangeMemberStatus = <
+    TError = ErrorType<ErrorResponseDto>,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof memberControllerChangeMemberStatus>>,
+            TError,
+            { id: string; data: BodyType<ChangeMemberStatusDto> },
+            TContext
+        >;
+        request?: SecondParameter<typeof customInstance>;
+    },
+    queryClient?: QueryClient,
+): UseMutationResult<
+    Awaited<ReturnType<typeof memberControllerChangeMemberStatus>>,
+    TError,
+    { id: string; data: BodyType<ChangeMemberStatusDto> },
+    TContext
+> => {
+    return useMutation(
+        getMemberControllerChangeMemberStatusMutationOptions(options),
         queryClient,
     );
 };

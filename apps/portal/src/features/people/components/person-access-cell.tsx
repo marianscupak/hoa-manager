@@ -1,7 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import {
+    Button,
+    ConfirmDialog,
     Select,
     SelectContent,
     SelectItem,
@@ -19,21 +22,27 @@ import {
 import { showApiError } from "@/api/error-utils";
 import { MemberResponseDtoRole } from "@/api/generated/model/memberResponseDtoRole";
 import { getPeopleControllerGetPeopleQueryKey } from "@/api/generated/people/people";
-import { useMemberControllerUpdateMemberRole } from "@/api/generated/tenant-members/tenant-members";
+import {
+    useMemberControllerChangeMemberStatus,
+    useMemberControllerUpdateMemberRole,
+} from "@/api/generated/tenant-members/tenant-members";
 
 import { type PersonRow } from "../utils/people-filter";
 
 const STATUS_VARIANT: Record<string, StatusChipVariant> = {
     ACTIVE: "success",
     INVITED: "warning",
+    SUSPENDED: "destructive",
 };
 
 interface PersonAccessCellProps {
     person: PersonRow;
     /** Changing a role is ADMIN-only, as the endpoint already enforces. */
     isAdmin: boolean;
-    /** True when this association has exactly one ADMIN left. */
+    /** True when this association has exactly one active ADMIN left. */
     isLastAdmin: boolean;
+    /** The viewer's own membership: an admin cannot suspend themselves. */
+    currentMembershipId?: string;
 }
 
 /**
@@ -45,17 +54,37 @@ export function PersonAccessCell({
     person,
     isAdmin,
     isLastAdmin,
+    currentMembershipId,
 }: PersonAccessCellProps) {
     const { t } = useTranslation(["admin"]);
     const queryClient = useQueryClient();
+    const [confirmSuspend, setConfirmSuspend] = useState(false);
+
+    const refreshPeople = () =>
+        queryClient.invalidateQueries({
+            queryKey: getPeopleControllerGetPeopleQueryKey(),
+        });
+
+    const changeStatus = useMemberControllerChangeMemberStatus({
+        mutation: {
+            onSuccess: (_data, { data }) => {
+                setConfirmSuspend(false);
+                toast.success(
+                    data.status === "SUSPENDED"
+                        ? t("users.suspend.success")
+                        : t("users.restore.success"),
+                );
+                void refreshPeople();
+            },
+            onError: showApiError,
+        },
+    });
 
     const updateRole = useMemberControllerUpdateMemberRole({
         mutation: {
             onSuccess: () => {
                 toast.success(t("users.updateRole.success"));
-                void queryClient.invalidateQueries({
-                    queryKey: getPeopleControllerGetPeopleQueryKey(),
-                });
+                void refreshPeople();
             },
             onError: showApiError,
         },
@@ -95,7 +124,58 @@ export function PersonAccessCell({
     }
 
     const membershipId = person.membershipId;
-    const lastAdminGuard = isLastAdmin && person.role === "ADMIN";
+    const lastAdminGuard =
+        isLastAdmin && person.role === "ADMIN" && status === "ACTIVE";
+    const isSelf = membershipId === currentMembershipId;
+
+    // Suspending the last active admin or oneself is refused by the server
+    // too; hiding the button just saves the round trip.
+    const statusControl =
+        status === "SUSPENDED" ? (
+            <Button
+                variant="tableAction"
+                size="tableText"
+                onClick={() =>
+                    changeStatus.mutate({
+                        id: membershipId,
+                        data: { status: "ACTIVE" },
+                    })
+                }
+                disabled={changeStatus.isPending}
+            >
+                {t("users.restore.action")}
+            </Button>
+        ) : status === "ACTIVE" && !isSelf && !lastAdminGuard ? (
+            <>
+                <Button
+                    variant="tableActionDanger"
+                    size="tableText"
+                    onClick={() => setConfirmSuspend(true)}
+                    disabled={changeStatus.isPending}
+                    aria-haspopup="dialog"
+                >
+                    {t("users.suspend.action")}
+                </Button>
+                <ConfirmDialog
+                    open={confirmSuspend}
+                    onOpenChange={setConfirmSuspend}
+                    title={t("users.suspend.title")}
+                    description={t("users.suspend.description", {
+                        name: person.displayName,
+                    })}
+                    confirmLabel={t("users.suspend.confirm")}
+                    confirmingLabel={t("users.suspend.confirming")}
+                    cancelLabel={t("users.suspend.cancel")}
+                    confirming={changeStatus.isPending}
+                    onConfirm={() =>
+                        changeStatus.mutate({
+                            id: membershipId,
+                            data: { status: "SUSPENDED" },
+                        })
+                    }
+                />
+            </>
+        ) : null;
 
     const select = (
         <Select
@@ -140,6 +220,7 @@ export function PersonAccessCell({
                 select
             )}
             {statusChip}
+            {statusControl}
         </div>
     );
 }

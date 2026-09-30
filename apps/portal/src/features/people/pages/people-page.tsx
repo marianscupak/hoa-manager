@@ -64,9 +64,13 @@ export function PeoplePage() {
 
     const allRows = useMemo(() => toPersonRows(people ?? []), [people]);
 
-    // The guard the role control needs: with one ADMIN left, that role cannot
-    // be given away or there would be nobody to administer the association.
-    const isLastAdmin = allRows.filter((p) => p.role === "ADMIN").length === 1;
+    // The guard the role control needs: with one active ADMIN left, that role
+    // cannot be given away or suspended, or there would be nobody to
+    // administer the association. A suspended admin administers nothing.
+    const isLastAdmin =
+        allRows.filter((p) => p.role === "ADMIN" && p.status === "ACTIVE")
+            .length === 1;
+    const currentMembershipId = tenantCtx?.membershipId;
 
     const columns = useMemo(
         () =>
@@ -77,6 +81,7 @@ export function PeoplePage() {
                         person={person}
                         isAdmin={isAdmin}
                         isLastAdmin={isLastAdmin}
+                        currentMembershipId={currentMembershipId}
                     />
                 ),
                 renderActions: (person) => (
@@ -90,7 +95,7 @@ export function PeoplePage() {
                     />
                 ),
             }),
-        [t, canSeeAccounts, isAdmin, isLastAdmin],
+        [t, canSeeAccounts, isAdmin, isLastAdmin, currentMembershipId],
     );
     const rows = filterPeople(allRows, filter);
 

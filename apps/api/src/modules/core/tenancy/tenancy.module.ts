@@ -8,6 +8,7 @@ import { IdentityModule } from '@/modules/core/identity/identity.module';
 import { MemberController } from '@/modules/core/tenancy/api/member.controller';
 import { PeopleController } from '@/modules/core/tenancy/api/people.controller';
 import { TenancyController } from '@/modules/core/tenancy/api/tenancy.controller';
+import { ChangeMemberStatusHandler } from '@/modules/core/tenancy/application/handlers/change-member-status.handler';
 import { CreateMembershipHandler } from '@/modules/core/tenancy/application/handlers/create-membership.handler';
 import { CreateTenantHandler } from '@/modules/core/tenancy/application/handlers/create-tenant.handler';
 import { GetMembershipByTenantAndUserHandler } from '@/modules/core/tenancy/application/handlers/get-membership-by-tenant-and-user.handler';
@@ -36,6 +37,7 @@ const CommandHandlers = [
   CreateMembershipHandler,
   UpdateMembershipStatusHandler,
   UpdateMemberRoleHandler,
+  ChangeMemberStatusHandler,
 ];
 const QueryHandlers = [
   GetUserTenantsHandler,

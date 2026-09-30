@@ -27,6 +27,8 @@ export * from "./assemblyRecordUnitDtoEligibility";
 export * from "./auditControllerGetActivityParams";
 export * from "./authControllerHandleGoogleCallbackParams";
 export * from "./authResponseDto";
+export * from "./changeMemberStatusDto";
+export * from "./changeMemberStatusDtoStatus";
 export * from "./consentPreviewResponseDto";
 export * from "./createOwnerDto";
 export * from "./createOwnerDtoKind";

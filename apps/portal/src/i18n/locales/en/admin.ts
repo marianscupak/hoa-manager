@@ -319,5 +319,19 @@ export default {
             error: "Failed to update user role",
         },
         lastAdminHint: "The last administrator cannot be demoted.",
+        suspend: {
+            action: "Suspend",
+            title: "Suspend access?",
+            description:
+                "{{name}} will not be able to enter the association until you restore their access. Their role and history are kept.",
+            confirm: "Suspend",
+            confirming: "Suspending…",
+            cancel: "Cancel",
+            success: "Access suspended.",
+        },
+        restore: {
+            action: "Restore access",
+            success: "Access restored.",
+        },
     },
 } as const;

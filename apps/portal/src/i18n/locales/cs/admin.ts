@@ -327,5 +327,19 @@ export default {
             error: "Nepodařilo se aktualizovat roli uživatele",
         },
         lastAdminHint: "Posledního správce nelze odebrat.",
+        suspend: {
+            action: "Pozastavit",
+            title: "Pozastavit přístup?",
+            description:
+                "{{name}} se do společenství nedostane, dokud mu přístup neobnovíte. Role i historie zůstanou zachovány.",
+            confirm: "Pozastavit",
+            confirming: "Pozastavuji…",
+            cancel: "Zrušit",
+            success: "Přístup byl pozastaven.",
+        },
+        restore: {
+            action: "Obnovit přístup",
+            success: "Přístup byl obnoven.",
+        },
     },
 } as const;

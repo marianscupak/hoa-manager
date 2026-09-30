@@ -11,9 +11,11 @@ import {
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
+import { ChangeMemberStatusDto } from '@/modules/core/tenancy/api/dto/change-member-status.dto';
 import { MemberResponseDto } from '@/modules/core/tenancy/api/dto/member-response.dto';
 import { TenantContactResponseDto } from '@/modules/core/tenancy/api/dto/tenant-contact-response.dto';
 import { UpdateMemberRoleDto } from '@/modules/core/tenancy/api/dto/update-member-role.dto';
+import { ChangeMemberStatusCommand } from '@/modules/core/tenancy/application/commands/change-member-status.command';
 import { UpdateMemberRoleCommand } from '@/modules/core/tenancy/application/commands/update-member-role.command';
 import { ListTenantContactsQuery } from '@/modules/core/tenancy/application/queries/list-tenant-contacts.query';
 import { ListTenantMembersQuery } from '@/modules/core/tenancy/application/queries/list-tenant-members.query';
@@ -74,6 +76,26 @@ export class MemberController {
   ): Promise<void> {
     await this.commandBus.execute(
       new UpdateMemberRoleCommand(tenantCtx.tenantId, membershipId, dto.role),
+    );
+  }
+
+  /** Suspends a member or restores their access; the role is kept either way. */
+  @Patch(':id/status')
+  @Roles(TenantMembershipRole.ADMIN)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOkResponse({ description: 'Member status updated successfully' })
+  async changeMemberStatus(
+    @Tenant() tenantCtx: TenantContext,
+    @Param('id') membershipId: string,
+    @Body() dto: ChangeMemberStatusDto,
+  ): Promise<void> {
+    await this.commandBus.execute(
+      new ChangeMemberStatusCommand(
+        tenantCtx.tenantId,
+        membershipId,
+        tenantCtx.membershipId,
+        dto.status,
+      ),
     );
   }
 }

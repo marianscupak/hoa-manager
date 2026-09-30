@@ -168,6 +168,7 @@ export * from "./timelineEntryDto";
 export * from "./timelineEntryDtoDetails";
 export * from "./totalVotingPowerDto";
 export * from "./unitDetailResponseDto";
+export * from "./unitOwnerRefDto";
 export * from "./unitOwnershipHistoryResponseDto";
 export * from "./unitOwnershipMemberResponseDto";
 export * from "./unitOwnershipMemberResponseDtoKind";

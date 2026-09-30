@@ -5368,6 +5368,21 @@
           "buildingShareDenominator"
         ]
       },
+      "UnitOwnerRefDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "displayName"
+        ]
+      },
       "UnitResponseDto": {
         "type": "object",
         "properties": {
@@ -5393,6 +5408,13 @@
             "type": "array",
             "items": {
               "type": "string"
+            }
+          },
+          "ownerRefs": {
+            "description": "The current owners with their ids, in the same order as `owners`",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnitOwnerRefDto"
             }
           },
           "mine": {
@@ -5434,6 +5456,7 @@
           "buildingShareNumerator",
           "buildingShareDenominator",
           "owners",
+          "ownerRefs",
           "mine",
           "myShareNumerator",
           "myShareDenominator",
@@ -5641,6 +5664,13 @@
               "type": "string"
             }
           },
+          "ownerRefs": {
+            "description": "The current owners with their ids, in the same order as `owners`",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnitOwnerRefDto"
+            }
+          },
           "mine": {
             "type": "boolean"
           },
@@ -5686,6 +5716,7 @@
           "buildingShareNumerator",
           "buildingShareDenominator",
           "owners",
+          "ownerRefs",
           "mine",
           "myShareNumerator",
           "myShareDenominator",

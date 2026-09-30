@@ -18,6 +18,11 @@ import {
 } from '@/modules/core/property/domain/mark-own-units';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 
+export interface UnitOwnerRef {
+  id: string;
+  displayName: string;
+}
+
 // Named explicitly rather than `extends Unit`: `katastr_unit_id` is an
 // internal matching key with no screen to appear on, and listing the
 // fields here means a future column on `units` does not silently join
@@ -33,6 +38,12 @@ export interface UnitWithStatus {
   createdAt: Date;
   updatedAt: Date;
   owners: string[];
+  /**
+   * The same owners as `owners`, with their ids. Names are not unique — the
+   * katastr import produces namesakes — so anything that needs to know
+   * *which* owner holds a unit reads this, not `owners`.
+   */
+  ownerRefs: UnitOwnerRef[];
 }
 
 export type ListedUnit = MarkedUnit<UnitWithStatus>;
@@ -76,20 +87,29 @@ export class ListUnitsHandler
       ownerIdsByUnit.set(row.unitId, ids);
     }
 
-    const result: UnitWithStatus[] = units.map((unit) => ({
-      id: unit.id,
-      tenantId: unit.tenantId,
-      unitNo: unit.unitNo,
-      buildingShareNumerator: unit.buildingShareNumerator,
-      buildingShareDenominator: unit.buildingShareDenominator,
-      usageCode: unit.usageCode,
-      usageName: unit.usageName,
-      createdAt: unit.createdAt,
-      updatedAt: unit.updatedAt,
-      owners: [...(ownerIdsByUnit.get(unit.id) ?? [])]
-        .map((id) => namesById.get(id))
-        .filter((name): name is string => !!name),
-    }));
+    const result: UnitWithStatus[] = units.map((unit) => {
+      // One list, then the names from it, so the two can never disagree about
+      // who was dropped for having no owner record.
+      const ownerRefs = [...(ownerIdsByUnit.get(unit.id) ?? [])].flatMap(
+        (id) => {
+          const displayName = namesById.get(id);
+          return displayName ? [{ id, displayName }] : [];
+        },
+      );
+      return {
+        id: unit.id,
+        tenantId: unit.tenantId,
+        unitNo: unit.unitNo,
+        buildingShareNumerator: unit.buildingShareNumerator,
+        buildingShareDenominator: unit.buildingShareDenominator,
+        usageCode: unit.usageCode,
+        usageName: unit.usageName,
+        createdAt: unit.createdAt,
+        updatedAt: unit.updatedAt,
+        owners: ownerRefs.map((ref) => ref.displayName),
+        ownerRefs,
+      };
+    });
 
     return markOwnUnits(result, owned);
   }

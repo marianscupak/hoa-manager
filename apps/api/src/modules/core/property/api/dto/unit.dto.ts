@@ -120,6 +120,14 @@ export class ReplaceOwnershipsDto extends createZodDto(
   replaceOwnershipsSchema,
 ) {}
 
+export class UnitOwnerRefDto {
+  @ApiProperty()
+  id!: string;
+
+  @ApiProperty()
+  displayName!: string;
+}
+
 export class UnitResponseDto {
   @ApiProperty()
   id!: string;
@@ -141,6 +149,13 @@ export class UnitResponseDto {
     description: 'Display names of the current owners of this unit',
   })
   owners!: string[];
+
+  @ApiProperty({
+    type: [UnitOwnerRefDto],
+    description:
+      'The current owners with their ids, in the same order as `owners`',
+  })
+  ownerRefs!: UnitOwnerRefDto[];
 
   /** True when the caller holds a share in this unit today. */
   @ApiProperty()

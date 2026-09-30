@@ -49,4 +49,33 @@ describe('GetUnitDetailHandler', () => {
     // An internal matching key has no screen to appear on.
     expect(unit).not.toHaveProperty('katastrUnitId');
   });
+
+  it('carries the owners with their ids, like the unit list', async () => {
+    const party = (id: string, memberOwnerIds: string[]) => ({
+      id,
+      tenantId: TENANT,
+      unitId: 'u1',
+      partyType: 'SOLE',
+      shareNumerator: 1,
+      shareDenominator: 2,
+      validFrom: new Date('2026-01-01'),
+      validTo: null,
+      memberOwnerIds,
+    });
+    const { handler } = buildHandler({
+      ownerships: [party('p1', ['o1']), party('p2', ['o2', 'o1'])],
+      owners: [
+        { id: 'o1', displayName: 'Jana Nováková', kind: 'PERSON' },
+        { id: 'o2', displayName: 'Jana Nováková', kind: 'PERSON' },
+      ],
+    });
+
+    const unit = await handler.execute(new GetUnitDetailQuery(TENANT, 'u1'));
+
+    // Namesakes stay two owners; one owner in two parties stays one.
+    expect(unit.ownerRefs).toEqual([
+      { id: 'o1', displayName: 'Jana Nováková' },
+      { id: 'o2', displayName: 'Jana Nováková' },
+    ]);
+  });
 });

@@ -5,6 +5,7 @@
  * The HOA Manager API description
  * OpenAPI spec version: 1.0
  */
+import type { UnitOwnerRefDto } from "./unitOwnerRefDto";
 import type { UnitOwnershipResponseDto } from "./unitOwnershipResponseDto";
 
 export interface UnitDetailResponseDto {
@@ -17,6 +18,8 @@ export interface UnitDetailResponseDto {
     buildingShareDenominator: number;
     /** Display names of the current owners of this unit */
     owners: string[];
+    /** The current owners with their ids, in the same order as `owners` */
+    ownerRefs: UnitOwnerRefDto[];
     mine: boolean;
     /**
      * Numerator of the caller's share of this unit; null if none

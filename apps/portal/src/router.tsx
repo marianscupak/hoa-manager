@@ -16,6 +16,7 @@ import { VerifyEmailPage } from "@/features/auth/pages/verify-email-page";
 import { DashboardPage } from "@/features/dashboard/pages/dashboard-page";
 import { OwnerInvitePage } from "@/features/invite/pages/owner-invite-page";
 import { PeoplePage } from "@/features/people/pages/people-page";
+import { PersonDetailPage } from "@/features/people/pages/person-detail-page";
 import { ProfilePage } from "@/features/profile/pages/profile-page";
 import { CreateTenantPage } from "@/features/tenants/pages/create-tenant-page";
 import { UnitDetailRoute } from "@/features/units/pages/unit-detail-route";
@@ -122,7 +123,25 @@ export const router = createBrowserRouter([
                     },
                     {
                         path: "people",
-                        element: <PeoplePage />,
+                        children: [
+                            {
+                                index: true,
+                                element: <PeoplePage />,
+                            },
+                            {
+                                // The list is the register every member may
+                                // read; one person's contact and account
+                                // controls are the board's.
+                                path: ":key",
+                                element: <AdminGuard />,
+                                children: [
+                                    {
+                                        index: true,
+                                        element: <PersonDetailPage />,
+                                    },
+                                ],
+                            },
+                        ],
                     },
                     {
                         path: "admin",

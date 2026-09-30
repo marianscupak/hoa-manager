@@ -113,6 +113,7 @@ describe('ListPeopleHandler', () => {
       joinedAt: null,
       inviteStatus: null,
       suggestedCounterpartKey: null,
+      accountEmail: null,
     });
     // Ownership is still there — that is the part they are entitled to.
     expect(jana.unitCount).toBe(1);

@@ -1,6 +1,7 @@
 import { Inject } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
+import { type UnitOwnerRef } from '@/modules/core/property/application/handlers/list-units.handler';
 import {
   toOwnershipPartyItem,
   type UnitOwnershipDetailItem,
@@ -38,6 +39,7 @@ export interface UnitDetail {
   updatedAt: Date;
   ownerships: UnitOwnershipDetailItem[];
   owners: string[];
+  ownerRefs: UnitOwnerRef[];
 }
 
 @QueryHandler(GetUnitDetailQuery)
@@ -73,14 +75,14 @@ export class GetUnitDetailHandler
 
     const ownersById = new Map(tenantOwners.map((o) => [o.id, o]));
 
-    const owners = [
-      ...new Set(
-        ownerships
-          .flatMap((p) => p.memberOwnerIds)
-          .map((id) => ownersById.get(id)?.displayName)
-          .filter((name): name is string => !!name),
-      ),
-    ];
+    // Deduplicated by id, not by name: namesakes are two owners. The names
+    // come from the same list so `owners` and `ownerRefs` cannot disagree.
+    const ownerRefs = [
+      ...new Set(ownerships.flatMap((p) => p.memberOwnerIds)),
+    ].flatMap((id) => {
+      const displayName = ownersById.get(id)?.displayName;
+      return displayName ? [{ id, displayName }] : [];
+    });
 
     return {
       id: unit.id,
@@ -95,7 +97,8 @@ export class GetUnitDetailHandler
       ownerships: ownerships.map((party) =>
         toOwnershipPartyItem(party, ownersById),
       ),
-      owners,
+      owners: ownerRefs.map((ref) => ref.displayName),
+      ownerRefs,
     };
   }
 }

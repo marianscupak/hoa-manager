@@ -71,7 +71,7 @@ export default {
             mine: "Yours",
             coOwned: "co-owned",
             noOwner: "no registered owner",
-            openDetail: "Open unit {{unitNo}}",
+            detail: "Detail",
             count_one: "{{count}} unit",
             count_other: "{{count}} units",
         },

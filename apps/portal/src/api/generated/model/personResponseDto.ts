@@ -39,4 +39,6 @@ export interface PersonResponseDto {
     inviteCreatedAt: string | null;
     /** @nullable */
     suggestedCounterpartKey: string | null;
+    /** @nullable */
+    accountEmail: string | null;
 }

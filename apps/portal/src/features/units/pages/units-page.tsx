@@ -151,7 +151,7 @@ export function UnitsPage() {
                 columns={columns}
                 data={units ?? []}
                 gridTemplate={unitsGridTemplate({ canManage, showMyShare })}
-                minWidth={showMyShare ? "900px" : "760px"}
+                minWidth={showMyShare ? "940px" : "800px"}
                 isLoading={isLoading}
                 loadingMessage={t("loading")}
                 emptyMessage={t("buildingUnits.empty")}

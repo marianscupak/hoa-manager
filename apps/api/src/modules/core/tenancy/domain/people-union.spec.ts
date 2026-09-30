@@ -51,6 +51,35 @@ describe('unionPeople', () => {
     });
   });
 
+  it("carries the linked account's sign-in e-mail apart from the owner's contact", () => {
+    // `email` on an owner row is a contact the board typed in, often empty
+    // after the katastr import; the account signs in with its own address.
+    const people = unionPeople({
+      owners: [owner({ userId: 'u1', email: 'contact@example.cz' })],
+      members: [member()],
+      holdings: [],
+    });
+
+    expect(people[0]).toMatchObject({
+      email: 'contact@example.cz',
+      accountEmail: 'jana@hoa.local',
+    });
+  });
+
+  it('gives an account-only row its sign-in e-mail and an unlinked owner none', () => {
+    const people = unionPeople({
+      owners: [owner({ ownerId: 'o2', displayName: 'Bez účtu' })],
+      members: [
+        member({ membershipId: 'm2', userId: 'u2', email: 'x@hoa.local' }),
+      ],
+      holdings: [],
+    });
+
+    const byKey = Object.fromEntries(people.map((p) => [p.key, p]));
+    expect(byKey['member:m2'].accountEmail).toBe('x@hoa.local');
+    expect(byKey['owner:o2'].accountEmail).toBeNull();
+  });
+
   it('keeps an owner with no account and a member who owns nothing', () => {
     const people = unionPeople({
       owners: [

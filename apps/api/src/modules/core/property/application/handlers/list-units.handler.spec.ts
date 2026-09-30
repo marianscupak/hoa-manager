@@ -186,4 +186,73 @@ describe('ListUnitsHandler', () => {
       new Date('2026-09-04T10:00:00Z'),
     );
   });
+
+  it('carries each owner as id and name, deduplicated like the names', async () => {
+    const { handler } = buildHandler({
+      ownerships: [
+        { unitId: 'u1', ownerId: 'o1' },
+        { unitId: 'u1', ownerId: 'o2' },
+        { unitId: 'u1', ownerId: 'o1' },
+      ],
+    });
+
+    const [unit] = await handler.execute(
+      new ListUnitsQuery(TENANT, MEMBERSHIP),
+    );
+
+    expect(unit.ownerRefs).toEqual([
+      { id: 'o1', displayName: 'Jana Nováková' },
+      { id: 'o2', displayName: 'Petr Svoboda' },
+    ]);
+    expect(unit.owners).toEqual(unit.ownerRefs.map((r) => r.displayName));
+  });
+
+  it('keeps two owners who share a name apart by id', async () => {
+    // Why the ids exist at all: the katastr import yields namesakes, and a
+    // person's holdings must not be matched by name.
+    const { handler } = buildHandler({
+      ownerships: [
+        { unitId: 'u1', ownerId: 'o1' },
+        { unitId: 'u1', ownerId: 'o3' },
+      ],
+      owners: [
+        { id: 'o1', displayName: 'Jana Nováková' },
+        { id: 'o3', displayName: 'Jana Nováková' },
+      ],
+    });
+
+    const [unit] = await handler.execute(
+      new ListUnitsQuery(TENANT, MEMBERSHIP),
+    );
+
+    expect(unit.ownerRefs.map((r) => r.id)).toEqual(['o1', 'o3']);
+  });
+
+  it('drops an owner without a record from both lists alike', async () => {
+    const { handler } = buildHandler({
+      ownerships: [
+        { unitId: 'u1', ownerId: 'o1' },
+        { unitId: 'u1', ownerId: 'o-gone' },
+      ],
+    });
+
+    const [unit] = await handler.execute(
+      new ListUnitsQuery(TENANT, MEMBERSHIP),
+    );
+
+    expect(unit.owners).toEqual(['Jana Nováková']);
+    expect(unit.ownerRefs).toEqual([
+      { id: 'o1', displayName: 'Jana Nováková' },
+    ]);
+  });
+
+  it('returns empty ownerRefs for a unit without active ownerships', async () => {
+    const { handler } = buildHandler({ ownerships: [] });
+
+    const [unit] = await handler.execute(
+      new ListUnitsQuery(TENANT, MEMBERSHIP),
+    );
+
+    expect(unit.ownerRefs).toEqual([]);
+  });
 });

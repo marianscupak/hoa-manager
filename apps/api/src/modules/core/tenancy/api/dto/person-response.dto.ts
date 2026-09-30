@@ -74,4 +74,11 @@ export class PersonResponseDto {
   /** The counterpart that looks like the same person, by e-mail. */
   @ApiProperty({ type: 'string', nullable: true })
   suggestedCounterpartKey!: string | null;
+
+  /**
+   * The address the linked account signs in with — unlike `email`, which on
+   * an owner row is the board's contact for that owner.
+   */
+  @ApiProperty({ type: 'string', nullable: true })
+  accountEmail!: string | null;
 }

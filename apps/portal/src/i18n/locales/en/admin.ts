@@ -264,7 +264,8 @@ export default {
             name: "Name",
             email: "Email",
             holdings: "Owns",
-            access: "Access",
+            status: "Status",
+            detail: "Detail",
             searchPlaceholder: "Search for a person…",
             noMatch: "Nobody matches that search.",
             unitCount_one: "{{count}} unit",
@@ -288,6 +289,54 @@ export default {
         unlink: {
             action: "Remove the link",
             success: "Link removed.",
+        },
+        detail: {
+            back: "Back to people",
+            notFound: "This person is no longer on the list.",
+            loadError: "The person could not be loaded.",
+            subtitle: {
+                ownerWithUnits_one:
+                    "Owner of {{count}} unit · {{share}} of the building · {{account}}",
+                ownerWithUnits_other:
+                    "Owner of {{count}} units · {{share}} of the building · {{account}}",
+                owner: "Owner · {{account}}",
+                accountOnly: "Account without an owner record",
+                hasAccount: "has an account",
+                noAccount: "no account",
+            },
+            owner: {
+                title: "Owner",
+                caption: "Entry on the ownership register",
+                name: "Name",
+                email: "Email",
+                type: "Type",
+                companyId: "Company ID",
+                holdings: "Holdings",
+                coOwners: "with {{names}}",
+                noHoldings: "Holds no unit today.",
+                holdingsError: "The units could not be loaded.",
+                notOnRegisterTitle: "Not on the ownership register",
+                notOnRegisterBody:
+                    "This account holds no unit. To let it act for an owner, open that owner's page and link the account there.",
+            },
+            account: {
+                title: "Account",
+                caption: "Access to the association portal",
+                status: "Status",
+                signsInWith: "Signs in with",
+                memberSince: "Member since",
+                sent: "Sent",
+                to: "To",
+                explainPending:
+                    "Waiting for {{name}} to accept. You can resend the invitation or revoke it.",
+                explainInvite:
+                    "Invite {{name}} to the portal by email, or link an account that already exists.",
+                explainNoEmail:
+                    "Add an email address to invite this owner, or link an account that already exists.",
+                unlinkNote:
+                    "The link decides who votes for this owner's units. Removing it does not touch closed votes.",
+                selfNote: "This is your account — you cannot suspend yourself.",
+            },
         },
     },
     users: {

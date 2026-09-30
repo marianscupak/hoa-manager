@@ -1,19 +1,25 @@
 import type { TFunction } from "i18next";
+import { ChevronRightIcon } from "lucide-react";
+import { Link } from "react-router";
 
-import { type ColumnDef, formatPercent, StatusChip } from "@hoa-mngr/ui";
+import {
+    Button,
+    type ColumnDef,
+    formatPercent,
+    StatusChip,
+} from "@hoa-mngr/ui";
 
 import { type PersonRow } from "../utils/people-filter";
+import { PersonStatusChip } from "./person-status-chip";
 
 export interface PeopleColumnOptions {
     /** ADMIN and BOARD_MEMBER; a unit owner gets neither contact nor access. */
     canSeeAccounts: boolean;
-    renderAccess: (person: PersonRow) => React.ReactNode;
-    renderActions: (person: PersonRow) => React.ReactNode;
 }
 
 export const getPeopleColumns = (
     t: TFunction<"admin">,
-    { canSeeAccounts, renderAccess, renderActions }: PeopleColumnOptions,
+    { canSeeAccounts }: PeopleColumnOptions,
 ): ColumnDef<PersonRow>[] => [
     {
         id: "name",
@@ -36,11 +42,6 @@ export const getPeopleColumns = (
                             )}
                         </StatusChip>
                     )}
-                    {person.suggestedCounterpartKey && (
-                        <span className="text-faint text-xs">
-                            {t("people.link.suggested")}
-                        </span>
-                    )}
                 </div>
             );
         },
@@ -54,7 +55,11 @@ export const getPeopleColumns = (
                   enableSorting: false,
                   enableGlobalFilter: true,
                   cell: ({ row }: { row: { original: PersonRow } }) =>
-                      row.original.email ?? (
+                      row.original.email ? (
+                          <span className="text-secondary-foreground truncate text-sm">
+                              {row.original.email}
+                          </span>
+                      ) : (
                           <span className="text-faint">—</span>
                       ),
               } satisfies ColumnDef<PersonRow>,
@@ -92,21 +97,30 @@ export const getPeopleColumns = (
     ...(canSeeAccounts
         ? [
               {
-                  id: "access",
-                  header: t("people.table.access"),
+                  id: "status",
+                  header: t("people.table.status"),
                   enableSorting: false,
                   enableGlobalFilter: false,
-                  cell: ({ row }: { row: { original: PersonRow } }) =>
-                      renderAccess(row.original),
+                  cell: ({ row }: { row: { original: PersonRow } }) => (
+                      <PersonStatusChip person={row.original} />
+                  ),
               } satisfies ColumnDef<PersonRow>,
               {
-                  id: "actions",
+                  id: "detail",
                   header: "",
                   enableSorting: false,
                   enableGlobalFilter: false,
                   meta: { align: "right" as const },
-                  cell: ({ row }: { row: { original: PersonRow } }) =>
-                      renderActions(row.original),
+                  cell: ({ row }: { row: { original: PersonRow } }) => (
+                      <Button variant="tableAction" size="tableText" asChild>
+                          <Link
+                              to={`/people/${encodeURIComponent(row.original.key)}`}
+                          >
+                              {t("people.table.detail")}
+                              <ChevronRightIcon />
+                          </Link>
+                      </Button>
+                  ),
               } satisfies ColumnDef<PersonRow>,
           ]
         : []),

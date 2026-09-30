@@ -5,9 +5,9 @@ import { Link } from "react-router";
 import { Button, CellNumeric, StatusChip, type ColumnDef } from "@hoa-mngr/ui";
 
 import type { UnitResponseDto } from "@/api/generated/model";
-import { capitalizeFirst } from "@/features/admin/components/units-table/capitalize-first";
 
 import { isCoOwnedShare, shareCellValues } from "../utils/shares";
+import { unitUsageLabel } from "../utils/unit-usage";
 
 type UnitRow = UnitResponseDto & { id: string };
 
@@ -61,32 +61,19 @@ export function getUnitColumns(
             enableSorting: false,
             enableGlobalFilter: false,
             cell: ({ row }) => {
-                const { usageCode, usageName } = row.original;
-                if (!usageCode && !usageName) {
-                    return (
-                        <span className="text-faint text-detail">
-                            {t("admin:units.table.usageUnknown")}
-                        </span>
-                    );
-                }
-                // i18next returns the key itself when it is missing, which is
-                // the signal to fall back to the cadastre's own Czech wording
-                // (the sample extract only carries codes 1 and 5).
-                const key = `admin:units.table.usage_${usageCode}`;
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const translated = t(key as any) as string;
-                const label = translated === key ? usageName ?? "" : translated;
-                if (!label) {
-                    return (
-                        <span className="text-faint text-detail">
-                            {t("admin:units.table.usageUnknown")}
-                        </span>
-                    );
-                }
-                return (
+                const label = unitUsageLabel(
+                    t,
+                    row.original.usageCode,
+                    row.original.usageName,
+                );
+                return label ? (
                     <StatusChip variant="neutral" dot={false}>
-                        {capitalizeFirst(label)}
+                        {label}
                     </StatusChip>
+                ) : (
+                    <span className="text-faint text-detail">
+                        {t("admin:units.table.usageUnknown")}
+                    </span>
                 );
             },
         },

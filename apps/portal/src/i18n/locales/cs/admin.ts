@@ -269,7 +269,8 @@ export default {
             name: "Jméno",
             email: "E-mail",
             holdings: "Vlastní",
-            access: "Přístup",
+            status: "Stav",
+            detail: "Detail",
             searchPlaceholder: "Hledat osobu…",
             noMatch: "Hledání nikoho nenašlo.",
             unitCount_one: "{{count}} jednotka",
@@ -295,6 +296,56 @@ export default {
         unlink: {
             action: "Zrušit propojení",
             success: "Propojení zrušeno.",
+        },
+        detail: {
+            back: "Zpět na seznam lidí",
+            notFound: "Tato osoba už v seznamu není.",
+            loadError: "Osobu se nepodařilo načíst.",
+            subtitle: {
+                ownerWithUnits_one:
+                    "Vlastní {{count}} jednotku · {{share}} domu · {{account}}",
+                ownerWithUnits_few:
+                    "Vlastní {{count}} jednotky · {{share}} domu · {{account}}",
+                ownerWithUnits_other:
+                    "Vlastní {{count}} jednotek · {{share}} domu · {{account}}",
+                owner: "Vlastník · {{account}}",
+                accountOnly: "Účet bez záznamu vlastníka",
+                hasAccount: "má účet",
+                noAccount: "bez účtu",
+            },
+            owner: {
+                title: "Vlastník",
+                caption: "Záznam v evidenci vlastníků",
+                name: "Jméno",
+                email: "E-mail",
+                type: "Typ",
+                companyId: "IČO",
+                holdings: "Jednotky",
+                coOwners: "spolu s {{names}}",
+                noHoldings: "Dnes nevlastní žádnou jednotku.",
+                holdingsError: "Jednotky se nepodařilo načíst.",
+                notOnRegisterTitle: "Není v evidenci vlastníků",
+                notOnRegisterBody:
+                    "Tento účet nevlastní žádnou jednotku. Aby mohl jednat za vlastníka, otevřete stránku toho vlastníka a propojte účet tam.",
+            },
+            account: {
+                title: "Účet",
+                caption: "Přístup do portálu společenství",
+                status: "Stav",
+                signsInWith: "Přihlašuje se",
+                memberSince: "Členem od",
+                sent: "Odesláno",
+                to: "Komu",
+                explainPending:
+                    "Pozvánka čeká na přijetí. Můžete ji poslat znovu, nebo ji zrušit.",
+                explainInvite:
+                    "Pozvěte tohoto vlastníka do portálu e-mailem, nebo propojte účet, který už existuje.",
+                explainNoEmail:
+                    "Přidejte e-mailovou adresu, abyste mohli vlastníka pozvat, nebo propojte účet, který už existuje.",
+                unlinkNote:
+                    "Propojení určuje, kdo za jednotky tohoto vlastníka hlasuje. Jeho zrušení se uzavřených hlasování nedotkne.",
+                selfNote: "Tohle je váš účet — sami sebe pozastavit nemůžete.",
+            },
         },
     },
     users: {

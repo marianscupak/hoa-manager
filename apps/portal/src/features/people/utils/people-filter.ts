@@ -16,7 +16,9 @@ export const toPersonRows = (people: PersonResponseDto[]): PersonRow[] =>
  * `displayName`, but the id they want is the owner's — not the row key, which
  * is prefixed to keep the two sources apart.
  */
-export const toOwnerRef = (person: PersonRow | null) =>
+export const toOwnerRef = (
+    person: Pick<PersonRow, "ownerId" | "displayName"> | null,
+) =>
     person?.ownerId
         ? { id: person.ownerId, displayName: person.displayName }
         : null;

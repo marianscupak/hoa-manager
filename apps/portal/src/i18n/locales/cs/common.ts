@@ -71,7 +71,7 @@ export default {
             mine: "Moje",
             coOwned: "spoluvlastnictví",
             noOwner: "bez zapsaného vlastníka",
-            openDetail: "Zobrazit jednotku {{unitNo}}",
+            detail: "Detail",
             count_one: "{{count}} jednotka",
             count_few: "{{count}} jednotky",
             count_other: "{{count}} jednotek",

@@ -1,13 +1,8 @@
 import type { TFunction } from "i18next";
-import { ChevronRightIcon } from "lucide-react";
-import { Link } from "react-router";
 
-import {
-    Button,
-    type ColumnDef,
-    formatPercent,
-    StatusChip,
-} from "@hoa-mngr/ui";
+import { type ColumnDef, formatPercent, StatusChip } from "@hoa-mngr/ui";
+
+import { TableDetailLink } from "@/components/table-detail-link";
 
 import { type PersonRow } from "../utils/people-filter";
 import { PersonStatusChip } from "./person-status-chip";
@@ -112,14 +107,10 @@ export const getPeopleColumns = (
                   enableGlobalFilter: false,
                   meta: { align: "right" as const },
                   cell: ({ row }: { row: { original: PersonRow } }) => (
-                      <Button variant="tableAction" size="tableText" asChild>
-                          <Link
-                              to={`/people/${encodeURIComponent(row.original.key)}`}
-                          >
-                              {t("people.table.detail")}
-                              <ChevronRightIcon />
-                          </Link>
-                      </Button>
+                      <TableDetailLink
+                          to={`/people/${encodeURIComponent(row.original.key)}`}
+                          label={t("people.table.detail")}
+                      />
                   ),
               } satisfies ColumnDef<PersonRow>,
           ]

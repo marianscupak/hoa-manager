@@ -1,10 +1,10 @@
 import { TFunction } from "i18next";
-import { ChevronRightIcon, PencilIcon, Trash2Icon } from "lucide-react";
-import { Link } from "react-router";
+import { Trash2Icon } from "lucide-react";
 
 import { Button, CellNumeric, StatusChip, type ColumnDef } from "@hoa-mngr/ui";
 
 import type { UnitResponseDto } from "@/api/generated/model";
+import { TableDetailLink } from "@/components/table-detail-link";
 
 import { isCoOwnedShare, shareCellValues } from "../utils/shares";
 import { unitUsageLabel } from "../utils/unit-usage";
@@ -159,16 +159,10 @@ export function getUnitColumns(
             cell: ({ row }) =>
                 canManage ? (
                     <div className="flex items-center gap-1.5">
-                        <Button
-                            variant="tableAction"
-                            size="tableIcon"
-                            aria-label={t("admin:units.details.ownership.edit")}
-                            asChild
-                        >
-                            <Link to={`/units/${row.original.id}`}>
-                                <PencilIcon />
-                            </Link>
-                        </Button>
+                        <TableDetailLink
+                            to={`/units/${row.original.id}`}
+                            label={t("buildingUnits.table.detail")}
+                        />
                         <Button
                             variant="tableActionDanger"
                             size="tableIcon"
@@ -181,17 +175,10 @@ export function getUnitColumns(
                 ) : row.original.mine ? (
                     // Only a unit the reader owns has a detail to open; the
                     // register says nothing more about anyone else's.
-                    <Button variant="tableAction" size="tableIcon" asChild>
-                        <Link
-                            to={`/units/${row.original.id}`}
-                            aria-label={t(
-                                "common:buildingUnits.table.openDetail",
-                                { unitNo: row.original.unitNo },
-                            )}
-                        >
-                            <ChevronRightIcon />
-                        </Link>
-                    </Button>
+                    <TableDetailLink
+                        to={`/units/${row.original.id}`}
+                        label={t("buildingUnits.table.detail")}
+                    />
                 ) : null,
         },
     ];
@@ -207,6 +194,8 @@ export function unitsGridTemplate({
     showMyShare,
 }: Pick<UnitColumnOptions, "canManage" | "showMyShare">): string {
     const base = "1.1fr 0.9fr 1.2fr 1.5fr";
-    const actions = canManage ? "88px" : "60px";
+    // "Detail ›" plus the delete icon, or "Detail ›" alone — the same button
+    // the People table opens a person with.
+    const actions = canManage ? "132px" : "96px";
     return showMyShare ? `${base} 1.3fr ${actions}` : `${base} ${actions}`;
 }

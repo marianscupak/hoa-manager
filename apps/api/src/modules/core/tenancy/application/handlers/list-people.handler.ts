@@ -99,6 +99,7 @@ export class ListPeopleHandler implements IQueryHandler<ListPeopleQuery> {
       suggestedCounterpartKey: query.canSeeAccounts
         ? p.suggestedCounterpartKey
         : null,
+      accountEmail: query.canSeeAccounts ? p.accountEmail : null,
     }));
   }
 }

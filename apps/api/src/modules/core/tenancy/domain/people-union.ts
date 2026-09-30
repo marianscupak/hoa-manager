@@ -51,6 +51,11 @@ export interface Person {
   inviteStatus: string | null;
   inviteCreatedAt: Date | null;
   suggestedCounterpartKey: string | null;
+  /**
+   * The address the linked account signs in with. Not `email`: on an owner
+   * row that is a contact the board keeps, and it may be empty or differ.
+   */
+  accountEmail: string | null;
 }
 
 const ownerKey = (ownerId: string) => `owner:${ownerId}`;
@@ -122,6 +127,7 @@ export function unionPeople(input: {
       inviteStatus: o.inviteStatus,
       inviteCreatedAt: o.inviteCreatedAt,
       suggestedCounterpartKey: null,
+      accountEmail: linked?.email ?? null,
     };
   });
 
@@ -146,6 +152,7 @@ export function unionPeople(input: {
       inviteStatus: null,
       inviteCreatedAt: null,
       suggestedCounterpartKey: null,
+      accountEmail: m.email,
     }));
 
   // Suggestions run only between an unlinked owner and a membership no owner

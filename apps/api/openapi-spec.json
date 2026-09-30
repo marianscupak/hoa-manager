@@ -4845,6 +4845,10 @@
           "suggestedCounterpartKey": {
             "type": "string",
             "nullable": true
+          },
+          "accountEmail": {
+            "type": "string",
+            "nullable": true
           }
         },
         "required": [
@@ -4865,7 +4869,8 @@
           "joinedAt",
           "inviteStatus",
           "inviteCreatedAt",
-          "suggestedCounterpartKey"
+          "suggestedCounterpartKey",
+          "accountEmail"
         ]
       },
       "UpdateUserLanguageDto": {

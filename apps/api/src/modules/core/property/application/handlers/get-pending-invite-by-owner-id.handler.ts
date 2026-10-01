@@ -4,8 +4,8 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import {
   OWNER_INVITE_REPOSITORY,
   type OwnerInviteRepository,
-} from '@/modules/core/invitation/application/ports/owner-invite.repository.port';
-import { GetPendingInviteByOwnerIdQuery } from '@/modules/core/invitation/application/queries/get-pending-invite-by-owner-id.query';
+} from '@/modules/core/property/application/ports/owner-invite.repository.port';
+import { GetPendingInviteByOwnerIdQuery } from '@/modules/core/property/application/queries/get-pending-invite-by-owner-id.query';
 
 export type PendingInviteResult = {
   expiresAt: Date;

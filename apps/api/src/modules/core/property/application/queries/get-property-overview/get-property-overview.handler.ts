@@ -4,7 +4,7 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import {
   INVITE_READ_REPOSITORY,
   type InviteReadRepository,
-} from '@/modules/core/invitation/application/ports/invite-read.repository.port';
+} from '@/modules/core/property/application/ports/invite-read.repository.port';
 import {
   OWNER_READ_REPOSITORY,
   type OwnerReadRepository,

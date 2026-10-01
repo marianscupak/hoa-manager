@@ -18,14 +18,14 @@ import {
 } from '@/modules/core/auth/application/ports/auth.utils.port';
 import { CreateUserCommand } from '@/modules/core/identity/application/commands/create-user.command';
 import { GetUserByEmailQuery } from '@/modules/core/identity/application/queries/get-user-by-email.query';
-import { RegisterFromInviteCommand } from '@/modules/core/invitation/application/commands/register-from-invite.command';
+import { RegisterFromInviteCommand } from '@/modules/core/property/application/commands/register-from-invite.command';
+import { SetOwnerUserIdCommand } from '@/modules/core/property/application/commands/set-owner-user-id.command';
 import {
   OWNER_INVITE_REPOSITORY,
   type OwnerInviteRepository,
-} from '@/modules/core/invitation/application/ports/owner-invite.repository.port';
-import { OwnerInviteAcceptedAuditEvent } from '@/modules/core/invitation/audit/events/owner-invite-accepted.event';
-import { SetOwnerUserIdCommand } from '@/modules/core/property/application/commands/set-owner-user-id.command';
+} from '@/modules/core/property/application/ports/owner-invite.repository.port';
 import { GetOwnerByIdQuery } from '@/modules/core/property/application/queries/get-owner-by-id.query';
+import { OwnerInviteAcceptedAuditEvent } from '@/modules/core/property/audit/events/owner-invite-accepted.event';
 import { CreateMembershipCommand } from '@/modules/core/tenancy/application/commands/create-membership.command';
 import { ACTOR_CLS_KEY } from '@/shared/application/actor-context';
 import {

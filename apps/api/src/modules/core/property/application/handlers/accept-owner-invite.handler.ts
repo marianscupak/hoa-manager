@@ -10,14 +10,14 @@ import { AuditContextService } from '@/modules/core/audit/application/services/a
 import { AuditService } from '@/modules/core/audit/application/services/audit.service';
 import { CoreAuditLabelResolver } from '@/modules/core/audit-projections/core-audit-label-resolver.service';
 import { GetUserByIdQuery } from '@/modules/core/identity/application/queries/get-user-by-id.query';
-import { AcceptOwnerInviteCommand } from '@/modules/core/invitation/application/commands/accept-owner-invite.command';
+import { AcceptOwnerInviteCommand } from '@/modules/core/property/application/commands/accept-owner-invite.command';
+import { SetOwnerUserIdCommand } from '@/modules/core/property/application/commands/set-owner-user-id.command';
 import {
   OWNER_INVITE_REPOSITORY,
   type OwnerInviteRepository,
-} from '@/modules/core/invitation/application/ports/owner-invite.repository.port';
-import { OwnerInviteAcceptedAuditEvent } from '@/modules/core/invitation/audit/events/owner-invite-accepted.event';
-import { SetOwnerUserIdCommand } from '@/modules/core/property/application/commands/set-owner-user-id.command';
+} from '@/modules/core/property/application/ports/owner-invite.repository.port';
 import { GetOwnerByIdQuery } from '@/modules/core/property/application/queries/get-owner-by-id.query';
+import { OwnerInviteAcceptedAuditEvent } from '@/modules/core/property/audit/events/owner-invite-accepted.event';
 import { CreateMembershipCommand } from '@/modules/core/tenancy/application/commands/create-membership.command';
 import { UpdateMembershipStatusCommand } from '@/modules/core/tenancy/application/commands/update-membership-status.command';
 import { GetMembershipByTenantAndUserQuery } from '@/modules/core/tenancy/application/queries/get-membership-by-tenant-and-user.query';

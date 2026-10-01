@@ -1,13 +1,13 @@
 import { Inject } from '@nestjs/common';
 import { IQueryHandler, QueryHandler, QueryBus } from '@nestjs/cqrs';
 
-import { GetPendingInviteByOwnerIdQuery } from '@/modules/core/invitation/application/queries/get-pending-invite-by-owner-id.query';
 import {
   OWNER_REPOSITORY,
   UNIT_OWNERSHIP_REPOSITORY,
   type OwnerRepository,
   type UnitOwnershipRepository,
 } from '@/modules/core/property/application/ports/property.repository.port';
+import { GetPendingInviteByOwnerIdQuery } from '@/modules/core/property/application/queries/get-pending-invite-by-owner-id.query';
 import { ListOwnersQuery } from '@/modules/core/property/application/queries/list-owners.query';
 import type { OwnerKind } from '@/modules/core/property/domain/ownership-plan';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';

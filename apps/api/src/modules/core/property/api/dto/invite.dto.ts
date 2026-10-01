@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
-import { InviteStatus } from '@/modules/core/invitation/domain/invite-status';
+import { InviteStatus } from '@/modules/core/property/domain/invite-status';
 
 export class SendOwnerInviteResponseDto {
   @ApiProperty()

@@ -4,8 +4,8 @@ import { eq, and, isNull } from 'drizzle-orm';
 import { DrizzleService } from '@/infrastructure/db/drizzle.service';
 import { DRIZZLE_TX_STORAGE } from '@/infrastructure/db/drizzle.unit-of-work';
 import { ownerInvites } from '@/infrastructure/db/schema';
-import { OwnerInviteRepository } from '@/modules/core/invitation/application/ports/owner-invite.repository.port';
-import { OwnerInvite } from '@/modules/core/invitation/domain/owner-invite.entity';
+import { OwnerInviteRepository } from '@/modules/core/property/application/ports/owner-invite.repository.port';
+import { OwnerInvite } from '@/modules/core/property/domain/owner-invite.entity';
 
 @Injectable()
 export class DrizzleOwnerInviteRepository implements OwnerInviteRepository {

@@ -13,7 +13,6 @@ import { AuditProjectionsModule } from '@/modules/core/audit-projections/audit-p
 import { AuthModule } from '@/modules/core/auth/auth.module';
 import { IdentityPortsModule } from '@/modules/core/identity/identity-ports.module';
 import { IdentityModule } from '@/modules/core/identity/identity.module';
-import { InvitationModule } from '@/modules/core/invitation/invitation.module';
 import { PropertyModule } from '@/modules/core/property/property.module';
 import { TenancyPortsModule } from '@/modules/core/tenancy/tenancy-ports.module';
 import { TenancyModule } from '@/modules/core/tenancy/tenancy.module';
@@ -39,7 +38,6 @@ import { DomainExceptionFilter } from '@/shared/filters/domain-exception.filter'
     IdentityModule,
     AuthModule,
     PropertyModule,
-    InvitationModule,
     AuditModule,
     AuditProjectionsModule,
     VotingModule,

@@ -14,13 +14,13 @@ import {
 import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
 import { AuditService } from '@/modules/core/audit/application/services/audit.service';
 import { CoreAuditLabelResolver } from '@/modules/core/audit-projections/core-audit-label-resolver.service';
-import { SendOwnerInviteCommand } from '@/modules/core/invitation/application/commands/send-owner-invite.command';
+import { SendOwnerInviteCommand } from '@/modules/core/property/application/commands/send-owner-invite.command';
 import {
   OWNER_INVITE_REPOSITORY,
   type OwnerInviteRepository,
-} from '@/modules/core/invitation/application/ports/owner-invite.repository.port';
-import { OwnerInviteSentAuditEvent } from '@/modules/core/invitation/audit/events/owner-invite-sent.event';
+} from '@/modules/core/property/application/ports/owner-invite.repository.port';
 import { GetOwnerByIdQuery } from '@/modules/core/property/application/queries/get-owner-by-id.query';
+import { OwnerInviteSentAuditEvent } from '@/modules/core/property/audit/events/owner-invite-sent.event';
 import { GetTenantByIdQuery } from '@/modules/core/tenancy/application/queries/get-tenant-by-id.query';
 import {
   OwnerAlreadyClaimedException,

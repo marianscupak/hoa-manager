@@ -4,12 +4,12 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
 import { AuditService } from '@/modules/core/audit/application/services/audit.service';
 import { CoreAuditLabelResolver } from '@/modules/core/audit-projections/core-audit-label-resolver.service';
-import { RevokeOwnerInviteCommand } from '@/modules/core/invitation/application/commands/revoke-owner-invite.command';
+import { RevokeOwnerInviteCommand } from '@/modules/core/property/application/commands/revoke-owner-invite.command';
 import {
   OWNER_INVITE_REPOSITORY,
   type OwnerInviteRepository,
-} from '@/modules/core/invitation/application/ports/owner-invite.repository.port';
-import { OwnerInviteRevokedAuditEvent } from '@/modules/core/invitation/audit/events/owner-invite-revoked.event';
+} from '@/modules/core/property/application/ports/owner-invite.repository.port';
+import { OwnerInviteRevokedAuditEvent } from '@/modules/core/property/audit/events/owner-invite-revoked.event';
 import {
   InviteNotFoundException,
   InviteAlreadyAcceptedException,

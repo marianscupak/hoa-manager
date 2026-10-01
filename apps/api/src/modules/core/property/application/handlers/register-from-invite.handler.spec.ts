@@ -1,5 +1,5 @@
 import { CreateUserCommand } from '@/modules/core/identity/application/commands/create-user.command';
-import { RegisterFromInviteCommand } from '@/modules/core/invitation/application/commands/register-from-invite.command';
+import { RegisterFromInviteCommand } from '@/modules/core/property/application/commands/register-from-invite.command';
 
 import { RegisterFromInviteHandler } from './register-from-invite.handler';
 

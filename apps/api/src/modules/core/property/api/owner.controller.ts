@@ -19,8 +19,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { RevokeOwnerInviteCommand } from '@/modules/core/invitation/application/commands/revoke-owner-invite.command';
-import { SendOwnerInviteCommand } from '@/modules/core/invitation/application/commands/send-owner-invite.command';
 import {
   CreateOwnerDto,
   CreateOwnerResponseDto,
@@ -33,6 +31,8 @@ import { CreateOwnerCommand } from '@/modules/core/property/application/commands
 import { DeleteOwnerCommand } from '@/modules/core/property/application/commands/delete-owner.command';
 import { LinkOwnerToAccountCommand } from '@/modules/core/property/application/commands/link-owner-to-account.command';
 import { RenameOwnerCommand } from '@/modules/core/property/application/commands/rename-owner.command';
+import { RevokeOwnerInviteCommand } from '@/modules/core/property/application/commands/revoke-owner-invite.command';
+import { SendOwnerInviteCommand } from '@/modules/core/property/application/commands/send-owner-invite.command';
 import { SetOwnerEmailCommand } from '@/modules/core/property/application/commands/set-owner-email.command';
 import { UnlinkOwnerFromAccountCommand } from '@/modules/core/property/application/commands/unlink-owner-from-account.command';
 import { ListOwnersQuery } from '@/modules/core/property/application/queries/list-owners.query';

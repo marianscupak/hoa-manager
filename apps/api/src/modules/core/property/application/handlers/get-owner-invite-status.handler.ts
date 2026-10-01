@@ -5,9 +5,9 @@ import { GetUserByEmailQuery } from '@/modules/core/identity/application/queries
 import {
   OWNER_INVITE_REPOSITORY,
   type OwnerInviteRepository,
-} from '@/modules/core/invitation/application/ports/owner-invite.repository.port';
-import { GetOwnerInviteStatusQuery } from '@/modules/core/invitation/application/queries/get-owner-invite-status.query';
-import { InviteStatus } from '@/modules/core/invitation/domain/invite-status';
+} from '@/modules/core/property/application/ports/owner-invite.repository.port';
+import { GetOwnerInviteStatusQuery } from '@/modules/core/property/application/queries/get-owner-invite-status.query';
+import { InviteStatus } from '@/modules/core/property/domain/invite-status';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 import { hashToken } from '@/shared/application/utils/token.utils';
 

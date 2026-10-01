@@ -7,7 +7,7 @@ import { ownerInvites } from '@/infrastructure/db/schema';
 import {
   InviteReadRepository,
   PendingInviteSummary,
-} from '@/modules/core/invitation/application/ports/invite-read.repository.port';
+} from '@/modules/core/property/application/ports/invite-read.repository.port';
 
 @Injectable()
 export class DrizzleInviteReadRepository implements InviteReadRepository {

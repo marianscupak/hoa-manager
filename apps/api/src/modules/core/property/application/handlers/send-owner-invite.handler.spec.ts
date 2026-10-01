@@ -10,9 +10,9 @@ import type {
 import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
 import { AuditService } from '@/modules/core/audit/application/services/audit.service';
 import { CoreAuditLabelResolver } from '@/modules/core/audit-projections/core-audit-label-resolver.service';
-import { SendOwnerInviteCommand } from '@/modules/core/invitation/application/commands/send-owner-invite.command';
-import { SendOwnerInviteHandler } from '@/modules/core/invitation/application/handlers/send-owner-invite.handler';
-import { type OwnerInviteRepository } from '@/modules/core/invitation/application/ports/owner-invite.repository.port';
+import { SendOwnerInviteCommand } from '@/modules/core/property/application/commands/send-owner-invite.command';
+import { SendOwnerInviteHandler } from '@/modules/core/property/application/handlers/send-owner-invite.handler';
+import { type OwnerInviteRepository } from '@/modules/core/property/application/ports/owner-invite.repository.port';
 import { GetOwnerByIdQuery } from '@/modules/core/property/application/queries/get-owner-by-id.query';
 import { type Clock } from '@/shared/application/ports/clock.port';
 import type { AuditActor } from '@/shared/domain/actor';

@@ -1,4 +1,4 @@
-import { GetOwnerInviteStatusQuery } from '@/modules/core/invitation/application/queries/get-owner-invite-status.query';
+import { GetOwnerInviteStatusQuery } from '@/modules/core/property/application/queries/get-owner-invite-status.query';
 
 import { GetOwnerInviteStatusHandler } from './get-owner-invite-status.handler';
 

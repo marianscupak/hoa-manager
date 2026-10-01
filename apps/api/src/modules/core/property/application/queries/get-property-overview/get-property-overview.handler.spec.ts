@@ -1,4 +1,4 @@
-import type { InviteReadRepository } from '@/modules/core/invitation/application/ports/invite-read.repository.port';
+import type { InviteReadRepository } from '@/modules/core/property/application/ports/invite-read.repository.port';
 import type { OwnerReadRepository } from '@/modules/core/property/application/ports/owner-read.repository.port';
 import type { UnitReadRepository } from '@/modules/core/property/application/ports/unit-read.repository.port';
 import { type Clock } from '@/shared/application/ports/clock.port';

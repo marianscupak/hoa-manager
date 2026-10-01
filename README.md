@@ -52,15 +52,15 @@ The domain is Czech (_společenství vlastníků jednotek_, SVJ), so the built-i
 | **Contract** | OpenAPI generated from the Nest app; orval generates the typed react-query hooks the portal uses                 |
 | **Email**    | React Email templates in a shared package, delivered through Brevo                                               |
 | **Infra**    | Docker, Caddy, GitHub Actions → GHCR → a single Hetzner host, Prometheus + Loki + Grafana, Cloudflare R2         |
-| **Tooling**  | pnpm workspaces, Turborepo, ESLint, Prettier, Jest (API) and Vitest (web) — 168 test files                       |
+| **Tooling**  | pnpm workspaces, Turborepo, ESLint, Prettier, Jest (API) and Vitest (web)                                        |
 
 ## Architecture in one paragraph
 
-A modular monolith. Each module (`tenancy`, `identity`, `auth`, `property`, `invitation`, `audit`, `voting`) is sliced into `domain`, `application`, `api` and `infrastructure`. The rules worth arguing about — tally, quorum, ruleset validation, electorate resolution, ballot answers — live in pure domain functions with no framework imports and carry the bulk of the unit tests. Application code talks to ports; Drizzle, object storage and the email provider are adapters behind them. Everything is multi-tenant: one deployment serves many associations, and the active one is resolved per request.
+A modular monolith. Each module (`tenancy`, `identity`, `auth`, `property`, `audit`, `voting`) is sliced into `domain`, `application`, `api` and `infrastructure`. Dependencies point one way — voting on the core, and inside the core specific modules on general ones — and a test fails on any cycle between modules. The rules worth arguing about — tally, quorum, ruleset validation, electorate resolution, ballot answers — live in pure domain functions with no framework imports and carry the bulk of the unit tests. Application code talks to ports; Drizzle, object storage and the email provider are adapters behind them. Everything is multi-tenant: one deployment serves many associations, and the active one is resolved per request.
 
 ## Getting started
 
-**Prerequisites:** Node 22, pnpm 8.15.6, Docker.
+**Prerequisites:** Node 22, pnpm (the version pinned in `packageManager` in `package.json`), Docker.
 
 ```bash
 pnpm install

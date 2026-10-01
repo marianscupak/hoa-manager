@@ -1,7 +1,7 @@
 import { QueryBus } from '@nestjs/cqrs';
 
+import { type PeopleHoldingsRepository } from '@/modules/core/property/application/ports/people-holdings.repository.port';
 import { ListOwnersQuery } from '@/modules/core/property/application/queries/list-owners.query';
-import { type PeopleHoldingsRepository } from '@/modules/core/tenancy/application/ports/people-holdings.repository.port';
 import { type Clock } from '@/shared/application/ports/clock.port';
 
 import { ListPeopleHandler } from './list-people.handler';

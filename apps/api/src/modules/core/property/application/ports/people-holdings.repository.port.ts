@@ -1,4 +1,4 @@
-import { type PeopleHoldingRow } from '@/modules/core/tenancy/domain/people-union';
+import { type PeopleHoldingRow } from '@/modules/core/property/domain/people-union';
 
 export interface PeopleHoldingsRepository {
   /**

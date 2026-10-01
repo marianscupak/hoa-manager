@@ -10,6 +10,7 @@ import { IdentityModule } from '@/modules/core/identity/identity.module';
 import { InviteController } from '@/modules/core/property/api/invite.controller';
 import { KatastrImportController } from '@/modules/core/property/api/katastr-import.controller';
 import { OwnerController } from '@/modules/core/property/api/owner.controller';
+import { PeopleController } from '@/modules/core/property/api/people.controller';
 import { PropertyController } from '@/modules/core/property/api/property.controller';
 import { UnitController } from '@/modules/core/property/api/unit.controller';
 import { AcceptOwnerInviteHandler } from '@/modules/core/property/application/handlers/accept-owner-invite.handler';
@@ -26,6 +27,7 @@ import { GetUnitOwnershipHistoryHandler } from '@/modules/core/property/applicat
 import { ImportKatastrDataHandler } from '@/modules/core/property/application/handlers/import-katastr-data.handler';
 import { LinkOwnerToAccountHandler } from '@/modules/core/property/application/handlers/link-owner-to-account.handler';
 import { ListOwnersHandler } from '@/modules/core/property/application/handlers/list-owners.handler';
+import { ListPeopleHandler } from '@/modules/core/property/application/handlers/list-people.handler';
 import { ListUnitsHandler } from '@/modules/core/property/application/handlers/list-units.handler';
 import { PreviewKatastrImportHandler } from '@/modules/core/property/application/handlers/preview-katastr-import.handler';
 import { RegisterFromInviteHandler } from '@/modules/core/property/application/handlers/register-from-invite.handler';
@@ -42,6 +44,7 @@ import { INVITE_READ_REPOSITORY } from '@/modules/core/property/application/port
 import { KATASTR_SNAPSHOT_REPOSITORY } from '@/modules/core/property/application/ports/katastr-snapshot.repository.port';
 import { OWNER_INVITE_REPOSITORY } from '@/modules/core/property/application/ports/owner-invite.repository.port';
 import { OWNER_READ_REPOSITORY } from '@/modules/core/property/application/ports/owner-read.repository.port';
+import { PEOPLE_HOLDINGS_REPOSITORY } from '@/modules/core/property/application/ports/people-holdings.repository.port';
 import {
   OWNER_REPOSITORY,
   UNIT_OWNERSHIP_REPOSITORY,
@@ -55,6 +58,7 @@ import { DrizzleInviteReadRepository } from '@/modules/core/property/infrastruct
 import { DrizzleKatastrSnapshotRepository } from '@/modules/core/property/infrastructure/persistence/drizzle-katastr-snapshot.repository';
 import { DrizzleOwnerInviteRepository } from '@/modules/core/property/infrastructure/persistence/drizzle-owner-invite.repository';
 import { DrizzleOwnerReadRepository } from '@/modules/core/property/infrastructure/persistence/drizzle-owner-read.repository';
+import { DrizzlePeopleHoldingsRepository } from '@/modules/core/property/infrastructure/persistence/drizzle-people-holdings.repository';
 import {
   DrizzleOwnerRepository,
   DrizzleUnitOwnershipRepository,
@@ -95,6 +99,7 @@ const QueryHandlers = [
   PreviewKatastrImportHandler,
   GetOwnerInviteStatusHandler,
   GetPendingInviteByOwnerIdHandler,
+  ListPeopleHandler,
 ];
 
 const Repositories = [
@@ -112,6 +117,10 @@ const Repositories = [
   },
   { provide: OWNER_INVITE_REPOSITORY, useClass: DrizzleOwnerInviteRepository },
   { provide: INVITE_READ_REPOSITORY, useClass: DrizzleInviteReadRepository },
+  {
+    provide: PEOPLE_HOLDINGS_REPOSITORY,
+    useClass: DrizzlePeopleHoldingsRepository,
+  },
 ];
 
 @Module({
@@ -131,6 +140,7 @@ const Repositories = [
     UnitController,
     KatastrImportController,
     InviteController,
+    PeopleController,
   ],
   providers: [
     ...CommandHandlers,

@@ -1,16 +1,16 @@
 import { Inject } from '@nestjs/common';
 import { IQueryHandler, QueryBus, QueryHandler } from '@nestjs/cqrs';
 
+import { PersonResponseDto } from '@/modules/core/property/api/dto/person-response.dto';
 import { type OwnerWithInviteStatus } from '@/modules/core/property/application/handlers/list-owners.handler';
-import { ListOwnersQuery } from '@/modules/core/property/application/queries/list-owners.query';
-import { PersonResponseDto } from '@/modules/core/tenancy/api/dto/person-response.dto';
 import {
   PEOPLE_HOLDINGS_REPOSITORY,
   type PeopleHoldingsRepository,
-} from '@/modules/core/tenancy/application/ports/people-holdings.repository.port';
+} from '@/modules/core/property/application/ports/people-holdings.repository.port';
+import { ListOwnersQuery } from '@/modules/core/property/application/queries/list-owners.query';
+import { unionPeople } from '@/modules/core/property/domain/people-union';
 import { type TenantMembershipWithUser } from '@/modules/core/tenancy/application/ports/tenant.repository.port';
 import { ListTenantMembersQuery } from '@/modules/core/tenancy/application/queries/list-tenant-members.query';
-import { unionPeople } from '@/modules/core/tenancy/domain/people-union';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 import { Rational } from '@/shared/domain/rational';
 

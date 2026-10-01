@@ -8,15 +8,13 @@ import {
   unitOwnerships,
   units,
 } from '@/infrastructure/db/schema';
-import { type PeopleHoldingsRepository } from '@/modules/core/tenancy/application/ports/people-holdings.repository.port';
-import { type PeopleHoldingRow } from '@/modules/core/tenancy/domain/people-union';
+import { type PeopleHoldingsRepository } from '@/modules/core/property/application/ports/people-holdings.repository.port';
+import { type PeopleHoldingRow } from '@/modules/core/property/domain/people-union';
 
 /**
- * Reads `unit_ownerships` from tenancy, which is property's table.
- *
- * That is deliberate and confined to the read side, the way the voting
- * module's `drizzle-electorate-data.repository.ts` already reads both
- * `owners` and `tenant_memberships`. Nothing here writes.
+ * Who holds which unit, and in what share, for the people overview. Reads
+ * only the register's own tables; the member half of the overview comes from
+ * tenancy through `ListTenantMembersQuery`.
  */
 @Injectable()
 export class DrizzlePeopleHoldingsRepository

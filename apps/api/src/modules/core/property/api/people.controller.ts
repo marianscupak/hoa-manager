@@ -8,8 +8,8 @@ import {
 import { QueryBus } from '@nestjs/cqrs';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
-import { PersonResponseDto } from '@/modules/core/tenancy/api/dto/person-response.dto';
-import { ListPeopleQuery } from '@/modules/core/tenancy/application/queries/list-people.query';
+import { PersonResponseDto } from '@/modules/core/property/api/dto/person-response.dto';
+import { ListPeopleQuery } from '@/modules/core/property/application/queries/list-people.query';
 import { Tenant } from '@/shared/api/decorators/auth.decorators';
 import { ApiErrorResponses } from '@/shared/api/decorators/error.decorators';
 import { AccessTokenAuthGuard } from '@/shared/api/guards/access-token-auth.guard';

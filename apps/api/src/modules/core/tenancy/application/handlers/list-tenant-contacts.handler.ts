@@ -9,7 +9,7 @@ import { ListTenantContactsQuery } from '@/modules/core/tenancy/application/quer
 import {
   TenantMembershipRole,
   TenantMembershipStatus,
-} from '@/modules/core/tenancy/domain/tenant.entity';
+} from '@/shared/domain/membership';
 
 export interface TenantContact {
   fullName: string;

@@ -1,8 +1,8 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
-import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
 import { ForbiddenException } from '@/shared/application/exceptions/auth.exceptions';
+import { TenantMembershipRole } from '@/shared/domain/membership';
 import { TenantContext } from '@/shared/domain/tenant-context';
 
 export const ROLES_KEY = 'roles';

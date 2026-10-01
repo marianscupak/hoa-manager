@@ -4,7 +4,7 @@ import { z } from 'zod';
 import {
   TenantMembershipRole,
   TenantMembershipStatus,
-} from '@/modules/core/tenancy/domain/tenant.entity';
+} from '@/shared/domain/membership';
 
 export const memberUserResponseSchema = z.object({
   id: z.string(),

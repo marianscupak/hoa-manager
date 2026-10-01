@@ -21,13 +21,13 @@ import {
 } from '@/modules/core/property/api/dto/katastr-import.dto';
 import { ImportKatastrDataCommand } from '@/modules/core/property/application/commands/import-katastr-data.command';
 import { PreviewKatastrImportQuery } from '@/modules/core/property/application/queries/preview-katastr-import.query';
-import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
 import { Roles, Tenant } from '@/shared/api/decorators/auth.decorators';
 import { ApiErrorResponses } from '@/shared/api/decorators/error.decorators';
 import { AccessTokenAuthGuard } from '@/shared/api/guards/access-token-auth.guard';
 import { RolesGuard } from '@/shared/api/guards/roles.guard';
 import { TenantContextGuard } from '@/shared/api/guards/tenant-context.guard';
 import { parseAssociationDate } from '@/shared/domain/association-date';
+import { TenantMembershipRole } from '@/shared/domain/membership';
 import type { TenantContext } from '@/shared/domain/tenant-context';
 
 const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;

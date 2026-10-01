@@ -1,9 +1,9 @@
 import { resolveAutoScope } from '@/modules/core/auth/application/resolve-auto-scope';
+import { TenantMembership } from '@/modules/core/tenancy/domain/tenant.entity';
 import {
-  TenantMembership,
   TenantMembershipRole,
   TenantMembershipStatus,
-} from '@/modules/core/tenancy/domain/tenant.entity';
+} from '@/shared/domain/membership';
 
 function membership(
   id: string,

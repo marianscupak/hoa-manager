@@ -1,5 +1,5 @@
 import { Visibility } from '@/modules/core/audit/domain/visibility';
-import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
+import { TenantMembershipRole } from '@/shared/domain/membership';
 
 import { VisibilityPolicyService } from './visibility-policy.service';
 

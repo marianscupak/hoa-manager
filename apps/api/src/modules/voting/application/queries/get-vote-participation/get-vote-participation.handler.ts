@@ -1,9 +1,9 @@
 import { Inject } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
 import { VoteNotFoundException } from '@/shared/application/exceptions/vote.exceptions';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
+import { TenantMembershipRole } from '@/shared/domain/membership';
 
 import { GetVoteParticipationQuery } from './get-vote-participation.query';
 import {

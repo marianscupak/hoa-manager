@@ -7,7 +7,7 @@ import {
   type MembershipRepository,
 } from '@/modules/core/tenancy/application/ports/tenant.repository.port';
 import { GetUserTenantsQuery } from '@/modules/core/tenancy/application/queries/get-user-tenants.query';
-import { TenantMembershipStatus } from '@/modules/core/tenancy/domain/tenant.entity';
+import { TenantMembershipStatus } from '@/shared/domain/membership';
 
 @QueryHandler(GetUserTenantsQuery)
 export class GetUserTenantsHandler

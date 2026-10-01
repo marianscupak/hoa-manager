@@ -1,4 +1,4 @@
-import { type TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
+import { type TenantMembershipRole } from '@/shared/domain/membership';
 
 export class GetVotesQuery {
   constructor(

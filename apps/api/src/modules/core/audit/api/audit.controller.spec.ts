@@ -1,8 +1,8 @@
+import type { AuthPrincipal } from '@/shared/domain/auth-principal';
 import {
   TenantMembershipRole,
   TenantMembershipStatus,
-} from '@/modules/core/tenancy/domain/tenant.entity';
-import type { AuthPrincipal } from '@/shared/domain/auth-principal';
+} from '@/shared/domain/membership';
 import type { TenantContext } from '@/shared/domain/tenant-context';
 
 import { AuditController } from './audit.controller';

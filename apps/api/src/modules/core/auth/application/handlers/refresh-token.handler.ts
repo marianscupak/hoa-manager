@@ -18,10 +18,7 @@ import { type GetUserByIdResult } from '@/modules/core/identity/application/hand
 import { GetUserByIdQuery } from '@/modules/core/identity/application/queries/get-user-by-id.query';
 import { GetMembershipByTenantAndUserQuery } from '@/modules/core/tenancy/application/queries/get-membership-by-tenant-and-user.query';
 import { GetMembershipsByUserIdQuery } from '@/modules/core/tenancy/application/queries/get-memberships-by-user-id.query';
-import {
-  TenantMembership,
-  TenantMembershipStatus,
-} from '@/modules/core/tenancy/domain/tenant.entity';
+import { TenantMembership } from '@/modules/core/tenancy/domain/tenant.entity';
 import {
   InvalidTokenException,
   ReplayAttackException,
@@ -40,6 +37,7 @@ import {
   type UnitOfWork,
 } from '@/shared/application/ports/unit-of-work.port';
 import { AuthClaims } from '@/shared/domain/auth-claims';
+import { TenantMembershipStatus } from '@/shared/domain/membership';
 
 @CommandHandler(RefreshTokenCommand)
 export class RefreshTokenHandler

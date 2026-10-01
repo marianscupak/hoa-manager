@@ -1,5 +1,5 @@
-import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
 import { VoteNotFoundException } from '@/shared/application/exceptions/vote.exceptions';
+import { TenantMembershipRole } from '@/shared/domain/membership';
 
 import { GetVoteParticipationHandler } from './get-vote-participation.handler';
 import { GetVoteParticipationQuery } from './get-vote-participation.query';

@@ -2,7 +2,7 @@ import { UpdateMemberRoleCommand } from '@/modules/core/tenancy/application/comm
 import {
   TenantMembershipRole,
   TenantMembershipStatus,
-} from '@/modules/core/tenancy/domain/tenant.entity';
+} from '@/shared/domain/membership';
 import { ErrorCode } from '@/shared/errors/error-codes';
 
 import { UpdateMemberRoleHandler } from './update-member-role.handler';

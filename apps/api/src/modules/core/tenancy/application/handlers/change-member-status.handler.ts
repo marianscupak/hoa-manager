@@ -10,15 +10,15 @@ import {
   type MembershipRepository,
 } from '@/modules/core/tenancy/application/ports/tenant.repository.port';
 import { MembershipStatusUpdatedAuditEvent } from '@/modules/core/tenancy/audit/events/membership-status-updated.event';
-import {
-  TenantMembershipRole,
-  TenantMembershipStatus,
-} from '@/modules/core/tenancy/domain/tenant.entity';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 import {
   UNIT_OF_WORK,
   type UnitOfWork,
 } from '@/shared/application/ports/unit-of-work.port';
+import {
+  TenantMembershipRole,
+  TenantMembershipStatus,
+} from '@/shared/domain/membership';
 import { DomainException } from '@/shared/errors/domain.exception';
 import { ErrorCode } from '@/shared/errors/error-codes';
 

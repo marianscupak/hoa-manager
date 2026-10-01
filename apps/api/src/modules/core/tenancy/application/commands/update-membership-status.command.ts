@@ -1,4 +1,4 @@
-import { TenantMembershipStatus } from '@/modules/core/tenancy/domain/tenant.entity';
+import { TenantMembershipStatus } from '@/shared/domain/membership';
 
 export class UpdateMembershipStatusCommand {
   constructor(

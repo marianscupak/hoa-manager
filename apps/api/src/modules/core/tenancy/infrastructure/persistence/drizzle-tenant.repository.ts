@@ -13,8 +13,8 @@ import {
 import {
   Tenant,
   TenantMembership,
-  TenantMembershipStatus,
 } from '@/modules/core/tenancy/domain/tenant.entity';
+import { TenantMembershipStatus } from '@/shared/domain/membership';
 
 @Injectable()
 export class DrizzleTenantRepository implements TenantRepository {

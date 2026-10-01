@@ -13,15 +13,15 @@ import {
 } from '@/modules/core/tenancy/application/ports/tenant.repository.port';
 import { MembershipCreatedAuditEvent } from '@/modules/core/tenancy/audit/events/membership-created.event';
 import { TenantCreatedAuditEvent } from '@/modules/core/tenancy/audit/events/tenant-created.event';
-import {
-  TenantMembershipRole,
-  TenantMembershipStatus,
-} from '@/modules/core/tenancy/domain/tenant.entity';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 import {
   UNIT_OF_WORK,
   type UnitOfWork,
 } from '@/shared/application/ports/unit-of-work.port';
+import {
+  TenantMembershipRole,
+  TenantMembershipStatus,
+} from '@/shared/domain/membership';
 
 @CommandHandler(CreateTenantCommand)
 export class CreateTenantHandler

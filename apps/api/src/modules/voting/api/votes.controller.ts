@@ -23,6 +23,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import { TenantMembershipRole } from '@/shared/domain/membership';
+
 import { VoteActivityResponseDto } from './dto/vote-activity.dto';
 import { VoteAuditExportDto } from './dto/vote-audit-export.dto';
 import {
@@ -66,7 +68,6 @@ import { RolesGuard } from '../../../shared/api/guards/roles.guard';
 import { TenantContextGuard } from '../../../shared/api/guards/tenant-context.guard';
 import { type AuthPrincipal } from '../../../shared/domain/auth-principal';
 import { type TenantContext } from '../../../shared/domain/tenant-context';
-import { TenantMembershipRole } from '../../core/tenancy/domain/tenant.entity';
 import { CloseVoteCommand } from '../application/commands/close-vote/close-vote.command';
 import { ConfirmDocumentUploadCommand } from '../application/commands/confirm-document-upload/confirm-document-upload.command';
 import { CreateVoteCommand } from '../application/commands/create-vote/create-vote.command';

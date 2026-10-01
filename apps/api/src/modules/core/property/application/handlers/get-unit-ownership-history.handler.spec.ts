@@ -4,7 +4,7 @@ import {
   OwnershipPartyType,
 } from '@/modules/core/property/domain/ownership-plan';
 import type { UnitOwnershipParty } from '@/modules/core/property/domain/property.entity';
-import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
+import { TenantMembershipRole } from '@/shared/domain/membership';
 
 import { GetUnitOwnershipHistoryHandler } from './get-unit-ownership-history.handler';
 

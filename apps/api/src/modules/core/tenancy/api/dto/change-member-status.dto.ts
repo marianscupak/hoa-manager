@@ -1,7 +1,7 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
-import { TenantMembershipStatus } from '@/modules/core/tenancy/domain/tenant.entity';
+import { TenantMembershipStatus } from '@/shared/domain/membership';
 
 export const changeMemberStatusSchema = z.object({
   status: z.enum([

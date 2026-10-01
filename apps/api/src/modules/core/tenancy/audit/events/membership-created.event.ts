@@ -7,7 +7,7 @@ import { CoreEventType } from '@/modules/core/audit-projections/core-event-types
 import {
   TenantMembershipRole,
   TenantMembershipStatus,
-} from '@/modules/core/tenancy/domain/tenant.entity';
+} from '@/shared/domain/membership';
 
 const PayloadSchema = z.object({
   userId: z.uuid(),

@@ -37,7 +37,6 @@ import { SetOwnerEmailCommand } from '@/modules/core/property/application/comman
 import { UnlinkOwnerFromAccountCommand } from '@/modules/core/property/application/commands/unlink-owner-from-account.command';
 import { ListOwnersQuery } from '@/modules/core/property/application/queries/list-owners.query';
 import type { OwnerKind } from '@/modules/core/property/domain/ownership-plan';
-import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
 import {
   Roles,
   Tenant,
@@ -48,6 +47,7 @@ import { AccessTokenAuthGuard } from '@/shared/api/guards/access-token-auth.guar
 import { RolesGuard } from '@/shared/api/guards/roles.guard';
 import { TenantContextGuard } from '@/shared/api/guards/tenant-context.guard';
 import type { AuthPrincipal } from '@/shared/domain/auth-principal';
+import { TenantMembershipRole } from '@/shared/domain/membership';
 import type { TenantContext } from '@/shared/domain/tenant-context';
 
 @ApiTags('Property Owners')

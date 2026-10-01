@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { Visibility } from '@/modules/core/audit/domain/visibility';
-import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
+import { TenantMembershipRole } from '@/shared/domain/membership';
 
 const PRIVILEGED_ROLES = new Set<TenantMembershipRole>([
   TenantMembershipRole.ADMIN,

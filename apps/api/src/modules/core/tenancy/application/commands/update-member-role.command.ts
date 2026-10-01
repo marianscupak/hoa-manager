@@ -1,4 +1,4 @@
-import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
+import { TenantMembershipRole } from '@/shared/domain/membership';
 
 export class UpdateMemberRoleCommand {
   constructor(

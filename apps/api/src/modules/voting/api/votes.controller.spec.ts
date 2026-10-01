@@ -3,9 +3,9 @@ import 'reflect-metadata';
 import { GUARDS_METADATA } from '@nestjs/common/constants';
 
 import { ROLES_KEY, RolesGuard } from '@/shared/api/guards/roles.guard';
+import { TenantMembershipRole } from '@/shared/domain/membership';
 
 import { VotesController } from './votes.controller';
-import { TenantMembershipRole } from '../../core/tenancy/domain/tenant.entity';
 
 // `@Roles` is declared as `(...roles: string[])`, so the metadata comes back
 // as plain strings; the enum members are string-valued, so they compare

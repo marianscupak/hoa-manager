@@ -1,7 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
 import { type VoteListItemResponseDto } from '@/modules/voting/api/dto/vote.dto';
 import {
   VOTE_READ_REPOSITORY,
@@ -10,6 +9,7 @@ import {
 import { GetVotesQuery } from '@/modules/voting/application/queries/get-votes/get-votes.query';
 import { VoteStatus } from '@/modules/voting/domain/vote/vote.types';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
+import { TenantMembershipRole } from '@/shared/domain/membership';
 
 const MEMBER_VISIBLE_STATUSES: readonly VoteStatus[] = [
   VoteStatus.SCHEDULED,

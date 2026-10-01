@@ -3,8 +3,8 @@ import { AuditFormatterRegistry } from '@/modules/core/audit/application/service
 import { VisibilityPolicyService } from '@/modules/core/audit/application/services/visibility-policy.service';
 import type { AuditEventType } from '@/modules/core/audit/domain/audit-event-types';
 import { Visibility } from '@/modules/core/audit/domain/visibility';
-import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
 import { VotingEventType } from '@/modules/voting/audit/voting-event-types';
+import { TenantMembershipRole } from '@/shared/domain/membership';
 
 import { VotingAuditFormatter } from './voting-audit-formatter';
 

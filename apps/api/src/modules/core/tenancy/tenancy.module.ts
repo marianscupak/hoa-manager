@@ -1,4 +1,4 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
 import { AuditModule } from '@/modules/core/audit/audit.module';
@@ -49,12 +49,7 @@ const QueryHandlers = [
 ];
 
 @Module({
-  imports: [
-    CqrsModule,
-    IdentityModule,
-    forwardRef(() => AuditModule),
-    AuditProjectionsModule,
-  ],
+  imports: [CqrsModule, IdentityModule, AuditModule, AuditProjectionsModule],
   controllers: [TenancyController, MemberController, PeopleController],
   providers: [
     { provide: TENANT_REPOSITORY, useClass: DrizzleTenantRepository },

@@ -1,9 +1,9 @@
 import type { AuditEventReadRepository } from '@/modules/core/audit/application/ports/audit-event-read.repository.port';
 import { VisibilityPolicyService } from '@/modules/core/audit/application/services/visibility-policy.service';
 import { Visibility } from '@/modules/core/audit/domain/visibility';
-import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
 import { VoteNotFoundException } from '@/shared/application/exceptions/vote.exceptions';
 import type { Clock } from '@/shared/application/ports/clock.port';
+import { TenantMembershipRole } from '@/shared/domain/membership';
 
 import { VoteAuditExporterService } from './vote-audit-exporter.service';
 

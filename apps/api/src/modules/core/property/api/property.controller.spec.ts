@@ -1,10 +1,10 @@
 import 'reflect-metadata';
 
+import { ROLES_KEY } from '@/shared/api/guards/roles.guard';
 import {
   TenantMembershipRole,
   TenantMembershipStatus,
-} from '@/modules/core/tenancy/domain/tenant.entity';
-import { ROLES_KEY } from '@/shared/api/guards/roles.guard';
+} from '@/shared/domain/membership';
 import type { TenantContext } from '@/shared/domain/tenant-context';
 
 import { PropertyController } from './property.controller';

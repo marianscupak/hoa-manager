@@ -1,6 +1,6 @@
-import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
 import { type VoteListItemResponseDto } from '@/modules/voting/api/dto/vote.dto';
 import { type VoteReadRepository } from '@/modules/voting/application/ports/vote-read.repository.port';
+import { TenantMembershipRole } from '@/shared/domain/membership';
 
 import { GetVotesHandler } from './get-votes.handler';
 import { GetVotesQuery } from './get-votes.query';

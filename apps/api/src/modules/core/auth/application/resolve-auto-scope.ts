@@ -1,7 +1,5 @@
-import {
-  TenantMembership,
-  TenantMembershipStatus,
-} from '@/modules/core/tenancy/domain/tenant.entity';
+import { TenantMembership } from '@/modules/core/tenancy/domain/tenant.entity';
+import { TenantMembershipStatus } from '@/shared/domain/membership';
 
 /**
  * The single association a token may be scoped to without the user choosing.

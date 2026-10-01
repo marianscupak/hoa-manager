@@ -4,7 +4,7 @@ import { defineAuditEvent } from '@/modules/core/audit/application/registry/defi
 import type { AuditActor } from '@/modules/core/audit/domain/actor';
 import { Visibility } from '@/modules/core/audit/domain/visibility';
 import { CoreEventType } from '@/modules/core/audit-projections/core-event-types';
-import { TenantMembershipStatus } from '@/modules/core/tenancy/domain/tenant.entity';
+import { TenantMembershipStatus } from '@/shared/domain/membership';
 
 const PayloadSchema = z.object({
   userId: z.uuid(),

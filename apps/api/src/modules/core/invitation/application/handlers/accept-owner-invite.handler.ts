@@ -22,10 +22,6 @@ import { CreateMembershipCommand } from '@/modules/core/tenancy/application/comm
 import { UpdateMembershipStatusCommand } from '@/modules/core/tenancy/application/commands/update-membership-status.command';
 import { GetMembershipByTenantAndUserQuery } from '@/modules/core/tenancy/application/queries/get-membership-by-tenant-and-user.query';
 import {
-  TenantMembershipRole,
-  TenantMembershipStatus,
-} from '@/modules/core/tenancy/domain/tenant.entity';
-import {
   InviteNotFoundException,
   InviteExpiredException,
   InviteAlreadyAcceptedException,
@@ -40,6 +36,10 @@ import {
 } from '@/shared/application/ports/unit-of-work.port';
 import { normalizeEmail } from '@/shared/application/utils/normalize-email';
 import { hashToken } from '@/shared/application/utils/token.utils';
+import {
+  TenantMembershipRole,
+  TenantMembershipStatus,
+} from '@/shared/domain/membership';
 
 export interface AcceptOwnerInviteResult {
   tenantId: string;

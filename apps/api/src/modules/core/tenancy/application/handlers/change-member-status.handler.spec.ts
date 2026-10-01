@@ -2,7 +2,7 @@ import { ChangeMemberStatusCommand } from '@/modules/core/tenancy/application/co
 import {
   TenantMembershipRole,
   TenantMembershipStatus,
-} from '@/modules/core/tenancy/domain/tenant.entity';
+} from '@/shared/domain/membership';
 import { DomainException } from '@/shared/errors/domain.exception';
 import { ErrorCode } from '@/shared/errors/error-codes';
 

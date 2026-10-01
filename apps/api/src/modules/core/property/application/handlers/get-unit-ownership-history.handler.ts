@@ -18,10 +18,10 @@ import {
   groupIntoPeriods,
   type OwnershipPeriodStatus,
 } from '@/modules/core/property/domain/ownership-periods';
-import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
 import { UnitNotFoundException } from '@/shared/application/exceptions/property.exceptions';
 import { NotAUnitOwnerException } from '@/shared/application/exceptions/vote.exceptions';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
+import { TenantMembershipRole } from '@/shared/domain/membership';
 
 export interface UnitOwnershipHistoryPeriod {
   validFrom: Date;

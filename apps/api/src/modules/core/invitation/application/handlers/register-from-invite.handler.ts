@@ -29,10 +29,6 @@ import { SetOwnerUserIdCommand } from '@/modules/core/property/application/comma
 import { GetOwnerByIdQuery } from '@/modules/core/property/application/queries/get-owner-by-id.query';
 import { CreateMembershipCommand } from '@/modules/core/tenancy/application/commands/create-membership.command';
 import {
-  TenantMembershipRole,
-  TenantMembershipStatus,
-} from '@/modules/core/tenancy/domain/tenant.entity';
-import {
   InviteNotFoundException,
   InviteExpiredException,
   InviteAlreadyAcceptedException,
@@ -45,6 +41,10 @@ import {
   type UnitOfWork,
 } from '@/shared/application/ports/unit-of-work.port';
 import { hashToken } from '@/shared/application/utils/token.utils';
+import {
+  TenantMembershipRole,
+  TenantMembershipStatus,
+} from '@/shared/domain/membership';
 
 export interface RegisterFromInviteResult {
   accessToken: string;

@@ -2,7 +2,7 @@ import type { AuditEventReadRecord } from '@/modules/core/audit/application/port
 import { AuditFormatterRegistry } from '@/modules/core/audit/application/services/audit-formatter-registry';
 import type { AuditEventType } from '@/modules/core/audit/domain/audit-event-types';
 import { Visibility } from '@/modules/core/audit/domain/visibility';
-import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
+import { TenantMembershipRole } from '@/shared/domain/membership';
 
 import { CoreAuditFormatter } from './core-audit-formatter';
 import { CoreEventType } from './core-event-types';

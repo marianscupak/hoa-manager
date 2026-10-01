@@ -10,12 +10,12 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 import { PersonResponseDto } from '@/modules/core/tenancy/api/dto/person-response.dto';
 import { ListPeopleQuery } from '@/modules/core/tenancy/application/queries/list-people.query';
-import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
 import { Tenant } from '@/shared/api/decorators/auth.decorators';
 import { ApiErrorResponses } from '@/shared/api/decorators/error.decorators';
 import { AccessTokenAuthGuard } from '@/shared/api/guards/access-token-auth.guard';
 import { RolesGuard } from '@/shared/api/guards/roles.guard';
 import { TenantContextGuard } from '@/shared/api/guards/tenant-context.guard';
+import { TenantMembershipRole } from '@/shared/domain/membership';
 import type { TenantContext } from '@/shared/domain/tenant-context';
 
 /**

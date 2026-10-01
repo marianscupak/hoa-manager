@@ -1,8 +1,8 @@
 import {
   Tenant,
   TenantMembership,
-  TenantMembershipStatus,
 } from '@/modules/core/tenancy/domain/tenant.entity';
+import { TenantMembershipStatus } from '@/shared/domain/membership';
 
 export interface TenantRepository {
   findById(id: string): Promise<Tenant | null>;

@@ -1,4 +1,4 @@
-import { TenantMembershipRole } from '@/modules/core/tenancy/domain/tenant.entity';
+import { TenantMembershipRole } from '@/shared/domain/membership';
 
 import { GetTenantActivityHandler } from './get-tenant-activity.handler';
 import { GetTenantActivityQuery } from './get-tenant-activity.query';

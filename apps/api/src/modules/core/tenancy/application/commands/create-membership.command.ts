@@ -1,7 +1,7 @@
 import {
   TenantMembershipRole,
   TenantMembershipStatus,
-} from '@/modules/core/tenancy/domain/tenant.entity';
+} from '@/shared/domain/membership';
 
 export class CreateMembershipCommand {
   constructor(

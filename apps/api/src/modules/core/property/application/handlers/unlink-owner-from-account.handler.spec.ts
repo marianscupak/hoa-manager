@@ -1,10 +1,10 @@
 import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
 import { AuditService } from '@/modules/core/audit/application/services/audit.service';
-import type { AuditActor } from '@/modules/core/audit/domain/actor';
 import { CoreAuditLabelResolver } from '@/modules/core/audit-projections/core-audit-label-resolver.service';
 import { type OwnerRepository } from '@/modules/core/property/application/ports/property.repository.port';
 import { type Clock } from '@/shared/application/ports/clock.port';
 import { type UnitOfWork } from '@/shared/application/ports/unit-of-work.port';
+import type { AuditActor } from '@/shared/domain/actor';
 
 import { UnlinkOwnerFromAccountHandler } from './unlink-owner-from-account.handler';
 import { UnlinkOwnerFromAccountCommand } from '../commands/unlink-owner-from-account.command';

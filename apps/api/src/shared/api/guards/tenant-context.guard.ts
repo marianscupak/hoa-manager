@@ -1,20 +1,27 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { QueryBus } from '@nestjs/cqrs';
+import {
+  CanActivate,
+  ExecutionContext,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import type { Request } from 'express';
 import { ClsService } from 'nestjs-cls';
 
-import type { AuditActor } from '@/modules/core/audit/domain/actor';
-import { AUDIT_CLS_KEYS } from '@/modules/core/audit/infrastructure/cls/audit-context.keys';
-import { GetMembershipByTenantAndUserQuery } from '@/modules/core/tenancy/application/queries/get-membership-by-tenant-and-user.query';
-import { TenantMembership } from '@/modules/core/tenancy/domain/tenant.entity';
+import { ACTOR_CLS_KEY } from '@/shared/application/actor-context';
 import { UnauthorizedException } from '@/shared/application/exceptions/auth.exceptions';
+import {
+  MEMBERSHIP_ACCESS_LOOKUP,
+  type MembershipAccessLookup,
+} from '@/shared/application/ports/membership-access.port';
+import type { AuditActor } from '@/shared/domain/actor';
 import { AuthClaims } from '@/shared/domain/auth-claims';
 import { TenantContext } from '@/shared/domain/tenant-context';
 
 @Injectable()
 export class TenantContextGuard implements CanActivate {
   constructor(
-    private readonly queryBus: QueryBus,
+    @Inject(MEMBERSHIP_ACCESS_LOOKUP)
+    private readonly memberships: MembershipAccessLookup,
     private readonly cls: ClsService,
   ) {}
 
@@ -34,10 +41,10 @@ export class TenantContextGuard implements CanActivate {
       throw new UnauthorizedException();
     }
 
-    const membership = await this.queryBus.execute<
-      GetMembershipByTenantAndUserQuery,
-      TenantMembership | null
-    >(new GetMembershipByTenantAndUserQuery(claims.tid, claims.sub));
+    const membership = await this.memberships.findMembership(
+      claims.tid,
+      claims.sub,
+    );
 
     if (!membership || membership.status !== 'ACTIVE') {
       throw new UnauthorizedException();
@@ -53,9 +60,9 @@ export class TenantContextGuard implements CanActivate {
     request.tenant = tenantContext;
     request.authClaims!.roles = [membership.role];
 
-    const existing = this.cls.get<AuditActor | undefined>(AUDIT_CLS_KEYS.actor);
+    const existing = this.cls.get<AuditActor | undefined>(ACTOR_CLS_KEY);
     if (existing && existing.type === 'USER') {
-      this.cls.set(AUDIT_CLS_KEYS.actor, {
+      this.cls.set(ACTOR_CLS_KEY, {
         type: 'USER',
         userId: existing.userId,
         membershipId: membership.id,

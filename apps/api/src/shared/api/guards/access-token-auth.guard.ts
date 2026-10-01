@@ -4,17 +4,18 @@ import {
   Injectable,
   Inject,
 } from '@nestjs/common';
-import { QueryBus } from '@nestjs/cqrs';
 import type { Request } from 'express';
 import { ClsService } from 'nestjs-cls';
 
-import { AUDIT_CLS_KEYS } from '@/modules/core/audit/infrastructure/cls/audit-context.keys';
-import { type GetUserByIdResult } from '@/modules/core/identity/application/handlers/get-user-by-id.handler';
-import { GetUserByIdQuery } from '@/modules/core/identity/application/queries/get-user-by-id.query';
+import { ACTOR_CLS_KEY } from '@/shared/application/actor-context';
 import { InvalidTokenException } from '@/shared/application/exceptions/auth.exceptions';
 import { UserInactiveException } from '@/shared/application/exceptions/user.exceptions';
 import type { TokenVerifier } from '@/shared/application/ports/token.port';
 import { TOKEN_VERIFIER } from '@/shared/application/ports/token.port';
+import {
+  USER_ACCESS_LOOKUP,
+  type UserAccessLookup,
+} from '@/shared/application/ports/user-access.port';
 import { AuthClaims } from '@/shared/domain/auth-claims';
 import { AuthPrincipal } from '@/shared/domain/auth-principal';
 
@@ -22,7 +23,8 @@ import { AuthPrincipal } from '@/shared/domain/auth-principal';
 export class AccessTokenAuthGuard implements CanActivate {
   constructor(
     @Inject(TOKEN_VERIFIER) private readonly tokenVerifier: TokenVerifier,
-    private readonly queryBus: QueryBus,
+    @Inject(USER_ACCESS_LOOKUP)
+    private readonly userAccess: UserAccessLookup,
     private readonly cls: ClsService,
   ) {}
 
@@ -41,12 +43,12 @@ export class AccessTokenAuthGuard implements CanActivate {
     try {
       const payload = await this.tokenVerifier.verifyToken<AuthClaims>(token);
 
-      const user = await this.queryBus.execute<
-        GetUserByIdQuery,
-        GetUserByIdResult
-      >(new GetUserByIdQuery(payload.sub));
+      const user = await this.userAccess.findUserAccess(payload.sub);
 
-      if (!user || !user.isActive) {
+      if (!user) {
+        throw new InvalidTokenException();
+      }
+      if (!user.isActive) {
         throw new UserInactiveException();
       }
 
@@ -65,7 +67,7 @@ export class AccessTokenAuthGuard implements CanActivate {
       throw new InvalidTokenException();
     }
 
-    this.cls.set(AUDIT_CLS_KEYS.actor, {
+    this.cls.set(ACTOR_CLS_KEY, {
       type: 'USER',
       userId: request['user']!.userId,
       membershipId: null,

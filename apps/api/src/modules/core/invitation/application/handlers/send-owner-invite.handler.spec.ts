@@ -9,13 +9,13 @@ import type {
 } from '@/infrastructure/email/email-sender.port';
 import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
 import { AuditService } from '@/modules/core/audit/application/services/audit.service';
-import type { AuditActor } from '@/modules/core/audit/domain/actor';
 import { CoreAuditLabelResolver } from '@/modules/core/audit-projections/core-audit-label-resolver.service';
 import { SendOwnerInviteCommand } from '@/modules/core/invitation/application/commands/send-owner-invite.command';
 import { SendOwnerInviteHandler } from '@/modules/core/invitation/application/handlers/send-owner-invite.handler';
 import { type OwnerInviteRepository } from '@/modules/core/invitation/application/ports/owner-invite.repository.port';
 import { GetOwnerByIdQuery } from '@/modules/core/property/application/queries/get-owner-by-id.query';
 import { type Clock } from '@/shared/application/ports/clock.port';
+import type { AuditActor } from '@/shared/domain/actor';
 
 // Rendering is covered by @hoa-mngr/emails' own tests. Mocking it here keeps
 // this spec about orchestration and spares Jest the renderer's dynamic

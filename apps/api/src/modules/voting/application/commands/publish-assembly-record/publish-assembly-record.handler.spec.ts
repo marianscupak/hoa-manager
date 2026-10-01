@@ -1,6 +1,5 @@
 import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
 import { AuditService } from '@/modules/core/audit/application/services/audit.service';
-import type { AuditActor } from '@/modules/core/audit/domain/actor';
 import { type ElectorateService } from '@/modules/voting/application/ports/electorate-service.port';
 import { type ResultCalculationService } from '@/modules/voting/application/ports/result-calculation.service.port';
 import {
@@ -19,6 +18,7 @@ import {
 } from '@/modules/voting/domain/vote/vote.types';
 import { type Clock } from '@/shared/application/ports/clock.port';
 import { type UnitOfWork } from '@/shared/application/ports/unit-of-work.port';
+import type { AuditActor } from '@/shared/domain/actor';
 
 import { PublishAssemblyRecordCommand } from './publish-assembly-record.command';
 import { PublishAssemblyRecordHandler } from './publish-assembly-record.handler';

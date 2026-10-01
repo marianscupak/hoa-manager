@@ -9,7 +9,6 @@ import { ClsService } from 'nestjs-cls';
 
 import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
 import { AuditService } from '@/modules/core/audit/application/services/audit.service';
-import { AUDIT_CLS_KEYS } from '@/modules/core/audit/infrastructure/cls/audit-context.keys';
 import { CoreAuditLabelResolver } from '@/modules/core/audit-projections/core-audit-label-resolver.service';
 import { CreateAuthIdentityCommand } from '@/modules/core/auth/application/commands/create-auth-identity.command';
 import { CreateSessionCommand } from '@/modules/core/auth/application/commands/create-session.command';
@@ -28,6 +27,7 @@ import { OwnerInviteAcceptedAuditEvent } from '@/modules/core/invitation/audit/e
 import { SetOwnerUserIdCommand } from '@/modules/core/property/application/commands/set-owner-user-id.command';
 import { GetOwnerByIdQuery } from '@/modules/core/property/application/queries/get-owner-by-id.query';
 import { CreateMembershipCommand } from '@/modules/core/tenancy/application/commands/create-membership.command';
+import { ACTOR_CLS_KEY } from '@/shared/application/actor-context';
 import {
   InviteNotFoundException,
   InviteExpiredException,
@@ -121,7 +121,7 @@ export class RegisterFromInviteHandler
 
       // Establish audit actor for the rest of this request. The new user IS the
       // actor of the downstream owner-link / membership-create / invite-accept events.
-      this.cls.set(AUDIT_CLS_KEYS.actor, {
+      this.cls.set(ACTOR_CLS_KEY, {
         type: 'USER',
         userId,
         membershipId: null,

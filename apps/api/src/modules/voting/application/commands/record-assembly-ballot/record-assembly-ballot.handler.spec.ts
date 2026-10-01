@@ -1,6 +1,5 @@
 import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
 import { AuditService } from '@/modules/core/audit/application/services/audit.service';
-import type { AuditActor } from '@/modules/core/audit/domain/actor';
 import {
   type AttendanceRow,
   type VoteAttendanceRepository,
@@ -14,6 +13,7 @@ import { VotingAuditLabelResolver } from '@/modules/voting/audit/label-resolver.
 import { VoteMode, VoteStatus } from '@/modules/voting/domain/vote/vote.types';
 import { type Clock } from '@/shared/application/ports/clock.port';
 import { type UnitOfWork } from '@/shared/application/ports/unit-of-work.port';
+import type { AuditActor } from '@/shared/domain/actor';
 
 import { RecordAssemblyBallotCommand } from './record-assembly-ballot.command';
 import { RecordAssemblyBallotHandler } from './record-assembly-ballot.handler';

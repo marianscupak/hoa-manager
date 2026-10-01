@@ -1,7 +1,6 @@
 import { z } from 'zod';
 
 import { defineAuditEvent } from '@/modules/core/audit/application/registry/define-audit-event';
-import type { AuditActor } from '@/modules/core/audit/domain/actor';
 import { Visibility } from '@/modules/core/audit/domain/visibility';
 import {
   MajorityDenominatorBasis,
@@ -11,6 +10,7 @@ import {
   type VoteRuleset,
   VoteWeightBasis,
 } from '@/modules/voting/domain/vote/vote.types';
+import type { AuditActor } from '@/shared/domain/actor';
 
 import { VotingEventType } from '../voting-event-types';
 

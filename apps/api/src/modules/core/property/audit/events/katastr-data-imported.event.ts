@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 import { defineAuditEvent } from '@/modules/core/audit/application/registry/define-audit-event';
-import type { AuditActor } from '@/modules/core/audit/domain/actor';
 import { Visibility } from '@/modules/core/audit/domain/visibility';
 import { CoreEventType } from '@/modules/core/audit-projections/core-event-types';
+import type { AuditActor } from '@/shared/domain/actor';
 
 /**
  * The only warning codes the differ/parser can ever produce (see

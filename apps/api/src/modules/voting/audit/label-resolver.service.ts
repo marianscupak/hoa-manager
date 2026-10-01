@@ -9,7 +9,7 @@ import { units } from '@/infrastructure/db/schema/core/units';
 import { users } from '@/infrastructure/db/schema/core/users';
 import { voteQuestions } from '@/infrastructure/db/schema/voting/vote-questions';
 import { votes } from '@/infrastructure/db/schema/voting/votes';
-import type { AuditActor } from '@/modules/core/audit/domain/actor';
+import type { AuditActor } from '@/shared/domain/actor';
 
 @Injectable()
 export class VotingAuditLabelResolver {

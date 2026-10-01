@@ -1,9 +1,9 @@
 import type { z } from 'zod';
 
-import type { AuditActor } from '@/modules/core/audit/domain/actor';
 import type { AuditEvent } from '@/modules/core/audit/domain/audit-event';
 import type { AuditEventType } from '@/modules/core/audit/domain/audit-event-types';
 import type { Visibility } from '@/modules/core/audit/domain/visibility';
+import type { AuditActor } from '@/shared/domain/actor';
 
 import type { AuditEventDescriptor } from './audit-event.registry';
 

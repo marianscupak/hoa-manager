@@ -1,15 +1,13 @@
 import type { ClsService } from 'nestjs-cls';
 
-import type { AuditActor } from '@/modules/core/audit/domain/actor';
-import { AUDIT_CLS_KEYS } from '@/modules/core/audit/infrastructure/cls/audit-context.keys';
+import { ACTOR_CLS_KEY } from '@/shared/application/actor-context';
+import type { AuditActor } from '@/shared/domain/actor';
 
 import { AuditContextService } from './audit-context.service';
 
 function makeClsStub(actor: AuditActor | undefined): ClsService {
   return {
-    get: jest.fn((key: string) =>
-      key === AUDIT_CLS_KEYS.actor ? actor : undefined,
-    ),
+    get: jest.fn((key: string) => (key === ACTOR_CLS_KEY ? actor : undefined)),
   } as unknown as ClsService;
 }
 

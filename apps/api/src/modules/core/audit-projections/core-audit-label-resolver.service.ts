@@ -7,7 +7,7 @@ import { owners } from '@/infrastructure/db/schema/core/owners';
 import { tenants } from '@/infrastructure/db/schema/core/tenants';
 import { units } from '@/infrastructure/db/schema/core/units';
 import { users } from '@/infrastructure/db/schema/core/users';
-import type { AuditActor } from '@/modules/core/audit/domain/actor';
+import type { AuditActor } from '@/shared/domain/actor';
 
 @Injectable()
 export class CoreAuditLabelResolver {

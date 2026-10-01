@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ClsService } from 'nestjs-cls';
 
-import { AUDIT_CLS_KEYS } from './audit-context.keys';
+import { ACTOR_CLS_KEY } from '@/shared/application/actor-context';
 
 @Injectable()
 export class SystemActorRunner {
@@ -9,7 +9,7 @@ export class SystemActorRunner {
 
   async run<T>(reason: string, work: () => Promise<T>): Promise<T> {
     return this.cls.run(async () => {
-      this.cls.set(AUDIT_CLS_KEYS.actor, { type: 'SYSTEM', reason });
+      this.cls.set(ACTOR_CLS_KEY, { type: 'SYSTEM', reason });
       return work();
     });
   }

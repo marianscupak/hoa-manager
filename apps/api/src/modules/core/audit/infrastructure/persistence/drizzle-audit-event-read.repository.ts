@@ -10,9 +10,9 @@ import type {
   FindByAggregateParams,
   FindRecentParams,
 } from '@/modules/core/audit/application/ports/audit-event-read.repository.port';
-import type { AuditActor } from '@/modules/core/audit/domain/actor';
 import type { AuditEventType } from '@/modules/core/audit/domain/audit-event-types';
 import type { Visibility } from '@/modules/core/audit/domain/visibility';
+import type { AuditActor } from '@/shared/domain/actor';
 
 import { RESERVED_PAYLOAD_KEY } from './audit-payload.constants';
 

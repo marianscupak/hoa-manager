@@ -1,4 +1,5 @@
-import type { AuditActor } from './actor';
+import type { AuditActor } from '@/shared/domain/actor';
+
 import type { AuditEventType } from './audit-event-types';
 import type { Visibility } from './visibility';
 

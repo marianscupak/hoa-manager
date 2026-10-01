@@ -11,9 +11,11 @@ import { InfrastructureModule } from '@/infrastructure/infrastructure.module';
 import { AuditModule } from '@/modules/core/audit/audit.module';
 import { AuditProjectionsModule } from '@/modules/core/audit-projections/audit-projections.module';
 import { AuthModule } from '@/modules/core/auth/auth.module';
+import { IdentityPortsModule } from '@/modules/core/identity/identity-ports.module';
 import { IdentityModule } from '@/modules/core/identity/identity.module';
 import { InvitationModule } from '@/modules/core/invitation/invitation.module';
 import { PropertyModule } from '@/modules/core/property/property.module';
+import { TenancyPortsModule } from '@/modules/core/tenancy/tenancy-ports.module';
 import { TenancyModule } from '@/modules/core/tenancy/tenancy.module';
 import { VotingPortsModule } from '@/modules/voting/voting-ports.module';
 import { VotingModule } from '@/modules/voting/voting.module';
@@ -41,6 +43,8 @@ import { DomainExceptionFilter } from '@/shared/filters/domain-exception.filter'
     AuditModule,
     AuditProjectionsModule,
     VotingModule,
+    IdentityPortsModule,
+    TenancyPortsModule,
     VotingPortsModule,
   ],
   controllers: [],

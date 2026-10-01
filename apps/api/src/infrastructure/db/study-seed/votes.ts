@@ -3,7 +3,6 @@ import { and, eq } from 'drizzle-orm';
 import { ClsService } from 'nestjs-cls';
 
 import * as schema from '@/infrastructure/db/schema';
-import { AUDIT_CLS_KEYS } from '@/modules/core/audit/infrastructure/cls/audit-context.keys';
 import { CloseVoteCommand } from '@/modules/voting/application/commands/close-vote/close-vote.command';
 import {
   CreateVoteCommand,
@@ -23,6 +22,7 @@ import {
   VoteWeightBasis,
 } from '@/modules/voting/domain/vote/vote.types';
 import { channelMembershipIdSql } from '@/modules/voting/infrastructure/persistence/electorate-channel.sql';
+import { ACTOR_CLS_KEY } from '@/shared/application/actor-context';
 import {
   VoteNotOpenException,
   VoteNotScheduledException,
@@ -48,7 +48,7 @@ export function runAsUser<T>(
   work: () => Promise<T>,
 ): Promise<T> {
   return cls.run(async () => {
-    cls.set(AUDIT_CLS_KEYS.actor, {
+    cls.set(ACTOR_CLS_KEY, {
       type: 'USER',
       userId: actor.userId,
       membershipId: actor.membershipId,

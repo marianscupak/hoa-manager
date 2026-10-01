@@ -6,9 +6,10 @@ import {
   type AuditEventWriteRepository,
 } from '@/modules/core/audit/application/ports/audit-event-write.repository.port';
 import { AuditEventRegistry } from '@/modules/core/audit/application/registry/audit-event.registry';
-import type { AuditActor } from '@/modules/core/audit/domain/actor';
 import type { AuditEvent } from '@/modules/core/audit/domain/audit-event';
 import { AUDIT_CLS_KEYS } from '@/modules/core/audit/infrastructure/cls/audit-context.keys';
+import { ACTOR_CLS_KEY } from '@/shared/application/actor-context';
+import type { AuditActor } from '@/shared/domain/actor';
 
 @Injectable()
 export class AuditService {
@@ -40,7 +41,7 @@ export class AuditService {
     }
     descriptor.payloadSchema.parse(event.payload);
 
-    const clsActor = this.cls.get<AuditActor | undefined>(AUDIT_CLS_KEYS.actor);
+    const clsActor = this.cls.get<AuditActor | undefined>(ACTOR_CLS_KEY);
     if (!clsActor) {
       throw new Error(
         'No audit actor in CLS — wrap scheduler calls in SystemActorRunner or run inside a request',

@@ -1,6 +1,5 @@
 import { AuditContextService } from '@/modules/core/audit/application/services/audit-context.service';
 import { AuditService } from '@/modules/core/audit/application/services/audit.service';
-import type { AuditActor } from '@/modules/core/audit/domain/actor';
 import { type DocumentStoragePort } from '@/modules/voting/application/ports/document-storage.port';
 import {
   type VoteDocumentRecord,
@@ -12,6 +11,7 @@ import { type VoteAggregate } from '@/modules/voting/domain/vote/vote.aggregate'
 import { VoteStatus } from '@/modules/voting/domain/vote/vote.types';
 import { type Clock } from '@/shared/application/ports/clock.port';
 import { type UnitOfWork } from '@/shared/application/ports/unit-of-work.port';
+import type { AuditActor } from '@/shared/domain/actor';
 
 import { DeleteVoteCommand } from './delete-vote.command';
 import { DeleteVoteHandler } from './delete-vote.handler';

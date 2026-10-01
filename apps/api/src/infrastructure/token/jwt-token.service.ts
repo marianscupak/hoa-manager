@@ -5,7 +5,7 @@ import {
   TokenSigner,
   TokenVerifier,
   VerifyTokenOptions,
-} from '@/modules/core/auth/application/ports/auth.utils.port';
+} from '@/shared/application/ports/token.port';
 
 @Injectable()
 export class JwtTokenService implements TokenSigner, TokenVerifier {

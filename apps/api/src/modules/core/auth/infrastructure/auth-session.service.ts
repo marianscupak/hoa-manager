@@ -5,11 +5,11 @@ import {
   AUTH_SESSION_REPOSITORY,
   type AuthSessionRepository,
 } from '@/modules/core/auth/application/ports/auth.repository.port';
+import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
 import {
   TOKEN_SIGNER,
   type TokenSigner,
-} from '@/modules/core/auth/application/ports/auth.utils.port';
-import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
+} from '@/shared/application/ports/token.port';
 import {
   generateToken,
   hashToken,

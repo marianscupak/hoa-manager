@@ -4,6 +4,8 @@ import { ScheduleModule } from '@nestjs/schedule';
 
 import { ConfigModule } from '@/infrastructure/config/config.module';
 import { AuditModule } from '@/modules/core/audit/audit.module';
+import { IdentityModule } from '@/modules/core/identity/identity.module';
+import { TenancyModule } from '@/modules/core/tenancy/tenancy.module';
 import { DeleteAssemblyBallotHandler } from '@/modules/voting/application/commands/delete-assembly-ballot/delete-assembly-ballot.handler';
 import { PublishAssemblyRecordHandler } from '@/modules/voting/application/commands/publish-assembly-record/publish-assembly-record.handler';
 import { RecordAssemblyBallotHandler } from '@/modules/voting/application/commands/record-assembly-ballot/record-assembly-ballot.handler';
@@ -13,12 +15,6 @@ import { GetAssemblyRecordHandler } from '@/modules/voting/application/queries/g
 import { DrizzleVoteAttendanceRepository } from '@/modules/voting/infrastructure/persistence/drizzle-vote-attendance.repository';
 
 import { VotesController } from './api/votes.controller';
-import { VotingAuditLabelResolver } from './audit/label-resolver.service';
-import { VotingAuditFormatter } from './audit/voting-audit-formatter';
-import { VotingAuditRegistration } from './audit/voting-audit.registration';
-import { AuthModule } from '../core/auth/auth.module';
-import { IdentityModule } from '../core/identity/identity.module';
-import { TenancyModule } from '../core/tenancy/tenancy.module';
 import { CloseVoteCommandHandler } from './application/commands/close-vote/close-vote.handler';
 import { ConfirmDocumentUploadHandler } from './application/commands/confirm-document-upload/confirm-document-upload.handler';
 import { CreateVoteHandler } from './application/commands/create-vote/create-vote.handler';
@@ -67,6 +63,9 @@ import { ResultCalculationDomainService } from './application/services/result-ca
 import { TenantLookup } from './audit/exporter/tenant.lookup';
 import { VoteAuditExporterService } from './audit/exporter/vote-audit-exporter.service';
 import { VoteElectorateSnapshotLookup } from './audit/exporter/vote-electorate-snapshot.lookup';
+import { VotingAuditLabelResolver } from './audit/label-resolver.service';
+import { VotingAuditFormatter } from './audit/voting-audit-formatter';
+import { VotingAuditRegistration } from './audit/voting-audit.registration';
 import { DrizzleElectorateDataRepository } from './infrastructure/persistence/drizzle-electorate-data.repository';
 import { DrizzleResultCalculationDataRepository } from './infrastructure/persistence/drizzle-result-calculation-data.repository';
 import { DrizzleVoteConsentWriteRepository } from './infrastructure/persistence/drizzle-vote-consent-write.repository';
@@ -158,7 +157,6 @@ const REPOSITORIES = [
     CqrsModule,
     ScheduleModule,
     IdentityModule,
-    AuthModule,
     TenancyModule,
     AuditModule,
     ConfigModule,

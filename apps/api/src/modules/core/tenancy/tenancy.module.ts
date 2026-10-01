@@ -3,7 +3,6 @@ import { CqrsModule } from '@nestjs/cqrs';
 
 import { AuditModule } from '@/modules/core/audit/audit.module';
 import { AuditProjectionsModule } from '@/modules/core/audit-projections/audit-projections.module';
-import { AuthModule } from '@/modules/core/auth/auth.module';
 import { IdentityModule } from '@/modules/core/identity/identity.module';
 import { MemberController } from '@/modules/core/tenancy/api/member.controller';
 import { PeopleController } from '@/modules/core/tenancy/api/people.controller';
@@ -53,7 +52,6 @@ const QueryHandlers = [
   imports: [
     CqrsModule,
     IdentityModule,
-    forwardRef(() => AuthModule),
     forwardRef(() => AuditModule),
     AuditProjectionsModule,
   ],

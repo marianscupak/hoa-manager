@@ -1,7 +1,6 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
-import { AuthModule } from '@/modules/core/auth/auth.module';
 import { IdentityController } from '@/modules/core/identity/api/identity.controller';
 import { CreateUserHandler } from '@/modules/core/identity/application/handlers/create-user.handler';
 import { GetUserByEmailHandler } from '@/modules/core/identity/application/handlers/get-user-by-email.handler';
@@ -21,7 +20,7 @@ const CommandHandlers = [
 const QueryHandlers = [GetUserByIdHandler, GetUserByEmailHandler];
 
 @Module({
-  imports: [CqrsModule, forwardRef(() => AuthModule)],
+  imports: [CqrsModule],
   controllers: [IdentityController],
   providers: [
     ...CommandHandlers,

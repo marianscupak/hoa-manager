@@ -718,6 +718,44 @@
         ]
       }
     },
+    "/api/audit/activity": {
+      "get": {
+        "operationId": "AuditController_getActivity",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "accept-language",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantActivityResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "audit"
+        ]
+      }
+    },
     "/api/auth/login": {
       "post": {
         "operationId": "AuthController_login",
@@ -1590,44 +1628,6 @@
         },
         "tags": [
           "Auth"
-        ]
-      }
-    },
-    "/api/audit/activity": {
-      "get": {
-        "operationId": "AuditController_getActivity",
-        "parameters": [
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "accept-language",
-            "required": true,
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TenantActivityResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "audit"
         ]
       }
     },
@@ -4886,6 +4886,49 @@
           "language"
         ]
       },
+      "TenantActivityEntryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "eventType": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "navigateTo": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "occurredAt",
+          "eventType",
+          "message",
+          "navigateTo"
+        ]
+      },
+      "TenantActivityResponseDto": {
+        "type": "object",
+        "properties": {
+          "entries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TenantActivityEntryDto"
+            }
+          }
+        },
+        "required": [
+          "entries"
+        ]
+      },
       "LoginDto": {
         "type": "object",
         "properties": {
@@ -5040,49 +5083,6 @@
         },
         "required": [
           "success"
-        ]
-      },
-      "TenantActivityEntryDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "occurredAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "eventType": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          },
-          "navigateTo": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "required": [
-          "id",
-          "occurredAt",
-          "eventType",
-          "message",
-          "navigateTo"
-        ]
-      },
-      "TenantActivityResponseDto": {
-        "type": "object",
-        "properties": {
-          "entries": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TenantActivityEntryDto"
-            }
-          }
-        },
-        "required": [
-          "entries"
         ]
       },
       "OwnerResponseDto": {

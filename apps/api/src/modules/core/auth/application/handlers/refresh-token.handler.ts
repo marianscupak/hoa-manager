@@ -12,12 +12,6 @@ import {
   AUTH_SESSION_REPOSITORY,
   type AuthSessionRepository,
 } from '@/modules/core/auth/application/ports/auth.repository.port';
-import {
-  TOKEN_SIGNER,
-  TOKEN_VERIFIER,
-  type TokenSigner,
-  type TokenVerifier,
-} from '@/modules/core/auth/application/ports/auth.utils.port';
 import { resolveAutoScope } from '@/modules/core/auth/application/resolve-auto-scope';
 import { AuthSession } from '@/modules/core/auth/domain/auth-identity.entity';
 import { type GetUserByIdResult } from '@/modules/core/identity/application/handlers/get-user-by-id.handler';
@@ -35,6 +29,12 @@ import {
 } from '@/shared/application/exceptions/auth.exceptions';
 import { UserInactiveException } from '@/shared/application/exceptions/user.exceptions';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
+import {
+  TOKEN_SIGNER,
+  TOKEN_VERIFIER,
+  type TokenSigner,
+  type TokenVerifier,
+} from '@/shared/application/ports/token.port';
 import {
   UNIT_OF_WORK,
   type UnitOfWork,

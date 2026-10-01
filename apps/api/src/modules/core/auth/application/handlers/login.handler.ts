@@ -16,9 +16,7 @@ import {
 } from '@/modules/core/auth/application/ports/auth.repository.port';
 import {
   PASSWORD_HASHER,
-  TOKEN_SIGNER,
   type PasswordHasher,
-  type TokenSigner,
 } from '@/modules/core/auth/application/ports/auth.utils.port';
 import { resolveAutoScope } from '@/modules/core/auth/application/resolve-auto-scope';
 import { GetUserByEmailQuery } from '@/modules/core/identity/application/queries/get-user-by-email.query';
@@ -30,6 +28,10 @@ import {
 } from '@/shared/application/exceptions/auth.exceptions';
 import { EmailNotVerifiedException } from '@/shared/application/exceptions/invite.exceptions';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
+import {
+  TOKEN_SIGNER,
+  type TokenSigner,
+} from '@/shared/application/ports/token.port';
 import {
   UNIT_OF_WORK,
   type UnitOfWork,

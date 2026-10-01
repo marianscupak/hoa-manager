@@ -42,7 +42,7 @@ const QueryHandlers = [
     IdentityModule,
     TenancyModule,
     forwardRef(() => PropertyModule),
-    forwardRef(() => AuthModule),
+    AuthModule,
     AuditModule,
     AuditProjectionsModule,
   ],

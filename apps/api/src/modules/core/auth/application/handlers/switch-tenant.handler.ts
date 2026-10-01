@@ -5,12 +5,6 @@ import {
   SwitchTenantCommand,
   type SwitchTenantResult,
 } from '@/modules/core/auth/application/commands/switch-tenant.command';
-import {
-  TOKEN_SIGNER,
-  TOKEN_VERIFIER,
-  type TokenSigner,
-  type TokenVerifier,
-} from '@/modules/core/auth/application/ports/auth.utils.port';
 import { type GetUserByIdResult } from '@/modules/core/identity/application/handlers/get-user-by-id.handler';
 import { GetUserByIdQuery } from '@/modules/core/identity/application/queries/get-user-by-id.query';
 import { GetMembershipByTenantAndUserQuery } from '@/modules/core/tenancy/application/queries/get-membership-by-tenant-and-user.query';
@@ -23,6 +17,12 @@ import {
   UnauthorizedException,
 } from '@/shared/application/exceptions/auth.exceptions';
 import { UserInactiveException } from '@/shared/application/exceptions/user.exceptions';
+import {
+  TOKEN_SIGNER,
+  TOKEN_VERIFIER,
+  type TokenSigner,
+  type TokenVerifier,
+} from '@/shared/application/ports/token.port';
 import { AuthClaims } from '@/shared/domain/auth-claims';
 
 @CommandHandler(SwitchTenantCommand)

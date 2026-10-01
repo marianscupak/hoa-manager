@@ -8,14 +8,14 @@ import {
   AUTH_EXCHANGE_CODE_REPOSITORY,
   type AuthExchangeCodeRepository,
 } from '@/modules/core/auth/application/ports/auth.repository.port';
-import {
-  TOKEN_SIGNER,
-  type TokenSigner,
-} from '@/modules/core/auth/application/ports/auth.utils.port';
 import { type GetUserByIdResult } from '@/modules/core/identity/application/handlers/get-user-by-id.handler';
 import { GetUserByIdQuery } from '@/modules/core/identity/application/queries/get-user-by-id.query';
 import { UnauthorizedException } from '@/shared/application/exceptions/auth.exceptions';
 import { CLOCK, type Clock } from '@/shared/application/ports/clock.port';
+import {
+  TOKEN_SIGNER,
+  type TokenSigner,
+} from '@/shared/application/ports/token.port';
 import {
   UNIT_OF_WORK,
   type UnitOfWork,

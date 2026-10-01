@@ -1,7 +1,6 @@
-import { Module, forwardRef } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
-import { JwtModule } from '@nestjs/jwt';
 
 import { EmailModule } from '@/infrastructure/email/email.module';
 import { AuthController } from '@/modules/core/auth/api/auth.controller';
@@ -26,11 +25,7 @@ import {
   AUTH_EXCHANGE_CODE_REPOSITORY,
   EMAIL_VERIFICATION_CODE_REPOSITORY,
 } from '@/modules/core/auth/application/ports/auth.repository.port';
-import {
-  PASSWORD_HASHER,
-  TOKEN_SIGNER,
-  TOKEN_VERIFIER,
-} from '@/modules/core/auth/application/ports/auth.utils.port';
+import { PASSWORD_HASHER } from '@/modules/core/auth/application/ports/auth.utils.port';
 import { GOOGLE_OIDC_SERVICE } from '@/modules/core/auth/application/ports/google-oidc.service.port';
 import { SessionCleanupService } from '@/modules/core/auth/application/services/session-cleanup.service';
 import { VerificationCodeService } from '@/modules/core/auth/application/services/verification-code.service';
@@ -40,7 +35,6 @@ import {
 } from '@/modules/core/auth/infrastructure/auth-session.service';
 import { BcryptPasswordHasher } from '@/modules/core/auth/infrastructure/bcrypt-password-hasher';
 import { GoogleOidcServiceImpl } from '@/modules/core/auth/infrastructure/google/google-oidc.service';
-import { JwtTokenService } from '@/modules/core/auth/infrastructure/jwt-token.service';
 import {
   DrizzleAuthIdentityRepository,
   DrizzleAuthSessionRepository,
@@ -48,26 +42,9 @@ import {
   DrizzleAuthExchangeCodeRepository,
   DrizzleEmailVerificationCodeRepository,
 } from '@/modules/core/auth/infrastructure/persistence/drizzle-auth.repository';
-import { IdentityModule } from '@/modules/core/identity/identity.module';
-import { TenancyModule } from '@/modules/core/tenancy/tenancy.module';
 
 @Module({
-  imports: [
-    CqrsModule,
-    forwardRef(() => TenancyModule),
-    IdentityModule,
-    EmailModule,
-    ConfigModule,
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.getOrThrow<string>('JWT_SECRET'),
-        signOptions: { algorithm: 'HS256' },
-        verifyOptions: { algorithms: ['HS256'] },
-      }),
-    }),
-  ],
+  imports: [CqrsModule, EmailModule, ConfigModule],
   controllers: [AuthController],
   providers: [
     {
@@ -93,8 +70,6 @@ import { TenancyModule } from '@/modules/core/tenancy/tenancy.module';
     SessionCleanupService,
     VerificationCodeService,
     { provide: PASSWORD_HASHER, useClass: BcryptPasswordHasher },
-    { provide: TOKEN_SIGNER, useClass: JwtTokenService },
-    { provide: TOKEN_VERIFIER, useClass: JwtTokenService },
     { provide: GOOGLE_OIDC_SERVICE, useClass: GoogleOidcServiceImpl },
     { provide: AUTH_SESSION_SERVICE, useClass: AuthSessionServiceImpl },
     LoginHandler,
@@ -112,6 +87,6 @@ import { TenancyModule } from '@/modules/core/tenancy/tenancy.module';
     CreateAuthIdentityHandler,
     CreateSessionHandler,
   ],
-  exports: [TOKEN_VERIFIER, TOKEN_SIGNER, PASSWORD_HASHER],
+  exports: [PASSWORD_HASHER],
 })
 export class AuthModule {}

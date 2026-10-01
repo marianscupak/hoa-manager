@@ -1,5 +1,6 @@
 {
   "extends": "@hoa-mngr/typescript-config/base.json",
+  "exclude": ["node_modules", "dist"],
   "compilerOptions": {
     "module": "nodenext",
     "moduleResolution": "nodenext",

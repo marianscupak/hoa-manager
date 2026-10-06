@@ -174,6 +174,36 @@ describe('buildImportPlan — idempotence', () => {
   });
 });
 
+describe('buildImportPlan — ownership change preview', () => {
+  it('names a current co-owner the file no longer mentions by display name', () => {
+    const doc = document();
+    const first = buildImportPlan(doc, empty(), EFFECTIVE, NOW);
+    const after = applyPlanToSnapshot(empty(), first);
+
+    // 132/15 is held 1/2 + 1/2 by Emil and Karel Wolf. Karel buys Emil out.
+    const unit = doc.units.find((u) => u.unitNo === '132/15')!;
+    const karel = unit.parties.find((p) =>
+      p.members.some((m) => m.displayName === 'Karel Wolf'),
+    )!;
+    const bought: KatastrDocument = {
+      ...doc,
+      units: doc.units.map((u) =>
+        u === unit
+          ? { ...u, parties: [{ ...karel, share: { num: 1n, den: 1n } }] }
+          : u,
+      ),
+    };
+
+    const plan = buildImportPlan(bought, after, EFFECTIVE, NOW);
+    const planned = plan.units.find((u) => u.unitNo === '132/15')!;
+
+    expect(planned.action).toBe('UPDATE');
+    expect(
+      planned.ownershipChange!.from.flatMap((p) => p.memberNames).sort(),
+    ).toEqual(['Emil Wolf', 'Karel Wolf']);
+  });
+});
+
 describe('buildImportPlan — field-level update rules', () => {
   const oneUnitDoc = (): KatastrDocument => {
     const doc = document();

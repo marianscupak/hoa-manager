@@ -84,6 +84,11 @@ export function buildImportPlan(
     owners.map((o) => [o.katastrPersonId, o.existingOwnerId]),
   );
   const ownerByPerson = new Map(owners.map((o) => [o.katastrPersonId, o]));
+  // Names for current members the file no longer mentions, e.g. a co-owner
+  // who sold their share; without them the preview would show a raw id.
+  const registerOwnerNames = new Map(
+    snapshot.owners.map((o) => [o.id, o.displayName]),
+  );
 
   const unitsById = new Map(
     snapshot.units
@@ -104,6 +109,7 @@ export function buildImportPlan(
       existing,
       ownerIdByPerson,
       ownerByPerson,
+      registerOwnerNames,
       now,
     );
     if (existing !== null) {
@@ -354,6 +360,7 @@ function planUnit(
   existing: RegisterUnit | null,
   ownerIdByPerson: Map<string, string | null>,
   ownerByPerson: Map<string, PlannedOwner>,
+  registerOwnerNames: Map<string, string>,
   now: Date,
 ): PlannedUnit {
   const parties: PlannedParty[] = unit.parties.map((party) => ({
@@ -431,7 +438,7 @@ function planUnit(
     partyType: p.partyType,
     share: `${p.shareNumerator}/${p.shareDenominator}`,
     memberNames: p.memberOwnerIds
-      .map((id) => nameById.get(id) ?? id)
+      .map((id) => nameById.get(id) ?? registerOwnerNames.get(id) ?? id)
       .sort(compareStrings),
   }));
 

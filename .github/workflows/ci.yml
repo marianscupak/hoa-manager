@@ -42,3 +42,18 @@ jobs:
 
             - name: Build
               run: pnpm build
+
+            - name: Check the generated API contract is up to date
+              env:
+                  DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+                  CORS_ORIGINS: http://localhost:5173
+                  JWT_SECRET: ci-placeholder-secret-at-least-32-characters
+                  FRONTEND_URL: http://localhost:5173
+              run: |
+                  pnpm --filter @hoa-mngr/api generate
+                  pnpm --filter @hoa-mngr/portal generate
+                  if [ -n "$(git status --porcelain -- apps/api/openapi-spec.json apps/portal/src/api/generated)" ]; then
+                      git status --short -- apps/api/openapi-spec.json apps/portal/src/api/generated
+                      echo "::error::The generated API contract is out of date. Run 'pnpm generate' and commit the result."
+                      exit 1
+                  fi

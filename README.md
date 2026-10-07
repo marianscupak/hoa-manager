@@ -63,6 +63,7 @@ A modular monolith. Each module (`tenancy`, `identity`, `auth`, `property`, `aud
 **Prerequisites:** Node 22, pnpm (the version pinned in `packageManager` in `package.json`), Docker.
 
 ```bash
+corepack enable                      # pnpm in the version pinned in package.json
 pnpm install
 cp .env.docker.example .env.docker   # set POSTGRES_PASSWORD
 docker compose up -d postgres

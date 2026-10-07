@@ -431,6 +431,7 @@ async function seed() {
     console.log(`Password: ${ownerPassword}\n`);
   } catch (error) {
     console.error('❌ Seeder failed:', error);
+    process.exitCode = 1;
   } finally {
     await pool.end();
   }

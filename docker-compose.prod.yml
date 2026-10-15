@@ -5,9 +5,12 @@ services:
     caddy:
         image: ghcr.io/marianscupak/hoa-manager-web:latest
         restart: unless-stopped
-        ports:
-            - "80:80"
-            - "443:443"
+        # Ports 80/443 belong to the shared edge router (marianscupak/vps-router),
+        # which forwards hoa.* here with PROXY protocol.
+        networks:
+            default:
+            edge:
+                aliases: [hoa-caddy]
         environment:
             - DOMAIN=${DOMAIN}
         volumes:
@@ -93,6 +96,10 @@ services:
         depends_on:
             - prometheus
             - loki
+
+networks:
+    edge:
+        external: true
 
 volumes:
     postgres_data:

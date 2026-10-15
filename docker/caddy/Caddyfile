@@ -1,3 +1,17 @@
+# Behind the shared edge router (marianscupak/vps-router): TLS still terminates
+# here, the router forwards raw TCP with PROXY protocol so client IPs survive —
+# the API's IP-keyed throttling and audit log depend on it.
+{
+    servers {
+        listener_wrappers {
+            proxy_protocol {
+                allow 172.16.0.0/12
+            }
+            tls
+        }
+    }
+}
+
 {$DOMAIN} {
     # Structured access logs → docker stdout → Promtail → Loki (traffic
     # panels in Grafana are built from these).
